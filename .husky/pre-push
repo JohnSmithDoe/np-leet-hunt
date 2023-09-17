@@ -1,7 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "Linting All Files to assure consistency to OpenForge standards..."
+echo "Linting All Files to assure consistency to np standards..."
 npx nx run-many --all --target=lint --fix
 
 echo "Verifying Project Builds..."

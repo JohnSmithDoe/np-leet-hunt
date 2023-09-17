@@ -1,5 +1,5 @@
 {
-    "npmScope": "company-name",
+    "npmScope": "np-afterwork",
     "affected": {
         "defaultBase": "develop"
     },
@@ -41,7 +41,7 @@
             }
         }
     },
-    "defaultProject": "example-app-angular",
+    "defaultProject": "np-leet-hunt",
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
     "targetDefaults": {
         "build": {
@@ -52,7 +52,7 @@
             "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
         },
         "test": {
-            "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.ts"]
+            "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.ts", "{workspaceRoot}/jest.preset.js"]
         },
         "e2e": {
             "inputs": ["default", "^production"]

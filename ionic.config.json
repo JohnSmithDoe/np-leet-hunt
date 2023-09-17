@@ -1,13 +1,13 @@
 {
-  "defaultProject": "example-app-angular",
+  "defaultProject": "np-leet-hunt",
   "projects": {
-    "example-app-angular": {
-      "name": "example-app-angular",
+    "np-leet-hunt": {
+      "name": "np-leet-hunt",
       "integrations": {
         "capacitor": {}
       },
       "type": "angular",
-      "root": "apps/example-app-angular"
+      "root": "apps/np-leet-hunt"
     }
   }
 }
