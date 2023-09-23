@@ -1,5 +1,7 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import * as Phaser from 'phaser';
+import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class PhaserService {
@@ -11,6 +13,8 @@ export class PhaserService {
     }
 
     actionsHistory: string[] = []; // * Since phaser is a singleton, let's store the history of actions here for all components.
+    #initialized = new BehaviorSubject(false);
+    initialized$ = this.#initialized.asObservable();
 
     /**
      * * When A user Logs out, destroy the active game.
@@ -31,7 +35,7 @@ export class PhaserService {
      * ! GameInstance must be the parent class to scenes.
      * ! Should only be called *when* we want it to load in memory.  I.e. during simulation.
      */
-    async init(parent: string | HTMLElement = 'np-phaser-main'): Promise<void> {
+    init(parent: string | HTMLElement = 'np-phaser-main') {
         console.warn('phaser init');
         /**
          * * Phaser by default runs at 60 FPS, and each frame that triggers change detection in Angular which causes
@@ -40,30 +44,42 @@ export class PhaserService {
          */
         this.#ngZone.runOutsideAngular(() => {
             if (!this.#game) {
-                // To scale game to always fit in parent container
-                // https://photonstorm.github.io/phaser3-docs/Phaser.Scale.ScaleManager.html
-                this.#game = new Phaser.Game({
-                    type: Phaser.AUTO,
-                    scale: {
-                        mode: Phaser.Scale.RESIZE,
-                        width: window.innerWidth,
-                        autoCenter: Phaser.Scale.CENTER_BOTH,
-                        height: window.innerHeight,
-                    },
-                    parent,
-                    scene: [],
-                    plugins: {
-                        global: [],
-                        scene: [],
-                    },
-                    fps: {
-                        forceSetTimeOut: true,
-                    },
-                    render: {
-                        transparent: false,
-                    },
-                });
+                this.createGame(parent);
+                this.#initialized.next(true);
             }
+        });
+        return this.initialized$;
+    }
+
+    private createGame(parent: string | HTMLElement) {
+        // To scale game to always fit in parent container
+        // https://photonstorm.github.io/phaser3-docs/Phaser.Scale.ScaleManager.html
+        this.#game = new Phaser.Game({
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.RESIZE,
+                width: window.innerWidth,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                height: window.innerHeight,
+            },
+            parent,
+            scene: [],
+            plugins: {
+                global: [
+                    {
+                        key: 'rexMouseWheelScroller',
+                        plugin: MouseWheelScrollerPlugin,
+                        start: true,
+                    },
+                ],
+                scene: [],
+            },
+            fps: {
+                forceSetTimeOut: true,
+            },
+            render: {
+                transparent: false,
+            },
         });
     }
 }

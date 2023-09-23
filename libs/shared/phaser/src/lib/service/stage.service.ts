@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { PhaserService, SpaceScene } from '@shared/phaser';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -15,15 +15,13 @@ export class StageService {
         this.#phaser.game.scene.add(sceneKey, new SpaceScene(this), true);
     }
 
-    async initStage(stageContainer: HTMLElement) {
+    initStage(stageContainer: HTMLElement) {
         console.log('init stage');
-        await this.#phaser.init(stageContainer);
-        this.#initialized.next(true);
+        return this.#phaser.init(stageContainer).pipe(tap(isReady => this.#initialized.next(isReady)));
     }
 
     destroyStage(): void {
         console.log('DESTROY GAME');
         this.#phaser.destroyActiveGame();
-        this.#initialized.next(false);
     }
 }

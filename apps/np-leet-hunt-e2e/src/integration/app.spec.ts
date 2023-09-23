@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('example-app-angular', () => {
+describe('np-leet-hunt', () => {
     beforeEach(() => cy.visit('/'));
 
     it('should display welcome message', () => {
@@ -8,6 +8,6 @@ describe('example-app-angular', () => {
         cy.login('my-email@something.com', 'myPassword');
 
         // Function helper example, see `../support/app.po.ts` file
-        getGreeting().contains('Welcome to example-app-angular!');
+        getGreeting().contains('Welcome to np-leet-hunt!');
     });
 });

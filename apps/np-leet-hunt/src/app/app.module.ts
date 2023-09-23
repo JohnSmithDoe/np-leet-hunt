@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { SharedComponentsModule } from '@shared/components';
 import { PhaserModule } from '@shared/phaser';
 
+import { StageComponent } from '../../../../libs/shared/components/src/lib/basics/stage/stage.component';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HomePageComponent } from './home/home.page';
@@ -21,7 +21,7 @@ import { ShopPageComponent } from './shop/shop.component';
         }),
         PhaserModule.forRoot(),
         AppRoutingModule,
-        SharedComponentsModule,
+        StageComponent,
     ],
     providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
     bootstrap: [AppComponent],
