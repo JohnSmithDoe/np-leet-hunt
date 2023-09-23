@@ -1,5 +1,5 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Simple workflow for deploying the build to the gh-pages
+name: Deploy build to gh pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -19,10 +19,9 @@ permissions:
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -33,11 +32,14 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Pages
         uses: actions/configure-pages@v3
+      - name: Install all dependencies
+        run: npm install
+      - name: Build
+        run: npm run build # The build command of your project
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          # Upload entire repository
-          path: '.'
+          path: './dist/apps/np-leet-hunt'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
