@@ -1,27 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { StageService } from '@shared/phaser';
 /* eslint-disable no-magic-numbers */
+import { StageService } from '@shared/phaser';
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
+import { NPSpaceMap } from '../container/np-tileable-map';
+import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
-import TileSprite = Phaser.GameObjects.TileSprite;
+import { NPScene } from './np-scene';
 
-export class SpaceScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate, OnSceneInit {
-    private backgroundKey = 'background-image'; // * Store the background image name
-    private backgroundImageAsset = 'assets/tileablespace/tileable-classic-nebula-space-patterns-2.jpg'; // * Asset url relative to the app itself
+export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     iter = 0;
-    ts: TileSprite;
     private container: Phaser.GameObjects.Container;
     private controls: Phaser.Cameras.Controls.SmoothedKeyControl;
+    private rocket: NPMovableSprite;
+    private zoomIn: Phaser.Input.Keyboard.Key;
+    private zoomOut: Phaser.Input.Keyboard.Key;
+    private map: NPSpaceMap;
+    private stars: Phaser.GameObjects.TileSprite;
 
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
     }
 
-    async init() {
-        this.scale.baseSize.setSize(1920, 1080);
+    async setupComponents() {
+        this.map = new NPSpaceMap(this);
+        this.addComponent(this.map);
+    }
 
+    init() {
+        super.init();
+        this.scale.baseSize.setSize(1920, 1080);
         const scroller = new MouseWheelScroller(this, {
             enable: true,
             speed: 0.1,
@@ -32,15 +40,26 @@ export class SpaceScene extends Phaser.Scene implements OnScenePreload, OnSceneC
         });
     }
 
-    async preload(): Promise<void> {
+    preload() {
+        console.log('Preloading Assets...');
+        super.preload();
+        console.log('Preloading Assets...');
         try {
             console.log('world.scene.ts', 'Preloading Assets...');
             // * Now load the background image
-            this.load.image(this.backgroundKey, this.backgroundImageAsset);
-            this.load.image('test', 'assets/resolutiontesthd.png');
+            this.load.image('rocket', 'assets/rocket.png');
             this.load.image('planet-1', 'assets/planets/planet01.png');
             this.load.image('planet-2', 'assets/planets/planet02.png');
             this.load.image('planet-3', 'assets/planets/planet03.png');
+
+            this.load.image('space-blue-planet', 'assets/example/blue-planet.png');
+            this.load.image('space-brown-planet', 'assets/example/brown-planet.png');
+            this.load.image('space-sun', 'assets/example/sun.png');
+            this.load.image('space-galaxy', 'assets/example/galaxy.png');
+            this.load.image('space-gas-giant', 'assets/example/gas-giant.png');
+            this.load.image('space-brown-planet', 'assets/example/brown-planet.png');
+            this.load.image('space-purple-planet', 'assets/example/purple-planet.png');
+            this.load.image('space-eyes', 'assets/example/eyes.png');
         } catch (e) {
             console.error('preloader.scene.ts', 'error preloading', e);
         }
@@ -49,58 +68,42 @@ export class SpaceScene extends Phaser.Scene implements OnScenePreload, OnSceneC
     /**
      * * Phaser will only call create after all assets in Preload have been loaded
      */
-    async create(): Promise<void> {
-        this.ts = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, this.backgroundKey).setName('tiley').setOrigin(0, 0);
+    create() {
+        console.log('73:create-');
+        console.log('75:create-');
+
+        this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
+        this.physics.enableUpdate();
+        //  World size is 8000 x 6000
+
+        // this.ts = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, this.map.backgroundKey).setName('tiley').setOrigin(0, 0);
         console.log('forge.scene.ts', 'Creating Assets...', this.scale.width, this.scale.height);
+        super.create();
         //  Our container
-        const container = this.add.container(0, 0).setName('conty');
-        const image = this.add.image(2000, 200, 'planet-1');
-        container.add(image);
-        const image2 = this.add.image(200, 2000, 'planet-2');
-        container.add(image2);
-        const image3 = this.add.image(200, 200, 'planet-3');
-        container.add(image3);
-        // container.add(this.ts);
-        // container.add(image2);
-        this.container = container;
-        this.input.on(
-            'pointerup',
-            () => {
-                // this.scene.stop();
-            },
-            this
-        );
+        this.rocket = new NPMovableSprite(this, 128, 128, 'rocket').setScale(0.5);
+        // this.add.existing(this.rocket);
+        this.map.addShip(this.rocket);
+        // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+        this.cameras.main.setZoom(0.9).startFollow(this.rocket);
+        console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
-        const cursors = this.input.keyboard.createCursorKeys();
-
-        this.cameras.resetAll().ignore(this.container);
-        this.cameras.main = this.cameras.add().ignore(this.ts);
-
-        const controlConfig = {
-            camera: this.cameras.main,
-            left: cursors.left,
-            right: cursors.right,
-            up: cursors.up,
-            down: cursors.down,
-            zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
-            zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
-            acceleration: 0.06,
-            drag: 0.0005,
-            maxSpeed: 1.0,
-        };
-        this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     }
 
     update(time: number, delta: number) {
-        this.controls.update(delta);
+        // this.map.update(time, delta);
+        this.rocket.update(delta);
         // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
         // this.ts.tilePositionY = Math.sin(-this.iter) * 400;
         this.iter += 0.01;
-        const value = -1 * this.iter * 100;
-        this.ts.tilePositionX = -1 * value;
-        if (this.controls.zoomIn.isDown || this.controls.zoomOut.isDown) {
-            this.resize();
-        }
+        // const value = -1 * this.iter * 100;
+        super.update(time, delta);
+        // this.stars.tilePositionX = -1 * value;
+        // if (this.zoomIn.isDown || this.zoomOut.isDown) {
+        //     this.resize();
+        // }
+        // const worldView = this.controls.camera.worldView;
+        // this.rocket.setPosition(worldView.centerX, worldView.centerY);
     }
 
     /**
@@ -112,7 +115,8 @@ export class SpaceScene extends Phaser.Scene implements OnScenePreload, OnSceneC
         console.log('resize');
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
-        this.ts.setTileScale(this.controls.camera.zoomX);
+        // this.stars.setSize(width, height);
+        //this.ts.setTileScale(this.controls.camera.zoomX);
         // const worldBounds = this.controls.camera.worldView;
         // console.log(worldBounds);
         // //this.ts.setTileScale();

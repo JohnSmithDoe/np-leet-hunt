@@ -1,6 +1,7 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import * as Phaser from 'phaser';
 import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
+import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
@@ -54,6 +55,19 @@ export class PhaserService {
     private createGame(parent: string | HTMLElement) {
         // To scale game to always fit in parent container
         // https://photonstorm.github.io/phaser3-docs/Phaser.Scale.ScaleManager.html
+        const globalPlugins = [
+            {
+                key: 'rexMouseWheelScroller',
+                plugin: MouseWheelScrollerPlugin,
+                start: true,
+            },
+            {
+                key: 'rexShip',
+                plugin: ShipPlugin,
+                start: true,
+            },
+        ];
+
         this.#game = new Phaser.Game({
             type: Phaser.AUTO,
             scale: {
@@ -65,13 +79,7 @@ export class PhaserService {
             parent,
             scene: [],
             plugins: {
-                global: [
-                    {
-                        key: 'rexMouseWheelScroller',
-                        plugin: MouseWheelScrollerPlugin,
-                        start: true,
-                    },
-                ],
+                global: [...globalPlugins],
                 scene: [],
             },
             fps: {
@@ -79,6 +87,10 @@ export class PhaserService {
             },
             render: {
                 transparent: false,
+            },
+            physics: {
+                default: 'arcade',
+                arcade: { debug: true },
             },
         });
     }
