@@ -1,20 +1,64 @@
 import * as Phaser from 'phaser';
 
 // eslint-disable-next-line import/no-cycle
+import { NPLayer } from './np-layer';
+// eslint-disable-next-line import/no-cycle
 import { NPSceneComponent } from './np-scene-component';
 
-export class NPScene extends Phaser.Scene {
-    #components: NPSceneComponent[] = [];
+export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
-    setupComponents?(): void;
+export abstract class NPScene extends Phaser.Scene {
+    #components: NPSceneComponent[] = [];
+    layers: Record<TNPLayerKeys, NPLayer> = {};
+    #debugOut: Phaser.GameObjects.Text;
+
+    abstract setupComponents(): void;
+
+    #initScene() {
+        this.cameras.resetAll();
+        this.cameras.remove(this.cameras.main);
+        this.createLayer('bg');
+        this.createLayer('np', true);
+        this.createLayer('fg');
+        this.createLayer('ui');
+        // DEBUG -> start
+        this.#debugOut = this.add.text(0, 0, '', {
+            backgroundColor: '#2f6c38',
+        });
+        // DEBUG <- end
+    }
+
+    debugOut(text: string | string[]) {
+        this.#debugOut.setText(text);
+    }
 
     addComponent(component: NPSceneComponent) {
         this.#components.push(component);
     }
 
+    getLayers(): NPLayer[] {
+        return Object.values(this.layers);
+    }
+
+    addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject) {
+        for (const layer of this.getLayers()) {
+            if (layer.key === name) {
+                layer.add(gameObject, true);
+            } else {
+                layer.camera?.ignore(gameObject); // ignore obj on every other layer
+            }
+        }
+    }
+
+    protected createLayer(name: TNPLayerKeys, makeMain = false) {
+        this.layers[name] = new NPLayer(this, name, makeMain);
+    }
+
     init() {
-        if (this.setupComponents) {
-            this.setupComponents();
+        this.#initScene();
+        this.setupComponents();
+        for (const layer of this.getLayers()) {
+            layer.init();
         }
         for (const component of this.#components) {
             if (component.init) {
@@ -32,6 +76,10 @@ export class NPScene extends Phaser.Scene {
     }
 
     create() {
+        for (const layer of this.getLayers()) {
+            this.add.existing(layer);
+        }
+
         for (const component of this.#components) {
             if (component.create) {
                 component.create();

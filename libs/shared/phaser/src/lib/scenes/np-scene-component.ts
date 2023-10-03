@@ -1,11 +1,13 @@
 // eslint-disable-next-line import/no-cycle
 import { NPScene } from './np-scene';
 
-export class NPSceneComponent {
-    protected constructor(protected scene: NPScene) {}
+export interface NPBaseComponent {
+    scene: NPScene;
 
     init?(): void;
+}
 
+export interface NPSceneComponent extends NPBaseComponent {
     preload?(): void;
 
     create?(): void;

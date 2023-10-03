@@ -2,62 +2,58 @@
 // eslint-disable-next-line max-classes-per-file
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../scenes/np-scene';
+import { NPScene, TNPLayerKeys } from '../scenes/np-scene';
 import { NPSceneComponent } from '../scenes/np-scene-component';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { TNPTextureKey } from '../types/np-phaser';
 
-export class NPTileableMap extends NPSceneComponent {
+export class NPTileableMap implements NPSceneComponent {
     iter = 0;
-    bgLayer: Phaser.GameObjects.Container;
-    mapLayer: Phaser.GameObjects.Container;
+    // bgLayer: Phaser.GameObjects.Container;
+    // mapLayer: Phaser.GameObjects.Container;
 
-    #bgTileSprites: {
+    #tileSprites: {
         key: TNPTextureKey;
         url: string;
-        reverse: boolean;
+        speed: number;
+        layer: TNPLayerKeys;
         sprite?: Phaser.GameObjects.TileSprite;
     }[] = [];
+    private ship: NPMovableSprite;
 
-    constructor(scene: NPScene) {
-        super(scene);
-    }
+    constructor(public scene: NPScene) {}
 
-    addBgTileSpriteLayer(textureKey: TNPTextureKey, url: string, reverse = false) {
-        this.#bgTileSprites.push({ key: textureKey, url, reverse });
+    addTileSpriteLayer(textureKey: TNPTextureKey, url: string, speed: number, layer: TNPLayerKeys) {
+        this.#tileSprites.push({ key: textureKey, url, speed, layer });
     }
 
     preload() {
-        for (const { key, url } of this.#bgTileSprites) {
+        for (const { key, url } of this.#tileSprites) {
             this.scene.load.image(key, url);
         }
         this.scene.load.image('test', 'assets/resolutiontesthd.png');
     }
 
     create() {
-        this.bgLayer = this.scene.add.container();
-        this.mapLayer = this.scene.add.container();
-        for (const bgTile of this.#bgTileSprites) {
-            bgTile.sprite = new Phaser.GameObjects.TileSprite(this.scene, 0, 0, this.scene.scale.width, this.scene.scale.height, bgTile.key).setOrigin(0);
-            this.bgLayer.add(bgTile.sprite);
+        for (const tileSprite of this.#tileSprites) {
+            tileSprite.sprite = new Phaser.GameObjects.TileSprite(this.scene, 0, 0, this.scene.scale.width, this.scene.scale.height, tileSprite.key).setOrigin(0);
+            this.scene.addToLayer(tileSprite.layer, tileSprite.sprite);
         }
-        this.scene.cameras.resetAll().ignore(this.mapLayer).ignore(this.scene.physics.world.debugGraphic).setName('bg');
-        this.scene.cameras.main = this.scene.cameras.add().ignore(this.bgLayer).setName('container');
-
-        const img = new Phaser.GameObjects.Image(this.scene, 0, 0, 'test').setScale(0.3);
-        this.mapLayer.add(img);
-
-        //this.scene.cameras.main = this.scene.cameras.add().ignore(this.tileSprite);
+        const img = new Phaser.GameObjects.Image(this.scene, 0, 0, 'test').setOrigin(0);
+        this.scene.addToLayer('np', img);
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
     update() {
         // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
         // this.ts.tilePositionY = Math.sin(-this.iter) * 400;
-        this.iter += 0.01;
-        const value = -1 * this.iter * 100;
-        for (const { sprite, reverse } of this.#bgTileSprites) {
-            sprite.tilePositionX = (reverse ? 1 : -1) * value;
+        const shipSpeed = 0.25;
+        for (const { sprite, speed } of this.#tileSprites) {
+            sprite.tilePositionX += speed;
+            if (this.ship) {
+                sprite.tilePositionX += this.ship.body.deltaX() * shipSpeed;
+                sprite.tilePositionY += this.ship.body.deltaY() * shipSpeed;
+            }
         }
         // if (this.zoomIn.isDown || this.zoomOut.isDown) {
         //     this.resize();
@@ -78,33 +74,22 @@ export class NPTileableMap extends NPSceneComponent {
      */
     resize(gameSize?: Phaser.Structs.Size): void {
         const { width, height } = gameSize || this.scene.scale;
-        console.log('resi', width, height);
-        for (const { sprite } of this.#bgTileSprites) {
+        for (const { sprite } of this.#tileSprites) {
             sprite.setSize(width, height);
         }
-        //this.physics.world.setBounds(0, 0, width, height);
         // this.tileSprite.setTileScale(this.controls.camera.zoomX);
-        // const worldBounds = this.controls.camera.worldView;
-        // console.log(worldBounds);
-        // //this.ts.setTileScale();
-        // this.ts.setPosition(worldBounds.x, worldBounds.y);
-        // this.ts.setSize(worldBounds.width, worldBounds.height);
-        // console.log(this.controls.camera);
     }
 
     public addShip(rocket: NPMovableSprite) {
-        this.scene.add.existing(rocket);
-        const camera = this.scene.cameras.getCamera('bg');
-        camera.ignore(rocket);
-        console.log(camera);
-        // this.scene.cameras.getCamera('container').ignore(rocket);
+        this.ship = rocket;
     }
 }
 
 export class NPSpaceMap extends NPTileableMap {
     init = () => {
-        this.addBgTileSpriteLayer('background-image', 'assets/tileablespace/tileable-classic-nebula-space-patterns-2.jpg');
-        this.addBgTileSpriteLayer('space-stars', 'assets/example/stars.png', true);
+        this.addTileSpriteLayer('background-image', 'assets/tileablespace/tileable-classic-nebula-space-patterns-2.jpg', -0.05, 'bg');
+        this.addTileSpriteLayer('space-stars', 'assets/example/stars.png', 1, 'bg');
+        this.addTileSpriteLayer('space-stars', 'assets/example/stars.png', 2, 'fg');
     };
 
     create = () => {
