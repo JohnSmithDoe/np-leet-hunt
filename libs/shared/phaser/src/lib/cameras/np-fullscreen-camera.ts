@@ -17,7 +17,6 @@ export class NPFullscreenCamera extends NPCamera {
     }
 
     resize(gameSize?: Phaser.Structs.Size): void {
-        console.log('resize fullscreen cam', this.scene.cameras, this.name);
         const { width, height } = gameSize || this.scene.scale.gameSize;
         this.setSize(width, height);
     }

@@ -2,32 +2,34 @@
 // eslint-disable-next-line max-classes-per-file
 import * as Phaser from 'phaser';
 
+import { Planet } from '../../../../model/src/lib/sprites/planet/planet';
 import { NPScene, TNPLayerKeys } from '../scenes/np-scene';
-import { NPSceneComponent } from '../scenes/np-scene-component';
+import { NPComponentContainer, NPSceneComponent } from '../scenes/np-scene-component';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { TNPTextureKey } from '../types/np-phaser';
 
-export class NPTileableMap implements NPSceneComponent {
+export class NPTileableMap extends NPComponentContainer implements NPSceneComponent {
     iter = 0;
     // bgLayer: Phaser.GameObjects.Container;
     // mapLayer: Phaser.GameObjects.Container;
 
-    #tileSprites: {
-        key: TNPTextureKey;
-        url: string;
+    #tileSprites: (Phaser.Types.Loader.FileTypes.ImageFileConfig & {
         speed: number;
         layer: TNPLayerKeys;
         sprite?: Phaser.GameObjects.TileSprite;
-    }[] = [];
+    })[] = [];
     private ship: NPMovableSprite;
 
-    constructor(public scene: NPScene) {}
+    constructor(scene: NPScene) {
+        super(scene);
+    }
 
     addTileSpriteLayer(textureKey: TNPTextureKey, url: string, speed: number, layer: TNPLayerKeys) {
         this.#tileSprites.push({ key: textureKey, url, speed, layer });
     }
 
     preload() {
+        super.preload();
         for (const { key, url } of this.#tileSprites) {
             this.scene.load.image(key, url);
         }
@@ -35,6 +37,7 @@ export class NPTileableMap implements NPSceneComponent {
     }
 
     create() {
+        super.create();
         for (const tileSprite of this.#tileSprites) {
             tileSprite.sprite = new Phaser.GameObjects.TileSprite(this.scene, 0, 0, this.scene.scale.width, this.scene.scale.height, tileSprite.key).setOrigin(0);
             this.scene.addToLayer(tileSprite.layer, tileSprite.sprite);
@@ -44,8 +47,8 @@ export class NPTileableMap implements NPSceneComponent {
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
-    update() {
-        // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
+    update(time: number, delta: number) {
+        super.update(time, delta); // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
         // this.ts.tilePositionY = Math.sin(-this.iter) * 400;
         const shipSpeed = 0.25;
         for (const { sprite, speed } of this.#tileSprites) {
@@ -90,9 +93,13 @@ export class NPSpaceMap extends NPTileableMap {
         this.addTileSpriteLayer('background-image', 'assets/tileablespace/tileable-classic-nebula-space-patterns-2.jpg', -0.05, 'bg');
         this.addTileSpriteLayer('space-stars', 'assets/example/stars.png', 1, 'bg');
         this.addTileSpriteLayer('space-stars', 'assets/example/stars.png', 2, 'fg');
+        console.log('add a planet');
+        this.addPlanet();
+        super.init();
     };
 
-    create = () => {
-        super.create();
-    };
+    private addPlanet() {
+        const planet = new Planet(this.scene, 'planetBlue');
+        this.addComponent(planet);
+    }
 }

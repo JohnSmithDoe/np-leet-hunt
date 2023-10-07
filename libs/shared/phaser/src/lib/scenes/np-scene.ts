@@ -3,11 +3,11 @@ import * as Phaser from 'phaser';
 // eslint-disable-next-line import/no-cycle
 import { NPLayer } from './np-layer';
 // eslint-disable-next-line import/no-cycle
-import { NPSceneComponent } from './np-scene-component';
+import { NPSceneComponent, NPSceneComponentContainer } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
-export abstract class NPScene extends Phaser.Scene {
+export abstract class NPScene extends Phaser.Scene implements NPSceneComponentContainer {
     #components: NPSceneComponent[] = [];
     layers: Record<TNPLayerKeys, NPLayer> = {};
     #debugOut: Phaser.GameObjects.Text;
@@ -21,15 +21,19 @@ export abstract class NPScene extends Phaser.Scene {
         this.createLayer('np', true);
         this.createLayer('fg');
         this.createLayer('ui');
+        this.createLayer('debug');
         // DEBUG -> start
-        this.#debugOut = this.add.text(0, 0, '', {
+
+        this.#debugOut = new Phaser.GameObjects.Text(this, 0, 0, '', {
             backgroundColor: '#2f6c38',
         });
+        this.addToLayer('debug', this.#debugOut);
         // DEBUG <- end
     }
 
     debugOut(text: string | string[]) {
         this.#debugOut.setText(text);
+        this.addToLayer('debug', this.#debugOut); // need to readd or it will be rendered by every camera...
     }
 
     addComponent(component: NPSceneComponent) {
@@ -50,7 +54,7 @@ export abstract class NPScene extends Phaser.Scene {
         }
     }
 
-    protected createLayer(name: TNPLayerKeys, makeMain = false) {
+    createLayer(name: TNPLayerKeys, makeMain = false) {
         this.layers[name] = new NPLayer(this, name, makeMain);
     }
 

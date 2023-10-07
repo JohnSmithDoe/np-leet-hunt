@@ -49,17 +49,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             console.log('world.scene.ts', 'Preloading Assets...');
             // * Now load the background image
             this.load.image('rocket', 'assets/rocket.png');
-            this.load.image('planet-1', 'assets/planets/planet01.png');
-            this.load.image('planet-2', 'assets/planets/planet02.png');
-            this.load.image('planet-3', 'assets/planets/planet03.png');
-
-            this.load.image('space-blue-planet', 'assets/example/blue-planet.png');
-            this.load.image('space-brown-planet', 'assets/example/brown-planet.png');
-            this.load.image('space-sun', 'assets/example/sun.png');
-            this.load.image('space-galaxy', 'assets/example/galaxy.png');
-            this.load.image('space-gas-giant', 'assets/example/gas-giant.png');
-            this.load.image('space-brown-planet', 'assets/example/brown-planet.png');
-            this.load.image('space-purple-planet', 'assets/example/purple-planet.png');
             this.load.image('space-eyes', 'assets/example/eyes.png');
         } catch (e) {
             console.error('preloader.scene.ts', 'error preloading', e);
