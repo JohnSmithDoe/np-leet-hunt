@@ -24,7 +24,7 @@
         },
         "@nrwl/angular:component": {
             "style": "scss"
-        },
+        }
     },
     "defaultProject": "np-leet-hunt",
     "$schema": "./node_modules/nx/schemas/nx-schema.json",

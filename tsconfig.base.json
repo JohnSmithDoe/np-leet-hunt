@@ -15,6 +15,7 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
+            "@np-afterwork/np-library": ["libs/np-library/src/index.ts"],
             "@shared/components": ["libs/shared/components/src/index.ts"],
             "@shared/model": ["libs/shared/model/src/index.ts"],
             "@shared/phaser": ["libs/shared/phaser/src/index.ts"]
