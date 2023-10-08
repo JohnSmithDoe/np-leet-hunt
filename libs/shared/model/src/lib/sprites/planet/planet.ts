@@ -20,25 +20,23 @@ export const IMAGES = {
     planetPurple: { key: 'planet-purple', url: 'assets/example/purple-planet.png' },
 };
 
-export class Planet implements NPSceneComponent {
+export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
-    #planet: Phaser.GameObjects.Sprite;
 
     constructor(public scene: NPScene, type: keyof typeof IMAGES) {
+        super(scene, 0, 0, '');
         this.#image = IMAGES[type];
     }
 
     preload(): void {
-        console.log(this.#image);
         this.scene.load.image(this.#image);
     }
 
     public create(): void {
-        this.#planet = new Phaser.GameObjects.Sprite(this.scene, 0, 0, this.#image.key);
-        console.log(this.#planet, this.#image);
-        this.scene.addToLayer('np', this.#planet);
+        this.setTexture(this.#image.key);
+        this.scene.addToLayer('np', this);
     }
     public update(): void {
-        this.#planet.angle += 0.01;
+        this.angle += 0.1;
     }
 }

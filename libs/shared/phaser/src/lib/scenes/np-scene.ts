@@ -3,21 +3,24 @@ import * as Phaser from 'phaser';
 // eslint-disable-next-line import/no-cycle
 import { NPLayer } from './np-layer';
 // eslint-disable-next-line import/no-cycle
-import { NPSceneComponent, NPSceneComponentContainer } from './np-scene-component';
+import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
 export abstract class NPScene extends Phaser.Scene implements NPSceneComponentContainer {
-    #components: NPSceneComponent[] = [];
-    layers: Record<TNPLayerKeys, NPLayer> = {};
+    #components = new NPSceneContainer<NPSceneComponent>(this);
+    #layers = new NPSceneContainer<NPLayer>(this);
     #debugOut: Phaser.GameObjects.Text;
+    x: Phaser.Structs.List<NPLayer> = new Phaser.Structs.List<NPLayer>(this);
 
     abstract setupComponents(): void;
 
     #initScene() {
+        const npLayer = new NPLayer(this, 'bg', false);
+        this.x.add(npLayer);
         this.cameras.resetAll();
         this.cameras.remove(this.cameras.main);
-        this.createLayer('bg');
+        // this.createLayer('bg');
         this.createLayer('np', true);
         this.createLayer('fg');
         this.createLayer('ui');
@@ -37,16 +40,12 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     }
 
     addComponent(component: NPSceneComponent) {
-        this.#components.push(component);
-    }
-
-    getLayers(): NPLayer[] {
-        return Object.values(this.layers);
+        this.#components.add(component);
     }
 
     addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject) {
-        for (const layer of this.getLayers()) {
-            if (layer.key === name) {
+        for (const layer of this.#layers.list) {
+            if (layer.name === name) {
                 layer.add(gameObject, true);
             } else {
                 layer.camera?.ignore(gameObject); // ignore obj on every other layer
@@ -55,48 +54,28 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     }
 
     createLayer(name: TNPLayerKeys, makeMain = false) {
-        this.layers[name] = new NPLayer(this, name, makeMain);
+        this.#layers.add(new NPLayer(this, name, makeMain));
     }
 
     init() {
         this.#initScene();
         this.setupComponents();
-        for (const layer of this.getLayers()) {
-            layer.init();
-        }
-        for (const component of this.#components) {
-            if (component.init) {
-                component.init();
-            }
-        }
+        this.#layers.init();
+        this.#components.init();
     }
 
     preload() {
-        for (const component of this.#components) {
-            if (component.preload) {
-                component.preload();
-            }
-        }
+        this.#components.preload();
+        this.#layers.preload();
     }
 
     create() {
-        for (const layer of this.getLayers()) {
-            this.add.existing(layer);
-        }
-
-        for (const component of this.#components) {
-            if (component.create) {
-                component.create();
-            }
-        }
+        this.#layers.create();
+        this.#components.create();
     }
 
     update(time: number, delta: number) {
         super.update(time, delta);
-        for (const component of this.#components) {
-            if (component.update) {
-                component.update(time, delta);
-            }
-        }
+        this.#components.update(time, delta);
     }
 }

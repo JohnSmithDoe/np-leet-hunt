@@ -4,11 +4,11 @@ import * as Phaser from 'phaser';
 
 import { Planet } from '../../../../model/src/lib/sprites/planet/planet';
 import { NPScene, TNPLayerKeys } from '../scenes/np-scene';
-import { NPComponentContainer, NPSceneComponent } from '../scenes/np-scene-component';
+import { NPSceneComponent, NPSceneContainer } from '../scenes/np-scene-component';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { TNPTextureKey } from '../types/np-phaser';
 
-export class NPTileableMap extends NPComponentContainer implements NPSceneComponent {
+export class NPTileableMap extends NPSceneContainer<NPSceneComponent> {
     iter = 0;
     // bgLayer: Phaser.GameObjects.Container;
     // mapLayer: Phaser.GameObjects.Container;
@@ -100,6 +100,6 @@ export class NPSpaceMap extends NPTileableMap {
 
     private addPlanet() {
         const planet = new Planet(this.scene, 'planetBlue');
-        this.addComponent(planet);
+        this.add(planet);
     }
 }

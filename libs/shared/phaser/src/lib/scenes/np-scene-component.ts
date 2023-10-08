@@ -16,44 +16,48 @@ export interface NPSceneComponent extends NPBaseComponent {
 }
 
 export interface NPSceneComponentContainer {
-    addComponent(component: NPSceneComponent): void;
+    init(): void;
+
+    preload(): void;
+
+    create(): void;
+
+    update(time: number, delta: number): void;
 }
 
-export class NPComponentContainer implements NPSceneComponentContainer, NPSceneComponent {
-    #components: NPSceneComponent[] = [];
-
-    constructor(public scene: NPScene) {}
-
-    public addComponent(component: NPSceneComponent) {
-        this.#components.push(component);
+export class NPSceneContainer<T extends NPSceneComponent> extends Phaser.Structs.List<T> implements NPSceneComponentContainer {
+    scene: NPScene;
+    constructor(scene: NPScene) {
+        super(scene); // hmm: parent what does this?
+        this.scene = scene;
     }
 
-    public init(): void {
-        for (const component of this.#components) {
+    init(): void {
+        for (const component of this.list) {
             if (component.init) {
                 component.init();
             }
         }
     }
 
-    public preload(): void {
-        for (const component of this.#components) {
+    preload(): void {
+        for (const component of this.list) {
             if (component.preload) {
                 component.preload();
             }
         }
     }
 
-    public create(): void {
-        for (const component of this.#components) {
+    create(): void {
+        for (const component of this.list) {
             if (component.create) {
                 component.create();
             }
         }
     }
 
-    public update(time: number, delta: number): void {
-        for (const component of this.#components) {
+    update(time: number, delta: number): void {
+        for (const component of this.list) {
             if (component.update) {
                 component.update(time, delta);
             }

@@ -7,19 +7,23 @@ import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 // eslint-disable-next-line import/no-cycle
 import { NPScene, TNPLayerKeys } from './np-scene';
 // eslint-disable-next-line import/no-cycle
-import { NPBaseComponent } from './np-scene-component';
+import { NPSceneComponent } from './np-scene-component';
 
-export class NPLayer extends Phaser.GameObjects.Layer implements NPBaseComponent {
+export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponent {
     camera?: NPCamera;
 
-    constructor(public scene: NPScene, public readonly key: TNPLayerKeys, makeMain: boolean) {
+    constructor(public scene: NPScene, public readonly name: TNPLayerKeys, makeMain: boolean) {
         super(scene, []);
-        this.camera = new NPFullscreenCamera(scene, makeMain).setName(key);
+        this.camera = new NPFullscreenCamera(scene, makeMain).setName(name + '-camera');
         this.camera.debug = makeMain;
     }
 
     init(): void {
-        console.log('init layer', this.key);
+        console.log('init layer', this.name);
         this.camera?.init();
+    }
+
+    create(): void {
+        this.scene.add.existing(this);
     }
 }
