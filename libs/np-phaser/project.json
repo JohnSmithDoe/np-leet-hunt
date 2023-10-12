@@ -1,0 +1,24 @@
+{
+    "name": "np-phaser",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/np-phaser/src",
+    "prefix": "np-afterwork",
+    "targets": {
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/libs/np-phaser"],
+            "options": {
+                "jestConfig": "libs/np-phaser/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "options": {
+                "lintFilePatterns": ["libs/np-phaser/src/**/*.ts", "libs/np-phaser/src/**/*.html"]
+            }
+        }
+    },
+    "tags": []
+}

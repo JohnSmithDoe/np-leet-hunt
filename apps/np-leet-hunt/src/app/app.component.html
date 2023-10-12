@@ -13,7 +13,6 @@
                     <ion-label> NAVIGATION</ion-label>
                 </ion-item-divider>
                 <ion-button [routerLink]="['/home']">Forge (Home)</ion-button>
-                <ion-button (click)="openShop()">Open Shop (Modal)</ion-button>
                 <ion-button [routerLink]="['/shop']">Open Shop (Page)</ion-button>
 
                 <!-- OPERATIONS -->
@@ -21,7 +20,6 @@
                     <ion-label> OPERATIONS</ion-label>
                 </ion-item-divider>
                 <ion-button (click)="createWarrior()">Create Warrior</ion-button>
-                <ion-button (click)="createEvent()">Create Random Event</ion-button>
 
                 <!-- WARRIORS -->
                 <ion-item-divider>
@@ -29,20 +27,6 @@
                 </ion-item-divider>
                 <ion-list>
                     <ion-item>
-                        <div *ngFor="let _warrior of warriors">
-                            <ion-card>
-                                <ion-item>
-                                    <ion-icon name="person" slot="start"></ion-icon>
-                                    <ion-label>{{_warrior.name}}</ion-label>
-                                </ion-item>
-                                <ion-card-content>
-                                    <ion-button (click)="doPushUps(_warrior)"> Do Pushups</ion-button>
-                                </ion-card-content>
-                            </ion-card>
-                        </div>
-                        <div *ngIf="warriors.length <=0">
-                            <p><i>None created yet, click "Create Warrior"!</i></p>
-                        </div>
                     </ion-item>
                 </ion-list>
 

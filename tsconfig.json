@@ -18,14 +18,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/phaser": [
-        "libs/shared/phaser/src/index.ts"
+      "@shared/np-phaser": [
+        "libs/np-phaser/src/index.ts"
       ],
-      "@shared/model": [
-        "libs/shared/model/src/index.ts"
-      ],
-      "@shared/components": [
-        "libs/shared/components/src/index.ts"
+      "@shared/np-library": [
+        "libs/np-library/src/index.ts"
       ]
     }
   },

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Component, inject, OnInit } from '@angular/core';
-import { NPBaseSubscriber } from '@shared/model';
-import { StageService } from '@shared/phaser';
+import { NPBaseSubscriber } from '@shared/np-library';
+import { StageService } from '@shared/np-phaser';
 import { filter } from 'rxjs';
 
 @Component({
