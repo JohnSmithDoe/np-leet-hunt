@@ -44,14 +44,14 @@ export class WorldScene extends Phaser.Scene implements OnScenePreload, OnSceneC
         // this.blackSmith.setScale(3);
 
         // * Now handle scrolling
-        this.cameras.main.setBackgroundColor('0xEBF0F3');
+        // this.cameras.main.setBackgroundColor('0xEBF0F3');
 
         // * Register our custom scroll manager
         this.scrollManager = new ScrollManager(this);
-        this.scrollManager.registerScrollingBackground(this.backgroundImage);
+        // this.scrollManager.registerScrollingBackground(this.backgroundImage);
         // * Set cameras to the correct position
         this.cameras.main.setZoom(0.25);
-        this.scrollManager.scrollToCenter();
+        // this.scrollManager.scrollToCenter();
 
         this.scale.on('resize', this.resize, this);
     }

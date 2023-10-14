@@ -26,6 +26,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponen
     constructor(public scene: NPScene, type: keyof typeof IMAGES) {
         super(scene, 0, 0, '');
         this.#image = IMAGES[type];
+        this.setName(type);
     }
 
     preload(): void {

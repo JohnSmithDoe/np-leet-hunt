@@ -20,7 +20,9 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         this.x.add(npLayer);
         this.cameras.resetAll();
         this.cameras.remove(this.cameras.main);
-        // this.createLayer('bg');
+        console.log('23:#initScene');
+
+        this.createLayer('bg');
         this.createLayer('np', true);
         this.createLayer('fg');
         this.createLayer('ui');
@@ -46,6 +48,8 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject) {
         for (const layer of this.#layers.list) {
             if (layer.name === name) {
+                if (name !== 'debug') console.log(`adding ${gameObject.name} to layer ${layer.name}`);
+
                 layer.add(gameObject, true);
             } else {
                 layer.camera?.ignore(gameObject); // ignore obj on every other layer
@@ -76,6 +80,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
 
     update(time: number, delta: number) {
         super.update(time, delta);
+        this.#layers.update(time, delta);
         this.#components.update(time, delta);
     }
 }

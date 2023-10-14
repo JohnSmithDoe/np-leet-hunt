@@ -8,6 +8,7 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image {
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
         super(scene, x, y, texture);
         this.shipBehaviour = new Ship(this, { wrap: false, maxSpeed: 500 });
+        this.setName('rocket');
         // this.setVisible(true);
         console.log(this);
         // const controlConfig = {

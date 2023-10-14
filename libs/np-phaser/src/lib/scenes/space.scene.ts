@@ -2,7 +2,7 @@
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
-import { NPSpaceMap } from '../container/np-tileable-map';
+import { NPSpaceMap } from '../container/np-space-map';
 // eslint-disable-next-line import/no-cycle
 import { StageService } from '../service/stage.service';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
@@ -45,15 +45,9 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     preload() {
         console.log('Preloading Assets...');
         super.preload();
-        console.log('Preloading Assets...');
-        try {
-            console.log('world.scene.ts', 'Preloading Assets...');
-            // * Now load the background image
-            this.load.image('rocket', 'assets/rocket.png');
-            this.load.image('space-eyes', 'assets/example/eyes.png');
-        } catch (e) {
-            console.error('preloader.scene.ts', 'error preloading', e);
-        }
+        // * Now load the background image
+        this.load.image('rocket', 'assets/rocket.png');
+        this.load.image('space-eyes', 'assets/example/eyes.png');
     }
 
     /**
@@ -73,7 +67,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // this.addToLayer('ui', text);
         this.rocket = new NPMovableSprite(this, 128, 128, 'rocket').setScale(0.5);
         // this.add.existing(this.rocket);
-        this.map.addShip(this.rocket);
+        // this.map.addShip(this.rocket);
         this.addToLayer('np', this.rocket);
         // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);

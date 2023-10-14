@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-cycle,max-classes-per-file
+import * as Phaser from 'phaser';
+
 // eslint-disable-next-line import/no-cycle
 import { NPScene } from './np-scene';
 
@@ -14,6 +17,9 @@ export interface NPSceneComponent extends NPBaseComponent {
 
     update?(time: number, delta: number): void;
 }
+export interface NPResizeableSceneComponent extends NPSceneComponent {
+    resize?(gameSize?: Phaser.Structs.Size): void;
+}
 
 export interface NPSceneComponentContainer {
     init(): void;
@@ -23,6 +29,10 @@ export interface NPSceneComponentContainer {
     create(): void;
 
     update(time: number, delta: number): void;
+}
+
+export interface NPSceneComponentResizeableContainer extends NPSceneComponentContainer {
+    resize(gameSize?: Phaser.Structs.Size): void;
 }
 
 export class NPSceneContainer<T extends NPSceneComponent> extends Phaser.Structs.List<T> implements NPSceneComponentContainer {
@@ -60,6 +70,21 @@ export class NPSceneContainer<T extends NPSceneComponent> extends Phaser.Structs
         for (const component of this.list) {
             if (component.update) {
                 component.update(time, delta);
+            }
+        }
+    }
+}
+
+export class NPResizeableSceneContainer<T extends NPResizeableSceneComponent> extends NPSceneContainer<T> implements NPSceneComponentResizeableContainer {
+    create(): void {
+        super.create();
+        this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
+    }
+
+    resize(gameSize?: Phaser.Structs.Size): void {
+        for (const component of this.list) {
+            if (component.resize) {
+                component.resize(gameSize);
             }
         }
     }

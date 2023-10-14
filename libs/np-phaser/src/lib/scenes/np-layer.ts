@@ -16,6 +16,7 @@ export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponen
         super(scene, []);
         this.camera = new NPFullscreenCamera(scene, makeMain).setName(name + '-camera');
         this.camera.debug = makeMain;
+        // this.camera.backgroundColor = Phaser.Display.Color.RandomRGB();
     }
 
     init(): void {
