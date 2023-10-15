@@ -6,6 +6,7 @@ import { NPSpaceMap } from '../container/np-space-map';
 // eslint-disable-next-line import/no-cycle
 import { StageService } from '../service/stage.service';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
+import { Pipe } from '../sprites/paradroid/pipe';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
 import { NPScene } from './np-scene';
@@ -27,6 +28,21 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     async setupComponents() {
         this.map = new NPSpaceMap(this);
         this.addComponent(this.map);
+        const pipe = new Pipe(this, 'top_right_left_tee');
+        const pipe1 = new Pipe(this, 'right_left_straight');
+        const pipe2 = new Pipe(this, 'right_bottom_left_tee');
+        const pipe3 = new Pipe(this, 'cross');
+        const pipe4 = new Pipe(this, 'left_endCap');
+        pipe.setPosition(500 + 120, 0);
+        pipe1.setPosition(500 + 120 + 120, 0);
+        pipe2.setPosition(500 + 120 + 120 + 120, 0);
+        pipe3.setPosition(500 + 120 + 120 + 120 + 120, 0);
+        pipe4.setPosition(500 + 120 + 120 + 120 + 120 + 120, 0);
+        this.addComponent(pipe);
+        this.addComponent(pipe1);
+        this.addComponent(pipe2);
+        this.addComponent(pipe3);
+        this.addComponent(pipe4);
     }
 
     init() {
