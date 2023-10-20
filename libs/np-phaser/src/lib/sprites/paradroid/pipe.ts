@@ -52,8 +52,6 @@ export class Pipe extends Phaser.GameObjects.Sprite implements NPSceneComponent 
 
     create(): void {
         this.setTexture(SHEET.key, this.#frame);
-        this.scene.addToLayer('np', this);
-
         let frame = 0;
         for (let i = 0; i < this.getFrameCount(); i++) {
             for (let j = 0; j < this.getFrameCount(); j++) {

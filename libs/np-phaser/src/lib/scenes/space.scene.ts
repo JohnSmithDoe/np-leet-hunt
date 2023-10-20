@@ -21,6 +21,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private map: NPSpaceMap;
     private stars: Phaser.GameObjects.TileSprite;
 
+    private pipes: Pipe[] = [];
+
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
     }
@@ -28,21 +30,14 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     async setupComponents() {
         this.map = new NPSpaceMap(this);
         this.addComponent(this.map);
-        const pipe = new Pipe(this, 'top_right_left_tee');
-        const pipe1 = new Pipe(this, 'right_left_straight');
-        const pipe2 = new Pipe(this, 'right_bottom_left_tee');
-        const pipe3 = new Pipe(this, 'cross');
-        const pipe4 = new Pipe(this, 'left_endCap');
-        pipe.setPosition(500 + 120, 0);
-        pipe1.setPosition(500 + 120 + 120, 0);
-        pipe2.setPosition(500 + 120 + 120 + 120, 0);
-        pipe3.setPosition(500 + 120 + 120 + 120 + 120, 0);
-        pipe4.setPosition(500 + 120 + 120 + 120 + 120 + 120, 0);
-        this.addComponent(pipe);
-        this.addComponent(pipe1);
-        this.addComponent(pipe2);
-        this.addComponent(pipe3);
-        this.addComponent(pipe4);
+        this.pipes = [
+            new Pipe(this, 'top_right_left_tee').setPosition(500 + 120, 0),
+            new Pipe(this, 'right_left_straight').setPosition(500 + 120 + 120, 0),
+            new Pipe(this, 'right_bottom_left_tee').setPosition(500 + 120 + 120 + 120, 0),
+            new Pipe(this, 'cross').setPosition(500 + 120 + 120 + 120 + 120, 0),
+            new Pipe(this, 'left_endCap').setPosition(500 + 120 + 120 + 120 + 120 + 120, 0),
+        ];
+        // this.addComponent(this.pipes);
     }
 
     init() {
@@ -71,7 +66,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      */
     create() {
         super.create();
-
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
         this.physics.enableUpdate();
         //  World size is 8000 x 6000
@@ -84,19 +78,87 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.rocket = new NPMovableSprite(this, 128, 128, 'rocket').setScale(0.5);
         // this.add.existing(this.rocket);
         // this.map.addShip(this.rocket);
+        // this.addToLayer('np', this.pipes);
         this.addToLayer('np', this.rocket);
         // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.cameras.main.startFollow(this.rocket);
         console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
+
+        this.createSpeechBubble(20, 20, 320, 160, '“Twin ceramic rotor drives on each wheel! And these look like computer controlled anti-lock brakes! Wow, 200 horses at 12,000 rpm!”');
+
+        this.createSpeechBubble(
+            370,
+            120,
+            400,
+            180,
+            "“Kaneda, you've always been a pain in the ass, you know. You've been telling me what to do since we were kids. You always treat me like a kid. You always show up and start bossing me around, and don't you deny it!”"
+        );
+
+        this.createSpeechBubble(70, 400, 250, 100, "“And now you're a boss, too... of this pile of rubble.”");
+    }
+
+    createSpeechBubble(x: number, y: number, width: number, height: number, quote: string) {
+        const bubbleWidth = width;
+        const bubbleHeight = height;
+        const bubblePadding = 10;
+        const arrowHeight = bubbleHeight / 4;
+
+        const bubble = new Phaser.GameObjects.Graphics(this, { x, y });
+
+        //  Bubble shadow
+        bubble.fillStyle(0x222222, 0.5);
+        bubble.fillRoundedRect(6, 6, bubbleWidth, bubbleHeight, 16);
+
+        //  Bubble color
+        bubble.fillStyle(0xffffff, 1);
+
+        //  Bubble outline line style
+        bubble.lineStyle(4, 0x565656, 1);
+
+        //  Bubble shape and outline
+        bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+        bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+
+        //  Calculate arrow coordinates
+        const point1X = Math.floor(bubbleWidth / 7);
+        const point1Y = bubbleHeight;
+        const point2X = Math.floor((bubbleWidth / 7) * 2);
+        const point2Y = bubbleHeight;
+        const point3X = Math.floor(bubbleWidth / 7);
+        const point3Y = Math.floor(bubbleHeight + arrowHeight);
+
+        //  Bubble arrow shadow
+        bubble.lineStyle(4, 0x222222, 0.5);
+        bubble.lineBetween(point2X - 1, point2Y + 6, point3X + 2, point3Y);
+
+        //  Bubble arrow fill
+        bubble.fillTriangle(point1X, point1Y, point2X, point2Y, point3X, point3Y);
+        bubble.lineStyle(2, 0x565656, 1);
+        bubble.lineBetween(point2X, point2Y, point3X, point3Y);
+        bubble.lineBetween(point1X, point1Y, point3X, point3Y);
+        const content = new Phaser.GameObjects.Text(this, 0, 0, quote, {
+            fontFamily: 'Arial',
+            fontSize: `20`,
+            color: '#000000',
+            align: 'center',
+            wordWrap: { width: bubbleWidth - bubblePadding * 2 },
+        });
+
+        const b = content.getBounds();
+
+        content.setPosition(bubble.x + bubbleWidth / 2 - b.width / 2, bubble.y + bubbleHeight / 2 - b.height / 2);
+        const container = new Phaser.GameObjects.Container(this, bubble.x, bubble.y);
+        container.add([bubble, content]);
+        this.addToLayer('np', container);
     }
 
     update(time: number, delta: number) {
         // this.map.update(time, delta);
         this.rocket.update(delta);
 
-        this.debugOut(['rocket', vectorToStr(this.rocket.getCenter())]);
+        this.debugOut(['rocket', vectorToStr(this.rocket.getCenter()), 'fps', `${this.game.loop.actualFps}`]);
         // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
         // this.ts.tilePositionY = Math.sin(-this.iter) * 400;
         this.iter += 0.01;

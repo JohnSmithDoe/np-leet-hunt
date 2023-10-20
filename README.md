@@ -1,12 +1,3 @@
-Paradigma 1: Input
----
-Alles muss mit Tastatur, Maus und Gamepad steuerbar sein!
-
-Paradigma 2: Speedrun / New Game+ / Nervige Zwischensequenzen
----
-Alles kann abgebrochen oder übersprungen werden!
-
-
 # Mobile Game Template - Ionic & Phaser Monorepo
 
 This is a template project for all you aspiring video game developers out there! Want to use your web application skills
