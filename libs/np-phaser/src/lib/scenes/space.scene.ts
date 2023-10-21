@@ -76,27 +76,17 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         //  Our container
 
         // this.addToLayer('ui', text);
-        this.rocket = new NPMovableSprite(this, 128, 128, 'rocket').setScale(0.5);
+        this.rocket = new NPMovableSprite(this, 5000, 5000, 'rocket').setScale(0.5);
         // this.add.existing(this.rocket);
         // this.map.addShip(this.rocket);
         // this.addToLayer('np', this.pipes);
         this.addToLayer('np', this.rocket);
         // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        this.cameras.main.startFollow(this.rocket);
+        this.cameras.main.startFollow(this.rocket).setZoom(1.05);
+
         console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
-
-        // this.createSpeechBubble(20, 20, 320, 160, '“Twin ceramic rotor drives on each wheel! And these look like computer controlled anti-lock brakes! Wow, 200 horses at 12,000 rpm!”');
-        //
-        // this.createSpeechBubble(
-        //     370,
-        //     120,
-        //     400,
-        //     180,
-        //     "“Kaneda, you've always been a pain in the ass, you know. You've been telling me what to do since we were kids. You always treat me like a kid. You always show up and start bossing me around, and don't you deny it!”"
-        // );
-
         const bubble = createSpeechBubble(this, 70, 400, 250, 100, "“And now you're a boss, too... of this pile of rubble.”");
         this.addToLayer('np', bubble);
     }

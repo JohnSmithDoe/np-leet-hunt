@@ -7,16 +7,22 @@ export const vectorToStr = (vector: Phaser.Math.Vector2) => `(${vector.x}, ${vec
 
 export const maxDistance = (width: number, height: number, k: number) => Math.sqrt((width * height) / k);
 
+export const getClosest = (target: Phaser.Geom.Point, list: Phaser.Geom.Point[]) =>
+    list
+        .map(p => ({ ...p, distance: Phaser.Math.Distance.BetweenPoints(target, p) }))
+        .sort((a, b) => a.distance - b.distance)
+        .filter((p, idx) => idx < 4 && idx > 0);
+
 // Poisson disk sampling in a 2D square
-export const poissonDiscSampler = (width: number, height: number, minRadius: number, maxRadius?: number) => {
-    const pds = new PoissonDiskSampling({
+export const poissonDiscSampler = (width: number, height: number, minRadius: number, maxRadius?: number) =>
+    new PoissonDiskSampling({
         shape: [width, height],
         minDistance: minRadius,
         maxDistance: maxRadius,
         tries: 10,
-    });
-    return pds.fill().map(p => new Phaser.Geom.Point(p[0], p[1]));
-};
+    })
+        .fill()
+        .map(p => new Phaser.Geom.Point(p[0], p[1]));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const distributePointsInRectangle = (n, w, h) => {

@@ -1,7 +1,9 @@
 import { StarmapFactory } from '../factories/starmap.factory';
 import { NPSceneComponent, NPSceneContainer } from '../scenes/np-scene-component';
+import { DashedLine } from '../sprites/dashed-line/dashed-line';
 import { Planet } from '../sprites/planet/planet';
 import { Space } from '../sprites/space/space';
+import { getClosest } from '../utilities/np-phaser-utils';
 
 export class NPSpaceMap extends NPSceneContainer<NPSceneComponent> {
     init = () => {
@@ -9,10 +11,16 @@ export class NPSpaceMap extends NPSceneContainer<NPSceneComponent> {
         // this.addTileSpriteLayer('space-stars', 'assets/example/stars.png', 2, 'fg');
         console.log('add a planet');
         this.addSpace();
-        const map = StarmapFactory.create({ planets: 12, width: 5000, height: 5000, minDistance: 750 });
+        const map = StarmapFactory.create({ planets: 12, width: 15000, height: 15000, minDistance: 1750 });
         this.scene.debugOut(`planets ${map.planets} points ${map.coords.planets.length}`);
         for (const coords of map.coords.planets) {
-            console.log(coords);
+            const closest = getClosest(coords, map.coords.planets);
+            for (const target of closest) {
+                const line = new DashedLine(this.scene, 'dashedLineRed', coords, target);
+                this.add(line);
+            }
+        }
+        for (const coords of map.coords.planets) {
             this.addPlanet(coords);
         }
         super.init();

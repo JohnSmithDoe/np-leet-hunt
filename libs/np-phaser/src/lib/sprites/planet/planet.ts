@@ -46,6 +46,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponen
 
     public create(): void {
         this.setTexture(this.#image.key);
+        this.setDisplaySize(512, 512);
         // const a = this.scene.anims.create({
         //     key: this.#image.key,
         //     frames: this.#image.key,
