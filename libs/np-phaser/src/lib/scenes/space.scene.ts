@@ -6,6 +6,7 @@ import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
 // eslint-disable-next-line import/no-cycle
 import { StageService } from '../service/stage.service';
+import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { Pipe } from '../sprites/paradroid/pipe';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
@@ -83,7 +84,18 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.addToLayer('np', this.rocket);
         // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        this.cameras.main.startFollow(this.rocket).setZoom(1.05);
+        this.cameras.main.startFollow(this.rocket).setZoom(0.035);
+        const zoomInTxtBtn = new TextButton(this, 500, 10, 'Zoom In');
+        zoomInTxtBtn.on('pointerup', () => {
+            this.cameras.main.setZoom(1);
+        });
+        this.addToLayer('ui', zoomInTxtBtn);
+
+        const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
+        zoomOutTxtBtn.on('pointerup', () => {
+            this.cameras.main.setZoom(0.05);
+        });
+        this.addToLayer('ui', zoomOutTxtBtn);
 
         console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
