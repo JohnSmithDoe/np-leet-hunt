@@ -3,7 +3,7 @@ import * as Phaser from 'phaser';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent } from '../../scenes/np-scene-component';
 
-const SHEET = { key: 'pipes', url: 'assets/paradroid.png' };
+const SHEET = { key: 'pipes', url: 'np-phaser/paradroid/assets/paradroid.png' };
 
 export const FRAMES = {
     bottom_endCap: 0,

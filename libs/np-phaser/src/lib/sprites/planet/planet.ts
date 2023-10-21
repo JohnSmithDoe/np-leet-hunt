@@ -1,13 +1,14 @@
+import { randomElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent } from '../../scenes/np-scene-component';
 
-const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
-    frameWidth: 256 * 2,
-    frameHeight: 256 * 2,
-};
-export const IMAGES = {
+// const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
+//     frameWidth: 256 * 2,
+//     frameHeight: 256 * 2,
+// };
+const IMAGES = {
     planet1: { key: 'planet-1', url: 'np-phaser/planet/assets/planet01.png' },
     planet2: { key: 'planet-2', url: 'np-phaser/planet/assets/planet02.png' },
     planet3: { key: 'planet-3', url: 'np-phaser/planet/assets/planet03.png' },
@@ -22,11 +23,16 @@ export const IMAGES = {
     planetGalaxy: { key: 'planet-galaxy', url: 'np-phaser/planet/assets/galaxy.png' },
     planetGasGiant: { key: 'planet-gas-giant', url: 'np-phaser/planet/assets/gas-giant.png' },
     planetPurple: { key: 'planet-purple', url: 'np-phaser/planet/assets/purple-planet.png' },
-    planetSheet: { key: 'planet-sheet', url: 'np-phaser/planet/assets/planet-sheet-1.png', frameConfig },
+    // planetSheet: { key: 'planet-sheet', url: 'np-phaser/planet/assets/planet-sheet-1.png', frameConfig },
 };
 
 export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
+
+    static getRandom() {
+        const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
+        return randomElement(types);
+    }
 
     constructor(public scene: NPScene, type: keyof typeof IMAGES) {
         super(scene, 0, 0, '');

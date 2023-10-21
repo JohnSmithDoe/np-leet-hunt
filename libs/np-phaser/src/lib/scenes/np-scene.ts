@@ -33,7 +33,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             backgroundColor: '#2f6c38',
         });
         this.addToLayer('debug', this.#debugOut);
-        this.#layers.getByName('np').camera.setZoom(0.1);
+        // this.#layers.getByName('np').camera.setZoom(0.1);
         // DEBUG <- end
     }
 
