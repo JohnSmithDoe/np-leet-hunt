@@ -87,27 +87,46 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.cameras.main.startFollow(this.rocket).setZoom(0.035);
         const zoomInTxtBtn = new TextButton(this, 500, 10, 'Zoom In');
         zoomInTxtBtn.on('pointerup', () => {
-            this.cameras.main.setZoom(1);
+            this.cameras.main.setZoom(this.cameras.main.zoom + 0.1);
         });
         this.addToLayer('ui', zoomInTxtBtn);
 
         const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
         zoomOutTxtBtn.on('pointerup', () => {
-            this.cameras.main.setZoom(0.05);
+            this.cameras.main.setZoom(this.cameras.main.zoom - 0.1);
         });
         this.addToLayer('ui', zoomOutTxtBtn);
 
         console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
-        const bubble = createSpeechBubble(this, 70, 400, 250, 100, "“And now you're a boss, too... of this pile of rubble.”");
+        const bubble = createSpeechBubble(
+            this,
+            70,
+            400,
+            250,
+            100,
+            "“And now you're a boss, too... of this pile of rubble.”"
+        );
         this.addToLayer('np', bubble);
     }
 
     update(time: number, delta: number) {
         // this.map.update(time, delta);
         this.rocket.update(delta);
-
-        this.debugOut(['rocket', vectorToStr(this.rocket.getCenter()), 'fps', `${this.game.loop.actualFps}`, 'planets', `${this.map.list.length}`]);
+        const debugMsg = [
+            'rocket',
+            vectorToStr(this.rocket.getCenter()),
+            'fps',
+            `${this.game.loop.actualFps}`,
+            'planets',
+            `${this.map.list.length}`,
+            'zoom',
+            `${this.cameras.main.zoom}`,
+            't',
+            `${Phaser.Math.Distance.BetweenPoints({ x: -100, y: -100 }, { x: 100, y: 100 })}`,
+            `${Phaser.Math.Distance.BetweenPoints({ x: 0, y: 0 }, { x: 200, y: 200 })}`,
+        ];
+        this.debugOut(debugMsg);
         // this.ts.tilePositionX = Math.cos(-this.iter) * 400;
         // this.ts.tilePositionY = Math.sin(-this.iter) * 400;
         this.iter += 0.01;

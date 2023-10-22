@@ -2,7 +2,19 @@ import * as Phaser from 'phaser';
 
 import { NPScene } from '../scenes/np-scene';
 
-export const createSpeechBubble = (scene: NPScene, x: number, y: number, width: number, height: number, quote: string) => {
+export const createRectangle = (scene: NPScene, geom: Phaser.Geom.Rectangle) =>
+    new Phaser.GameObjects.Graphics(scene)
+        .lineStyle(64, 0x00ff00, 1)
+        .strokeRect(0, 0, geom.width, geom.height)
+        .setPosition(geom.x, geom.y);
+export const createSpeechBubble = (
+    scene: NPScene,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    quote: string
+) => {
     const bubbleWidth = width;
     const bubbleHeight = height;
     const bubblePadding = 10;

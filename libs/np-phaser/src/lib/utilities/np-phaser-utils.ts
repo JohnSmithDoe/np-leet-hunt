@@ -7,19 +7,33 @@ export const vectorToStr = (vector: Phaser.Math.Vector2) => `(${vector.x}, ${vec
 
 export const maxDistance = (width: number, height: number, k: number) => Math.sqrt((width * height) / k);
 
-export const getClosest = (target: Phaser.Geom.Point, list: Phaser.Geom.Point[]) =>
-    list
+export const getClosest = (
+    target: Phaser.Types.Math.Vector2Like,
+    list: Phaser.Types.Math.Vector2Like[],
+    maxCount = 3
+) => {
+    console.log(list.map(p => ({ ...p, distance: Phaser.Math.Distance.BetweenPoints(target, p) })));
+
+    return list
         .map(p => ({ ...p, distance: Phaser.Math.Distance.BetweenPoints(target, p) }))
         .sort((a, b) => a.distance - b.distance)
-        .filter((p, idx) => idx < 4 && idx > 0);
+        .filter((p, idx) => idx < maxCount + 1 && idx > 0);
+};
 
 // Poisson disk sampling in a 2D square
-export const poissonDiscSampler = (width: number, height: number, minRadius: number, maxRadius?: number) =>
+export const poissonDiscSampler = (
+    width: number,
+    height: number,
+    minRadius: number,
+    maxRadius?: number,
+    distanceFunction?: (p: number[]) => number
+) =>
     new PoissonDiskSampling({
         shape: [width, height],
         minDistance: minRadius,
         maxDistance: maxRadius,
         tries: 10,
+        distanceFunction,
     })
         .fill()
         .map(p => new Phaser.Geom.Point(p[0], p[1]));
