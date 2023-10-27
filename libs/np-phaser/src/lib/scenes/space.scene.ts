@@ -4,6 +4,7 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
+import { ParadroidContainer } from '../paradroid/paradroid.container';
 // eslint-disable-next-line import/no-cycle
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
@@ -40,6 +41,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
         }
         this.addComponent(this.pipes);
+        const p = new ParadroidContainer();
+        console.log(p);
     }
 
     init() {
