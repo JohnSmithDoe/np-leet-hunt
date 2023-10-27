@@ -8,7 +8,8 @@ import { createSpeechBubble } from '../factories/graphics.factory';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { Pipe } from '../sprites/paradroid/pipe';
+import { Pipe, PIPE_DEFINITIONS } from '../sprites/paradroid/pipe';
+import { Reality } from '../sprites/reality/reality';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
 import { NPScene } from './np-scene';
@@ -32,14 +33,13 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     async setupComponents() {
         this.map = new NPSpaceMap(this);
         this.addComponent(this.map);
-        this.pipes = [
-            new Pipe(this, 'top_right_left_tee').setPosition(500 + 120, 0),
-            new Pipe(this, 'right_left_straight').setPosition(500 + 120 + 120, 0),
-            new Pipe(this, 'right_bottom_left_tee').setPosition(500 + 120 + 120 + 120, 0),
-            new Pipe(this, 'cross').setPosition(500 + 120 + 120 + 120 + 120, 0),
-            new Pipe(this, 'left_endCap').setPosition(500 + 120 + 120 + 120 + 120 + 120, 0),
-        ];
-        // this.addComponent(this.pipes);
+        this.addComponent(new Reality(this, 'reality1'));
+
+        for (let i = 0; i < Object.keys(PIPE_DEFINITIONS).length; i++) {
+            const def = Object.keys(PIPE_DEFINITIONS)[i] as keyof typeof PIPE_DEFINITIONS;
+            this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
+        }
+        this.addComponent(this.pipes);
     }
 
     init() {

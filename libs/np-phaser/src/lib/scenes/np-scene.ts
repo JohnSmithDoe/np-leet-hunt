@@ -37,8 +37,8 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         // DEBUG <- end
     }
 
-    debugOut(text: string | string[]) {
-        this.#debugOut.setText(text);
+    debugOut(text: string | string[] | number | number[]) {
+        this.#debugOut.setText(`${text}`);
         this.addToLayer('debug', this.#debugOut); // need to readd or it will be rendered by every camera...
     }
 
