@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 
-// eslint-disable-next-line import/no-cycle
 import { SpaceScene } from '../scenes/space.scene';
 import { PhaserService } from './phaser.service';
 

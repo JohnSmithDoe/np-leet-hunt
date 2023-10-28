@@ -1,4 +1,4 @@
-import { EParadroidSpecialFX } from './paradroid.types';
+import { EParadroidSpecialFX } from './paradroid.consts';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const defaultOptions = {

@@ -1,26 +1,15 @@
 import { EventEmitter } from '@angular/core';
 
 import { Utils } from '../sprites/paradroid/utils';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidButton } from './paradroid.button';
-// eslint-disable-next-line import/no-cycle
+import { CParadroidModes, EFlowbarFlow, EParadroidDifficulty } from './paradroid.consts';
 import { ParadroidEngine } from './paradroid.engine';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidShape } from './paradroid.shape';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidTile } from './paradroid.tile';
-import {
-    CParadroidModes,
-    CParadroidTileInfo,
-    EFlowbarFlow,
-    EParadroidDifficulty,
-    EParadroidPlayer,
-    EParadroidShapeAccess,
-    EParadroidTileType,
-    TParadroidTileInfo,
-} from './paradroid.types';
+import { CParadroidTileInfo, EParadroidAccess, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
+import { TParadroidPlayer, TParadroidTile } from './paradroid.types';
 
-export type TParadroidAccessGridCol = EParadroidShapeAccess[];
+export type TParadroidAccessGridCol = EParadroidAccess[];
 type TParadroidAccessGrid = TParadroidAccessGridCol[];
 
 type TParadroidTileCol = ParadroidTile[];
@@ -59,7 +48,7 @@ export class ParadroidTileGrid {
 
     constructor(
         public engine: ParadroidEngine,
-        public owner: EParadroidPlayer,
+        public owner: TParadroidPlayer,
         public difficulty: EParadroidDifficulty,
         public columns: number,
         public rows: number,
@@ -135,9 +124,9 @@ export class ParadroidTileGrid {
             const accessGridCol: TParadroidAccessGridCol = [];
             for (let k: number = 0, l: number = this.rows; k < l; k++) {
                 if (i === 0) {
-                    accessGridCol.push(EParadroidShapeAccess.hasPath);
+                    accessGridCol.push(EParadroidAccess.hasPath);
                 } else {
-                    accessGridCol.push(EParadroidShapeAccess.unset);
+                    accessGridCol.push(EParadroidAccess.unset);
                 }
             }
             this.accessGrid.push(accessGridCol);
@@ -178,7 +167,8 @@ export class ParadroidTileGrid {
         if (columTiles) {
             for (let i: number = 0, j: number = columTiles.length; i < j; i++) {
                 const tile: ParadroidTile = columTiles[i];
-                currentRow += tile.info.rows;
+                const rows = tile.info.incoming.bot ? 3 : tile.info.incoming.mid ? 2 : 1;
+                currentRow += rows;
                 if (currentRow > row) {
                     result = tile;
                     break;
@@ -233,13 +223,14 @@ export class ParadroidTileGrid {
     }
 
     private isFitting(type: EParadroidTileType, col: TParadroidAccessGridCol, row: number): boolean {
-        const info: TParadroidTileInfo = CParadroidTileInfo[type];
-        let result: boolean = row + info.rows <= this.rows;
+        const info = CParadroidTileInfo[type];
+        const rows = info.incoming.bot ? 3 : info.incoming.mid ? 2 : 1;
+        let result: boolean = row + rows <= this.rows;
         if (result) {
-            for (let i: number = 0, j: number = info.rows; i < j; i++) {
+            for (let i: number = 0, j: number = rows; i < j; i++) {
                 result =
                     result &&
-                    (col[row + i] === EParadroidShapeAccess.unset ||
+                    (col[row + i] === EParadroidAccess.unset ||
                         ParadroidTile.getAccessInfoByIndex(info, true, i) === col[row + i]); // + 1
             }
         }
@@ -275,7 +266,7 @@ export class ParadroidTileGrid {
         const aGrid: TParadroidAccessGrid = this.getAccessGrid();
         const randomTileType: EParadroidTileType = this.getRandomTileType(aTileTypeSet, aGrid[col], row);
         const pos = this.getTilePosition(col, row);
-        const info: TParadroidTileInfo = CParadroidTileInfo[randomTileType];
+        const info: TParadroidTile = CParadroidTileInfo[randomTileType];
         const result: ParadroidTile = new ParadroidTile(this, pos, randomTileType, info, col, row);
         result.fillColumn(aGrid[col], aGrid[col + 1], row);
         return result;
@@ -288,7 +279,8 @@ export class ParadroidTileGrid {
         currentrow = 0;
         while (currentrow < this.rows) {
             tile = this.generateTile(aTypeSet, col, currentrow);
-            currentrow += tile.info.rows;
+            const rows = tile.info.incoming.bot ? 3 : tile.info.incoming.mid ? 2 : 1;
+            currentrow += rows;
             result.push(tile);
         }
         return result;

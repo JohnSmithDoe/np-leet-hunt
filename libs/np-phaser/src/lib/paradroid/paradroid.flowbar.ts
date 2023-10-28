@@ -1,7 +1,6 @@
 import { Utils } from '../sprites/paradroid/utils';
-// eslint-disable-next-line import/no-cycle
+import { EFlowbarFlow, EFlowbarState, EParadroidOwner } from './paradroid.consts';
 import { ParadroidShape } from './paradroid.shape';
-import { EFlowbarFlow, EFlowbarState, EParadroidOwner } from './paradroid.types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const defaultOptions = {
@@ -162,7 +161,7 @@ export class ParadroidFlowbar {
         return this.state === EFlowbarState.Active;
     }
 
-    private goToFrame(param: any) {
+    private goToFrame(param: number) {
         console.log(param);
     }
 }

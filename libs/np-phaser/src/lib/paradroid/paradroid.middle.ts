@@ -1,4 +1,4 @@
-import { EParadroidOwner } from './paradroid.types';
+import { EParadroidOwner } from './paradroid.consts';
 
 export class ParadroidMiddle {
     private owner: EParadroidOwner = EParadroidOwner.Nobody;

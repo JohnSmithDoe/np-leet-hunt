@@ -1,9 +1,6 @@
 import * as Phaser from 'phaser';
 
-// eslint-disable-next-line import/no-cycle
 import { NPScene } from '../scenes/np-scene';
-// eslint-disable-next-line import/no-cycle
-// eslint-disable-next-line import/no-cycle
 import { NPCamera } from './np-camera';
 
 export class NPFullscreenCamera extends NPCamera {

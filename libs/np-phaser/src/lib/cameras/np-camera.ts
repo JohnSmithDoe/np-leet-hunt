@@ -1,8 +1,6 @@
 import * as Phaser from 'phaser';
 
-// eslint-disable-next-line import/no-cycle
 import { NPScene } from '../scenes/np-scene';
-// eslint-disable-next-line import/no-cycle
 import { NPBaseComponent } from '../scenes/np-scene-component';
 import { isLayer } from '../utilities/np-phaser-utils';
 
@@ -34,7 +32,11 @@ export class NPCamera extends Phaser.Cameras.Scene2D.Camera implements NPBaseCom
     }
 
     addToRenderList(child: Phaser.GameObjects.GameObject) {
-        if ((!this.focusLayer && !this.focusObject) || (this.focusLayer && this.focusLayer.getChildren()?.includes(child)) || (this.focusObject && this.focusObject === child)) {
+        if (
+            (!this.focusLayer && !this.focusObject) ||
+            (this.focusLayer && this.focusLayer.getChildren()?.includes(child)) ||
+            (this.focusObject && this.focusObject === child)
+        ) {
             super.addToRenderList(child);
         }
     }

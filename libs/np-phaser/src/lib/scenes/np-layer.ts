@@ -1,12 +1,8 @@
 import * as Phaser from 'phaser';
 
-// eslint-disable-next-line import/no-cycle
 import { NPCamera } from '../cameras/np-camera';
-// eslint-disable-next-line import/no-cycle
 import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
-// eslint-disable-next-line import/no-cycle
 import { NPScene, TNPLayerKeys } from './np-scene';
-// eslint-disable-next-line import/no-cycle
 import { NPSceneComponent } from './np-scene-component';
 
 export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponent {

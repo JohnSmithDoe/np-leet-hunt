@@ -1,5 +1,5 @@
+import { EParadroidOwner } from './paradroid.consts';
 import { ParadroidMiddle } from './paradroid.middle';
-import { EParadroidOwner } from './paradroid.types';
 
 export class ParadroidCounter {
     private count: number = 0;

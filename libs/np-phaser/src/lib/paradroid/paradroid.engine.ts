@@ -1,11 +1,10 @@
 import { Utils } from '../sprites/paradroid/utils';
+import { EFlowbarFlow, EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
 import { ParadroidCounter } from './paradroid.counter';
 import { ParadroidMiddle } from './paradroid.middle';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidShape } from './paradroid.shape';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidTileGrid } from './paradroid.tilegrid';
-import { EFlowbarFlow, EParadroidDifficulty, EParadroidOwner, EParadroidPlayer } from './paradroid.types';
+import { TParadroidPlayer } from './paradroid.types';
 
 export class ParadroidEngine {
     private tilegrids: [ParadroidTileGrid, ParadroidTileGrid] = [null, null];
@@ -67,11 +66,11 @@ export class ParadroidEngine {
         this.droid_grid.reset();
     }
 
-    checkGridStructure(owner: EParadroidPlayer): boolean {
+    checkGridStructure(owner: TParadroidPlayer): boolean {
         return this.tilegrids[owner].checkGridStructure();
     }
 
-    createTileGrid(owner: EParadroidPlayer): void {
+    createTileGrid(owner: TParadroidPlayer): void {
         this.tilegrids[owner].createTileGrid();
         this.tilegrids[owner].ready();
     }
@@ -90,7 +89,7 @@ export class ParadroidEngine {
         });
     }
 
-    activateRow(row: number, owner: EParadroidPlayer): void {
+    activateRow(row: number, owner: TParadroidPlayer): void {
         this.tilegrids[owner].activeRows[row] = Date.now();
         this.tilegrids[owner].activateFlow(0, row);
         const len = this.tilegrids[owner].shots.length;
@@ -100,7 +99,7 @@ export class ParadroidEngine {
         }
     }
 
-    deactivateRow(row: number, owner: EParadroidPlayer): void {
+    deactivateRow(row: number, owner: TParadroidPlayer): void {
         delete this.tilegrids[owner].activeRows[row];
         this.tilegrids[owner].deactivateFlow(0, row);
     }

@@ -1,36 +1,29 @@
-// eslint-disable-next-line import/no-cycle
+import { EFlowbarFlow } from './paradroid.consts';
 import { ParadroidShape } from './paradroid.shape';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidTileGrid, TParadroidAccessGridCol } from './paradroid.tilegrid';
-import {
-    EFlowbarFlow,
-    EParadroidShape,
-    EParadroidShapeAccess,
-    EParadroidTileType,
-    TParadroidTileInfo,
-} from './paradroid.types';
+import { EParadroidAccess, EParadroidShape, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
+import { TParadroidTile } from './paradroid.types';
 
 export class ParadroidTile {
     shapes: ParadroidShape[] = [];
 
-    public static getAccessInfoByIndex(
-        info: TParadroidTileInfo,
-        incoming: boolean,
-        index: number
-    ): EParadroidShapeAccess {
+    public static getAccessInfoByIndex(info: TParadroidTile, incoming: boolean, index: number): EParadroidAccess {
+        let result: EParadroidAccess;
         if (index === 0) {
-            return incoming ? info.access.incoming.top : info.access.outgoing.top;
+            result = incoming ? info.incoming.top.access : info.outgoing.top.access;
         } else if (index === 1) {
-            return incoming ? info.access.incoming.mid : info.access.outgoing.mid;
+            result = incoming ? info.incoming.mid?.access : info.outgoing.mid?.access;
+        } else {
+            result = incoming ? info.incoming.bot?.access : info.outgoing.bot?.access;
         }
-        return incoming ? info.access.incoming.bot : info.access.outgoing.bot;
+        return result ?? EParadroidAccess.unset;
     }
 
     constructor(
         public tileGrid: ParadroidTileGrid,
         public pos: Phaser.Types.Math.Vector2Like,
         public tileType: EParadroidTileType,
-        public info: TParadroidTileInfo,
+        public info: TParadroidTile,
         public col: number,
         public row: number
     ) {
@@ -38,11 +31,12 @@ export class ParadroidTile {
         this.generateSubTiles();
     }
 
-    private generateSubTile(shape: EParadroidShape, row: number, col: number): void {
+    private generateSubTile(row: number, col: number, shape?: EParadroidShape): void {
         const pos: Phaser.Types.Math.Vector2Like = this.getShapePosition(row, col);
         row += this.row;
         col = this.col * 2 + col;
         if (col < this.tileGrid.columns && row < this.tileGrid.rows) {
+            shape ??= EParadroidShape.Empty;
             const subTile: ParadroidShape = new ParadroidShape(pos, this, shape, row, col);
             this.shapes.push(subTile);
             // this.addChild(subTile);
@@ -50,13 +44,13 @@ export class ParadroidTile {
     }
 
     private generateSubTiles(): void {
-        this.generateSubTile(this.info.subgrid.incoming.top, 0, 0);
-        this.generateSubTile(this.info.subgrid.incoming.mid, 1, 0);
-        this.generateSubTile(this.info.subgrid.incoming.bot, 2, 0);
+        this.generateSubTile(0, 0, this.info.incoming.top.shape);
+        this.generateSubTile(1, 0, this.info.incoming.mid?.shape);
+        this.generateSubTile(2, 0, this.info.incoming.bot?.shape);
 
-        this.generateSubTile(this.info.subgrid.outgoing.top, 0, 1);
-        this.generateSubTile(this.info.subgrid.outgoing.mid, 1, 1);
-        this.generateSubTile(this.info.subgrid.outgoing.bot, 2, 1);
+        this.generateSubTile(0, 1, this.info.outgoing.top.shape);
+        this.generateSubTile(1, 1, this.info.outgoing.mid?.shape);
+        this.generateSubTile(2, 1, this.info.outgoing.bot?.shape);
     }
 
     private getShapePosition(row: number, col: number): Phaser.Types.Math.Vector2Like {
@@ -75,36 +69,37 @@ export class ParadroidTile {
      * @return
      */
     fillColumn(col: TParadroidAccessGridCol, nextCol: TParadroidAccessGridCol, row: number): number {
-        for (let i: number = 0, j: number = this.info.rows; i < j; i++) {
+        const rows = this.info.incoming.bot ? 3 : this.info.incoming.mid ? 2 : 1;
+        for (let i: number = 0, j: number = rows; i < j; i++) {
             if (col && nextCol) {
                 col[row + i] = ParadroidTile.getAccessInfoByIndex(this.info, true, i);
                 nextCol[row + i] = ParadroidTile.getAccessInfoByIndex(this.info, false, i);
             }
         }
-        return row + this.info.rows;
+        return row + rows;
     }
 
     activateFlow(row: number, flow: EFlowbarFlow): void {
-        const shape: ParadroidShape = this.getShape(0, row);
-        shape.activateBar(flow);
+        const shape = this.getShape(0, row);
+        shape?.activateBar(flow);
     }
 
     deactivateFlow(row: number, flow: EFlowbarFlow): void {
-        const shape: ParadroidShape = this.getShape(0, row);
-        shape.deactivateBar(flow);
+        const shape = this.getShape(0, row);
+        shape?.deactivateBar(flow);
     }
 
-    getShape(col: number, row: number): ParadroidShape {
+    getShape(col: number, row: number) {
         return this.shapes.find((shape: ParadroidShape) => shape.row === row && shape.col === col);
     }
 
-    canActivate(row: number, flow: EFlowbarFlow): boolean {
-        const shape: ParadroidShape = this.getShape(0, row);
-        return shape.canActivate(flow);
+    canActivate(row: number, flow: EFlowbarFlow) {
+        const shape = this.getShape(0, row);
+        return !!shape?.canActivate(flow);
     }
 
     canDeActivate(row: number, flow: EFlowbarFlow): boolean {
-        const shape: ParadroidShape = this.getShape(0, row);
-        return shape.canDeActivate(flow);
+        const shape = this.getShape(0, row);
+        return !!shape?.canDeActivate(flow);
     }
 }

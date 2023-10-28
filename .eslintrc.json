@@ -176,10 +176,7 @@
           1
         ],
         "prettier/prettier": "error",
-        "brace-style": [
-          "error",
-          "1tbs"
-        ],
+        "brace-style": "off",
         "max-len": [
           "off",
           {
@@ -187,13 +184,7 @@
           }
         ],
         "no-underscore-dangle": "off",
-        "import/no-cycle": [
-          "error",
-          {
-            "maxDepth": 10,
-            "ignoreExternal": true
-          }
-        ],
+        "import/no-cycle": "off",
         "import/no-self-import": "error",
         "import/named": 2,
         "import/namespace": 2,

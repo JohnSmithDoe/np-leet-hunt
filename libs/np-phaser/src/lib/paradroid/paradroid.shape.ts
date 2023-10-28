@@ -1,20 +1,11 @@
 import { Utils } from '../sprites/paradroid/utils';
-// eslint-disable-next-line import/no-cycle
+import { CParadroidModes, EFlowbarFlow, EParadroidOwner, EParadroidSpecialFX } from './paradroid.consts';
 import { ParadroidFlowbar } from './paradroid.flowbar';
 import { ParadroidSpecialFX } from './paradroid.specialfx';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidTile } from './paradroid.tile';
-// eslint-disable-next-line import/no-cycle
 import { ParadroidTileGrid } from './paradroid.tilegrid';
-import {
-    CParadroidModes,
-    CParadroidShapeInfo,
-    EFlowbarFlow,
-    EParadroidOwner,
-    EParadroidShape,
-    EParadroidSpecialFX,
-    TParadroidShapeInfo,
-} from './paradroid.types';
+import { CParadroidShapeInfo, EParadroidShape } from './paradroid.tiles-and-shapes.definitions';
+import { TParadroidShapeInfo } from './paradroid.types';
 
 interface TParadroidPathInfo {
     changers: number;
@@ -172,7 +163,8 @@ export class ParadroidShape {
                     if (this.isCombineShape()) {
                         this.pathInfo.cost += last.pathInfo.cost;
                     } else if (this.isExpandShape()) {
-                        this.pathInfo.cost = last.pathInfo.cost / this.tile.info.rows;
+                        const rows = this.tile.info.incoming.bot ? 3 : this.tile.info.incoming.mid ? 2 : 1;
+                        this.pathInfo.cost = last.pathInfo.cost / rows;
                     } else {
                         this.pathInfo.cost = last.pathInfo.cost;
                     }

@@ -1,5 +1,5 @@
+import { EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
 import { ParadroidEngine } from './paradroid.engine';
-import { EParadroidDifficulty, EParadroidOwner } from './paradroid.types';
 import { StateMachine } from './stateMachine';
 
 interface TParadroidContainerOptions {
@@ -39,7 +39,7 @@ export class ParadroidContainer extends StateMachine {
             this.options.colCount,
             this.options.rowCount,
             this.options.shapeSize,
-            EParadroidDifficulty.Normal
+            EParadroidDifficulty.Debug
         );
         // this.addChild(this.stage.screenshot);
         // this.binaryTimer = new BinaryTimer(stage, {

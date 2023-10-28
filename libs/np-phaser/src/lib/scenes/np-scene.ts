@@ -1,8 +1,6 @@
 import * as Phaser from 'phaser';
 
-// eslint-disable-next-line import/no-cycle
 import { NPLayer } from './np-layer';
-// eslint-disable-next-line import/no-cycle
 import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;

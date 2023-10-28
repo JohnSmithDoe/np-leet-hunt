@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
@@ -6,8 +5,7 @@ import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
 import { ParadroidContainer } from '../paradroid/paradroid.container';
 import { ParadroidShape } from '../paradroid/paradroid.shape';
-import { EParadroidShape } from '../paradroid/paradroid.types';
-// eslint-disable-next-line import/no-cycle
+import { EParadroidShape } from '../paradroid/paradroid.tiles-and-shapes.definitions';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';

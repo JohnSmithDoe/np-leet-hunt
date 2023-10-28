@@ -1,5 +1,8 @@
 ## Allgemein
 
+### TypeScript
+* switch to strict i guess
+
 ### Input
 Alles muss mit Tastatur, Maus und Gamepad steuerbar sein!
 Hmm Html teile mit gamepad hmmm maybe
