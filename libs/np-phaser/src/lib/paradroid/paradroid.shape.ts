@@ -24,7 +24,6 @@ interface TParadroidPathInfo {
 }
 
 export class ParadroidShape {
-    private shape: any;
     private shapeInfo: TParadroidShapeInfo;
     private bars: ParadroidFlowbar[] = [];
     private isBlocked: boolean = false;

@@ -55,7 +55,7 @@ export class Pipe extends Phaser.GameObjects.Sprite implements NPSceneComponent 
         bottom?: Phaser.GameObjects.Graphics;
         left?: Phaser.GameObjects.Graphics;
     } = {};
-    private flip = false;
+    private flip = true;
 
     constructor(public scene: NPScene, frame: PIPES) {
         super(scene, 0, 0, '');
@@ -117,7 +117,7 @@ export class Pipe extends Phaser.GameObjects.Sprite implements NPSceneComponent 
 
             this.bars.bottom.fillRect(0, 0, 8, 32 - 4);
 
-            if (flip) {
+            if (!flip) {
                 this.bars.bottom.setPosition(this.x + 32 + 4, this.y + 64);
                 this.bars.bottom.rotation = Math.PI;
             } else {

@@ -29,7 +29,7 @@ enum States {
 export class ParadroidContainer extends StateMachine {
     options: TParadroidContainerOptions = defaultOptions;
 
-    private engine: ParadroidEngine;
+    engine: ParadroidEngine;
     private game = [];
     // private binaryTimer: BinaryTimer;
 
@@ -39,7 +39,7 @@ export class ParadroidContainer extends StateMachine {
             this.options.colCount,
             this.options.rowCount,
             this.options.shapeSize,
-            EParadroidDifficulty.Hard
+            EParadroidDifficulty.Normal
         );
         // this.addChild(this.stage.screenshot);
         // this.binaryTimer = new BinaryTimer(stage, {
@@ -53,7 +53,6 @@ export class ParadroidContainer extends StateMachine {
         // this.startBtn = new Button(this.stage, { title: 'choose', x: 200 });
         // this.startBtn.onClick.add(this.onGameChoosen, this);
         this.game = this.engine.generateBoard();
-        console.log(this.game);
         this.state_recreate_game();
         // this.game.position.x = (this.stage.baseResolution.x - this.game.getBounds().width) / 2;
         // this.recreateBtn = new Button(this.stage, { title: 'recreate' });

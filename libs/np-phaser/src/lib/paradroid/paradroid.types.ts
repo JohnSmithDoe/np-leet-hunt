@@ -24,10 +24,10 @@ export enum EParadroidSpecialFX {
 
 export enum EParadroidDifficulty {
     Debug,
-    Simple,
-    Medium,
+    Easy,
+    Normal,
     Hard,
-    Crazy,
+    Brutal,
 }
 
 export enum EParadroidShapeAccess {
@@ -237,12 +237,12 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
         changerRate: -7,
         autofireRate: -2,
     },
-    [EParadroidDifficulty.Simple]: {
+    [EParadroidDifficulty.Easy]: {
         tileSet: CSimpleTileSet,
         changerRate: -1,
         autofireRate: 10,
     },
-    [EParadroidDifficulty.Medium]: {
+    [EParadroidDifficulty.Normal]: {
         tileSet: CMediumTileSet,
         changerRate: 5,
         autofireRate: 5,
@@ -252,7 +252,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
         changerRate: -7,
         autofireRate: -2,
     },
-    [EParadroidDifficulty.Crazy]: {
+    [EParadroidDifficulty.Brutal]: {
         tileSet: CCrazyTileSet,
         changerRate: 15,
         autofireRate: 0,

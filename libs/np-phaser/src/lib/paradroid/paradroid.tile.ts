@@ -11,7 +11,7 @@ import {
 } from './paradroid.types';
 
 export class ParadroidTile {
-    private subtiles: ParadroidShape[] = [];
+    shapes: ParadroidShape[] = [];
 
     public static getAccessInfoByIndex(
         info: TParadroidTileInfo,
@@ -28,8 +28,8 @@ export class ParadroidTile {
 
     constructor(
         public tileGrid: ParadroidTileGrid,
-        private pos: Phaser.Types.Math.Vector2Like,
-        private tileType: EParadroidTileType,
+        public pos: Phaser.Types.Math.Vector2Like,
+        public tileType: EParadroidTileType,
         public info: TParadroidTileInfo,
         public col: number,
         public row: number
@@ -44,7 +44,7 @@ export class ParadroidTile {
         col = this.col * 2 + col;
         if (col < this.tileGrid.columns && row < this.tileGrid.rows) {
             const subTile: ParadroidShape = new ParadroidShape(pos, this, shape, row, col);
-            this.subtiles.push(subTile);
+            this.shapes.push(subTile);
             // this.addChild(subTile);
         }
     }
@@ -95,7 +95,7 @@ export class ParadroidTile {
     }
 
     getShape(col: number, row: number): ParadroidShape {
-        return this.subtiles.find((shape: ParadroidShape) => shape.row === row && shape.col === col);
+        return this.shapes.find((shape: ParadroidShape) => shape.row === row && shape.col === col);
     }
 
     canActivate(row: number, flow: EFlowbarFlow): boolean {

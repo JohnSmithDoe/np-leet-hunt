@@ -5,11 +5,13 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
 import { ParadroidContainer } from '../paradroid/paradroid.container';
+import { ParadroidShape } from '../paradroid/paradroid.shape';
+import { EParadroidShape } from '../paradroid/paradroid.types';
 // eslint-disable-next-line import/no-cycle
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { Pipe, PIPE_DEFINITIONS } from '../sprites/paradroid/pipe';
+import { Pipe } from '../sprites/paradroid/pipe';
 import { Reality } from '../sprites/reality/reality';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
@@ -26,6 +28,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private stars: Phaser.GameObjects.TileSprite;
 
     private pipes: Pipe[] = [];
+    private p: ParadroidContainer;
 
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
@@ -36,13 +39,19 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.addComponent(this.map);
         this.addComponent(new Reality(this, 'reality1'));
 
-        for (let i = 0; i < Object.keys(PIPE_DEFINITIONS).length; i++) {
-            const def = Object.keys(PIPE_DEFINITIONS)[i] as keyof typeof PIPE_DEFINITIONS;
-            this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
+        // for (let i = 0; i < Object.keys(PIPE_DEFINITIONS).length; i++) {
+        //     const def = Object.keys(PIPE_DEFINITIONS)[i] as keyof typeof PIPE_DEFINITIONS;
+        //     this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
+        // }
+        // this.addComponent(this.pipes);
+        this.p = new ParadroidContainer();
+        for (const tile of this.p.engine.player_grid.children) {
+            for (const shape of tile.shapes) {
+                const pipe = this.pipeForShape(shape);
+                pipe.setPosition(tile.pos.x + shape.pos.x, tile.pos.y + shape.pos.y);
+                this.addComponent(pipe);
+            }
         }
-        this.addComponent(this.pipes);
-        const p = new ParadroidContainer();
-        console.log(p);
     }
 
     init() {
@@ -161,5 +170,40 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // this.ts.setPosition(worldBounds.x, worldBounds.y);
         // this.ts.setSize(worldBounds.width, worldBounds.height);
         // console.log(this.controls.camera);
+    }
+
+    private pipeForShape(shape: ParadroidShape) {
+        switch (shape.shapeType) {
+            case EParadroidShape.Empty:
+                return new Pipe(this, 'empty');
+            case EParadroidShape.IShape:
+                return new Pipe(this, 'right_left_straight');
+            case EParadroidShape.Deadend:
+                return new Pipe(this, 'left_endCap');
+            case EParadroidShape.LShapeLeftUp:
+                return new Pipe(this, 'top_left_elbow');
+            case EParadroidShape.LShapeLeftDown:
+                return new Pipe(this, 'bottom_left_elbow');
+            case EParadroidShape.LShapeUpRight:
+                return new Pipe(this, 'right_bottom_elbow');
+            case EParadroidShape.LShapeDownRight:
+                return new Pipe(this, 'top_right_elbow');
+            case EParadroidShape.TShapeDownCombine:
+                return new Pipe(this, 'right_bottom_left_tee');
+            case EParadroidShape.TShapeDownExpand:
+                return new Pipe(this, 'right_bottom_left_tee');
+            case EParadroidShape.TShapeUpCombine:
+                return new Pipe(this, 'top_right_left_tee');
+            case EParadroidShape.TShapeUpExpand:
+                return new Pipe(this, 'top_right_left_tee');
+            case EParadroidShape.TShapeUpDownExpand:
+                return new Pipe(this, 'top_bottom_left_tee');
+            case EParadroidShape.TShapeUpDownCombine:
+                return new Pipe(this, 'top_right_bottom_tee');
+            case EParadroidShape.XShapeExpand:
+                return new Pipe(this, 'cross');
+            case EParadroidShape.XShapeCombine:
+                return new Pipe(this, 'cross');
+        }
     }
 }

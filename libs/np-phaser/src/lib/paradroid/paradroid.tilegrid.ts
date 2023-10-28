@@ -55,7 +55,7 @@ export class ParadroidTileGrid {
     onFlowReachedMiddleRow: EventEmitter<ParadroidShape> = new EventEmitter<ParadroidShape>();
     activeRows: number[];
     buttonContainer = [];
-    private children: any;
+    children: ParadroidTile[];
 
     constructor(
         public engine: ParadroidEngine,
@@ -81,20 +81,6 @@ export class ParadroidTileGrid {
         }
     }
 
-    checkGridStructure(): boolean {
-        let rows: number[] = [];
-        let canBeActivated: number = 0;
-        const lastColumn: number = this.columns - 1;
-        for (let row: number = 0, j: number = this.rows; row < j; row++) {
-            const shape: ParadroidShape = this.getShape(lastColumn, row);
-            if (shape && shape.pathInfo.activatedBy.length) {
-                rows = Utils.mergeArrays(rows, shape.pathInfo.activatedBy);
-                canBeActivated++;
-            }
-        }
-        return canBeActivated > this.rows / 2;
-    }
-
     createTileGrid(): void {
         this.generateGridAccess();
         this.generateGrid();
@@ -102,19 +88,36 @@ export class ParadroidTileGrid {
         this.generateBoard();
     }
 
+    // check each row of the last column
+    // true if there are more than this.rows / 2 shapes that get activated
+    // tests if the grid is interesting enough
+    checkGridStructure(): boolean {
+        let canBeActivated: number = 0;
+        const lastColumn: number = this.columns - 1;
+        for (let row: number = 0, j: number = this.rows; row < j; row++) {
+            const shape: ParadroidShape = this.getShape(lastColumn, row);
+            if (shape && shape.pathInfo.activatedBy.length) {
+                canBeActivated++;
+            }
+        }
+        return canBeActivated > this.rows / 2;
+    }
+
     ready(): void {
         //
     }
 
+    // adds the generated tileGrid sprites
     private generateBoard(): void {
         this.children = [];
-        for (let col: number = 0, colmax: number = this.tileGrid.length; col < colmax; col++) {
-            const colum: TParadroidTileCol = this.tileGrid[col];
-            for (let row: number = 0, rowmax: number = colum.length; row < rowmax; row++) {
-                const tile: ParadroidTile = colum[row];
+        for (let col = 0, colmax = this.tileGrid.length; col < colmax; col++) {
+            const colum = this.tileGrid[col];
+            for (let row = 0, rowmax = colum.length; row < rowmax; row++) {
+                const tile = colum[row];
                 this.children.push(tile);
             }
         }
+        console.log(this.children);
     }
 
     /**
