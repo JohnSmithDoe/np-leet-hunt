@@ -3,7 +3,7 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
-import { ParadroidContainer } from '../paradroid/paradroid.container';
+import { ParadroidContainer } from '../paradroid/old/paradroid.container';
 import { ParadroidFactory } from '../paradroid/paradroid.factory';
 import { EParadroidShape } from '../paradroid/paradroid.tiles-and-shapes.definitions';
 import { TParadroidSubTile } from '../paradroid/paradroid.types';
@@ -28,6 +28,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
 
     private pipes: Pipe[] = [];
     private p: ParadroidContainer;
+    private gs = [];
 
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
@@ -51,17 +52,28 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         //         this.addComponent(pipe);
         //     }
         // }
+        this.generateStuff();
+        this.addComponent(this.pipes);
+    }
+
+    private generateStuff() {
+        this.pipes = [];
+        this.gs = [];
         const f = new ParadroidFactory();
-        f.generateGrid();
-        const pipes = [];
-        for (const tileCol of f.tileGrid) {
+        const grid = f.generateGrid();
+        for (const tileCol of grid) {
             for (const tile of tileCol) {
                 for (const subTile of tile.subTiles) {
-                    pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
+                    this.pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
+                    Object.values(subTile.flow).forEach(bar => {
+                        if (!bar) return;
+                        const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+                        g.fillRect(bar.x, bar.y, bar.width, bar.height);
+                        this.gs.push(g);
+                    });
                 }
             }
         }
-        this.addComponent(pipes.filter(p => !!p));
     }
 
     init() {
@@ -90,6 +102,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      */
     create() {
         super.create();
+        this.gs.forEach(g => this.addToLayer('ui', g));
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
         this.physics.enableUpdate();
         //  World size is 8000 x 6000
@@ -112,6 +125,16 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             this.cameras.main.setZoom(this.cameras.main.zoom + 0.1);
         });
         this.addToLayer('ui', zoomInTxtBtn);
+
+        const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
+        recreateBtn.on('pointerup', () => {
+            this.removeFromLayer('ui', this.pipes);
+            this.removeFromLayer('ui', this.gs);
+            this.generateStuff();
+            this.pipes.forEach(p => p.create());
+            this.gs.forEach(g => this.addToLayer('ui', g));
+        });
+        this.addToLayer('ui', recreateBtn);
 
         const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
         zoomOutTxtBtn.on('pointerup', () => {

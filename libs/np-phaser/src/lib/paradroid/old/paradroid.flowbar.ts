@@ -1,5 +1,5 @@
-import { Utils } from '../sprites/paradroid/utils';
-import { EFlow, EFlowbarState, EParadroidOwner } from './paradroid.consts';
+import { Utils } from '../../sprites/paradroid/utils';
+import { EFlow, EFlowbarState, EParadroidOwner } from '../paradroid.consts';
 import { ParadroidShape } from './paradroid.shape';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -31,32 +31,7 @@ export class ParadroidFlowbar {
         public top: boolean
     ) {
         shape.addFlowbar(this);
-    }
-
-    static getOppositeFlow(flow: EFlow): EFlow {
-        if (flow === EFlow.FromLeft) {
-            return EFlow.ToRight;
-        } else if (flow === EFlow.FromBottom) {
-            return EFlow.ToTop;
-        } else if (flow === EFlow.FromTop) {
-            return EFlow.ToBottom;
-        } else if (flow === EFlow.ToRight) {
-            return EFlow.FromLeft;
-        } else if (flow === EFlow.ToBottom) {
-            return EFlow.FromTop;
-        } else if (flow === EFlow.ToTop) {
-            return EFlow.FromBottom;
-        }
-    }
-
-    static getOppositeOwner(owner: EParadroidOwner): EParadroidOwner {
-        if (owner === EParadroidOwner.Player) {
-            return EParadroidOwner.Droid;
-        } else if (owner === EParadroidOwner.Droid) {
-            return EParadroidOwner.Player;
-        } else {
-            return EParadroidOwner.Nobody;
-        }
+        this.updateFlowForDirection();
     }
 
     updateFlowForDirection(): void {

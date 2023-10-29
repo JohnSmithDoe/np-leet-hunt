@@ -147,3 +147,28 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
         autofireRate: 0,
     },
 };
+export const getOppositeFlow = (flow: EFlow): EFlow => {
+    if (flow === EFlow.FromLeft) {
+        return EFlow.ToRight;
+    } else if (flow === EFlow.FromBottom) {
+        return EFlow.ToTop;
+    } else if (flow === EFlow.FromTop) {
+        return EFlow.ToBottom;
+    } else if (flow === EFlow.ToRight) {
+        return EFlow.FromLeft;
+    } else if (flow === EFlow.ToBottom) {
+        return EFlow.FromTop;
+    } else if (flow === EFlow.ToTop) {
+        return EFlow.FromBottom;
+    }
+};
+
+export const getOppositeOwner = (owner: EParadroidOwner): EParadroidOwner => {
+    if (owner === EParadroidOwner.Player) {
+        return EParadroidOwner.Droid;
+    } else if (owner === EParadroidOwner.Droid) {
+        return EParadroidOwner.Player;
+    } else {
+        return EParadroidOwner.Nobody;
+    }
+};

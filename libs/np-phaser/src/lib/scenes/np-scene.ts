@@ -36,7 +36,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     }
 
     debugOut(text: string | string[] | number | number[]) {
-        this.#debugOut.setText(`${text}`);
+        this.#debugOut.setText(`${text}`).setPosition(0, this.scale.height - 50);
         this.addToLayer('debug', this.#debugOut); // need to readd or it will be rendered by every camera...
     }
 
@@ -61,7 +61,18 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             }
         }
     }
-
+    removeFromLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
+        if (Array.isArray(gameObject)) {
+            gameObject.forEach(gameObj => this.removeFromLayer(name, gameObj));
+        } else {
+            for (const layer of this.#layers.list) {
+                if (layer.name === name) {
+                    layer.remove(gameObject, true);
+                    gameObject.destroy(true);
+                }
+            }
+        }
+    }
     createLayer(name: TNPLayerKeys, makeMain = false) {
         this.#layers.add(new NPLayer(this, name, makeMain));
     }

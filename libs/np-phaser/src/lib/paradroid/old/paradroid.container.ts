@@ -1,4 +1,4 @@
-import { EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
+import { EParadroidDifficulty, EParadroidOwner } from '../paradroid.consts';
 import { ParadroidEngine } from './paradroid.engine';
 import { StateMachine } from './stateMachine';
 

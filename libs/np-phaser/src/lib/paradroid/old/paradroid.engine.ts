@@ -1,10 +1,10 @@
-import { Utils } from '../sprites/paradroid/utils';
-import { EFlow, EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
+import { Utils } from '../../sprites/paradroid/utils';
+import { EFlow, EParadroidDifficulty, EParadroidOwner } from '../paradroid.consts';
+import { TParadroidPlayer } from '../paradroid.types';
 import { ParadroidCounter } from './paradroid.counter';
 import { ParadroidMiddle } from './paradroid.middle';
 import { ParadroidShape } from './paradroid.shape';
 import { ParadroidTileGrid } from './paradroid.tilegrid';
-import { TParadroidPlayer } from './paradroid.types';
 
 export class ParadroidEngine {
     private tilegrids: [ParadroidTileGrid, ParadroidTileGrid] = [null, null];

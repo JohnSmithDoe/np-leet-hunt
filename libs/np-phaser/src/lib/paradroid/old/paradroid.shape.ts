@@ -1,11 +1,18 @@
-import { Utils } from '../sprites/paradroid/utils';
-import { CParadroidModes, EFlow, EParadroidOwner, EParadroidSpecialFX } from './paradroid.consts';
+import { Utils } from '../../sprites/paradroid/utils';
+import {
+    CParadroidModes,
+    EFlow,
+    EParadroidOwner,
+    EParadroidSpecialFX,
+    getOppositeFlow,
+    getOppositeOwner,
+} from '../paradroid.consts';
+import { CParadroidShapeInfo, EParadroidShape } from '../paradroid.tiles-and-shapes.definitions';
+import { TParadroidShape } from '../paradroid.types';
 import { ParadroidFlowbar } from './paradroid.flowbar';
 import { ParadroidSpecialFX } from './paradroid.specialfx';
 import { ParadroidTile } from './paradroid.tile';
 import { ParadroidTileGrid } from './paradroid.tilegrid';
-import { CParadroidShapeInfo, EParadroidShape } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidShape } from './paradroid.types';
 
 interface TParadroidPathInfo {
     changers: number;
@@ -99,14 +106,14 @@ export class ParadroidShape {
             } else if (incomingOwnerCount >= 2) {
                 incomingOwner = EParadroidOwner.Nobody;
             }
-            this.outgoingOwner = this.isChanger ? ParadroidFlowbar.getOppositeOwner(incomingOwner) : incomingOwner;
+            this.outgoingOwner = this.isChanger ? getOppositeOwner(incomingOwner) : incomingOwner;
             this.isBlocked = this.outgoingOwner === EParadroidOwner.Nobody;
             this.bars.forEach((bar: ParadroidFlowbar): void => {
                 if (!bar.incoming) {
                     bar.setOwner(this.outgoingOwner);
                     const next: ParadroidShape = this.tileGrid.getNextShape(this, bar.flow);
                     if (next) {
-                        next.updateIncomingFlow(ParadroidFlowbar.getOppositeFlow(bar.flow), this.outgoingOwner);
+                        next.updateIncomingFlow(getOppositeFlow(bar.flow), this.outgoingOwner);
                     }
                 }
             });

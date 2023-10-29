@@ -1,13 +1,13 @@
 import { EventEmitter } from '@angular/core';
 
-import { Utils } from '../sprites/paradroid/utils';
+import { Utils } from '../../sprites/paradroid/utils';
+import { CParadroidModes, EFlow, EParadroidDifficulty } from '../paradroid.consts';
+import { CParadroidTileInfo, EParadroidAccess, EParadroidTileType } from '../paradroid.tiles-and-shapes.definitions';
+import { TParadroidPlayer, TParadroidTileDefinition } from '../paradroid.types';
 import { ParadroidButton } from './paradroid.button';
-import { CParadroidModes, EFlow, EParadroidDifficulty } from './paradroid.consts';
 import { ParadroidEngine } from './paradroid.engine';
 import { ParadroidShape } from './paradroid.shape';
 import { ParadroidTile } from './paradroid.tile';
-import { CParadroidTileInfo, EParadroidAccess, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidPlayer, TParadroidTileDefinition } from './paradroid.types';
 
 export type TParadroidAccessGridCol = EParadroidAccess[];
 type TParadroidAccessGrid = TParadroidAccessGridCol[];

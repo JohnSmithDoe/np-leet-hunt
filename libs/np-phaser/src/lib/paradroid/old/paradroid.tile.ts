@@ -1,8 +1,8 @@
-import { EFlow } from './paradroid.consts';
+import { EFlow } from '../paradroid.consts';
+import { EParadroidAccess, EParadroidShape, EParadroidTileType } from '../paradroid.tiles-and-shapes.definitions';
+import { TParadroidTileDefinition } from '../paradroid.types';
 import { ParadroidShape } from './paradroid.shape';
 import { ParadroidTileGrid, TParadroidAccessGridCol } from './paradroid.tilegrid';
-import { EParadroidAccess, EParadroidShape, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidTileDefinition } from './paradroid.types';
 
 export class ParadroidTile {
     shapes: ParadroidShape[] = [];

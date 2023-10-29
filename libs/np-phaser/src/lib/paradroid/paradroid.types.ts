@@ -1,5 +1,4 @@
-import { EParadroidOwner } from './paradroid.consts';
-import { ParadroidFlowbar } from './paradroid.flowbar';
+import { EFlow, EParadroidOwner } from './paradroid.consts';
 import { EParadroidAccess, EParadroidShape, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
 
 export type TParadroidPlayer = EParadroidOwner.Player | EParadroidOwner.Droid;
@@ -21,21 +20,22 @@ export interface TParadroidShape {
     output: TParadroidGatesOut;
 }
 
+export interface TParadroidFlowbar extends Phaser.Types.Math.Vector2Like {
+    subTile: TParadroidSubTile;
+    flow: EFlow;
+    incoming: boolean;
+    horizontal: boolean;
+    top: boolean;
+    direction: number;
+    width: number;
+    height: number;
+}
+
 export interface TParadroidSubTile extends Phaser.Types.Math.Vector2Like, TParadroidSubTileDefinition {
-    tile?: TParadroidTile;
-    pathInfo?: {
-        activatedBy: number[];
-        cost: number;
-        changers: number;
-        autofires: number;
-    };
-    bars?: ParadroidFlowbar[];
-    isAutofire?: boolean;
-    isBlocked?: boolean;
-    isChanger?: boolean;
-    col?: number;
-    row?: number;
-    outgoingOwner?: EParadroidOwner;
+    tile: TParadroidTile;
+    flow: Partial<Record<EFlow, TParadroidFlowbar>>;
+    col: number;
+    row: number;
 }
 
 export interface TParadroidSubTileDefinition {

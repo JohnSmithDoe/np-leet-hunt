@@ -1,5 +1,5 @@
+import { TParadroidPlayer } from '../paradroid.types';
 import { ParadroidEngine } from './paradroid.engine';
-import { TParadroidPlayer } from './paradroid.types';
 
 export class ParadroidButton {
     constructor(

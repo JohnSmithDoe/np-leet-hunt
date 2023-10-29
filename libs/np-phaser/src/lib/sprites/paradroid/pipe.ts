@@ -85,61 +85,60 @@ export class Pipe extends Phaser.GameObjects.Sprite implements NPSceneComponent 
         this.setTexture(SHEET.key, this.#config.frame);
         this.setDisplaySize(64, 64);
         this.scene.addToLayer('ui', this);
-        const flip = this.flip;
-        if (this.#config.connections.top) {
-            this.bars.top = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-
-            this.bars.top.fillRect(0, 0, 8, 32 - 4);
-            if (flip) {
-                this.bars.top.setPosition(this.x + 32 + 4, this.y + 32 - 4);
-                this.bars.top.rotation = Math.PI;
-            } else {
-                this.bars.top.setPosition(this.x + 32 - 4, this.y);
-            }
-
-            this.scene.addToLayer('ui', this.bars.top);
-        }
-        if (this.#config.connections.right) {
-            this.bars.right = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-
-            this.bars.right.fillRect(0, 0, 32 - 4, 8);
-            if (flip) {
-                this.bars.right.setPosition(this.x + 64, this.y + 32 + 4);
-                this.bars.right.rotation = Math.PI;
-            } else {
-                this.bars.right.setPosition(this.x + 32 + 4, this.y + 32 - 4);
-            }
-
-            this.scene.addToLayer('ui', this.bars.right);
-        }
-        if (this.#config.connections.bottom) {
-            this.bars.bottom = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-
-            this.bars.bottom.fillRect(0, 0, 8, 32 - 4);
-
-            if (!flip) {
-                this.bars.bottom.setPosition(this.x + 32 + 4, this.y + 64);
-                this.bars.bottom.rotation = Math.PI;
-            } else {
-                this.bars.bottom.setPosition(this.x + 32 - 4, this.y + 32 + 4);
-            }
-
-            this.scene.addToLayer('ui', this.bars.bottom);
-        }
-        if (this.#config.connections.left) {
-            this.bars.left = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-
-            this.bars.left.fillRect(0, 0, 32 - 4, 8);
-
-            if (flip) {
-                this.bars.left.setPosition(this.x + 32 - 4, this.y + 32 + 4);
-                this.bars.left.rotation = Math.PI;
-            } else {
-                this.bars.left.setPosition(this.x, this.y + 32 - 4);
-            }
-
-            this.scene.addToLayer('ui', this.bars.left);
-        }
+        // if (this.#config.connections.top) {
+        //     this.bars.top = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+        //
+        //     this.bars.top.fillRect(0, 0, 8, 32 - 4);
+        //     if (flip) {
+        //         this.bars.top.setPosition(this.x + 32 + 4, this.y + 32 - 4);
+        //         this.bars.top.rotation = Math.PI;
+        //     } else {
+        //         this.bars.top.setPosition(this.x + 32 - 4, this.y);
+        //     }
+        //
+        //     this.scene.addToLayer('ui', this.bars.top);
+        // }
+        // if (this.#config.connections.right) {
+        //     this.bars.right = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+        //
+        //     this.bars.right.fillRect(0, 0, 32 - 4, 8);
+        //     if (flip) {
+        //         this.bars.right.setPosition(this.x + 64, this.y + 32 + 4);
+        //         this.bars.right.rotation = Math.PI;
+        //     } else {
+        //         this.bars.right.setPosition(this.x + 32 + 4, this.y + 32 - 4);
+        //     }
+        //
+        //     this.scene.addToLayer('ui', this.bars.right);
+        // }
+        // if (this.#config.connections.bottom) {
+        //     this.bars.bottom = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+        //
+        //     this.bars.bottom.fillRect(0, 0, 8, 32 - 4);
+        //
+        //     if (!flip) {
+        //         this.bars.bottom.setPosition(this.x + 32 + 4, this.y + 64);
+        //         this.bars.bottom.rotation = Math.PI;
+        //     } else {
+        //         this.bars.bottom.setPosition(this.x + 32 - 4, this.y + 32 + 4);
+        //     }
+        //
+        //     this.scene.addToLayer('ui', this.bars.bottom);
+        // }
+        // if (this.#config.connections.left) {
+        //     this.bars.left = this.scene.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+        //
+        //     this.bars.left.fillRect(0, 0, 32 - 4, 8);
+        //
+        //     if (flip) {
+        //         this.bars.left.setPosition(this.x + 32 - 4, this.y + 32 + 4);
+        //         this.bars.left.rotation = Math.PI;
+        //     } else {
+        //         this.bars.left.setPosition(this.x, this.y + 32 - 4);
+        //     }
+        //
+        //     this.scene.addToLayer('ui', this.bars.left);
+        // }
     }
 
     update(...args) {
