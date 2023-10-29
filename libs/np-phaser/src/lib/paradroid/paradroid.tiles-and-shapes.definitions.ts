@@ -1,4 +1,4 @@
-import { TParadroidShapeInfo, TParadroidTile } from './paradroid.types';
+import { TParadroidShape, TParadroidTileDefinition } from './paradroid.types';
 
 export enum EParadroidAccess {
     hasPath,
@@ -50,76 +50,76 @@ export enum EParadroidTileType {
     TrippleCombine,
 }
 
-export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShapeInfo> = {
+export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     [EParadroidShape.Empty]: {
-        ins: { left: false, bottom: false, top: false },
-        outs: { right: false, bottom: false, top: false },
+        input: { left: false, bottom: false, top: false },
+        output: { right: false, bottom: false, top: false },
     },
     [EParadroidShape.Deadend]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: false, bottom: false, top: false },
+        input: { left: true, bottom: false, top: false },
+        output: { right: false, bottom: false, top: false },
     },
     [EParadroidShape.IShape]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: true, bottom: false, top: false },
+        output: { right: true, bottom: false, top: false },
     },
 
     [EParadroidShape.LShapeLeftDown]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: false, bottom: true, top: false },
+        input: { left: true, bottom: false, top: false },
+        output: { right: false, bottom: true, top: false },
     },
     [EParadroidShape.LShapeLeftUp]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: false, bottom: false, top: true },
+        input: { left: true, bottom: false, top: false },
+        output: { right: false, bottom: false, top: true },
     },
 
     [EParadroidShape.LShapeUpRight]: {
-        ins: { left: false, bottom: true, top: false },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: false, bottom: true, top: false },
+        output: { right: true, bottom: false, top: false },
     },
     [EParadroidShape.LShapeDownRight]: {
-        ins: { left: false, bottom: false, top: true },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: false, bottom: false, top: true },
+        output: { right: true, bottom: false, top: false },
     },
 
     [EParadroidShape.TShapeUpCombine]: {
-        ins: { left: true, bottom: false, top: true },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: true, bottom: false, top: true },
+        output: { right: true, bottom: false, top: false },
     },
     [EParadroidShape.TShapeDownCombine]: {
-        ins: { left: true, bottom: true, top: false },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: true, bottom: true, top: false },
+        output: { right: true, bottom: false, top: false },
     },
 
     [EParadroidShape.TShapeUpExpand]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: true, bottom: false, top: true },
+        input: { left: true, bottom: false, top: false },
+        output: { right: true, bottom: false, top: true },
     },
     [EParadroidShape.TShapeDownExpand]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: true, bottom: true, top: false },
+        input: { left: true, bottom: false, top: false },
+        output: { right: true, bottom: true, top: false },
     },
 
     [EParadroidShape.TShapeUpDownCombine]: {
-        ins: { left: false, bottom: true, top: true },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: false, bottom: true, top: true },
+        output: { right: true, bottom: false, top: false },
     },
     [EParadroidShape.TShapeUpDownExpand]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: false, bottom: true, top: true },
+        input: { left: true, bottom: false, top: false },
+        output: { right: false, bottom: true, top: true },
     },
 
     [EParadroidShape.XShapeExpand]: {
-        ins: { left: true, bottom: false, top: false },
-        outs: { right: true, bottom: true, top: true },
+        input: { left: true, bottom: false, top: false },
+        output: { right: true, bottom: true, top: true },
     },
     [EParadroidShape.XShapeCombine]: {
-        ins: { left: true, bottom: true, top: true },
-        outs: { right: true, bottom: false, top: false },
+        input: { left: true, bottom: true, top: true },
+        output: { right: true, bottom: false, top: false },
     },
 };
 
-export const CParadroidTileInfo: Record<EParadroidTileType, TParadroidTile> = {
+export const CParadroidTileInfo: Record<EParadroidTileType, TParadroidTileDefinition> = {
     //
     //
     //
@@ -336,4 +336,48 @@ export const CParadroidTileInfo: Record<EParadroidTileType, TParadroidTile> = {
             bot: { shape: EParadroidShape.LShapeLeftUp, access: EParadroidAccess.isBlocked },
         },
     },
+};
+
+export const isCombineShape = (shape: EParadroidShape): boolean =>
+    [
+        EParadroidShape.XShapeCombine,
+        EParadroidShape.TShapeUpDownCombine,
+        EParadroidShape.TShapeUpCombine,
+        EParadroidShape.TShapeDownCombine,
+    ].indexOf(shape) >= 0;
+
+export const isExpandShape = (shape: EParadroidShape): boolean =>
+    [
+        EParadroidShape.XShapeExpand,
+        EParadroidShape.TShapeUpDownExpand,
+        EParadroidShape.TShapeUpExpand,
+        EParadroidShape.TShapeDownExpand,
+    ].indexOf(shape) >= 0;
+
+export const isEmptyShape = (shape: EParadroidShape): boolean => shape === EParadroidShape.Empty;
+
+export const getRowsFromDefinition = (info: TParadroidTileDefinition, incoming = true) => {
+    const column = incoming ? info.incoming : info.outgoing;
+    return column.bot ? 3 : column.mid ? 2 : 1;
+};
+
+export const getRowAccessByIndex = (
+    info: TParadroidTileDefinition,
+    incoming: boolean,
+    index: number
+): EParadroidAccess =>
+    (incoming ? info.incoming : info.outgoing)[getRowKeyByIndex(index)]?.access ?? EParadroidAccess.unset;
+
+export const getRowKeyByIndex = (index: number): 'top' | 'mid' | 'bot' =>
+    index === 2 ? 'bot' : index === 1 ? 'mid' : 'top';
+
+export const getRowAccessByKey = (
+    info: TParadroidTileDefinition,
+    incoming: boolean,
+    key: 'top' | 'mid' | 'bot'
+): EParadroidAccess => (incoming ? info.incoming : info.outgoing)[key]?.access ?? EParadroidAccess.unset;
+
+export const getRowKeysFromDefinition = (info: TParadroidTileDefinition, incoming = true): ['top', 'mid'?, 'bot'?] => {
+    const column = incoming ? info.incoming : info.outgoing;
+    return column.bot ? ['top', 'mid', 'bot'] : column.mid ? ['top', 'mid'] : ['top'];
 };

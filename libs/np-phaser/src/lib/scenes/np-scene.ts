@@ -54,8 +54,6 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         } else {
             for (const layer of this.#layers.list) {
                 if (layer.name === name) {
-                    if (name !== 'debug') console.log(`adding ${gameObject.name} to layer ${layer.name}`);
-
                     layer.add(gameObject, true);
                 } else {
                     layer.camera?.ignore(gameObject); // ignore obj on every other layer

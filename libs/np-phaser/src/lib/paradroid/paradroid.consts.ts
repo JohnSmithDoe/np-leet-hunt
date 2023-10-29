@@ -3,7 +3,7 @@
 import { EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
 import { TParadroidMode } from './paradroid.types';
 
-export enum EFlowbarFlow {
+export enum EFlow {
     FromTop,
     FromBottom,
     FromLeft,
@@ -39,115 +39,110 @@ export enum EParadroidOwner {
     Nobody,
 }
 
-const CDebugTileSet: EParadroidTileType[] = [
-    EParadroidTileType.Empty,
-    EParadroidTileType.Single,
-    EParadroidTileType.Single,
-    EParadroidTileType.Single,
-    EParadroidTileType.Single,
-    EParadroidTileType.Single,
-    EParadroidTileType.UpDownExpand,
-    EParadroidTileType.UpDownExpandDeadEnds,
-    EParadroidTileType.UpDownCombine,
-    EParadroidTileType.UpDownCombineDeadEnds,
-
-    EParadroidTileType.DoubleTopExpand,
-    EParadroidTileType.DoubleTopExpandDeadEnds,
-    EParadroidTileType.DoubleBottomExpand,
-    EParadroidTileType.DoubleBottomExpandDeadEnds,
-    EParadroidTileType.DoubleTopCombine,
-    EParadroidTileType.DoubleBottomCombine,
-
-    EParadroidTileType.TrippleExpand,
-    EParadroidTileType.TrippleExpandDeadEnds,
-    EParadroidTileType.TrippleCombine,
-];
-const CSimpleTileSet: EParadroidTileType[] = [
-    EParadroidTileType.Empty,
-    EParadroidTileType.Single,
-
-    EParadroidTileType.UpDownExpand,
-    EParadroidTileType.UpDownExpandDeadEnds,
-    EParadroidTileType.UpDownCombine,
-    EParadroidTileType.UpDownCombineDeadEnds,
-];
-const CMediumTileSet: EParadroidTileType[] = [
-    EParadroidTileType.Empty,
-    EParadroidTileType.Single,
-
-    EParadroidTileType.UpDownExpand,
-    EParadroidTileType.UpDownExpandDeadEnds,
-    EParadroidTileType.UpDownCombine,
-    EParadroidTileType.UpDownCombineDeadEnds,
-
-    EParadroidTileType.TrippleExpand,
-    EParadroidTileType.TrippleExpandDeadEnds,
-    EParadroidTileType.TrippleCombine,
-];
-const CHardTileSet: EParadroidTileType[] = [
-    EParadroidTileType.Empty,
-    EParadroidTileType.Single,
-
-    EParadroidTileType.UpDownExpand,
-    EParadroidTileType.UpDownExpandDeadEnds,
-    EParadroidTileType.UpDownCombine,
-    EParadroidTileType.UpDownCombineDeadEnds,
-
-    EParadroidTileType.DoubleTopExpand,
-    EParadroidTileType.DoubleTopExpandDeadEnds,
-    EParadroidTileType.DoubleBottomExpand,
-    EParadroidTileType.DoubleBottomExpandDeadEnds,
-    EParadroidTileType.DoubleTopCombine,
-    EParadroidTileType.DoubleBottomCombine,
-
-    EParadroidTileType.TrippleExpand,
-    EParadroidTileType.TrippleExpandDeadEnds,
-    EParadroidTileType.TrippleCombine,
-];
-const CCrazyTileSet: EParadroidTileType[] = [
-    EParadroidTileType.Empty,
-    EParadroidTileType.Single,
-    EParadroidTileType.Deadend,
-
-    EParadroidTileType.UpDownExpand,
-    EParadroidTileType.UpDownExpandDeadEnds,
-    EParadroidTileType.UpDownCombine,
-    EParadroidTileType.UpDownCombineDeadEnds,
-
-    EParadroidTileType.DoubleTopExpand,
-    EParadroidTileType.DoubleTopExpandDeadEnds,
-    EParadroidTileType.DoubleBottomExpand,
-    EParadroidTileType.DoubleBottomExpandDeadEnds,
-    EParadroidTileType.DoubleTopCombine,
-    EParadroidTileType.DoubleBottomCombine,
-
-    EParadroidTileType.TrippleExpand,
-    EParadroidTileType.TrippleExpandDeadEnds,
-    EParadroidTileType.TrippleCombine,
-];
 export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
     [EParadroidDifficulty.Debug]: {
-        tileSet: CDebugTileSet,
+        tileSet: [
+            EParadroidTileType.Empty,
+            EParadroidTileType.Single,
+            EParadroidTileType.Single,
+            EParadroidTileType.Single,
+            EParadroidTileType.Single,
+            EParadroidTileType.Single,
+            EParadroidTileType.UpDownExpand,
+            EParadroidTileType.UpDownExpandDeadEnds,
+            EParadroidTileType.UpDownCombine,
+            EParadroidTileType.UpDownCombineDeadEnds,
+
+            EParadroidTileType.DoubleTopExpand,
+            EParadroidTileType.DoubleTopExpandDeadEnds,
+            EParadroidTileType.DoubleBottomExpand,
+            EParadroidTileType.DoubleBottomExpandDeadEnds,
+            EParadroidTileType.DoubleTopCombine,
+            EParadroidTileType.DoubleBottomCombine,
+
+            EParadroidTileType.TrippleExpand,
+            EParadroidTileType.TrippleExpandDeadEnds,
+            EParadroidTileType.TrippleCombine,
+        ],
         changerRate: -7,
         autofireRate: -2,
     },
     [EParadroidDifficulty.Easy]: {
-        tileSet: CSimpleTileSet,
+        tileSet: [
+            EParadroidTileType.Empty,
+            EParadroidTileType.Single,
+
+            EParadroidTileType.UpDownExpand,
+            EParadroidTileType.UpDownExpandDeadEnds,
+            EParadroidTileType.UpDownCombine,
+            EParadroidTileType.UpDownCombineDeadEnds,
+        ],
         changerRate: -1,
         autofireRate: 10,
     },
     [EParadroidDifficulty.Normal]: {
-        tileSet: CMediumTileSet,
+        tileSet: [
+            EParadroidTileType.Empty,
+            EParadroidTileType.Single,
+
+            EParadroidTileType.UpDownExpand,
+            EParadroidTileType.UpDownExpandDeadEnds,
+            EParadroidTileType.UpDownCombine,
+            EParadroidTileType.UpDownCombineDeadEnds,
+
+            EParadroidTileType.TrippleExpand,
+            EParadroidTileType.TrippleExpandDeadEnds,
+            EParadroidTileType.TrippleCombine,
+        ],
         changerRate: 5,
         autofireRate: 5,
     },
     [EParadroidDifficulty.Hard]: {
-        tileSet: CHardTileSet,
+        tileSet: [
+            EParadroidTileType.Empty,
+            EParadroidTileType.Single,
+
+            EParadroidTileType.UpDownExpand,
+            EParadroidTileType.UpDownExpandDeadEnds,
+            EParadroidTileType.UpDownCombine,
+            EParadroidTileType.UpDownCombineDeadEnds,
+
+            EParadroidTileType.DoubleTopExpand,
+            EParadroidTileType.DoubleTopExpandDeadEnds,
+            EParadroidTileType.DoubleBottomExpand,
+            EParadroidTileType.DoubleBottomExpandDeadEnds,
+            EParadroidTileType.DoubleTopCombine,
+            EParadroidTileType.DoubleBottomCombine,
+
+            EParadroidTileType.TrippleExpand,
+            EParadroidTileType.TrippleExpandDeadEnds,
+            EParadroidTileType.TrippleCombine,
+        ],
         changerRate: -7,
         autofireRate: -2,
     },
     [EParadroidDifficulty.Brutal]: {
-        tileSet: CCrazyTileSet,
+        tileSet: [
+            EParadroidTileType.Empty,
+            EParadroidTileType.Single,
+            // EParadroidTileType.Deadend,
+
+            EParadroidTileType.UpDownExpand,
+            EParadroidTileType.UpDownExpandDeadEnds,
+            EParadroidTileType.UpDownCombine,
+            EParadroidTileType.UpDownCombineDeadEnds,
+
+            EParadroidTileType.DoubleTopExpand,
+            EParadroidTileType.DoubleTopExpandDeadEnds,
+            EParadroidTileType.DoubleBottomExpand,
+            EParadroidTileType.DoubleBottomExpandDeadEnds,
+            EParadroidTileType.DoubleTopCombine,
+            EParadroidTileType.DoubleBottomCombine,
+
+            EParadroidTileType.TrippleExpand,
+            EParadroidTileType.TrippleExpandDeadEnds,
+            EParadroidTileType.TrippleCombine,
+        ],
         changerRate: 15,
         autofireRate: 0,
     },

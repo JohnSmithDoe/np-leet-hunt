@@ -56,7 +56,6 @@ export class StarmapFactory {
             })
                 .filter(p => !inner.contains(p.x, p.y))
                 .map(p => p.setTo(p.x - config.outerSpaceDim, p.y - config.outerSpaceDim));
-            console.log(map);
         }
 
         return map;

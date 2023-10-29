@@ -1,13 +1,17 @@
-import { EFlowbarFlow } from './paradroid.consts';
+import { EFlow } from './paradroid.consts';
 import { ParadroidShape } from './paradroid.shape';
 import { ParadroidTileGrid, TParadroidAccessGridCol } from './paradroid.tilegrid';
 import { EParadroidAccess, EParadroidShape, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidTile } from './paradroid.types';
+import { TParadroidTileDefinition } from './paradroid.types';
 
 export class ParadroidTile {
     shapes: ParadroidShape[] = [];
 
-    public static getAccessInfoByIndex(info: TParadroidTile, incoming: boolean, index: number): EParadroidAccess {
+    public static getAccessInfoByIndex(
+        info: TParadroidTileDefinition,
+        incoming: boolean,
+        index: number
+    ): EParadroidAccess {
         let result: EParadroidAccess;
         if (index === 0) {
             result = incoming ? info.incoming.top.access : info.outgoing.top.access;
@@ -23,7 +27,7 @@ export class ParadroidTile {
         public tileGrid: ParadroidTileGrid,
         public pos: Phaser.Types.Math.Vector2Like,
         public tileType: EParadroidTileType,
-        public info: TParadroidTile,
+        public info: TParadroidTileDefinition,
         public col: number,
         public row: number
     ) {
@@ -79,12 +83,12 @@ export class ParadroidTile {
         return row + rows;
     }
 
-    activateFlow(row: number, flow: EFlowbarFlow): void {
+    activateFlow(row: number, flow: EFlow): void {
         const shape = this.getShape(0, row);
         shape?.activateBar(flow);
     }
 
-    deactivateFlow(row: number, flow: EFlowbarFlow): void {
+    deactivateFlow(row: number, flow: EFlow): void {
         const shape = this.getShape(0, row);
         shape?.deactivateBar(flow);
     }
@@ -93,12 +97,12 @@ export class ParadroidTile {
         return this.shapes.find((shape: ParadroidShape) => shape.row === row && shape.col === col);
     }
 
-    canActivate(row: number, flow: EFlowbarFlow) {
+    canActivate(row: number, flow: EFlow) {
         const shape = this.getShape(0, row);
         return !!shape?.canActivate(flow);
     }
 
-    canDeActivate(row: number, flow: EFlowbarFlow): boolean {
+    canDeActivate(row: number, flow: EFlow): boolean {
         const shape = this.getShape(0, row);
         return !!shape?.canDeActivate(flow);
     }

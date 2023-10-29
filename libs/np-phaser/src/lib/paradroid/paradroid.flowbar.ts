@@ -1,5 +1,5 @@
 import { Utils } from '../sprites/paradroid/utils';
-import { EFlowbarFlow, EFlowbarState, EParadroidOwner } from './paradroid.consts';
+import { EFlow, EFlowbarState, EParadroidOwner } from './paradroid.consts';
 import { ParadroidShape } from './paradroid.shape';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,7 +25,7 @@ export class ParadroidFlowbar {
 
     constructor(
         shape: ParadroidShape,
-        public flow: EFlowbarFlow,
+        public flow: EFlow,
         public incoming: boolean,
         public horizontal: boolean,
         public top: boolean
@@ -33,19 +33,19 @@ export class ParadroidFlowbar {
         shape.addFlowbar(this);
     }
 
-    static getOppositeFlow(flow: EFlowbarFlow): EFlowbarFlow {
-        if (flow === EFlowbarFlow.FromLeft) {
-            return EFlowbarFlow.ToRight;
-        } else if (flow === EFlowbarFlow.FromBottom) {
-            return EFlowbarFlow.ToTop;
-        } else if (flow === EFlowbarFlow.FromTop) {
-            return EFlowbarFlow.ToBottom;
-        } else if (flow === EFlowbarFlow.ToRight) {
-            return EFlowbarFlow.FromLeft;
-        } else if (flow === EFlowbarFlow.ToBottom) {
-            return EFlowbarFlow.FromTop;
-        } else if (flow === EFlowbarFlow.ToTop) {
-            return EFlowbarFlow.FromBottom;
+    static getOppositeFlow(flow: EFlow): EFlow {
+        if (flow === EFlow.FromLeft) {
+            return EFlow.ToRight;
+        } else if (flow === EFlow.FromBottom) {
+            return EFlow.ToTop;
+        } else if (flow === EFlow.FromTop) {
+            return EFlow.ToBottom;
+        } else if (flow === EFlow.ToRight) {
+            return EFlow.FromLeft;
+        } else if (flow === EFlow.ToBottom) {
+            return EFlow.FromTop;
+        } else if (flow === EFlow.ToTop) {
+            return EFlow.FromBottom;
         }
     }
 
@@ -162,6 +162,6 @@ export class ParadroidFlowbar {
     }
 
     private goToFrame(param: number) {
-        console.log(param);
+        if (param < -2222222222222) console.log(param);
     }
 }

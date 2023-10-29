@@ -11,14 +11,11 @@ export const getClosest = (
     target: Phaser.Types.Math.Vector2Like,
     list: Phaser.Types.Math.Vector2Like[],
     maxCount = 3
-) => {
-    console.log(list.map(p => ({ ...p, distance: Phaser.Math.Distance.BetweenPoints(target, p) })));
-
-    return list
+) =>
+    list
         .map(p => ({ ...p, distance: Phaser.Math.Distance.BetweenPoints(target, p) }))
         .sort((a, b) => a.distance - b.distance)
         .filter((p, idx) => idx < maxCount + 1 && idx > 0);
-};
 
 // Poisson disk sampling in a 2D square
 export const poissonDiscSampler = (

@@ -2,12 +2,12 @@ import { EventEmitter } from '@angular/core';
 
 import { Utils } from '../sprites/paradroid/utils';
 import { ParadroidButton } from './paradroid.button';
-import { CParadroidModes, EFlowbarFlow, EParadroidDifficulty } from './paradroid.consts';
+import { CParadroidModes, EFlow, EParadroidDifficulty } from './paradroid.consts';
 import { ParadroidEngine } from './paradroid.engine';
 import { ParadroidShape } from './paradroid.shape';
 import { ParadroidTile } from './paradroid.tile';
 import { CParadroidTileInfo, EParadroidAccess, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidPlayer, TParadroidTile } from './paradroid.types';
+import { TParadroidPlayer, TParadroidTileDefinition } from './paradroid.types';
 
 export type TParadroidAccessGridCol = EParadroidAccess[];
 type TParadroidAccessGrid = TParadroidAccessGridCol[];
@@ -106,7 +106,6 @@ export class ParadroidTileGrid {
                 this.children.push(tile);
             }
         }
-        console.log(this.children);
     }
 
     /**
@@ -183,16 +182,16 @@ export class ParadroidTileGrid {
         return tile ? tile.getShape(col, row) : null;
     }
 
-    activateFlow(col: number, row: number, flow?: EFlowbarFlow): void {
-        flow = flow || EFlowbarFlow.FromLeft;
+    activateFlow(col: number, row: number, flow?: EFlow): void {
+        flow = flow || EFlow.FromLeft;
         const tile: ParadroidTile = this.getTile(col, row);
         if (tile.canActivate(row, flow)) {
             tile.activateFlow(row, flow);
         }
     }
 
-    deactivateFlow(col: number, row: number, flow?: EFlowbarFlow): void {
-        flow = flow || EFlowbarFlow.FromLeft;
+    deactivateFlow(col: number, row: number, flow?: EFlow): void {
+        flow = flow || EFlow.FromLeft;
         const tile: ParadroidTile = this.getTile(col, row);
         if (tile.canDeActivate(row, flow)) {
             tile.deactivateFlow(row, flow);
@@ -266,7 +265,7 @@ export class ParadroidTileGrid {
         const aGrid: TParadroidAccessGrid = this.getAccessGrid();
         const randomTileType: EParadroidTileType = this.getRandomTileType(aTileTypeSet, aGrid[col], row);
         const pos = this.getTilePosition(col, row);
-        const info: TParadroidTile = CParadroidTileInfo[randomTileType];
+        const info: TParadroidTileDefinition = CParadroidTileInfo[randomTileType];
         const result: ParadroidTile = new ParadroidTile(this, pos, randomTileType, info, col, row);
         result.fillColumn(aGrid[col], aGrid[col + 1], row);
         return result;
@@ -328,7 +327,7 @@ export class ParadroidTileGrid {
         // so set the owner of the shape to the tile grid owner
         for (let row: number = 0, l: number = this.rows; row < l; row++) {
             const shape: ParadroidShape = this.getShape(0, row);
-            shape.updateIncomingFlow(EFlowbarFlow.FromLeft, this.owner);
+            shape.updateIncomingFlow(EFlow.FromLeft, this.owner);
         }
 
         // then walk through the shapes and update their owner accordingly
@@ -367,19 +366,19 @@ export class ParadroidTileGrid {
 
     // </editor-fold>
 
-    getNextShape(shape: ParadroidShape, flow: EFlowbarFlow): ParadroidShape {
+    getNextShape(shape: ParadroidShape, flow: EFlow): ParadroidShape {
         let result: ParadroidShape;
-        if (flow === EFlowbarFlow.ToTop) {
+        if (flow === EFlow.ToTop) {
             result = this.getShape(shape.col, shape.row - 1);
-        } else if (flow === EFlowbarFlow.ToBottom) {
+        } else if (flow === EFlow.ToBottom) {
             result = this.getShape(shape.col, shape.row + 1);
-        } else if (flow === EFlowbarFlow.ToRight) {
+        } else if (flow === EFlow.ToRight) {
             result = this.getShape(shape.col + 1, shape.row);
-        } else if (flow === EFlowbarFlow.FromTop) {
+        } else if (flow === EFlow.FromTop) {
             result = this.getShape(shape.col, shape.row - 1);
-        } else if (flow === EFlowbarFlow.FromBottom) {
+        } else if (flow === EFlow.FromBottom) {
             result = this.getShape(shape.col, shape.row + 1);
-        } else if (flow === EFlowbarFlow.FromLeft) {
+        } else if (flow === EFlow.FromLeft) {
             result = this.getShape(shape.col - 1, shape.row);
         }
         return result;

@@ -1,11 +1,11 @@
 import { Utils } from '../sprites/paradroid/utils';
-import { CParadroidModes, EFlowbarFlow, EParadroidOwner, EParadroidSpecialFX } from './paradroid.consts';
+import { CParadroidModes, EFlow, EParadroidOwner, EParadroidSpecialFX } from './paradroid.consts';
 import { ParadroidFlowbar } from './paradroid.flowbar';
 import { ParadroidSpecialFX } from './paradroid.specialfx';
 import { ParadroidTile } from './paradroid.tile';
 import { ParadroidTileGrid } from './paradroid.tilegrid';
 import { CParadroidShapeInfo, EParadroidShape } from './paradroid.tiles-and-shapes.definitions';
-import { TParadroidShapeInfo } from './paradroid.types';
+import { TParadroidShape } from './paradroid.types';
 
 interface TParadroidPathInfo {
     changers: number;
@@ -15,7 +15,7 @@ interface TParadroidPathInfo {
 }
 
 export class ParadroidShape {
-    private shapeInfo: TParadroidShapeInfo;
+    private shapeInfo: TParadroidShape;
     private bars: ParadroidFlowbar[] = [];
     private isBlocked: boolean = false;
     private isChanger: boolean = false;
@@ -53,39 +53,33 @@ export class ParadroidShape {
     }
 
     private addFlowbars(): void {
-        if (this.shapeInfo.ins.left) {
+        if (this.shapeInfo.input.left) {
             // left to mid
-            this.bars[EFlowbarFlow.FromLeft] = new ParadroidFlowbar(this, EFlowbarFlow.FromLeft, true, true, false);
+            this.bars[EFlow.FromLeft] = new ParadroidFlowbar(this, EFlow.FromLeft, true, true, false);
         }
-        if (this.shapeInfo.ins.top) {
+        if (this.shapeInfo.input.top) {
             // top to mid
-            this.bars[EFlowbarFlow.FromTop] = new ParadroidFlowbar(this, EFlowbarFlow.FromTop, true, false, true);
+            this.bars[EFlow.FromTop] = new ParadroidFlowbar(this, EFlow.FromTop, true, false, true);
         }
-        if (this.shapeInfo.ins.bottom) {
+        if (this.shapeInfo.input.bottom) {
             // bot to mid
-            this.bars[EFlowbarFlow.FromBottom] = new ParadroidFlowbar(
-                this,
-                EFlowbarFlow.FromBottom,
-                true,
-                false,
-                false
-            );
+            this.bars[EFlow.FromBottom] = new ParadroidFlowbar(this, EFlow.FromBottom, true, false, false);
         }
-        if (this.shapeInfo.outs.top) {
+        if (this.shapeInfo.output.top) {
             // mid to top
-            this.bars[EFlowbarFlow.ToTop] = new ParadroidFlowbar(this, EFlowbarFlow.ToTop, false, false, true);
+            this.bars[EFlow.ToTop] = new ParadroidFlowbar(this, EFlow.ToTop, false, false, true);
         }
-        if (this.shapeInfo.outs.bottom) {
+        if (this.shapeInfo.output.bottom) {
             // mid to bot
-            this.bars[EFlowbarFlow.ToBottom] = new ParadroidFlowbar(this, EFlowbarFlow.ToBottom, false, false, false);
+            this.bars[EFlow.ToBottom] = new ParadroidFlowbar(this, EFlow.ToBottom, false, false, false);
         }
-        if (this.shapeInfo.outs.right) {
+        if (this.shapeInfo.output.right) {
             // mid to right
-            this.bars[EFlowbarFlow.ToRight] = new ParadroidFlowbar(this, EFlowbarFlow.ToRight, false, true, false);
+            this.bars[EFlow.ToRight] = new ParadroidFlowbar(this, EFlow.ToRight, false, true, false);
         }
     }
 
-    updateIncomingFlow(incomingFlow: EFlowbarFlow, owner: EParadroidOwner): void {
+    updateIncomingFlow(incomingFlow: EFlow, owner: EParadroidOwner): void {
         this.bars[incomingFlow].setOwner(owner);
     }
 
@@ -121,7 +115,7 @@ export class ParadroidShape {
 
     initBefore(): void {
         if (!this.isEmptyShape() && this.shapeType !== EParadroidShape.Deadend && !this.specialFX) {
-            if (!this.shapeInfo.ins.bottom) {
+            if (!this.shapeInfo.input.bottom) {
                 if (Utils.rngPercentageHit(CParadroidModes[this.tileGrid.difficulty].changerRate)) {
                     this.specialFX = new ParadroidSpecialFX(EParadroidSpecialFX.Changer);
                     this.isChanger = true;
@@ -134,7 +128,7 @@ export class ParadroidShape {
 
     initAfter(): void {
         if (!this.isEmptyShape() && this.shapeType !== EParadroidShape.Deadend && !this.specialFX) {
-            if (!this.shapeInfo.ins.bottom) {
+            if (!this.shapeInfo.input.bottom) {
                 if (Utils.rngPercentageHit(CParadroidModes[this.tileGrid.difficulty].autofireRate)) {
                     if (this.pathInfo.changers === 0) {
                         if (this.pathInfo.autofires === 0) {
@@ -209,23 +203,23 @@ export class ParadroidShape {
         }
     }
 
-    activateBar(flow: EFlowbarFlow): void {
+    activateBar(flow: EFlow): void {
         this.bars[flow].activateBar();
     }
 
-    deactivateBar(flow: EFlowbarFlow): void {
+    deactivateBar(flow: EFlow): void {
         this.bars[flow].deactivateBar();
     }
 
-    canActivate(flow: EFlowbarFlow): boolean {
+    canActivate(flow: EFlow): boolean {
         return this.bars[flow].isDeactive();
     }
 
-    canDeActivate(flow: EFlowbarFlow): boolean {
+    canDeActivate(flow: EFlow): boolean {
         return this.bars[flow].isActive() && !this.isAutofire;
     }
 
-    getOwner(flow: EFlowbarFlow): EParadroidOwner {
+    getOwner(flow: EFlow): EParadroidOwner {
         return this.bars[flow].owner;
     }
 
@@ -293,19 +287,19 @@ export class ParadroidShape {
 
     private activateNextShapes(): void {
         let shape: ParadroidShape;
-        if (this.shapeInfo.outs.top) {
+        if (this.shapeInfo.output.top) {
             shape = this.tileGrid.getShape(this.col, this.row - 1);
-            shape.activateBar(EFlowbarFlow.FromBottom); // from below
+            shape.activateBar(EFlow.FromBottom); // from below
         }
-        if (this.shapeInfo.outs.bottom) {
+        if (this.shapeInfo.output.bottom) {
             shape = this.tileGrid.getShape(this.col, this.row + 1);
-            shape.activateBar(EFlowbarFlow.FromTop); // from top
+            shape.activateBar(EFlow.FromTop); // from top
         }
-        if (this.shapeInfo.outs.right) {
+        if (this.shapeInfo.output.right) {
             if (!this.isBlocked) {
                 if (this.col + 1 < this.tileGrid.columns) {
                     shape = this.tileGrid.getShape(this.col + 1, this.row);
-                    shape.activateBar(EFlowbarFlow.FromLeft); // from left
+                    shape.activateBar(EFlow.FromLeft); // from left
                 } else {
                     this.tileGrid.onFlowReachedMiddleRow.emit(this);
                 }
@@ -315,18 +309,18 @@ export class ParadroidShape {
 
     private deactivateNextShapes(): void {
         let shape: ParadroidShape;
-        if (this.shapeInfo.outs.top) {
+        if (this.shapeInfo.output.top) {
             shape = this.tileGrid.getShape(this.col, this.row - 1);
-            shape.deactivateBar(EFlowbarFlow.FromBottom); // from below
+            shape.deactivateBar(EFlow.FromBottom); // from below
         }
-        if (this.shapeInfo.outs.bottom) {
+        if (this.shapeInfo.output.bottom) {
             shape = this.tileGrid.getShape(this.col, this.row + 1);
-            shape.deactivateBar(EFlowbarFlow.FromTop); // from top
+            shape.deactivateBar(EFlow.FromTop); // from top
         }
-        if (this.shapeInfo.outs.right) {
+        if (this.shapeInfo.output.right) {
             if (this.col + 1 < this.tileGrid.columns) {
                 shape = this.tileGrid.getShape(this.col + 1, this.row);
-                shape.deactivateBar(EFlowbarFlow.FromLeft); // from left
+                shape.deactivateBar(EFlow.FromLeft); // from left
             }
         }
     }
@@ -335,7 +329,7 @@ export class ParadroidShape {
         return !!this.pathInfo.activatedBy.length;
     }
 
-    hasFlow(flow: EFlowbarFlow): boolean {
+    hasFlow(flow: EFlow): boolean {
         return typeof this.bars[flow] !== 'undefined';
     }
 
@@ -344,6 +338,6 @@ export class ParadroidShape {
     }
 
     public addFlowbar(param: ParadroidFlowbar) {
-        console.log(param);
+        if (param.flow % 0 > 1) console.log(param);
     }
 }

@@ -1,5 +1,5 @@
 import { Utils } from '../sprites/paradroid/utils';
-import { EFlowbarFlow, EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
+import { EFlow, EParadroidDifficulty, EParadroidOwner } from './paradroid.consts';
 import { ParadroidCounter } from './paradroid.counter';
 import { ParadroidMiddle } from './paradroid.middle';
 import { ParadroidShape } from './paradroid.shape';
@@ -49,7 +49,7 @@ export class ParadroidEngine {
     }
 
     private onFlowReachedMiddleRow(sender: ParadroidShape): void {
-        this.middle[sender.row].updateMiddle(sender.getOwner(EFlowbarFlow.ToRight));
+        this.middle[sender.row].updateMiddle(sender.getOwner(EFlow.ToRight));
         this.counter.updateCounter();
     }
 
@@ -152,7 +152,7 @@ export class ParadroidEngine {
             const shape: ParadroidShape = this.droid_grid.getShape(lastColumn, row);
             if (
                 shape.canBeActivated() &&
-                shape.hasFlow(EFlowbarFlow.ToRight) &&
+                shape.hasFlow(EFlow.ToRight) &&
                 shape.outgoingOwnerIs(EParadroidOwner.Droid)
             ) {
                 if (!this.triggeredBy[row]) {

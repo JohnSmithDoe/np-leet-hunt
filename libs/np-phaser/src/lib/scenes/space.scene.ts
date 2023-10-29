@@ -4,8 +4,9 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
 import { ParadroidContainer } from '../paradroid/paradroid.container';
-import { ParadroidShape } from '../paradroid/paradroid.shape';
+import { ParadroidFactory } from '../paradroid/paradroid.factory';
 import { EParadroidShape } from '../paradroid/paradroid.tiles-and-shapes.definitions';
+import { TParadroidSubTile } from '../paradroid/paradroid.types';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
@@ -42,14 +43,25 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         //     this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
         // }
         // this.addComponent(this.pipes);
-        this.p = new ParadroidContainer();
-        for (const tile of this.p.engine.player_grid.children) {
-            for (const shape of tile.shapes) {
-                const pipe = this.pipeForShape(shape);
-                pipe.setPosition(tile.pos.x + shape.pos.x, tile.pos.y + shape.pos.y);
-                this.addComponent(pipe);
+        // this.p = new ParadroidContainer();
+        // for (const tile of this.p.engine.player_grid.children) {
+        //     for (const shape of tile.shapes) {
+        //         const pipe = this.pipeForShape(shape);
+        //         pipe.setPosition(tile.pos.x + shape.pos.x, tile.pos.y + shape.pos.y);
+        //         this.addComponent(pipe);
+        //     }
+        // }
+        const f = new ParadroidFactory();
+        f.generateGrid();
+        const pipes = [];
+        for (const tileCol of f.tileGrid) {
+            for (const tile of tileCol) {
+                for (const subTile of tile.subTiles) {
+                    pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
+                }
             }
         }
+        this.addComponent(pipes.filter(p => !!p));
     }
 
     init() {
@@ -170,8 +182,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // console.log(this.controls.camera);
     }
 
-    private pipeForShape(shape: ParadroidShape) {
-        switch (shape.shapeType) {
+    private pipeForShape(subTile?: TParadroidSubTile) {
+        switch (subTile?.shape) {
             case EParadroidShape.Empty:
                 return new Pipe(this, 'empty');
             case EParadroidShape.IShape:
