@@ -356,28 +356,10 @@ export const isExpandShape = (shape: EParadroidShape): boolean =>
 
 export const isEmptyShape = (shape: EParadroidShape): boolean => shape === EParadroidShape.Empty;
 
-export const getRowsFromDefinition = (info: TParadroidTileDefinition, incoming = true) => {
+export const getRowCount = (info: TParadroidTileDefinition, incoming = true) => {
     const column = incoming ? info.incoming : info.outgoing;
     return column.bot ? 3 : column.mid ? 2 : 1;
 };
 
-export const getRowAccessByIndex = (
-    info: TParadroidTileDefinition,
-    incoming: boolean,
-    index: number
-): EParadroidAccess =>
-    (incoming ? info.incoming : info.outgoing)[getRowKeyByIndex(index)]?.access ?? EParadroidAccess.unset;
-
 export const getRowKeyByIndex = (index: number): 'top' | 'mid' | 'bot' =>
     index === 2 ? 'bot' : index === 1 ? 'mid' : 'top';
-
-export const getRowAccessByKey = (
-    info: TParadroidTileDefinition,
-    incoming: boolean,
-    key: 'top' | 'mid' | 'bot'
-): EParadroidAccess => (incoming ? info.incoming : info.outgoing)[key]?.access ?? EParadroidAccess.unset;
-
-export const getRowKeysFromDefinition = (info: TParadroidTileDefinition, incoming = true): ['top', 'mid'?, 'bot'?] => {
-    const column = incoming ? info.incoming : info.outgoing;
-    return column.bot ? ['top', 'mid', 'bot'] : column.mid ? ['top', 'mid'] : ['top'];
-};
