@@ -18,6 +18,7 @@ export class Utils {
     static rngElement<T>(array: T[]): T {
         return array[Utils.rng(array.length - 1)];
     }
+
     static rngElementDict<T>(array: T[]): T {
         const tmp: T[] = [];
         array.forEach((item: T): void => {
@@ -25,6 +26,7 @@ export class Utils {
         });
         return tmp[Utils.rng(tmp.length - 1)];
     }
+
     /**
      * Returns a random integer between start (inclusive) and end (inclusive)
      * If end is not given start is 0
@@ -44,3 +46,16 @@ export class Utils {
         return Utils.rng(100) <= percent;
     }
 }
+
+/**
+ * Returns a random integer between start (inclusive) and end (inclusive)
+ * If end is not given start is 0
+ */
+export const rng = (start: number, end?: number) => {
+    const range: number = end ? end - start + 1 : start + 1;
+    return Math.floor(Math.random() * range) + (end ? start : 0);
+};
+/**
+ * Returns if a 100 percent roll is lower than the given percentage
+ */
+export const rngPercentageHit = (percent: number) => rng(100) <= percent;

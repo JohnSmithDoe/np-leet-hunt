@@ -1,4 +1,5 @@
-import { EParadroidDifficulty, EParadroidOwner } from '../paradroid.consts';
+import { EParadroidDifficulty } from '../paradroid.consts';
+import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
 import { ParadroidEngine } from './paradroid.engine';
 import { StateMachine } from './stateMachine';
 

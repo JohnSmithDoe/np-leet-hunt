@@ -1,5 +1,6 @@
 import { Utils } from '../../sprites/paradroid/utils';
-import { EFlow, EFlowbarState, EParadroidOwner } from '../paradroid.consts';
+import { EFlow, EFlowbarState } from '../paradroid.consts';
+import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
 import { ParadroidShape } from './paradroid.shape';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

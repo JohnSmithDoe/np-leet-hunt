@@ -61,17 +61,24 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.gs = [];
         const f = new ParadroidFactory();
         const grid = f.generateGrid();
+        const paths = f.initializePath();
+        console.log(paths);
+
         for (const tileCol of grid) {
-            for (const tile of tileCol) {
-                for (const subTile of tile.subTiles) {
-                    this.pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
-                    Object.values(subTile.flow).forEach(bar => {
-                        if (!bar) return;
-                        const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-                        g.fillRect(bar.x, bar.y, bar.width, bar.height);
-                        this.gs.push(g);
-                    });
-                }
+            for (const subTile of tileCol) {
+                this.pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
+                // Object.values(subTile.flow).forEach(bar => {
+                //     if (!bar) return;
+                //     const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
+                //     g.fillRect(bar.x, bar.y, bar.width, bar.height);
+                //     this.gs.push(g);
+                // });
+
+                // if (subTile.fx === 'fx-changer') {
+                //     const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x00ff00 } });
+                //     g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
+                //     this.gs.push(g);
+                // }
             }
         }
     }

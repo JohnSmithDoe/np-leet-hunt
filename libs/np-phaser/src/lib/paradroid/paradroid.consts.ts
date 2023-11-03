@@ -1,15 +1,17 @@
 // noinspection JSSuspiciousNameCombination
 
-import { EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
+import { EFlowFrom, EFlowTo, EParadroidOwner, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
 import { TParadroidMode } from './paradroid.types';
 
 export enum EFlow {
-    FromTop,
-    FromBottom,
-    FromLeft,
-    ToTop,
-    ToBottom,
-    ToRight,
+    FromTop = EFlowFrom.Top,
+    FromBottom = EFlowFrom.Bottom,
+    FromLeft = EFlowFrom.Left,
+    FromMid = EFlowFrom.Mid,
+    ToTop = EFlowTo.Top,
+    ToBottom = EFlowTo.Bottom,
+    ToRight = EFlowTo.Right,
+    ToMid = EFlowTo.Mid,
 }
 
 export enum EFlowbarState {
@@ -31,12 +33,6 @@ export enum EParadroidDifficulty {
     Normal,
     Hard,
     Brutal,
-}
-
-export enum EParadroidOwner {
-    Player,
-    Droid,
-    Nobody,
 }
 
 export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
@@ -125,7 +121,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
         tileSet: [
             EParadroidTileType.Empty,
             EParadroidTileType.Single,
-            // EParadroidTileType.Deadend,
+            // EParadroidTileType.Deadend, // comment out for better grid?
 
             EParadroidTileType.UpDownExpand,
             EParadroidTileType.UpDownExpandDeadEnds,
@@ -162,6 +158,20 @@ export const getOppositeFlow = (flow: EFlow): EFlow => {
         return EFlow.FromBottom;
     }
 };
+
+export const getNextFlow = (flow: EFlowTo): EFlowFrom => {
+    switch (flow) {
+        case EFlowTo.Mid:
+            return EFlowFrom.Mid;
+        case EFlowTo.Top:
+            return EFlowFrom.Bottom;
+        case EFlowTo.Bottom:
+            return EFlowFrom.Top;
+        case EFlowTo.Right:
+            return EFlowFrom.Left;
+    }
+};
+export const isNextFlow = (flow: EFlowTo, next: EFlowFrom) => next === getNextFlow(flow);
 
 export const getOppositeOwner = (owner: EParadroidOwner): EParadroidOwner => {
     if (owner === EParadroidOwner.Player) {

@@ -1,4 +1,4 @@
-import { EParadroidOwner } from '../paradroid.consts';
+import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
 import { ParadroidMiddle } from './paradroid.middle';
 
 export class ParadroidCounter {

@@ -1,4 +1,4 @@
-import { EParadroidOwner } from '../paradroid.consts';
+import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
 
 export class ParadroidMiddle {
     private owner: EParadroidOwner = EParadroidOwner.Nobody;

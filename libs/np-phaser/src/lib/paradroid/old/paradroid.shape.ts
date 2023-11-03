@@ -1,13 +1,6 @@
 import { Utils } from '../../sprites/paradroid/utils';
-import {
-    CParadroidModes,
-    EFlow,
-    EParadroidOwner,
-    EParadroidSpecialFX,
-    getOppositeFlow,
-    getOppositeOwner,
-} from '../paradroid.consts';
-import { CParadroidShapeInfo, EParadroidShape } from '../paradroid.tiles-and-shapes.definitions';
+import { CParadroidModes, EFlow, EParadroidSpecialFX, getOppositeFlow, getOppositeOwner } from '../paradroid.consts';
+import { CParadroidShapeInfo, EParadroidOwner, EParadroidShape } from '../paradroid.tiles-and-shapes.definitions';
 import { TParadroidShape } from '../paradroid.types';
 import { ParadroidFlowbar } from './paradroid.flowbar';
 import { ParadroidSpecialFX } from './paradroid.specialfx';

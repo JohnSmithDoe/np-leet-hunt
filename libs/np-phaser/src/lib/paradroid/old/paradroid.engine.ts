@@ -1,5 +1,6 @@
 import { Utils } from '../../sprites/paradroid/utils';
-import { EFlow, EParadroidDifficulty, EParadroidOwner } from '../paradroid.consts';
+import { EFlow, EParadroidDifficulty } from '../paradroid.consts';
+import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
 import { TParadroidPlayer } from '../paradroid.types';
 import { ParadroidCounter } from './paradroid.counter';
 import { ParadroidMiddle } from './paradroid.middle';
