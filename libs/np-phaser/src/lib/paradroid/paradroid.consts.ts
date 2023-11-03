@@ -3,30 +3,6 @@
 import { EFlowFrom, EFlowTo, EParadroidOwner, EParadroidTileType } from './paradroid.tiles-and-shapes.definitions';
 import { TParadroidMode } from './paradroid.types';
 
-export enum EFlow {
-    FromTop = EFlowFrom.Top,
-    FromBottom = EFlowFrom.Bottom,
-    FromLeft = EFlowFrom.Left,
-    FromMid = EFlowFrom.Mid,
-    ToTop = EFlowTo.Top,
-    ToBottom = EFlowTo.Bottom,
-    ToRight = EFlowTo.Right,
-    ToMid = EFlowTo.Mid,
-}
-
-export enum EFlowbarState {
-    Deactive,
-    Activating,
-    Active,
-    Deactivating,
-}
-
-export enum EParadroidSpecialFX {
-    Combine,
-    Changer,
-    Autofire,
-}
-
 export enum EParadroidDifficulty {
     Debug,
     Easy,
@@ -143,21 +119,6 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
         autofireRate: 0,
     },
 };
-export const getOppositeFlow = (flow: EFlow): EFlow => {
-    if (flow === EFlow.FromLeft) {
-        return EFlow.ToRight;
-    } else if (flow === EFlow.FromBottom) {
-        return EFlow.ToTop;
-    } else if (flow === EFlow.FromTop) {
-        return EFlow.ToBottom;
-    } else if (flow === EFlow.ToRight) {
-        return EFlow.FromLeft;
-    } else if (flow === EFlow.ToBottom) {
-        return EFlow.FromTop;
-    } else if (flow === EFlow.ToTop) {
-        return EFlow.FromBottom;
-    }
-};
 
 export const getNextFlow = (flow: EFlowTo): EFlowFrom => {
     switch (flow) {
@@ -172,7 +133,6 @@ export const getNextFlow = (flow: EFlowTo): EFlowFrom => {
     }
 };
 export const isNextFlow = (flow: EFlowTo, next: EFlowFrom) => next === getNextFlow(flow);
-
 export const getOppositeOwner = (owner: EParadroidOwner): EParadroidOwner => {
     if (owner === EParadroidOwner.Player) {
         return EParadroidOwner.Droid;

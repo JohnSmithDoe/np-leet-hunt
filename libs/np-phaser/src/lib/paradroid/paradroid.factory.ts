@@ -1,4 +1,4 @@
-import { Utils } from '../sprites/paradroid/utils';
+import { rngPercentageHit, Utils } from '../sprites/paradroid/utils';
 import { CParadroidModes, EParadroidDifficulty, isNextFlow } from './paradroid.consts';
 import {
     CParadroidShapeInfo,
@@ -7,12 +7,13 @@ import {
     EFlowTo,
     EParadroidAccess,
     EParadroidOwner,
+    EParadroidShape,
     EParadroidTileType,
     getRowCount,
     getRowKeyByIndex,
+    isCombineShape,
 } from './paradroid.tiles-and-shapes.definitions';
 import {
-    TParadroidFlow,
     TParadroidPath,
     TParadroidSubTile,
     TParadroidSubTileDefinition,
@@ -31,14 +32,18 @@ export interface TParadroidFactoryOptions {
 }
 
 const defaultOptions: TParadroidFactoryOptions = {
-    rows: 6,
+    rows: 12,
     columns: 10,
     shapeSize: 64,
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
-    autoFireRate: 0, // percentage chance 0 - 100
+    autoFireRate: 110, // percentage chance 0 - 100
     changerRate: 110, // percentage chance 0 - 100
     tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
 };
+
+const hasCombineShapeOnPath = (path: TParadroidPath) =>
+    isCombineShape(path.subTile.shape) ||
+    path.next.reduce((hasCombine, p) => hasCombine || hasCombineShapeOnPath(p), false);
 
 export class ParadroidFactory {
     #options: TParadroidFactoryOptions;
@@ -53,12 +58,13 @@ export class ParadroidFactory {
 
     generateGrid() {
         let tileColumn: TParadroidTile[];
-        this.#initializeGrids();
+        this.#initialize();
         for (let col: number = 0, j: number = Math.trunc(this.#columns / 2); col < j; col++) {
             const tileSet = this.#adjustTileSetForColumn(col);
             tileColumn = this.#generateCol(col, tileSet);
             this.#tileGrid.push(tileColumn);
         }
+        this.#initializePaths();
         return this.#subTileGrid;
     }
 
@@ -66,6 +72,18 @@ export class ParadroidFactory {
         return col % (this.#options.stretchFactor + 1) !== 0
             ? [EParadroidTileType.Empty, EParadroidTileType.Single]
             : this.#tileSet;
+    }
+
+    #adjustPathFx(path: TParadroidPath) {
+        if (path.from !== EFlowFrom.Left) return;
+        if (path.subTile.shape !== EParadroidShape.IShape) return;
+        const prev = this.#getSubTile(path.subTile.col - 1, path.subTile.row);
+        if (prev && prev.paths.find(p => p.fx !== 'none')) return;
+        if (rngPercentageHit(this.#options.changerRate) && !hasCombineShapeOnPath(path)) {
+            path.fx = 'fx-changer';
+        } else if (rngPercentageHit(this.#options.autoFireRate)) {
+            path.fx = 'fx-autofire';
+        }
     }
 
     /**
@@ -77,9 +95,11 @@ export class ParadroidFactory {
      *
      * @return
      */
-    #initializeGrids() {
+    #initialize() {
+        this.#tileGrid = [];
         this.#accessGrid = [];
         this.#subTileGrid = [];
+        this.#paths = [];
         for (let i = 0; i < this.#columns; i++) {
             this.#accessGrid[i] = [];
             this.#subTileGrid[i] = [];
@@ -88,6 +108,21 @@ export class ParadroidFactory {
                 this.#subTileGrid[i][j] = undefined;
             }
         }
+    }
+
+    #initializePaths() {
+        // set all next first
+        for (const path of this.#paths) {
+            const nextSubTile = this.#getNextSubTile(path.subTile, path.to);
+            path.next = this.#paths.filter(p => p.subTile === nextSubTile && isNextFlow(path.to, p.from));
+        }
+        // set all other attributes afterward
+        for (const path of this.#paths) {
+            path.prev = this.#paths.filter(p => p.next.find(p2 => p2 === path));
+            this.#adjustPathFx(path);
+        }
+
+        // const starts = this.#paths.filter(p => p.subTile.col === 0 && p.flowFrom === EFlowFrom.Left).shift();
     }
 
     #generateCol(col: number, aTypeSet: EParadroidTileType[]): TParadroidTile[] {
@@ -123,6 +158,7 @@ export class ParadroidFactory {
         }
         return tile;
     }
+
     #generateSubTile(
         tile: TParadroidTile,
         subTileDef: TParadroidSubTileDefinition,
@@ -136,30 +172,17 @@ export class ParadroidFactory {
             x: subCol * this.#shapeSize + this.#shapeSize / 2 + tile.x,
             y: subRow * this.#shapeSize + this.#shapeSize / 2 + tile.y,
             ...subTileDef,
+            paths: [],
         };
-        this.#generateSubtileFlow(subTile);
+        this.#generateSubTilePaths(subTile);
         this.#subTileGrid[subTile.col][subTile.row] = subTile;
         return subTile;
     }
 
-    initializePath() {
-        // set all next first
-        for (const path of this.#paths) {
-            const nextSubTile = this.#getNextSubTile(path.subTile, path.to);
-            path.next = this.#paths.filter(p => p.subTile === nextSubTile && isNextFlow(path.to, p.from));
-        }
-        // set all prev afterwards
-        for (const path of this.#paths) {
-            path.prev = this.#paths.filter(p => p.next.find(p2 => p2 === path));
-        }
-        // const starts = this.#paths.filter(p => p.subTile.col === 0 && p.flowFrom === EFlowFrom.Left).shift();
-        return this.#paths;
-    }
-
-    #generateSubtileFlow(subTile: TParadroidSubTile) {
+    #generateSubTilePaths(subTile: TParadroidSubTile) {
         const info = CParadroidShapeInfo[subTile.shape];
         for (const flow of Object.values(info.flows)) {
-            this.#paths.push({
+            const path: TParadroidPath = {
                 subTile,
                 ...flow,
                 fx: 'none',
@@ -170,78 +193,11 @@ export class ParadroidFactory {
                 height: 0,
                 next: [],
                 prev: [],
-            });
+            };
+            subTile.paths.push(path);
         }
+        this.#paths.push(...subTile.paths);
     }
-
-    #generateFlow(isSet: boolean, subTile: TParadroidSubTile, flowFrom: EFlowFrom, flowTo: EFlowTo): TParadroidFlow {
-        if (!isSet) return undefined;
-        const barStrength = 8; // TODO: settings
-        const halfBarStrength = barStrength / 2;
-        const halfShapeSize: number = this.#shapeSize / 2;
-        const horizontal = flowFrom === EFlowFrom.Left || flowTo === EFlowTo.Right;
-        let x: number;
-        let y: number;
-        let barLength = halfShapeSize - halfBarStrength;
-        switch (flowFrom) {
-            case EFlowFrom.Top:
-                x = halfShapeSize - halfBarStrength;
-                y = 0;
-                break;
-            case EFlowFrom.Bottom:
-                x = halfShapeSize - halfBarStrength;
-                y = halfShapeSize + halfBarStrength;
-                break;
-            case EFlowFrom.Left:
-                x = 0;
-                y = halfShapeSize - halfBarStrength;
-                break;
-            case EFlowFrom.Mid:
-                switch (flowTo) {
-                    case EFlowTo.Top:
-                        x = halfShapeSize - halfBarStrength;
-                        y = 0;
-                        break;
-                    case EFlowTo.Bottom:
-                        x = halfShapeSize - halfBarStrength;
-                        y = halfShapeSize + halfBarStrength;
-                        break;
-                    case EFlowTo.Right:
-                        x = halfShapeSize + halfBarStrength;
-                        y = halfShapeSize - halfBarStrength;
-                        barLength = halfShapeSize + halfBarStrength - barStrength; // TODO debug
-                        break;
-                }
-                break;
-        }
-
-        return {
-            subTile,
-            x: subTile.x + x,
-            y: subTile.y + y,
-            from: flowFrom,
-            to: flowTo,
-            width: horizontal ? barLength : barStrength,
-            height: horizontal ? barStrength : barLength,
-        };
-    }
-
-    #getRandomTileType = (aTileSet: EParadroidTileType[], col: EParadroidAccess[], row: number): EParadroidTileType => {
-        const isFitting = (info: TParadroidTileDefinition): boolean => {
-            const rows = getRowCount(info);
-            let result: boolean = row + rows <= col.length;
-            if (result) {
-                for (let i: number = 0, j: number = rows; i < j; i++) {
-                    const nextAccess = col[row + i];
-                    const rowAccessByIndex = info.incoming[getRowKeyByIndex(i)].access;
-                    result &&= nextAccess === EParadroidAccess.unset || nextAccess === rowAccessByIndex;
-                }
-            }
-            return result;
-        };
-        const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
-        return Utils.rngElement(suitableTypes);
-    };
 
     get #columns() {
         return this.#options.columns;
@@ -277,4 +233,21 @@ export class ParadroidFactory {
         }
         return result;
     }
+
+    #getRandomTileType = (aTileSet: EParadroidTileType[], col: EParadroidAccess[], row: number): EParadroidTileType => {
+        const isFitting = (info: TParadroidTileDefinition): boolean => {
+            const rows = getRowCount(info);
+            let result: boolean = row + rows <= col.length;
+            if (result) {
+                for (let i: number = 0, j: number = rows; i < j; i++) {
+                    const nextAccess = col[row + i];
+                    const rowAccessByIndex = info.incoming[getRowKeyByIndex(i)].access;
+                    result &&= nextAccess === EParadroidAccess.unset || nextAccess === rowAccessByIndex;
+                }
+            }
+            return result;
+        };
+        const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
+        return Utils.rngElement(suitableTypes);
+    };
 }

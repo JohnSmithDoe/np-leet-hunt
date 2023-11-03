@@ -3,7 +3,6 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
-import { ParadroidContainer } from '../paradroid/old/paradroid.container';
 import { ParadroidFactory } from '../paradroid/paradroid.factory';
 import { EParadroidShape } from '../paradroid/paradroid.tiles-and-shapes.definitions';
 import { TParadroidSubTile } from '../paradroid/paradroid.types';
@@ -27,7 +26,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private stars: Phaser.GameObjects.TileSprite;
 
     private pipes: Pipe[] = [];
-    private p: ParadroidContainer;
     private gs = [];
 
     constructor(private npStage: StageService) {
@@ -61,8 +59,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.gs = [];
         const f = new ParadroidFactory();
         const grid = f.generateGrid();
-        const paths = f.initializePath();
-        console.log(paths);
 
         for (const tileCol of grid) {
             for (const subTile of tileCol) {
@@ -74,11 +70,16 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
                 //     this.gs.push(g);
                 // });
 
-                // if (subTile.fx === 'fx-changer') {
-                //     const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x00ff00 } });
-                //     g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
-                //     this.gs.push(g);
-                // }
+                if (subTile.paths.find(p => p.fx === 'fx-changer')) {
+                    const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x00ff00 } });
+                    g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
+                    this.gs.push(g);
+                }
+                if (subTile.paths.find(p => p.fx === 'fx-autofire')) {
+                    const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x0000ff } });
+                    g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
+                    this.gs.push(g);
+                }
             }
         }
     }
@@ -110,6 +111,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     create() {
         super.create();
         this.gs.forEach(g => this.addToLayer('ui', g));
+        this.cameras.getCamera('ui-camera').setZoom(0.75);
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
         this.physics.enableUpdate();
         //  World size is 8000 x 6000

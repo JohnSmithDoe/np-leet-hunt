@@ -13,6 +13,7 @@ export enum EFlowTo {
     Right = 'to-right',
     Mid = 'to-mid',
 }
+
 export enum EParadroidOwner {
     Player,
     Droid,
@@ -71,18 +72,12 @@ export enum EParadroidTileType {
 
 export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     [EParadroidShape.Empty]: {
-        input: { left: false, bottom: false, top: false },
-        output: { right: false, bottom: false, top: false },
         flows: [],
     },
     [EParadroidShape.Deadend]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: false, bottom: false, top: false },
         flows: [{ from: EFlowFrom.Left, to: EFlowTo.Mid }],
     },
     [EParadroidShape.IShape]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
@@ -90,16 +85,12 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.LShapeLeftDown]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: false, bottom: true, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Bottom },
         ],
     },
     [EParadroidShape.LShapeLeftUp]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: false, bottom: false, top: true },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Top },
@@ -107,16 +98,12 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.LShapeUpRight]: {
-        input: { left: false, bottom: true, top: false },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Bottom, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
         ],
     },
     [EParadroidShape.LShapeDownRight]: {
-        input: { left: false, bottom: false, top: true },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Top, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
@@ -124,8 +111,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.TShapeUpCombine]: {
-        input: { left: true, bottom: false, top: true },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Top, to: EFlowTo.Mid },
@@ -133,8 +118,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
         ],
     },
     [EParadroidShape.TShapeDownCombine]: {
-        input: { left: true, bottom: true, top: false },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Bottom, to: EFlowTo.Mid },
@@ -143,8 +126,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.TShapeUpExpand]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: true, bottom: false, top: true },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
@@ -152,8 +133,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
         ],
     },
     [EParadroidShape.TShapeDownExpand]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: true, bottom: true, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
@@ -162,8 +141,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.TShapeUpDownCombine]: {
-        input: { left: false, bottom: true, top: true },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Bottom, to: EFlowTo.Mid },
             { from: EFlowFrom.Top, to: EFlowTo.Mid },
@@ -171,8 +148,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
         ],
     },
     [EParadroidShape.TShapeUpDownExpand]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: false, bottom: true, top: true },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Top },
@@ -181,8 +156,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     },
 
     [EParadroidShape.XShapeExpand]: {
-        input: { left: true, bottom: false, top: false },
-        output: { right: true, bottom: true, top: true },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Mid, to: EFlowTo.Right },
@@ -191,8 +164,6 @@ export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
         ],
     },
     [EParadroidShape.XShapeCombine]: {
-        input: { left: true, bottom: true, top: true },
-        output: { right: true, bottom: false, top: false },
         flows: [
             { from: EFlowFrom.Left, to: EFlowTo.Mid },
             { from: EFlowFrom.Top, to: EFlowTo.Mid },

@@ -9,32 +9,16 @@ import {
 
 export type TParadroidPlayer = EParadroidOwner.Player | EParadroidOwner.Droid;
 
-export interface TParadroidGatesIn {
-    left: boolean;
-    top: boolean;
-    bottom: boolean;
-}
-
-export interface TParadroidGatesOut {
-    right: boolean;
-    top: boolean;
-    bottom: boolean;
-}
-
 export interface TParadroidShape {
-    input: TParadroidGatesIn;
-    output: TParadroidGatesOut;
     flows: { from: EFlowFrom; to: EFlowTo }[];
 }
 
-export interface TParadroidFlow extends Phaser.Types.Math.Vector2Like {
+export interface TParadroidPath extends Phaser.Types.Math.Vector2Like {
     subTile: TParadroidSubTile;
     from: EFlowFrom;
     to: EFlowTo;
     width: number;
     height: number;
-}
-export interface TParadroidPath extends TParadroidFlow {
     owner: EParadroidOwner;
     fx: 'none' | 'fx-autofire' | 'fx-changer';
     next: TParadroidPath[];
@@ -45,6 +29,7 @@ export interface TParadroidSubTile extends Phaser.Types.Math.Vector2Like, TParad
     tile: TParadroidTile;
     col: number;
     row: number;
+    paths: TParadroidPath[];
 }
 
 export interface TParadroidSubTileDefinition {

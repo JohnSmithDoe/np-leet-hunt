@@ -1,4 +1,4 @@
-import { TParadroidPlayer } from '../paradroid.types';
+import { TParadroidPlayer } from '../../libs/np-phaser/src/lib/paradroid/paradroid.types';
 import { ParadroidEngine } from './paradroid.engine';
 
 export class ParadroidButton {

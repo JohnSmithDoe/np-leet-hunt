@@ -1,4 +1,4 @@
-import { EParadroidOwner } from '../paradroid.tiles-and-shapes.definitions';
+import { EParadroidOwner } from '../../libs/np-phaser/src/lib/paradroid/paradroid.tiles-and-shapes.definitions';
 import { ParadroidMiddle } from './paradroid.middle';
 
 export class ParadroidCounter {
