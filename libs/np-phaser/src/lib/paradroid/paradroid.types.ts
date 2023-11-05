@@ -5,7 +5,7 @@ import {
     EParadroidOwner,
     EParadroidShape,
     EParadroidTileType,
-} from './paradroid.tiles-and-shapes.definitions';
+} from './paradroid.consts';
 
 export type TParadroidPlayer = EParadroidOwner.Player | EParadroidOwner.Droid;
 
@@ -13,28 +13,26 @@ export interface TParadroidShape {
     flows: { from: EFlowFrom; to: EFlowTo }[];
 }
 
-export interface TParadroidPath extends Phaser.Types.Math.Vector2Like {
+export interface TParadroidPath {
     subTile: TParadroidSubTile;
     from: EFlowFrom;
     to: EFlowTo;
-    width: number;
-    height: number;
     owner: EParadroidOwner;
     fx: 'none' | 'fx-autofire' | 'fx-changer';
+    state: 'active' | 'none';
     next: TParadroidPath[];
     prev: TParadroidPath[];
-}
-
-export interface TParadroidSubTile extends Phaser.Types.Math.Vector2Like, TParadroidSubTileDefinition {
-    tile: TParadroidTile;
-    col: number;
-    row: number;
-    paths: TParadroidPath[];
 }
 
 export interface TParadroidSubTileDefinition {
     shape: EParadroidShape;
     access: EParadroidAccess;
+}
+export interface TParadroidSubTile extends TParadroidSubTileDefinition {
+    tile: TParadroidTile;
+    col: number;
+    row: number;
+    paths: TParadroidPath[];
 }
 
 export interface TParadroidTileDefinition {

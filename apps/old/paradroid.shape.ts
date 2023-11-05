@@ -2,7 +2,7 @@ import {
     CParadroidShapeInfo,
     EParadroidOwner,
     EParadroidShape,
-} from '../../libs/np-phaser/src/lib/paradroid/paradroid.tiles-and-shapes.definitions';
+} from '../../libs/np-phaser/src/lib/paradroid/paradroid.consts';
 import { TParadroidShape } from '../../libs/np-phaser/src/lib/paradroid/paradroid.types';
 import { Utils } from '../../libs/np-phaser/src/lib/sprites/paradroid/utils';
 import { ParadroidFlowbar } from './paradroid.flowbar';

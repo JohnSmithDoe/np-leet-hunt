@@ -1,18 +1,16 @@
 import { rngPercentageHit, Utils } from '../sprites/paradroid/utils';
-import { CParadroidModes, EParadroidDifficulty, isNextFlow } from './paradroid.consts';
 import {
+    CParadroidModes,
     CParadroidShapeInfo,
     CParadroidTileInfo,
     EFlowFrom,
     EFlowTo,
     EParadroidAccess,
+    EParadroidDifficulty,
     EParadroidOwner,
     EParadroidShape,
     EParadroidTileType,
-    getRowCount,
-    getRowKeyByIndex,
-    isCombineShape,
-} from './paradroid.tiles-and-shapes.definitions';
+} from './paradroid.consts';
 import {
     TParadroidPath,
     TParadroidSubTile,
@@ -20,6 +18,7 @@ import {
     TParadroidTile,
     TParadroidTileDefinition,
 } from './paradroid.types';
+import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow } from './paradroid.utils';
 
 export interface TParadroidFactoryOptions {
     rows: number;
@@ -31,7 +30,7 @@ export interface TParadroidFactoryOptions {
     tileSet: EParadroidTileType[];
 }
 
-const defaultOptions: TParadroidFactoryOptions = {
+export const defaultFactoryOptions: TParadroidFactoryOptions = {
     rows: 12,
     columns: 10,
     shapeSize: 64,
@@ -52,8 +51,8 @@ export class ParadroidFactory {
     #paths: TParadroidPath[] = [];
     #accessGrid: EParadroidAccess[][] = [];
 
-    constructor(options?: TParadroidFactoryOptions) {
-        this.#options = options ?? defaultOptions;
+    constructor(options: TParadroidFactoryOptions) {
+        this.#options = options;
     }
 
     generateGrid() {
@@ -169,8 +168,6 @@ export class ParadroidFactory {
             tile,
             col: tile.col * 2 + subCol,
             row: tile.row + subRow,
-            x: subCol * this.#shapeSize + this.#shapeSize / 2 + tile.x,
-            y: subRow * this.#shapeSize + this.#shapeSize / 2 + tile.y,
             ...subTileDef,
             paths: [],
         };
@@ -187,10 +184,7 @@ export class ParadroidFactory {
                 ...flow,
                 fx: 'none',
                 owner: EParadroidOwner.Nobody,
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
+                state: 'none',
                 next: [],
                 prev: [],
             };

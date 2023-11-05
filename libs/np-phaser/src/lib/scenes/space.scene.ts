@@ -3,13 +3,11 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
-import { ParadroidFactory } from '../paradroid/paradroid.factory';
-import { EParadroidShape } from '../paradroid/paradroid.tiles-and-shapes.definitions';
-import { TParadroidSubTile } from '../paradroid/paradroid.types';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { Pipe } from '../sprites/paradroid/pipe';
+import { ParadroidEngine } from '../sprites/paradroid/paradroid.engine';
+import { ParadroidField } from '../sprites/paradroid/paradroid.field';
 import { Reality } from '../sprites/reality/reality';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
@@ -25,7 +23,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private map: NPSpaceMap;
     private stars: Phaser.GameObjects.TileSprite;
 
-    private pipes: Pipe[] = [];
+    private pipes: ParadroidField[] = [];
     private gs = [];
 
     constructor(private npStage: StageService) {
@@ -57,31 +55,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private generateStuff() {
         this.pipes = [];
         this.gs = [];
-        const f = new ParadroidFactory();
-        const grid = f.generateGrid();
-
-        for (const tileCol of grid) {
-            for (const subTile of tileCol) {
-                this.pipes.push(this.pipeForShape(subTile).setPosition(subTile.x, subTile.y));
-                // Object.values(subTile.flow).forEach(bar => {
-                //     if (!bar) return;
-                //     const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0xff0000 } });
-                //     g.fillRect(bar.x, bar.y, bar.width, bar.height);
-                //     this.gs.push(g);
-                // });
-
-                if (subTile.paths.find(p => p.fx === 'fx-changer')) {
-                    const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x00ff00 } });
-                    g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
-                    this.gs.push(g);
-                }
-                if (subTile.paths.find(p => p.fx === 'fx-autofire')) {
-                    const g = this.make.graphics({ fillStyle: { alpha: 0.5, color: 0x0000ff } });
-                    g.fillRect(subTile.x + 24, subTile.y + 24, 16, 16);
-                    this.gs.push(g);
-                }
-            }
-        }
+        const f = new ParadroidEngine(this);
+        this.addComponent(f);
     }
 
     init() {
@@ -109,9 +84,10 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      * * Phaser will only call create after all assets in Preload have been loaded
      */
     create() {
-        super.create();
         this.gs.forEach(g => this.addToLayer('ui', g));
-        this.cameras.getCamera('ui-camera').setZoom(0.75);
+        super.create();
+        this.pipes.filter(p => p.col === 0).forEach(p => p.activate());
+        // this.cameras.getCamera('ui-camera').setZoom(0.75);
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
         this.physics.enableUpdate();
         //  World size is 8000 x 6000
@@ -212,40 +188,5 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // this.ts.setPosition(worldBounds.x, worldBounds.y);
         // this.ts.setSize(worldBounds.width, worldBounds.height);
         // console.log(this.controls.camera);
-    }
-
-    private pipeForShape(subTile?: TParadroidSubTile) {
-        switch (subTile?.shape) {
-            case EParadroidShape.Empty:
-                return new Pipe(this, 'empty');
-            case EParadroidShape.IShape:
-                return new Pipe(this, 'right_left_straight');
-            case EParadroidShape.Deadend:
-                return new Pipe(this, 'left_endCap');
-            case EParadroidShape.LShapeLeftUp:
-                return new Pipe(this, 'top_left_elbow');
-            case EParadroidShape.LShapeLeftDown:
-                return new Pipe(this, 'bottom_left_elbow');
-            case EParadroidShape.LShapeUpRight:
-                return new Pipe(this, 'right_bottom_elbow');
-            case EParadroidShape.LShapeDownRight:
-                return new Pipe(this, 'top_right_elbow');
-            case EParadroidShape.TShapeDownCombine:
-                return new Pipe(this, 'right_bottom_left_tee');
-            case EParadroidShape.TShapeDownExpand:
-                return new Pipe(this, 'right_bottom_left_tee');
-            case EParadroidShape.TShapeUpCombine:
-                return new Pipe(this, 'top_right_left_tee');
-            case EParadroidShape.TShapeUpExpand:
-                return new Pipe(this, 'top_right_left_tee');
-            case EParadroidShape.TShapeUpDownExpand:
-                return new Pipe(this, 'top_bottom_left_tee');
-            case EParadroidShape.TShapeUpDownCombine:
-                return new Pipe(this, 'top_right_bottom_tee');
-            case EParadroidShape.XShapeExpand:
-                return new Pipe(this, 'cross');
-            case EParadroidShape.XShapeCombine:
-                return new Pipe(this, 'cross');
-        }
     }
 }

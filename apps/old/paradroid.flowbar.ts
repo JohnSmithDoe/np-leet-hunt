@@ -1,8 +1,4 @@
-import {
-    EFlowFrom,
-    EFlowTo,
-    EParadroidOwner,
-} from '../../libs/np-phaser/src/lib/paradroid/paradroid.tiles-and-shapes.definitions';
+import { EFlowFrom, EFlowTo, EParadroidOwner } from '../../libs/np-phaser/src/lib/paradroid/paradroid.consts';
 import { TParadroidSubTile } from '../../libs/np-phaser/src/lib/paradroid/paradroid.types';
 import { ParadroidShape } from './paradroid.shape';
 
@@ -80,8 +76,8 @@ export class ParadroidFlowbar {
 
         return {
             subTile,
-            x: subTile.x + x,
-            y: subTile.y + y,
+            x,
+            y,
             from: flowFrom,
             to: flowTo,
             width: horizontal ? barLength : barStrength,

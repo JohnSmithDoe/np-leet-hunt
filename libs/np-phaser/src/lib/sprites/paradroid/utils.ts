@@ -1,7 +1,8 @@
 export class Utils {
-    public static readonly PI: number = Math.PI;
     public static readonly PIQuart: number = Math.PI / 4;
     public static readonly PIHalf: number = Math.PI / 2;
+    public static readonly PI: number = Math.PI;
+    public static readonly PIAndAHalf: number = Math.PI / 2 + Math.PI;
     public static readonly PIDouble: number = Math.PI * 2;
     public static readonly OneDegInRad: number = Utils.PIDouble / 360;
     public static readonly DIR_RIGHT: number = Utils.PIHalf;
@@ -11,7 +12,7 @@ export class Utils {
 
     // Input: [ [1, 2, 3], [101, 2, 1, 10], [2, 1] ]
     // Output: [1, 2, 3, 101, 10]
-    public static mergeArrays<T extends any[]>(...arr: T[]): any[] {
+    public static mergeArrays<T extends unknown[]>(...arr: T[]): unknown[] {
         return [...new Set<T>([].concat(...arr))];
     }
 
