@@ -1,4 +1,4 @@
-import { rngPercentageHit, Utils } from '../sprites/paradroid/utils';
+import { rngElement, rngPercentageHit } from '../sprites/paradroid/utils';
 import {
     CParadroidModes,
     CParadroidShapeInfo,
@@ -242,6 +242,6 @@ export class ParadroidFactory {
             return result;
         };
         const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
-        return Utils.rngElement(suitableTypes);
+        return rngElement(suitableTypes);
     };
 }

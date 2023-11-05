@@ -2,10 +2,8 @@ import * as Phaser from 'phaser';
 
 import { EFlowFrom, EParadroidShape } from '../../paradroid/paradroid.consts';
 import { TParadroidSubTile } from '../../paradroid/paradroid.types';
-import { getNextFlow } from '../../paradroid/paradroid.utils';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent, NPSceneContainer } from '../../scenes/np-scene-component';
-import { ParadroidEngine } from './paradroid.engine';
 import { EVENTS, ParadroidPath } from './paradroid.path';
 
 const SHEET = { key: 'pipes', url: 'np-phaser/paradroid/assets/paradroid.png', frameWidth: 120, frameHeight: 120 };
@@ -90,16 +88,9 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
     #subTile: TParadroidSubTile;
     #paths: NPSceneContainer<ParadroidPath>;
     #options: { width: number; height?: number };
-    #engine: ParadroidEngine;
 
-    constructor(
-        public scene: NPScene,
-        engine: ParadroidEngine,
-        subTile: TParadroidSubTile,
-        options: { width: number; height?: number }
-    ) {
+    constructor(public scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
         super(scene, 0, 0, '');
-        this.#engine = engine;
         this.#subTile = subTile;
         this.#options = options;
         this.#paths = new NPSceneContainer<ParadroidPath>(scene);
@@ -114,8 +105,9 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         this.setName(`${this.#subTile.col}_${this.#subTile.row}`).setOrigin(0).setPosition(x, y);
 
         for (const path of this.#subTile.paths) {
-            const paradroidPath = new ParadroidPath(this.scene, this.#engine, this, path);
-            paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onActivated(p));
+            const paradroidPath = new ParadroidPath(this.scene, this, path);
+            paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
+            paradroidPath.on(EVENTS.DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
             this.#paths.add(paradroidPath);
         }
         this.#paths.init();
@@ -154,21 +146,35 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
 
     activate(from: EFlowFrom = EFlowFrom.Left) {
         console.log(from);
-
         this.#paths.list.filter(p => p.from === from).forEach(p => p.activate());
     }
+    deactivate(from: EFlowFrom = EFlowFrom.Left) {
+        console.log(from);
+        this.#paths.list.filter(p => p.from === from).forEach(p => p.deactivate());
+    }
 
-    #onActivated(path: ParadroidPath) {
+    #onPathActivated(path: ParadroidPath) {
         if (path.isIncoming && this.isActive()) {
             // all active -> activate outgoing
             this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.activate());
         } else if (!path.isIncoming) {
             // activate next
-            path.next.forEach(p => this.#engine.activate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
+            this.emit('activate_next', this, path);
+        }
+    }
+    #onPathDeactivated(path: ParadroidPath) {
+        console.log('path deactiv on');
+
+        if (path.isIncoming) {
+            // not all active -> deactivate outgoing
+            this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.deactivate());
+        } else if (!path.isIncoming) {
+            // deactivate next
+            this.emit('deactivate_next', this, path);
         }
     }
 
     private isActive() {
-        return this.#paths.list.reduce((isActive, path) => isActive && (!path.isIncoming || path.activated), true);
+        return this.#paths.list.reduce((isActive, path) => isActive && (!path.isIncoming || path.isActive), true);
     }
 }
