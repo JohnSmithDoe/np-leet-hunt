@@ -177,7 +177,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      */
     resize(gameSize?: Phaser.Structs.Size): void {
         console.log('resize');
-        this.cameras.cameras.forEach(cam => console.log(cam.renderList));
+        // this.cameras.cameras.forEach(cam => console.log(cam.renderList));
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
         // this.stars.setSize(width, height);

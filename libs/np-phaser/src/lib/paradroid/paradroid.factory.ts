@@ -13,12 +13,13 @@ import {
 } from './paradroid.consts';
 import {
     TParadroidPath,
+    TParadroidPlayer,
     TParadroidSubTile,
     TParadroidSubTileDefinition,
     TParadroidTile,
     TParadroidTileDefinition,
 } from './paradroid.types';
-import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow } from './paradroid.utils';
+import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow, oppositeOwner } from './paradroid.utils';
 
 export interface TParadroidFactoryOptions {
     rows: number;
@@ -28,6 +29,7 @@ export interface TParadroidFactoryOptions {
     changerRate: number;
     autoFireRate: number;
     tileSet: EParadroidTileType[];
+    owner: TParadroidPlayer;
 }
 
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
@@ -35,9 +37,10 @@ export const defaultFactoryOptions: TParadroidFactoryOptions = {
     columns: 10,
     shapeSize: 64,
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
-    autoFireRate: 110, // percentage chance 0 - 100
-    changerRate: 110, // percentage chance 0 - 100
+    autoFireRate: 10, // percentage chance 0 - 100
+    changerRate: 50, // percentage chance 0 - 100
     tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
+    owner: EParadroidOwner.Player,
 };
 
 const hasCombineShapeOnPath = (path: TParadroidPath) =>
@@ -74,17 +77,23 @@ export class ParadroidFactory {
     }
 
     #adjustPathFx(path: TParadroidPath) {
+        if (path.subTile.col === 0) return;
         if (path.from !== EFlowFrom.Left) return;
         if (path.subTile.shape !== EParadroidShape.IShape) return;
         const prev = this.#getSubTile(path.subTile.col - 1, path.subTile.row);
         if (prev && prev.paths.find(p => p.fx !== 'none')) return;
         if (rngPercentageHit(this.#options.changerRate) && !hasCombineShapeOnPath(path)) {
             path.fx = 'fx-changer';
+            this.#applyFxChanger(path);
         } else if (rngPercentageHit(this.#options.autoFireRate)) {
             path.fx = 'fx-autofire';
         }
     }
 
+    #applyFxChanger(path: TParadroidPath) {
+        path.owner = oppositeOwner(path.owner);
+        path.next.forEach(p => this.#applyFxChanger(p));
+    }
     /**
      * Create a Grid with path access in the first column. The rest is unset
      * - X X X
@@ -165,7 +174,6 @@ export class ParadroidFactory {
         subCol: number
     ): TParadroidSubTile {
         const subTile: TParadroidSubTile = {
-            tile,
             col: tile.col * 2 + subCol,
             row: tile.row + subRow,
             ...subTileDef,
@@ -182,9 +190,8 @@ export class ParadroidFactory {
             const path: TParadroidPath = {
                 subTile,
                 ...flow,
+                owner: this.#options.owner,
                 fx: 'none',
-                owner: EParadroidOwner.Nobody,
-                state: 'none',
                 next: [],
                 prev: [],
             };

@@ -1,5 +1,5 @@
 import { EFlowFrom, EFlowTo, EParadroidOwner, EParadroidShape } from './paradroid.consts';
-import { TParadroidTileDefinition } from './paradroid.types';
+import { TParadroidPlayer, TParadroidTileDefinition } from './paradroid.types';
 
 export const isCombineShape = (shape: EParadroidShape): boolean =>
     [
@@ -35,12 +35,5 @@ export const getNextFlow = (flow: EFlowTo): EFlowFrom => {
     }
 };
 export const isNextFlow = (flow: EFlowTo, next: EFlowFrom) => next === getNextFlow(flow);
-export const getOppositeOwner = (owner: EParadroidOwner): EParadroidOwner => {
-    if (owner === EParadroidOwner.Player) {
-        return EParadroidOwner.Droid;
-    } else if (owner === EParadroidOwner.Droid) {
-        return EParadroidOwner.Player;
-    } else {
-        return EParadroidOwner.Nobody;
-    }
-};
+export const oppositeOwner = (owner: TParadroidPlayer): TParadroidPlayer =>
+    owner === EParadroidOwner.Player ? EParadroidOwner.Droid : EParadroidOwner.Player;

@@ -1,5 +1,6 @@
 import { EFlowFrom } from '../../paradroid/paradroid.consts';
 import { defaultFactoryOptions, ParadroidFactory, TParadroidFactoryOptions } from '../../paradroid/paradroid.factory';
+import { TParadroidPlayer } from '../../paradroid/paradroid.types';
 import { getNextFlow } from '../../paradroid/paradroid.utils';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent, NPSceneContainer } from '../../scenes/np-scene-component';
@@ -25,7 +26,10 @@ export class ParadroidEngine implements NPSceneComponent {
         for (const tileCol of grid) {
             const fieldCol = [];
             for (const subTile of tileCol) {
-                const field = new ParadroidField(this.scene, subTile, { width: this.#options.shapeSize });
+                const field = new ParadroidField(this.scene, subTile, {
+                    width: this.#options.shapeSize,
+                    interactive: subTile.col === 0,
+                });
                 fieldCol.push(field);
                 if (field.col === 0) {
                     field.on('pointerdown', () => this.#onFieldClick(field));
@@ -67,8 +71,6 @@ export class ParadroidEngine implements NPSceneComponent {
         const config: Phaser.Types.Time.TimerEventConfig = {
             delay: 3000,
             callback: () => {
-                console.log('trigger deactive');
-
                 delete this.#deactivateMap[key];
                 field.deactivate();
             },
@@ -82,10 +84,19 @@ export class ParadroidEngine implements NPSceneComponent {
 
     #activateNext(field: ParadroidField, path: ParadroidPath) {
         console.log('actuve next');
-        path.next.forEach(p => this.activate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
+        if (path.next.length === 0) {
+            console.log('end reached');
+            this.#activateMiddle(field.row, path.owner);
+        } else {
+            path.next.forEach(p => this.activate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
+        }
     }
     #deactivateNext(field: ParadroidField, path: ParadroidPath) {
         console.log('deactuve next');
         path.next.forEach(p => this.deactivate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
+    }
+
+    #activateMiddle(row: number, owner: TParadroidPlayer) {
+        console.log(row, owner);
     }
 }

@@ -87,14 +87,26 @@ const shapeToFieldDefinition = (shape: EParadroidShape) => {
 export class ParadroidField extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     #subTile: TParadroidSubTile;
     #paths: NPSceneContainer<ParadroidPath>;
-    #options: { width: number; height?: number };
+    #options: { width: number; height?: number; interactive?: boolean };
 
-    constructor(public scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
+    constructor(
+        public scene: NPScene,
+        subTile: TParadroidSubTile,
+        options: { width: number; height?: number; interactive?: boolean }
+    ) {
         super(scene, 0, 0, '');
         this.#subTile = subTile;
         this.#options = options;
         this.#paths = new NPSceneContainer<ParadroidPath>(scene);
-        if (subTile.col === 0) this.setInteractive({ useHandCursor: true });
+
+        for (const path of this.#subTile.paths) {
+            const paradroidPath = new ParadroidPath(this.scene, this, path);
+            paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
+            paradroidPath.on(EVENTS.DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
+            this.#paths.add(paradroidPath);
+        }
+
+        if (options.interactive) this.setInteractive({ useHandCursor: true });
     }
 
     init(): void {
@@ -104,12 +116,6 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         const y = this.#subTile.row * height;
         this.setName(`${this.#subTile.col}_${this.#subTile.row}`).setOrigin(0).setPosition(x, y);
 
-        for (const path of this.#subTile.paths) {
-            const paradroidPath = new ParadroidPath(this.scene, this, path);
-            paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
-            paradroidPath.on(EVENTS.DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
-            this.#paths.add(paradroidPath);
-        }
         this.#paths.init();
     }
 
@@ -142,6 +148,13 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
 
     get row() {
         return this.#subTile.row;
+    }
+
+    get tileWidth() {
+        return this.#options.width;
+    }
+    get tileHeight() {
+        return this.#options.height ?? this.tileWidth;
     }
 
     activate(from: EFlowFrom = EFlowFrom.Left) {

@@ -2,8 +2,8 @@
 
 import * as Phaser from 'phaser';
 
-import { EFlowFrom, EFlowTo } from '../../paradroid/paradroid.consts';
-import { TParadroidPath } from '../../paradroid/paradroid.types';
+import { EFlowFrom, EFlowTo, EParadroidOwner } from '../../paradroid/paradroid.consts';
+import { TParadroidPath, TParadroidPlayer } from '../../paradroid/paradroid.types';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent } from '../../scenes/np-scene-component';
 import { ParadroidField } from './paradroid.field';
@@ -25,7 +25,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     #pos: { rot: number; x: number; width: number; y: number; height: number };
 
     constructor(public scene: NPScene, field: ParadroidField, path: TParadroidPath) {
-        super(scene, 0, 0, '');
+        super(scene, field.x, field.y, '');
         this.#field = field;
         this.#path = path;
     }
@@ -37,11 +37,31 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     }
 
     create(): void {
-        this.setTexture(SHEET.key, this.#path.fx === 'fx-changer' ? 0 : 1);
+        this.setTexture(SHEET.key, this.owner === EParadroidOwner.Droid ? 0 : 1);
         this.#setActivatingOrientation();
-        this.setDisplaySize(0, this.#pos.height);
+        const size = 16;
+        const center = this.getCenter();
+        const x = center.x - size / 2;
+        const y = center.y - size / 2;
+        let g: Phaser.GameObjects.Graphics;
 
+        switch (this.#path.fx) {
+            case 'none':
+                g = this.scene.make.graphics({ fillStyle: { alpha: 0.15, color: 0xff0000 } });
+                break;
+            case 'fx-autofire':
+                g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x00ff00 } });
+                break;
+            case 'fx-changer':
+                g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x0000ff } });
+                break;
+        }
+        g.fillRect(x, y, size, size);
+        // set to inactive state -> comment to see the full path net
+        this.setDisplaySize(0, this.#pos.height);
+        if (this.#path.fx === 'fx-autofire') this.activate(); // probably not here
         this.scene.addToLayer('ui', this);
+        this.scene.addToLayer('ui', g);
     }
 
     update(...args) {
@@ -78,6 +98,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     }
 
     deactivate() {
+        if (this.#path.fx === 'fx-autofire') return;
         this.#setDeactivatingOrientation();
         this.#state = 'deactivating';
     }
@@ -97,8 +118,17 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     get isIncoming() {
         return this.#path.to === EFlowTo.Mid;
     }
+
     get isActive() {
         return this.#state === 'active';
+    }
+
+    get owner(): TParadroidPlayer {
+        return this.#path.owner;
+    }
+
+    set owner(value: TParadroidPlayer) {
+        this.#path.owner = value;
     }
 
     #setActivatingOrientation() {

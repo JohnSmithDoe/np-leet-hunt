@@ -17,9 +17,8 @@ export interface TParadroidPath {
     subTile: TParadroidSubTile;
     from: EFlowFrom;
     to: EFlowTo;
-    owner: EParadroidOwner;
     fx: 'none' | 'fx-autofire' | 'fx-changer';
-    state: 'active' | 'none';
+    owner: TParadroidPlayer;
     next: TParadroidPath[];
     prev: TParadroidPath[];
 }
@@ -29,7 +28,6 @@ export interface TParadroidSubTileDefinition {
     access: EParadroidAccess;
 }
 export interface TParadroidSubTile extends TParadroidSubTileDefinition {
-    tile: TParadroidTile;
     col: number;
     row: number;
     paths: TParadroidPath[];
