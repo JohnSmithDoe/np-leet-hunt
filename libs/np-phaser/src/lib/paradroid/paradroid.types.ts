@@ -13,11 +13,13 @@ export interface TParadroidShape {
     flows: { from: EFlowFrom; to: EFlowTo }[];
 }
 
+export type TParadroidFx = 'none' | 'fx-autofire' | 'fx-changer';
+
 export interface TParadroidPath {
     subTile: TParadroidSubTile;
     from: EFlowFrom;
     to: EFlowTo;
-    fx: 'none' | 'fx-autofire' | 'fx-changer';
+    fx: TParadroidFx;
     owner: TParadroidPlayer;
     next: TParadroidPath[];
     prev: TParadroidPath[];

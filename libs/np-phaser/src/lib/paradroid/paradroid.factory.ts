@@ -3,7 +3,6 @@ import {
     CParadroidModes,
     CParadroidShapeInfo,
     CParadroidTileInfo,
-    EFlowFrom,
     EFlowTo,
     EParadroidAccess,
     EParadroidDifficulty,
@@ -78,7 +77,7 @@ export class ParadroidFactory {
 
     #adjustPathFx(path: TParadroidPath) {
         if (path.subTile.col === 0) return;
-        if (path.from !== EFlowFrom.Left) return;
+        if (path.to !== EFlowTo.Right) return;
         if (path.subTile.shape !== EParadroidShape.IShape) return;
         const prev = this.#getSubTile(path.subTile.col - 1, path.subTile.row);
         if (prev && prev.paths.find(p => p.fx !== 'none')) return;

@@ -48,6 +48,9 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         }
     }
 
+    layer(name: TNPLayerKeys) {
+        return this.#layers.getByName(name);
+    }
     addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
         if (Array.isArray(gameObject)) {
             gameObject.forEach(gameObj => this.addToLayer(name, gameObj));
@@ -67,8 +70,8 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         } else {
             for (const layer of this.#layers.list) {
                 if (layer.name === name) {
-                    layer.remove(gameObject, true);
-                    gameObject.destroy(true);
+                    layer.remove(gameObject);
+                    // gameObject.destroy(true);
                 }
             }
         }

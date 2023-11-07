@@ -1,9 +1,16 @@
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../../scenes/np-scene';
+import { NPSceneComponent } from '../../scenes/np-scene-component';
 
-export class TextButton extends Phaser.GameObjects.Text {
-    constructor(public scene: NPScene, x: number, y: number, text: string | string[], style?: Phaser.Types.GameObjects.Text.TextStyle) {
+export class TextButton extends Phaser.GameObjects.Text implements NPSceneComponent {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        text: string | string[],
+        style?: Phaser.Types.GameObjects.Text.TextStyle
+    ) {
         super(scene, x, y, text, style);
 
         this.setInteractive({ useHandCursor: true });

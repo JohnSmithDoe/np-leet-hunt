@@ -3,10 +3,10 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
+import { ParadroidGame } from '../paradroid/paradroid.game';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { ParadroidEngine } from '../sprites/paradroid/paradroid.engine';
 import { ParadroidField } from '../sprites/paradroid/paradroid.field';
 import { Reality } from '../sprites/reality/reality';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
@@ -55,7 +55,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private generateStuff() {
         this.pipes = [];
         this.gs = [];
-        const f = new ParadroidEngine(this);
+        const f = new ParadroidGame(this);
         this.addComponent(f);
     }
 
@@ -126,8 +126,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             this.cameras.main.setZoom(this.cameras.main.zoom - 0.1);
         });
         this.addToLayer('ui', zoomOutTxtBtn);
-
-        console.log(this.cameras);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         const bubble = createSpeechBubble(
             this,

@@ -1,7 +1,8 @@
 import * as Phaser from 'phaser';
 
 import { EFlowFrom, EParadroidShape } from '../../paradroid/paradroid.consts';
-import { TParadroidSubTile } from '../../paradroid/paradroid.types';
+import { TParadroidFx, TParadroidSubTile } from '../../paradroid/paradroid.types';
+import { isCombineShape, isExpandShape } from '../../paradroid/paradroid.utils';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent, NPSceneContainer } from '../../scenes/np-scene-component';
 import { EVENTS, ParadroidPath } from './paradroid.path';
@@ -99,6 +100,12 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         this.#options = options;
         this.#paths = new NPSceneContainer<ParadroidPath>(scene);
 
+        const width = this.#options.width;
+        const height = this.#options.height ?? width;
+        const x = this.#subTile.col * width;
+        const y = this.#subTile.row * height;
+        this.setName(`${this.#subTile.col}_${this.#subTile.row}`).setOrigin(0).setPosition(x, y);
+
         for (const path of this.#subTile.paths) {
             const paradroidPath = new ParadroidPath(this.scene, this, path);
             paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
@@ -110,12 +117,6 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
     }
 
     init(): void {
-        const width = this.#options.width;
-        const height = this.#options.height ?? width;
-        const x = this.#subTile.col * width;
-        const y = this.#subTile.row * height;
-        this.setName(`${this.#subTile.col}_${this.#subTile.row}`).setOrigin(0).setPosition(x, y);
-
         this.#paths.init();
     }
 
@@ -126,15 +127,43 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         this.#paths.preload();
     }
 
-    create(): void {
+    create(container?: Phaser.GameObjects.Container): void {
         const def = shapeToFieldDefinition(this.#subTile.shape);
 
         this.setTexture(SHEET.key, def.frame).setDisplaySize(
             this.#options.width,
             this.#options.height ?? this.#options.width
         );
-        this.scene.addToLayer('ui', this);
-        this.#paths.create();
+        container?.add(this);
+        this.#paths.create(container);
+        let g: Phaser.GameObjects.Graphics;
+        const size = 16;
+        const center = this.getCenter();
+        const x = center.x - size / 2;
+        const y = center.y - size / 2;
+        if (isCombineShape(this.#subTile.shape) || isExpandShape(this.#subTile.shape)) {
+            g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0xff0000 } });
+            g.fillRect(x, y, size, size);
+            container?.add(g);
+        } else {
+            const fxType = this.#paths.list.reduce(
+                (fx, path) => (fx !== 'none' ? fx : path.fx),
+                'none' as TParadroidFx
+            );
+            switch (fxType) {
+                case 'none':
+                    g = this.scene.make.graphics({ fillStyle: { alpha: 0.15, color: 0xff0000 } });
+                    break;
+                case 'fx-autofire':
+                    g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x00ff00 } });
+                    break;
+                case 'fx-changer':
+                    g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x0000ff } });
+                    break;
+            }
+            g.fillRect(x, y, size, size);
+            container?.add(g);
+        }
     }
 
     update(...args) {
@@ -153,6 +182,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
     get tileWidth() {
         return this.#options.width;
     }
+
     get tileHeight() {
         return this.#options.height ?? this.tileWidth;
     }
@@ -161,6 +191,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         console.log(from);
         this.#paths.list.filter(p => p.from === from).forEach(p => p.activate());
     }
+
     deactivate(from: EFlowFrom = EFlowFrom.Left) {
         console.log(from);
         this.#paths.list.filter(p => p.from === from).forEach(p => p.deactivate());
@@ -175,6 +206,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
             this.emit('activate_next', this, path);
         }
     }
+
     #onPathDeactivated(path: ParadroidPath) {
         console.log('path deactiv on');
 

@@ -36,32 +36,13 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
         }
     }
 
-    create(): void {
+    create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(SHEET.key, this.owner === EParadroidOwner.Droid ? 0 : 1);
         this.#setActivatingOrientation();
-        const size = 16;
-        const center = this.getCenter();
-        const x = center.x - size / 2;
-        const y = center.y - size / 2;
-        let g: Phaser.GameObjects.Graphics;
-
-        switch (this.#path.fx) {
-            case 'none':
-                g = this.scene.make.graphics({ fillStyle: { alpha: 0.15, color: 0xff0000 } });
-                break;
-            case 'fx-autofire':
-                g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x00ff00 } });
-                break;
-            case 'fx-changer':
-                g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x0000ff } });
-                break;
-        }
-        g.fillRect(x, y, size, size);
         // set to inactive state -> comment to see the full path net
         this.setDisplaySize(0, this.#pos.height);
         if (this.#path.fx === 'fx-autofire') this.activate(); // probably not here
-        this.scene.addToLayer('ui', this);
-        this.scene.addToLayer('ui', g);
+        container?.add(this);
     }
 
     update(...args) {
@@ -127,8 +108,8 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
         return this.#path.owner;
     }
 
-    set owner(value: TParadroidPlayer) {
-        this.#path.owner = value;
+    get fx() {
+        return this.#path.fx;
     }
 
     #setActivatingOrientation() {

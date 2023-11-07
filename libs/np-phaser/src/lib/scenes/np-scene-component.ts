@@ -12,7 +12,7 @@ export interface NPBaseComponent {
 export interface NPSceneComponent extends NPBaseComponent {
     preload?(): void;
 
-    create?(): void;
+    create?(container?: Phaser.GameObjects.Container): void;
 
     update?(time: number, delta: number): void;
 }
@@ -26,7 +26,7 @@ export interface NPSceneComponentContainer {
 
     preload(): void;
 
-    create(): void;
+    create(container?: Phaser.GameObjects.Container): void;
 
     update(time: number, delta: number): void;
 }
@@ -62,10 +62,10 @@ export class NPSceneContainer<T extends NPSceneComponent>
         }
     }
 
-    create(): void {
+    create(container?: Phaser.GameObjects.Container): void {
         for (const component of this.list) {
             if (component.create) {
-                component.create();
+                component.create(container);
             }
         }
     }
