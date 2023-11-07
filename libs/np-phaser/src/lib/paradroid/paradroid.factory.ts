@@ -23,7 +23,8 @@ import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow, oppositeOwne
 export interface TParadroidFactoryOptions {
     rows: number;
     columns: number;
-    shapeSize: number;
+    tileWidth: number;
+    tileHeight?: number;
     stretchFactor: number;
     changerRate: number;
     autoFireRate: number;
@@ -34,7 +35,7 @@ export interface TParadroidFactoryOptions {
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
     rows: 12,
     columns: 10,
-    shapeSize: 64,
+    tileWidth: 64,
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
     autoFireRate: 10, // percentage chance 0 - 100
     changerRate: 50, // percentage chance 0 - 100
@@ -149,8 +150,8 @@ export class ParadroidFactory {
         const type = this.#getRandomTileType(aTileTypeSet, this.#accessGrid[col], row);
         // Col multiplied by 2 for the tileColumn shapes included in the tile.
         const pos = {
-            x: col * (2 * this.#shapeSize),
-            y: row * this.#shapeSize,
+            x: col * (2 * this.#tileWidth),
+            y: row * this.#tileHeight,
         };
         const info = CParadroidTileInfo[type];
         const tile: TParadroidTile = { ...pos, ...info, type, col, row, subTiles: [] };
@@ -207,8 +208,11 @@ export class ParadroidFactory {
         return this.#options.rows;
     }
 
-    get #shapeSize() {
-        return this.#options.shapeSize;
+    get #tileWidth() {
+        return this.#options.tileWidth;
+    }
+    get #tileHeight() {
+        return this.#options.tileHeight;
     }
 
     get #tileSet() {

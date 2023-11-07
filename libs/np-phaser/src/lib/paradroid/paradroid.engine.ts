@@ -73,7 +73,8 @@ export class ParadroidEngine {
             const fieldCol = [];
             for (const subTile of tileCol) {
                 const field = new ParadroidField(this.scene, subTile, {
-                    width: this.#options.shapeSize,
+                    width: this.#options.tileWidth,
+                    height: this.#options.tileHeight ?? this.#options.tileWidth,
                     interactive: subTile.col === 0,
                 });
                 fieldCol.push(field);

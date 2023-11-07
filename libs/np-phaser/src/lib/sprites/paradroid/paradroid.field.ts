@@ -137,7 +137,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         container?.add(this);
         this.#paths.create(container);
         let g: Phaser.GameObjects.Graphics;
-        const size = 16;
+        const size = Math.min(this.#options.width, this.#options.height ?? Number.MAX_SAFE_INTEGER) / 4;
         const center = this.getCenter();
         const x = center.x - size / 2;
         const y = center.y - size / 2;
@@ -151,18 +151,17 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
                 'none' as TParadroidFx
             );
             switch (fxType) {
-                case 'none':
-                    g = this.scene.make.graphics({ fillStyle: { alpha: 0.15, color: 0xff0000 } });
-                    break;
                 case 'fx-autofire':
                     g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x00ff00 } });
+                    g.fillRect(x, y, size, size);
+                    container?.add(g);
                     break;
                 case 'fx-changer':
                     g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x0000ff } });
+                    g.fillRect(x, y, size, size);
+                    container?.add(g);
                     break;
             }
-            g.fillRect(x, y, size, size);
-            container?.add(g);
         }
     }
 

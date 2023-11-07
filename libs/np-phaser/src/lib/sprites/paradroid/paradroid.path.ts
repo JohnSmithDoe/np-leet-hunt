@@ -22,12 +22,18 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     #field: ParadroidField;
     #path: TParadroidPath;
 
-    #pos: { rot: number; x: number; width: number; y: number; height: number };
+    #fullWidth: number;
+    #tileWidth: number;
+    #tileHeight: number;
+    #thickness: number;
 
     constructor(public scene: NPScene, field: ParadroidField, path: TParadroidPath) {
         super(scene, field.x, field.y, '');
         this.#field = field;
         this.#path = path;
+        this.#tileWidth = this.#field.tileWidth;
+        this.#tileHeight = this.#field.tileHeight;
+        this.#thickness = Math.min(this.#tileWidth, this.#tileHeight ?? Number.MAX_SAFE_INTEGER) / 4;
     }
 
     preload(): void {
@@ -39,40 +45,37 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(SHEET.key, this.owner === EParadroidOwner.Droid ? 0 : 1);
         this.#setActivatingOrientation();
-        // set to inactive state -> comment to see the full path net
-        this.setDisplaySize(0, this.#pos.height);
+        // set to inactive state
+        this.setDisplaySize(0, this.#thickness);
+        // this.setDisplaySize(this.#fullWidth, this.#thickness);
         if (this.#path.fx === 'fx-autofire') this.activate(); // probably not here
         container?.add(this);
     }
 
     update(...args) {
         super.update(...args);
-
-        if (this.#pos) {
-            switch (this.#state) {
-                case 'activating':
-                    this.displayWidth += 160 / 60;
-                    if (this.displayWidth >= this.#pos.width) {
-                        this.displayWidth = this.#pos.width;
-                        this.#state = 'active';
-                        this.emit(EVENTS.ACTIVATED, this);
-                    }
-                    break;
-                case 'deactivating':
-                    this.displayWidth -= 60 / 60;
-                    if (Math.round(this.displayWidth) === 0) {
-                        this.displayWidth = 0;
-                        this.#state = 'inactive';
-                        this.emit(EVENTS.DEACTIVATED, this);
-                    }
-                    break;
-                case 'active':
-                case 'inactive':
-                    break;
-            }
+        switch (this.#state) {
+            case 'activating':
+                this.displayWidth += 160 / 60;
+                if (this.displayWidth >= this.#fullWidth) {
+                    this.displayWidth = this.#fullWidth;
+                    this.#state = 'active';
+                    this.emit(EVENTS.ACTIVATED, this);
+                }
+                break;
+            case 'deactivating':
+                this.displayWidth -= 60 / 60;
+                if (Math.round(this.displayWidth) === 0) {
+                    this.displayWidth = 0;
+                    this.#state = 'inactive';
+                    this.emit(EVENTS.DEACTIVATED, this);
+                }
+                break;
+            case 'active':
+            case 'inactive':
+                break;
         }
     }
-
     activate() {
         this.#setActivatingOrientation();
         this.#state = 'activating';
@@ -113,53 +116,55 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
     }
 
     #setActivatingOrientation() {
-        let pos = { x: 0, y: 0, rot: 0, width: 32, height: SHEET.frameHeight };
+        let pos = { x: 0, y: 0, rot: 0, width: this.#tileWidth / 2, height: this.#tileHeight / 2 };
         switch (this.#path.from) {
             case EFlowFrom.Top:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
+                    x: 0.5 * this.#tileWidth,
                     y: 0,
                     rot: PIHalf,
-                    width: pos.width + SHEET.frameHeight / 2,
+                    width: pos.height + this.#thickness / 2,
                 };
                 break;
             case EFlowFrom.Bottom:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
-                    y: 64,
+                    x: 0.5 * this.#tileWidth,
+                    y: this.#tileHeight,
                     rot: PIAndAHalf,
-                    width: pos.width + SHEET.frameHeight / 2,
+                    width: pos.height + this.#thickness / 2,
                 };
                 break;
             case EFlowFrom.Left:
                 pos = {
                     ...pos,
                     x: 0,
-                    y: 0.5 * 64,
-                    width: pos.width + SHEET.frameHeight / 2,
+                    y: 0.5 * this.#tileHeight,
+                    width: pos.width + this.#thickness / 2,
                 };
                 break;
             case EFlowFrom.Mid:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
-                    y: 0.5 * 64,
+                    x: 0.5 * this.#tileWidth,
+                    y: 0.5 * this.#tileHeight,
                     rot: 0,
-                    width: pos.width - SHEET.frameHeight / 2,
+                    width: pos.width - this.#thickness / 2,
                 };
                 switch (this.#path.to) {
                     case EFlowTo.Top:
-                        pos.y -= SHEET.frameHeight / 2;
+                        pos.y -= this.#thickness / 2;
                         pos.rot = PIAndAHalf;
+                        pos.width = pos.height - this.#thickness / 2;
                         break;
                     case EFlowTo.Right:
-                        pos.x += SHEET.frameHeight / 2;
+                        pos.x += this.#thickness / 2;
                         break;
                     case EFlowTo.Bottom:
-                        pos.y += SHEET.frameHeight / 2;
+                        pos.y += this.#thickness / 2;
                         pos.rot = PIHalf;
+                        pos.width = pos.height - this.#thickness / 2;
                         break;
                 }
                 break;
@@ -167,71 +172,72 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
 
         this.setOrigin(0, 0.5);
         this.setRotation(pos.rot);
-        this.#pos = pos;
+        this.#fullWidth = pos.width;
         this.setPosition(this.#field.x + pos.x, this.#field.y + pos.y);
     }
 
     #setDeactivatingOrientation() {
-        let pos = { x: 0, y: 0, rot: 0, width: 32, height: SHEET.frameHeight };
+        let pos = { x: 0, y: 0, rot: 0, width: this.#tileWidth / 2, height: this.#tileHeight / 2 };
         switch (this.#path.from) {
             case EFlowFrom.Top:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
-                    y: 0.5 * 64 + SHEET.frameHeight / 2,
+                    x: 0.5 * this.#tileWidth,
+                    y: 0.5 * this.#tileHeight + this.#thickness / 2,
                     rot: PIAndAHalf,
-                    width: pos.width,
+                    width: pos.height,
                 };
                 break;
             case EFlowFrom.Bottom:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
-                    y: 0.5 * 64 - SHEET.frameHeight / 2,
+                    x: 0.5 * this.#tileWidth,
+                    y: 0.5 * this.#tileHeight - this.#thickness / 2,
                     rot: PIHalf,
-                    width: pos.width - SHEET.frameHeight / 2,
+                    width: pos.height - this.#thickness / 2,
                 };
                 break;
             case EFlowFrom.Left:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64 + SHEET.frameHeight / 2,
-                    y: 0.5 * 64,
-                    width: pos.width + SHEET.frameHeight / 2,
+                    x: 0.5 * this.#tileWidth + this.#thickness / 2,
+                    y: 0.5 * this.#tileHeight,
+                    width: pos.width + this.#thickness / 2,
                     rot: PI,
                 };
                 break;
             case EFlowFrom.Mid:
                 pos = {
                     ...pos,
-                    x: 0.5 * 64,
-                    y: 0.5 * 64,
+                    x: 0.5 * this.#tileWidth,
+                    y: 0.5 * this.#tileHeight,
                     rot: 0,
-                    width: pos.width - SHEET.frameHeight / 2,
+                    width: pos.width - this.#thickness / 2,
                 };
                 switch (this.#path.to) {
                     case EFlowTo.Top:
                         pos = {
                             ...pos,
-                            x: 0.5 * 64,
+                            x: 0.5 * this.#tileWidth,
                             y: 0,
                             rot: PIHalf,
-                            width: pos.width - SHEET.frameHeight / 2,
+                            width: pos.height - this.#thickness / 2,
                         };
                         break;
                     case EFlowTo.Right:
-                        pos.x = 64;
+                        pos.x = this.#tileWidth;
                         pos.rot = PI;
                         break;
                     case EFlowTo.Bottom:
-                        pos.y = 64;
+                        pos.y = this.#tileHeight;
                         pos.rot = PIAndAHalf;
+                        pos.width = pos.height - this.#thickness / 2;
                         break;
                 }
                 break;
         }
         this.setRotation(pos.rot);
-        this.#pos = pos;
+        this.#fullWidth = pos.width;
         this.setPosition(this.#field.x + pos.x, this.#field.y + pos.y);
     }
 }
