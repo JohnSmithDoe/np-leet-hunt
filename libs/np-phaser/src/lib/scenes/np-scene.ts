@@ -6,16 +6,13 @@ import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from '.
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
 export abstract class NPScene extends Phaser.Scene implements NPSceneComponentContainer {
-    #components = new NPSceneContainer<NPSceneComponent>(this);
+    protected components = new NPSceneContainer<NPSceneComponent>(this);
     #layers = new NPSceneContainer<NPLayer>(this);
     #debugOut: Phaser.GameObjects.Text;
-    x: Phaser.Structs.List<NPLayer> = new Phaser.Structs.List<NPLayer>(this);
 
     abstract setupComponents(): void;
 
     #initScene() {
-        const npLayer = new NPLayer(this, 'bg', false);
-        this.x.add(npLayer);
         this.cameras.resetAll();
         this.cameras.remove(this.cameras.main);
         console.log('23:#initScene');
@@ -44,7 +41,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         if (Array.isArray(component)) {
             component.forEach(comp => this.addComponent(comp));
         } else {
-            this.#components.add(component);
+            this.components.add(component);
         }
     }
 
@@ -71,9 +68,16 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             for (const layer of this.#layers.list) {
                 if (layer.name === name) {
                     layer.remove(gameObject);
-                    // gameObject.destroy(true);
+                    gameObject.destroy(true);
                 }
             }
+        }
+    }
+    removeFromContainer(component: NPSceneComponent | NPSceneComponent[]) {
+        if (Array.isArray(component)) {
+            component.forEach(comp => this.removeFromContainer(comp));
+        } else {
+            this.components.remove(component);
         }
     }
     createLayer(name: TNPLayerKeys, makeMain = false) {
@@ -84,22 +88,22 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         this.#initScene();
         this.setupComponents();
         this.#layers.init();
-        this.#components.init();
+        this.components.init();
     }
 
     preload() {
-        this.#components.preload();
+        this.components.preload();
         this.#layers.preload();
     }
 
     create(container?: Phaser.GameObjects.Container) {
         this.#layers.create(container);
-        this.#components.create(container);
+        this.components.create(container);
     }
 
     update(time: number, delta: number) {
         super.update(time, delta);
         this.#layers.update(time, delta);
-        this.#components.update(time, delta);
+        this.components.update(time, delta);
     }
 }

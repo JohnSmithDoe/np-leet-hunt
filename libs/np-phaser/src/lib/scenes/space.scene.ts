@@ -24,6 +24,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
 
     private pipes: ParadroidField[] = [];
     private gs = [];
+    #paradroidGame: ParadroidGame;
 
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
@@ -41,13 +42,14 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // this.addComponent(this.map);
         // this.addComponent(new Reality(this, 'reality1'));
 
-        const f = new ParadroidGame(this);
-        this.addComponent(f);
+        this.#paradroidGame = new ParadroidGame(this);
+        this.addComponent(this.#paradroidGame);
     }
 
     init() {
         super.init();
         this.scale.baseSize.setSize(1920, 1080);
+        // this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
         const scroller = new MouseWheelScroller(this, {
             enable: true,
             speed: 0.1,
@@ -101,11 +103,15 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
 
         const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
         recreateBtn.on('pointerup', () => {
-            this.removeFromLayer('ui', this.pipes);
-            this.removeFromLayer('ui', this.gs);
+            this.removeFromContainer(this.#paradroidGame);
+            this.removeFromLayer('ui', this.#paradroidGame.container);
+            console.log(this.layer('ui').list, this.components);
+            const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
             this.generateStuff();
-            this.pipes.forEach(p => p.create());
-            this.gs.forEach(g => this.addToLayer('ui', g));
+            this.#paradroidGame.init();
+            this.#paradroidGame.create(newcontainer);
+            this.addToLayer('ui', newcontainer);
+            // this.generateStuff();
         });
         this.addToLayer('ui', recreateBtn);
 

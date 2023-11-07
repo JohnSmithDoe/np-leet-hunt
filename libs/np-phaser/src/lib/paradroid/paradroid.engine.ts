@@ -1,5 +1,3 @@
-import * as Phaser from 'phaser';
-
 import { ParadroidField } from '../sprites/paradroid/paradroid.field';
 import { ParadroidPath } from '../sprites/paradroid/paradroid.path';
 import { EFlowFrom } from './paradroid.consts';
@@ -8,8 +6,6 @@ import { getNextFlow } from './paradroid.utils';
 
 export class ParadroidEngine {
     readonly #fieldGrid: ParadroidField[][]; // O(1) access to the #fields
-    // move to button -> then no map is needed
-    #deactivateMap: Phaser.Time.TimerEvent[] = [];
     get grid() {
         return this.#fieldGrid;
     }
@@ -37,9 +33,7 @@ export class ParadroidEngine {
     }
 
     #activateNext(field: ParadroidField, path: ParadroidPath) {
-        console.log('actuve next');
         if (path.next.length === 0) {
-            console.log('end reached');
             this.#activateMiddle(field.row, path.owner);
         } else {
             path.next.forEach(p => this.activate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
@@ -47,7 +41,6 @@ export class ParadroidEngine {
     }
 
     #deactivateNext(field: ParadroidField, path: ParadroidPath) {
-        console.log('deactuve next');
         path.next.forEach(p => this.deactivate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
     }
 

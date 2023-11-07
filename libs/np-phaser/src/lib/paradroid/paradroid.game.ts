@@ -24,6 +24,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #engine: ParadroidEngine;
     #buttons: NPSceneContainer<ParadroidButton>;
     #timer: BinaryTimer;
+    container: Phaser.GameObjects.Container;
 
     constructor(scene: NPScene, options?: TParadroidFactoryOptions) {
         super(scene);
@@ -87,6 +88,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         container?.add(middle);
         container?.add(droid);
         container?.add(buttons2);
+        this.container = container;
     }
 
     #generateFields() {

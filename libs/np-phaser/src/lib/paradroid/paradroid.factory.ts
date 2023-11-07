@@ -34,13 +34,13 @@ export interface TParadroidFactoryOptions {
 
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
     rows: 8,
-    columns: 12, // only use even values
+    columns: 6, // only use even values
     tileWidth: 64,
     tileHeight: 64,
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
     autoFireRate: 10, // percentage chance 0 - 100
-    changerRate: 50, // percentage chance 0 - 100
-    tileSet: CParadroidModes[EParadroidDifficulty.Easy].tileSet,
+    changerRate: 5, // percentage chance 0 - 100
+    tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
     owner: EParadroidOwner.Player,
 };
 
