@@ -1,5 +1,3 @@
-import { EventEmitter } from '@angular/core';
-
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent } from '../../scenes/np-scene-component';
 import { NPTimer } from '../../utilities/np-timer';
@@ -41,8 +39,8 @@ const defaultOptions: TBinareTimerOptions = {
 };
 
 export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneComponent {
+    static EVENT_TIMER_ENDED = 'binary-timer-ended';
     options: TBinareTimerOptions;
-    onTimerEnded = new EventEmitter();
 
     #startTime: number;
     #barWidth: number;
@@ -92,7 +90,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneC
         } else {
             time = this.#getTime();
             if ((reachedEnd = this.#reachedEnd(time))) {
-                this.onTimerEnded.emit();
+                this.emit(BinaryTimer.EVENT_TIMER_ENDED);
                 this.#frenzyMode = true;
             }
         }
