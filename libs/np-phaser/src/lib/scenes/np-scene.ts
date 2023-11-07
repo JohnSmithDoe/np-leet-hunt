@@ -92,9 +92,9 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         this.#layers.preload();
     }
 
-    create() {
-        this.#layers.create();
-        this.#components.create();
+    create(container?: Phaser.GameObjects.Container) {
+        this.#layers.create(container);
+        this.#components.create(container);
     }
 
     update(time: number, delta: number) {

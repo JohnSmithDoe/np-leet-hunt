@@ -142,7 +142,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
         const x = center.x - size / 2;
         const y = center.y - size / 2;
         if (isCombineShape(this.#subTile.shape) || isExpandShape(this.#subTile.shape)) {
-            g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0xff0000 } });
+            g = this.scene.make.graphics({ fillStyle: { alpha: 0.1, color: 0xff0000 } });
             g.fillRect(x, y, size, size);
             container?.add(g);
         } else {

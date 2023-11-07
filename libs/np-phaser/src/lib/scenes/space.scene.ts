@@ -3,12 +3,11 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
-import { ParadroidGame } from '../paradroid/paradroid.game';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { ParadroidField } from '../sprites/paradroid/paradroid.field';
-import { Reality } from '../sprites/reality/reality';
+import { BinaryTimer } from '../sprites/timer/binarytimer';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
 import { NPScene } from './np-scene';
@@ -31,23 +30,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     }
 
     async setupComponents() {
-        this.map = new NPSpaceMap(this);
-        this.addComponent(this.map);
-        this.addComponent(new Reality(this, 'reality1'));
-
-        // for (let i = 0; i < Object.keys(PIPE_DEFINITIONS).length; i++) {
-        //     const def = Object.keys(PIPE_DEFINITIONS)[i] as keyof typeof PIPE_DEFINITIONS;
-        //     this.pipes.push(new Pipe(this, def).setPosition(500 + i * 64, 440));
-        // }
-        // this.addComponent(this.pipes);
-        // this.p = new ParadroidContainer();
-        // for (const tile of this.p.engine.player_grid.children) {
-        //     for (const shape of tile.shapes) {
-        //         const pipe = this.pipeForShape(shape);
-        //         pipe.setPosition(tile.pos.x + shape.pos.x, tile.pos.y + shape.pos.y);
-        //         this.addComponent(pipe);
-        //     }
-        // }
         this.generateStuff();
         this.addComponent(this.pipes);
     }
@@ -55,8 +37,14 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private generateStuff() {
         this.pipes = [];
         this.gs = [];
-        const f = new ParadroidGame(this);
-        this.addComponent(f);
+        // this.map = new NPSpaceMap(this);
+        // this.addComponent(this.map);
+        // this.addComponent(new Reality(this, 'reality1'));
+
+        // const f = new ParadroidGame(this);
+        // this.addComponent(f);
+        const bt = new BinaryTimer(this, { startTime: 6e5, min: false });
+        this.addComponent(bt);
     }
 
     init() {
@@ -85,7 +73,10 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      */
     create() {
         this.gs.forEach(g => this.addToLayer('ui', g));
-        super.create();
+        const container = new Phaser.GameObjects.Container(this, 0, 0, []);
+
+        super.create(container);
+        this.addToLayer('ui', container);
         this.pipes.filter(p => p.col === 0).forEach(p => p.activate());
         // this.cameras.getCamera('ui-camera').setZoom(0.75);
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
@@ -147,7 +138,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             'fps',
             `${this.game.loop.actualFps}`,
             'planets',
-            `${this.map.list.length}`,
+            `${this.map?.list.length}`,
             'zoom',
             `${this.cameras.main.zoom}`,
             't',
