@@ -40,7 +40,7 @@ export const defaultFactoryOptions: TParadroidFactoryOptions = {
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
     autoFireRate: 10, // percentage chance 0 - 100
     changerRate: 50, // percentage chance 0 - 100
-    tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
+    tileSet: CParadroidModes[EParadroidDifficulty.Easy].tileSet,
     owner: EParadroidOwner.Player,
 };
 
@@ -60,15 +60,33 @@ export class ParadroidFactory {
     }
 
     generateGrid() {
-        let tileColumn: TParadroidTile[];
-        this.#initialize();
-        for (let col: number = 0, j: number = Math.trunc(this.#columns / 2); col < j; col++) {
-            const tileSet = this.#adjustTileSetForColumn(col);
-            tileColumn = this.#generateCol(col, tileSet);
-            this.#tileGrid.push(tileColumn);
-        }
+        let isValid = false;
+        let tryouts = 0;
+        do {
+            let tileColumn: TParadroidTile[];
+            this.#initialize();
+            for (let col: number = 0, j: number = Math.trunc(this.columns / 2); col < j; col++) {
+                const tileSet = this.#adjustTileSetForColumn(col);
+                tileColumn = this.#generateCol(col, tileSet);
+                this.#tileGrid.push(tileColumn);
+            }
+            isValid = this.#validateGrid();
+            tryouts++;
+            if (tryouts > 100) throw new Error('Could not generate grid');
+        } while (!isValid);
+
         this.#initializePaths();
         return this.#subTileGrid;
+    }
+
+    #validateGrid(minCount?: number) {
+        const lastCol = this.#subTileGrid[this.#subTileGrid.length - 1];
+        return (
+            lastCol.reduce(
+                (count, current) => (current.paths.find(p => p.to === EFlowTo.Right) ? count + 1 : count),
+                0
+            ) >= (minCount ?? lastCol.length / 2)
+        );
     }
 
     #adjustTileSetForColumn(col: number) {
@@ -95,6 +113,7 @@ export class ParadroidFactory {
         path.owner = oppositeOwner(path.owner);
         path.next.forEach(p => this.#applyFxChanger(p));
     }
+
     /**
      * Create a Grid with path access in the first column. The rest is unset
      * - X X X
@@ -109,10 +128,10 @@ export class ParadroidFactory {
         this.#accessGrid = [];
         this.#subTileGrid = [];
         this.#paths = [];
-        for (let i = 0; i < this.#columns; i++) {
+        for (let i = 0; i < this.columns; i++) {
             this.#accessGrid[i] = [];
             this.#subTileGrid[i] = [];
-            for (let j = 0; j < this.#rows; j++) {
+            for (let j = 0; j < this.rows; j++) {
                 this.#accessGrid[i][j] = i === 0 ? EParadroidAccess.hasPath : EParadroidAccess.unset;
                 this.#subTileGrid[i][j] = undefined;
             }
@@ -139,7 +158,7 @@ export class ParadroidFactory {
         let tile: TParadroidTile;
         const result: TParadroidTile[] = [];
         currentrow = 0;
-        while (currentrow < this.#rows) {
+        while (currentrow < this.rows) {
             tile = this.#generateTile(aTypeSet, col, currentrow);
             currentrow += getRowCount(tile);
             result.push(tile);
@@ -201,17 +220,18 @@ export class ParadroidFactory {
         this.#paths.push(...subTile.paths);
     }
 
-    get #columns() {
+    get columns() {
         return this.#options.columns;
     }
 
-    get #rows() {
+    get rows() {
         return this.#options.rows;
     }
 
     get #tileWidth() {
         return this.#options.tileWidth;
     }
+
     get #tileHeight() {
         return this.#options.tileHeight;
     }

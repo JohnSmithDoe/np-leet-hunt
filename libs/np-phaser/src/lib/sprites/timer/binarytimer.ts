@@ -49,8 +49,8 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneC
     #frenzyMode: boolean = false;
     #timer = new NPTimer();
 
-    constructor(public scene: NPScene, options?: TBinareTimerOptions) {
-        super(scene, { x: 0, y: 0 });
+    constructor(public scene: NPScene, x: number, y: number, options?: TBinareTimerOptions) {
+        super(scene, { x, y });
         this.options = options ? Object.assign(defaultOptions, options) : defaultOptions;
         let digits: number = 0;
         digits += this.options.hour ? 2 : 0;
@@ -60,13 +60,17 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneC
         this.#barWidth = (this.options.timerWidth - digits) / digits; // digits bars and digits gaps
         this.#barHeight = (this.options.timerHeight - 3) / 4; // 4 bars and 3 gaps
         if (this.options.displayText) {
-            const config: Phaser.Types.GameObjects.Text.TextStyle = {
-                color: this.options.textFill,
-                stroke: this.options.textStroke,
-            };
-            this.#text = this.scene.make.text(config, false);
+            this.#text = this.scene.make.text(
+                {
+                    style: {
+                        color: this.options.textFill,
+                        stroke: this.options.textStroke,
+                    },
+                },
+                false
+            );
             this.#text.setOrigin(0.5);
-            this.#text.setPosition(this.options.timerWidth / 2, this.options.timerHeight / 2);
+            this.#text.setPosition(x + this.options.timerWidth / 2, y + this.options.timerHeight / 2);
             this.#text.alpha = 0.75;
         }
     }

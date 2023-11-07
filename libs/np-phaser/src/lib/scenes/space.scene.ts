@@ -3,11 +3,11 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
+import { ParadroidGame } from '../paradroid/paradroid.game';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
 import { ParadroidField } from '../sprites/paradroid/paradroid.field';
-import { BinaryTimer } from '../sprites/timer/binarytimer';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
 import { NPScene } from './np-scene';
@@ -41,10 +41,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         // this.addComponent(this.map);
         // this.addComponent(new Reality(this, 'reality1'));
 
-        // const f = new ParadroidGame(this);
-        // this.addComponent(f);
-        const bt = new BinaryTimer(this, { startTime: 6e5, min: false });
-        this.addComponent(bt);
+        const f = new ParadroidGame(this);
+        this.addComponent(f);
     }
 
     init() {
@@ -77,8 +75,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
 
         super.create(container);
         this.addToLayer('ui', container);
-        this.pipes.filter(p => p.col === 0).forEach(p => p.activate());
-        // this.cameras.getCamera('ui-camera').setZoom(0.75);
+
         this.physics.world.setBounds(0, 0, this.scale.gameSize.width, this.scale.gameSize.height);
         this.physics.enableUpdate();
         //  World size is 8000 x 6000

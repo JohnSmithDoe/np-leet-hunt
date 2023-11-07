@@ -88,13 +88,9 @@ const shapeToFieldDefinition = (shape: EParadroidShape) => {
 export class ParadroidField extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     #subTile: TParadroidSubTile;
     #paths: NPSceneContainer<ParadroidPath>;
-    #options: { width: number; height?: number; interactive?: boolean };
+    #options: { width: number; height?: number };
 
-    constructor(
-        public scene: NPScene,
-        subTile: TParadroidSubTile,
-        options: { width: number; height?: number; interactive?: boolean }
-    ) {
+    constructor(public scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
         super(scene, 0, 0, '');
         this.#subTile = subTile;
         this.#options = options;
@@ -112,8 +108,6 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
             paradroidPath.on(EVENTS.DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
             this.#paths.add(paradroidPath);
         }
-
-        if (options.interactive) this.setInteractive({ useHandCursor: true });
     }
 
     init(): void {
