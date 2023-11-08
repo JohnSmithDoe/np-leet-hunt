@@ -1,4 +1,3 @@
-import { randomElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../../scenes/np-scene';
@@ -10,37 +9,73 @@ import { NPSceneComponent } from '../../scenes/np-scene-component';
 // };
 const IMAGES = {
     defaultBtn: {
-        key: 'dashed-line-red',
-        url: 'np-phaser/dashed-line/assets/red-dashed-2896x205.png',
-        width: 2896,
-        height: 205,
+        key: 'button-glossy',
+        url: 'np-phaser/button/assets/button1.png',
+    },
+    defaultBtnHover: {
+        key: 'button-glossy-hover',
+        url: 'np-phaser/button/assets/button2.png',
+    },
+    defaultBtnPressed: {
+        key: 'button-glossy-pressed',
+        url: 'np-phaser/button/assets/button3.png',
+    },
+    defaultBtnDisabled: {
+        key: 'button-glossy-disabled',
+        url: 'np-phaser/button/assets/button4.png',
     },
 };
 
 export class Button extends Phaser.GameObjects.Sprite implements NPSceneComponent {
-    readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
+    static readonly EVENT_CLICK = 'np-click';
+    #disabled = false;
 
-    static getRandom() {
-        const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
-        return randomElement(types);
-    }
-
-    constructor(public scene: NPScene, type: keyof typeof IMAGES, public start: Phaser.Types.Math.Vector2Like, public target: Phaser.Types.Math.Vector2Like) {
-        super(scene, 0, 0, '');
-        this.#image = IMAGES[type];
-        this.setName(type);
+    constructor(public scene: NPScene, x: number, y: number) {
+        super(scene, x, y, '');
+        this.setInteractive({ useHandCursor: true });
+        this.on('pointerover', () => this.#updateTexture(true, false))
+            .on('pointerout', () => this.#updateTexture(false, false))
+            .on('pointerdown', () => this.#updateTexture(true, true))
+            .on('pointerup', () => this.#onClick());
     }
 
     preload(): void {
-        this.scene.load.image(this.#image);
+        this.scene.load.image(IMAGES.defaultBtn);
+        this.scene.load.image(IMAGES.defaultBtnHover);
+        this.scene.load.image(IMAGES.defaultBtnPressed);
+        this.scene.load.image(IMAGES.defaultBtnDisabled);
     }
 
-    public create(): void {
-        this.setTexture(this.#image.key);
-        this.scene.addToLayer('np', this);
+    create(container?: Phaser.GameObjects.Container): void {
+        this.setTexture(IMAGES.defaultBtn.key);
+        this.setOrigin(0);
+        this.setDisplaySize(64, 64);
+        container?.add(this);
+        if (!container) this.scene.addToLayer('ui', this);
     }
 
-    public update(...args: number[]): void {
-        super.update(...args);
+    #onClick() {
+        if (this.#disabled) {
+            return;
+        }
+        this.setTexture(IMAGES.defaultBtn.key);
+        this.emit(Button.EVENT_CLICK, this);
+    }
+
+    set disabled(value: boolean) {
+        this.#disabled = value;
+        value ? this.setTexture(IMAGES.defaultBtnDisabled.key) : this.setTexture(IMAGES.defaultBtn.key);
+    }
+
+    #updateTexture(hover: boolean, press: boolean) {
+        if (this.#disabled) {
+            this.setTexture(IMAGES.defaultBtnDisabled.key);
+        } else if (press) {
+            this.setTexture(IMAGES.defaultBtnPressed.key);
+        } else if (hover) {
+            this.setTexture(IMAGES.defaultBtnHover.key);
+        } else {
+            this.setTexture(IMAGES.defaultBtn.key);
+        }
     }
 }
