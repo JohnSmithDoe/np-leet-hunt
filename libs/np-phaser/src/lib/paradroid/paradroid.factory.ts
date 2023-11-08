@@ -59,7 +59,8 @@ export class ParadroidFactory {
         this.#options = options;
     }
 
-    generateGrid() {
+    generateGrid(owner: EParadroidOwner = EParadroidOwner.Player) {
+        this.#options.owner = owner;
         let isValid = false;
         let tryouts = 0;
         do {

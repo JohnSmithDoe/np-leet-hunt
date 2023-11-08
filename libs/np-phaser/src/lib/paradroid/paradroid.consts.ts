@@ -17,7 +17,6 @@ export enum EFlowTo {
 export enum EParadroidOwner {
     Player = 'player',
     Droid = 'droid',
-    Nobody = 'nobody',
 }
 
 export enum EParadroidAccess {

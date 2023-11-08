@@ -1,20 +1,24 @@
 import { ParadroidField } from '../sprites/paradroid/paradroid.field';
 import { ParadroidPath } from '../sprites/paradroid/paradroid.path';
 import { EFlowFrom } from './paradroid.consts';
-import { TParadroidPlayer } from './paradroid.types';
 import { getNextFlow } from './paradroid.utils';
 
-export class ParadroidEngine {
+export class ParadroidEngine extends Phaser.Events.EventEmitter {
+    static readonly EVENT_ACTIVATE_MIDDLE = 'activate_middle';
+    static readonly EVENT_DEACTIVATE_MIDDLE = 'deactivate_middle';
+
     readonly #fieldGrid: ParadroidField[][]; // O(1) access to the #fields
+
     get grid() {
         return this.#fieldGrid;
     }
 
     constructor(fields: ParadroidField[]) {
+        super();
         this.#fieldGrid = [];
         for (const field of fields) {
-            field.on('activate_next', this.#activateNext, this);
-            field.on('deactivate_next', this.#deactivateNext, this);
+            field.on(ParadroidField.EVENT_ACTIVATE_NEXT, this.#activateNext, this);
+            field.on(ParadroidField.EVENT_DEACTIVATE_NEXT, this.#deactivateNext, this);
             if (!this.#fieldGrid[field.col]) {
                 this.#fieldGrid[field.col] = [];
             }
@@ -34,17 +38,17 @@ export class ParadroidEngine {
 
     #activateNext(field: ParadroidField, path: ParadroidPath) {
         if (path.next.length === 0) {
-            this.#activateMiddle(field.row, path.owner);
+            this.emit(ParadroidEngine.EVENT_ACTIVATE_MIDDLE, field.row, path.owner);
         } else {
             path.next.forEach(p => this.activate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
         }
     }
 
     #deactivateNext(field: ParadroidField, path: ParadroidPath) {
-        path.next.forEach(p => this.deactivate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
-    }
-
-    #activateMiddle(row: number, owner: TParadroidPlayer) {
-        console.log(row, owner);
+        if (path.next.length === 0) {
+            this.emit(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, field.row, path.owner);
+        } else {
+            path.next.forEach(p => this.deactivate(p.subTile.col, p.subTile.row, getNextFlow(path.to)));
+        }
     }
 }

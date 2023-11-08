@@ -11,12 +11,9 @@ import { PI, PIAndAHalf, PIHalf } from './utils';
 
 const SHEET = { key: 'pipes-paths', url: 'np-phaser/paradroid/assets/paths.png', frameWidth: 32, frameHeight: 16 };
 
-export enum EVENTS {
-    ACTIVATED = 'activated',
-    DEACTIVATED = 'deactivated',
-}
-
 export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+    static readonly EVENT_ACTIVATED = 'activated';
+    static readonly EVENT_DEACTIVATED = 'deactivated';
     #state: 'inactive' | 'activating' | 'deactivating' | 'active' = 'inactive';
 
     #field: ParadroidField;
@@ -60,7 +57,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
                 if (this.displayWidth >= this.#fullWidth) {
                     this.displayWidth = this.#fullWidth;
                     this.#state = 'active';
-                    this.emit(EVENTS.ACTIVATED, this);
+                    this.emit(ParadroidPath.EVENT_ACTIVATED, this);
                 }
                 break;
             case 'deactivating':
@@ -68,7 +65,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneC
                 if (Math.round(this.displayWidth) === 0) {
                     this.displayWidth = 0;
                     this.#state = 'inactive';
-                    this.emit(EVENTS.DEACTIVATED, this);
+                    this.emit(ParadroidPath.EVENT_DEACTIVATED, this);
                 }
                 break;
             case 'active':

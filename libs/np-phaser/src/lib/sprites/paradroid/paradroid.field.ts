@@ -5,7 +5,7 @@ import { TParadroidFx, TParadroidSubTile } from '../../paradroid/paradroid.types
 import { isCombineShape, isExpandShape } from '../../paradroid/paradroid.utils';
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent, NPSceneContainer } from '../../scenes/np-scene-component';
-import { EVENTS, ParadroidPath } from './paradroid.path';
+import { ParadroidPath } from './paradroid.path';
 
 const SHEET = { key: 'pipes', url: 'np-phaser/paradroid/assets/paradroid.png', frameWidth: 120, frameHeight: 120 };
 
@@ -86,6 +86,9 @@ const shapeToFieldDefinition = (shape: EParadroidShape) => {
 };
 
 export class ParadroidField extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+    static readonly EVENT_ACTIVATE_NEXT = 'activate_next';
+    static readonly EVENT_DEACTIVATE_NEXT = 'deactivate_next';
+
     #subTile: TParadroidSubTile;
     #paths: NPSceneContainer<ParadroidPath>;
     #options: { width: number; height?: number };
@@ -104,8 +107,8 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
 
         for (const path of this.#subTile.paths) {
             const paradroidPath = new ParadroidPath(this.scene, this, path);
-            paradroidPath.on(EVENTS.ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
-            paradroidPath.on(EVENTS.DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
+            paradroidPath.on(ParadroidPath.EVENT_ACTIVATED, (p: ParadroidPath) => this.#onPathActivated(p));
+            paradroidPath.on(ParadroidPath.EVENT_DEACTIVATED, (p: ParadroidPath) => this.#onPathDeactivated(p));
             this.#paths.add(paradroidPath);
         }
     }
@@ -194,7 +197,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
             this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.activate());
         } else if (!path.isIncoming) {
             // activate next
-            this.emit('activate_next', this, path);
+            this.emit(ParadroidField.EVENT_ACTIVATE_NEXT, this, path);
         }
     }
 
@@ -204,7 +207,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
             this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.deactivate());
         } else if (!path.isIncoming) {
             // deactivate next
-            this.emit('deactivate_next', this, path);
+            this.emit(ParadroidField.EVENT_DEACTIVATE_NEXT, this, path);
         }
     }
 
