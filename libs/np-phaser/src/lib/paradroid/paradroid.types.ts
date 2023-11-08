@@ -23,6 +23,7 @@ export interface TParadroidPath {
     owner: TParadroidPlayer;
     next: TParadroidPath[];
     prev: TParadroidPath[];
+    triggeredBy: number[];
 }
 
 export interface TParadroidSubTileDefinition {

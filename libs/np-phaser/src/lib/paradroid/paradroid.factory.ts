@@ -3,6 +3,7 @@ import {
     CParadroidModes,
     CParadroidShapeInfo,
     CParadroidTileInfo,
+    EFlowFrom,
     EFlowTo,
     EParadroidAccess,
     EParadroidDifficulty,
@@ -50,8 +51,7 @@ const hasCombineShapeOnPath = (path: TParadroidPath) =>
 
 export class ParadroidFactory {
     #options: TParadroidFactoryOptions;
-    #tileGrid: TParadroidTile[][] = [];
-    #subTileGrid: TParadroidSubTile[][] = [];
+    #tileGrid: TParadroidSubTile[][] = [];
     #paths: TParadroidPath[] = [];
     #accessGrid: EParadroidAccess[][] = [];
 
@@ -63,12 +63,10 @@ export class ParadroidFactory {
         let isValid = false;
         let tryouts = 0;
         do {
-            let tileColumn: TParadroidTile[];
             this.#initialize();
             for (let col: number = 0, j: number = Math.trunc(this.columns / 2); col < j; col++) {
                 const tileSet = this.#adjustTileSetForColumn(col);
-                tileColumn = this.#generateCol(col, tileSet);
-                this.#tileGrid.push(tileColumn);
+                this.#generateCol(col, tileSet);
             }
             isValid = this.#validateGrid();
             tryouts++;
@@ -76,11 +74,11 @@ export class ParadroidFactory {
         } while (!isValid);
 
         this.#initializePaths();
-        return this.#subTileGrid;
+        return this.#tileGrid;
     }
 
     #validateGrid(minCount?: number) {
-        const lastCol = this.#subTileGrid[this.#subTileGrid.length - 1];
+        const lastCol = this.#tileGrid[this.#tileGrid.length - 1];
         return (
             lastCol.reduce(
                 (count, current) => (current.paths.find(p => p.to === EFlowTo.Right) ? count + 1 : count),
@@ -124,16 +122,15 @@ export class ParadroidFactory {
      * @return
      */
     #initialize() {
-        this.#tileGrid = [];
         this.#accessGrid = [];
-        this.#subTileGrid = [];
+        this.#tileGrid = [];
         this.#paths = [];
         for (let i = 0; i < this.columns; i++) {
             this.#accessGrid[i] = [];
-            this.#subTileGrid[i] = [];
+            this.#tileGrid[i] = [];
             for (let j = 0; j < this.rows; j++) {
                 this.#accessGrid[i][j] = i === 0 ? EParadroidAccess.hasPath : EParadroidAccess.unset;
-                this.#subTileGrid[i][j] = undefined;
+                this.#tileGrid[i][j] = undefined;
             }
         }
     }
@@ -149,8 +146,21 @@ export class ParadroidFactory {
             path.prev = this.#paths.filter(p => p.next.find(p2 => p2 === path));
             this.#adjustPathFx(path);
         }
-
-        // const starts = this.#paths.filter(p => p.subTile.col === 0 && p.flowFrom === EFlowFrom.Left).shift();
+        // stats -> analyse the grid
+        const stats: Record<number, { start: TParadroidPath; ends: TParadroidPath[] }> = {};
+        const startPaths = this.#paths.filter(p => p.subTile.col === 0 && p.from === EFlowFrom.Left);
+        startPaths.forEach(start => {
+            const ends = this.#ends(start);
+            stats[start.subTile.row] = { start, ends };
+        });
+        // console.log(stats);
+        const statsr: Record<number, { end: TParadroidPath; starts: TParadroidPath[] }> = {};
+        const endPaths = this.#paths.filter(p => p.subTile.col === this.columns - 1 && p.to === EFlowTo.Right);
+        endPaths.forEach(end => {
+            const starts = this.#starts(end);
+            statsr[end.subTile.row] = { end, starts };
+        });
+        console.log(statsr);
     }
 
     #generateCol(col: number, aTypeSet: EParadroidTileType[]): TParadroidTile[] {
@@ -200,7 +210,7 @@ export class ParadroidFactory {
             paths: [],
         };
         this.#generateSubTilePaths(subTile);
-        this.#subTileGrid[subTile.col][subTile.row] = subTile;
+        this.#tileGrid[subTile.col][subTile.row] = subTile;
         return subTile;
     }
 
@@ -214,6 +224,7 @@ export class ParadroidFactory {
                 fx: 'none',
                 next: [],
                 prev: [],
+                triggeredBy: [],
             };
             subTile.paths.push(path);
         }
@@ -241,8 +252,8 @@ export class ParadroidFactory {
     }
 
     #getSubTile(col: number, row: number) {
-        if (col < 0 || row < 0 || col >= this.#subTileGrid.length || row >= this.#subTileGrid[col].length) return null;
-        return this.#subTileGrid[col][row];
+        if (col < 0 || row < 0 || col >= this.#tileGrid.length || row >= this.#tileGrid[col].length) return null;
+        return this.#tileGrid[col][row];
     }
 
     #getNextSubTile(subTile: TParadroidSubTile, flow: EFlowTo) {
@@ -275,4 +286,35 @@ export class ParadroidFactory {
         const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
         return rngElement(suitableTypes);
     };
+
+    #last(path: TParadroidPath): TParadroidPath[] {
+        const lasts = path.next
+            .map(next => this.#last(next))
+            .reduce((all, current) => {
+                all.push(...current);
+                return all;
+            }, []);
+        return path.next.length ? lasts : [path];
+    }
+    #first(path: TParadroidPath): TParadroidPath[] {
+        const firsts = path.prev
+            .map(prev => this.#first(prev))
+            .reduce((all, current) => {
+                all.push(...current);
+                return all;
+            }, []);
+        return path.prev.length ? firsts : [path];
+    }
+
+    #starts(end: TParadroidPath) {
+        return this.#first(end).filter(
+            (p, idx, arr) => p.from === EFlowFrom.Left && arr.findIndex(p2 => p2.subTile.row === p.subTile.row) === idx
+        );
+    }
+
+    #ends(start: TParadroidPath) {
+        return this.#last(start).filter(
+            (p, idx, arr) => p.to === EFlowTo.Right && arr.findIndex(p2 => p2.subTile.row === p.subTile.row) === idx
+        );
+    }
 }
