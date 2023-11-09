@@ -17,8 +17,9 @@
         "esModuleInterop": true,
         "baseUrl": ".",
         "paths": {
-            "@shared/np-paradroid": ["libs/np-paradroid/src/index.ts"],
+            "@shared/np-space": ["libs/np-space/src/index.ts"],
             "@shared/np-library": ["libs/np-library/src/index.ts"],
+            "@shared/np-paradroid": ["libs/np-paradroid/src/index.ts"],
             "@shared/np-phaser": ["libs/np-phaser/src/index.ts"]
         }
     },

@@ -1,29 +1,29 @@
 import { rngElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 
 // const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
 //     frameWidth: 256 * 2,
 //     frameHeight: 256 * 2,
 // };
 const IMAGES = {
-    planet1: { key: 'planet-1', url: 'np-phaser/planet/assets/planet01.png' },
-    planet2: { key: 'planet-2', url: 'np-phaser/planet/assets/planet02.png' },
-    planet3: { key: 'planet-3', url: 'np-phaser/planet/assets/planet03.png' },
-    planet4: { key: 'planet-4', url: 'np-phaser/planet/assets/planet04.png' },
-    planet5: { key: 'planet-5', url: 'np-phaser/planet/assets/planet05.png' },
-    planet6: { key: 'planet-6', url: 'np-phaser/planet/assets/planet06.png' },
-    planet7: { key: 'planet-7', url: 'np-phaser/planet/assets/planet07.png' },
-    planet8: { key: 'planet-8', url: 'np-phaser/planet/assets/planet08.png' },
-    planetBlue: { key: 'planet-blue', url: 'np-phaser/planet/assets/blue-planet.png' },
-    planetBrown: { key: 'planet-brown', url: 'np-phaser/planet/assets/brown-planet.png' },
-    planetSun: { key: 'planet-sun', url: 'np-phaser/planet/assets/sun.png' },
-    planetGalaxy: { key: 'planet-galaxy', url: 'np-phaser/planet/assets/galaxy.png' },
-    planetGasGiant: { key: 'planet-gas-giant', url: 'np-phaser/planet/assets/gas-giant.png' },
-    planetPurple: { key: 'planet-purple', url: 'np-phaser/planet/assets/purple-planet.png' },
-    // planetSheet: { key: 'planet-sheet', url: 'np-phaser/planet/assets/planet-sheet-1.png', frameConfig },
+    planet1: { key: 'planet-1', url: 'np-space/planets/planet01.png' },
+    planet2: { key: 'planet-2', url: 'np-space/planets/planet02.png' },
+    planet3: { key: 'planet-3', url: 'np-space/planets/planet03.png' },
+    planet4: { key: 'planet-4', url: 'np-space/planets/planet04.png' },
+    planet5: { key: 'planet-5', url: 'np-space/planets/planet05.png' },
+    planet6: { key: 'planet-6', url: 'np-space/planets/planet06.png' },
+    planet7: { key: 'planet-7', url: 'np-space/planets/planet07.png' },
+    planet8: { key: 'planet-8', url: 'np-space/planets/planet08.png' },
+    planetBlue: { key: 'planet-blue', url: 'np-space/planets/blue-planet.png' },
+    planetBrown: { key: 'planet-brown', url: 'np-space/planets/brown-planet.png' },
+    planetSun: { key: 'planet-sun', url: 'np-space/planets/sun.png' },
+    planetGalaxy: { key: 'planet-galaxy', url: 'np-space/planets/galaxy.png' },
+    planetGasGiant: { key: 'planet-gas-giant', url: 'np-space/planets/gas-giant.png' },
+    planetPurple: { key: 'planet-purple', url: 'np-space/planets/purple-planet.png' },
+    // planetSheet: { key: 'planet-sheet', url: 'np-space/planets/planet-sheet-1.png', frameConfig },
 };
 
 export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponent {

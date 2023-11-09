@@ -1,8 +1,8 @@
 import { rngElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 
 const IMAGES = {
     space1: { key: 'space-1', url: 'np-phaser/space/assets/tileable-classic-nebula-space-patterns-1.jpg' },

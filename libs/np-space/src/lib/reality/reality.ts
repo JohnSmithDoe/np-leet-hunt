@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 
 const IMAGES = {
     reality1: { key: 'reality-1', url: 'np-phaser/reality/assets/nebular.jpg' },

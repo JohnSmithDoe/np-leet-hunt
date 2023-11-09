@@ -25,19 +25,19 @@
             "output": "./svg"
           },
           {
-            "glob": "**/*",
-            "input": "libs/np-phaser/src/assets",
-            "output": "./assets"
-          },
-          {
             "glob": "**/assets/**/*",
             "input": "libs/np-phaser/src/lib/sprites",
             "output": "./np-phaser"
           },
           {
             "glob": "**/*",
-            "input": "libs/np-paradroid/assets",
+            "input": "libs/np-paradroid/src/assets",
             "output": "./np-paradroid"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/np-space/src/assets",
+            "output": "./np-space"
           }
         ],
         "styles": [

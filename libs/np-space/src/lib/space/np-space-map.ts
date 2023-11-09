@@ -1,10 +1,10 @@
-import { createRectangle } from '../factories/graphics.factory';
-import { StarmapFactory } from '../factories/starmap.factory';
-import { NPSceneComponent, NPSceneContainer } from '../scenes/np-scene-component';
-import { DashedLine } from '../sprites/dashed-line/dashed-line';
-import { Planet } from '../sprites/planet/planet';
-import { Space } from '../sprites/space/space';
-import { getClosest } from '../utilities/np-phaser-utils';
+import { createRectangle } from '../../../../np-phaser/src/lib/factories/graphics.factory';
+import { NPSceneComponent, NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/dashed-line';
+import { getClosest } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
+import { Planet } from '../planet/planet';
+import { Space } from './space';
+import { StarmapFactory } from './starmap.factory';
 
 export class NPSpaceMap extends NPSceneContainer<NPSceneComponent> {
     init = () => {

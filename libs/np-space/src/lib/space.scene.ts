@@ -1,14 +1,14 @@
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
-import { NPSpaceMap } from '../container/np-space-map';
-import { createSpeechBubble } from '../factories/graphics.factory';
-import { StageService } from '../service/stage.service';
-import { TextButton } from '../sprites/button/text-button';
-import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
-import { vectorToStr } from '../utilities/np-phaser-utils';
-import { NPScene } from './np-scene';
+import { createSpeechBubble } from '../../../np-phaser/src/lib/factories/graphics.factory';
+import { NPScene } from '../../../np-phaser/src/lib/scenes/np-scene';
+import { StageService } from '../../../np-phaser/src/lib/service/stage.service';
+import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
+import { NPMovableSprite } from '../../../np-phaser/src/lib/sprites/np-movable-sprite';
+import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
+import { vectorToStr } from '../../../np-phaser/src/lib/utilities/np-phaser-utils';
+import { NPSpaceMap } from './space/np-space-map';
 
 export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     iter = 0;

@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 
-import { poissonDiscSampler } from '../utilities/np-phaser-utils';
+import { poissonDiscSampler } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
 
 export interface StarmapConfig {
     planets: number;

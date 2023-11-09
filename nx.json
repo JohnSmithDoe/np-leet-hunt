@@ -37,7 +37,13 @@
             "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
         },
         "test": {
-            "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.ts", "{workspaceRoot}/jest.preset.js"]
+            "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.ts",
+                "{workspaceRoot}/jest.preset.js",
+                "{workspaceRoot}/jest.preset.js"
+            ]
         },
         "e2e": {
             "inputs": ["default", "^production"]
@@ -45,7 +51,17 @@
     },
     "namedInputs": {
         "default": ["{projectRoot}/**/*", "sharedGlobals"],
-        "sharedGlobals": ["{workspaceRoot}/.stylelintrc.json", "{workspaceRoot}/tsconfig.base.json", "{workspaceRoot}/tsconfig.json"],
-        "production": ["default", "!{projectRoot}/.eslintrc.json", "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)", "!{projectRoot}/tsconfig.spec.json", "!{projectRoot}/jest.config.[jt]s"]
+        "sharedGlobals": [
+            "{workspaceRoot}/.stylelintrc.json",
+            "{workspaceRoot}/tsconfig.base.json",
+            "{workspaceRoot}/tsconfig.json"
+        ],
+        "production": [
+            "default",
+            "!{projectRoot}/.eslintrc.json",
+            "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+            "!{projectRoot}/tsconfig.spec.json",
+            "!{projectRoot}/jest.config.[jt]s"
+        ]
     }
 }
