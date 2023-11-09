@@ -1,37 +1,12 @@
 ## grid gen
-// check each row of the last column
-// true if there are more than this.rows / 2 shapes that get activated
 // tests if the grid is interesting enough
 
 ## UI and splash :D
-// button row
-private onClicked(): void {
-this.engine.activateRow(this.row, this.owner);
-}
-// ui
-// this.recreateBtn = new Button(this.stage, { title: 'recreate' });
-// this.recreateBtn.onClick.add(this.onStartCreating, this);
-// this.splashVsIntro = new SplashVsElement(this.stage, { hiddenAndPaused: false }, this, this.onStartCreating);
-// this.splashGo = new SplashImageElement(
-//     this.stage,
-//     {
-//         frames: [CImages.Splash.Three, CImages.Splash.Two, CImages.Splash.One, CImages.Splash.Fight],
-//         hiddenAndPaused: true,
-//     },
-//     this,
-//     this.onStartPlaying
-// );
-//
-// this.addChild(this.binaryTimer);
+
+ frames: [CImages.Splash.Three, CImages.Splash.Two, CImages.Splash.One, CImages.Splash.Fight],
         
 ### states on scene?
 states intro pause playing .... end  
-
-
-### counter
-export class ParadroidCounter {
-private count: number = 0;
-private owner: EParadroidOwner;
 
 
 ### droid

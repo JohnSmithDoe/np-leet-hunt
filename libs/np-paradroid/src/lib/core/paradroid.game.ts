@@ -7,7 +7,6 @@ import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer } from '../@types/paradroid.types';
 import { ParadroidButton } from '../sprites/paradroid.button';
 import { ParadroidField } from '../sprites/paradroid.field';
-import { ParadroidImage } from '../sprites/paradroid.image';
 import { ParadroidMiddle } from '../sprites/paradroid.middle';
 import { ParadroidEngine } from './paradroid.engine';
 import { defaultFactoryOptions, ParadroidFactory, TParadroidFactoryOptions } from './paradroid.factory';
@@ -27,7 +26,6 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #buttons: NPSceneContainer<ParadroidButton>;
     #timer: BinaryTimer;
     container: Phaser.GameObjects.Container;
-    private imageTest: ParadroidImage;
 
     constructor(scene: NPScene, options?: TParadroidFactoryOptions) {
         super(scene);
@@ -72,17 +70,6 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
 
         this.#droidButtons = this.#generateButtons(this.#droidEngine);
         this.add(this.#droidButtons);
-        this.imageTest = new ParadroidImage(this.scene, 400, -200, 'vsDroid');
-        this.add(this.imageTest);
-        const intro = this.scene.tweens.add({
-            targets: this.imageTest,
-            y: 400,
-            ease: 'Power1',
-            duration: 2000,
-        });
-        intro.on(Phaser.Tweens.Events.TWEEN_COMPLETE, () => {
-            this.imageTest.destroy(true);
-        });
         super.init();
     }
 
@@ -112,7 +99,6 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         container?.add(droid);
         container?.add(buttons2);
         this.container = container;
-        this.imageTest.create(container);
     }
 
     #generateFields(owner: EParadroidOwner) {

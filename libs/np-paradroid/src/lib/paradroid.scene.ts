@@ -6,6 +6,7 @@ import { NPScene } from '../../../np-phaser/src/lib/scenes/np-scene';
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { ParadroidGame } from './core/paradroid.game';
+import { ParadroidIntro } from './sprites/paradroid.intro';
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     iter = 0;
@@ -18,6 +19,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     async setupComponents() {
         this.#paradroidGame = new ParadroidGame(this);
         this.addComponent(this.#paradroidGame);
+        this.addComponent(new ParadroidIntro(this));
     }
 
     init() {
@@ -55,6 +57,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         });
         this.addToLayer('ui', recreateBtn);
 
+        this.layer('ui').camera.setViewport(0, 0, 100, 100);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
@@ -69,7 +72,6 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
      * @param gameSize
      */
     resize(gameSize?: Phaser.Structs.Size): void {
-        console.log('resize');
         // this.cameras.cameras.forEach(cam => console.log(cam.renderList));
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
