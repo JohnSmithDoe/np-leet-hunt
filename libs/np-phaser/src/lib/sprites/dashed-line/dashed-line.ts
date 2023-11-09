@@ -1,4 +1,4 @@
-import { randomElement } from '@shared/np-library';
+import { rngElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../../scenes/np-scene';
@@ -22,10 +22,15 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPScene
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
-        return randomElement(types);
+        return rngElement(types);
     }
 
-    constructor(public scene: NPScene, type: keyof typeof IMAGES, public start: Phaser.Types.Math.Vector2Like, public target: Phaser.Types.Math.Vector2Like) {
+    constructor(
+        public scene: NPScene,
+        type: keyof typeof IMAGES,
+        public start: Phaser.Types.Math.Vector2Like,
+        public target: Phaser.Types.Math.Vector2Like
+    ) {
         super(scene, 0, 0, 0, 0, '');
         this.#image = IMAGES[type];
         this.setName(type);

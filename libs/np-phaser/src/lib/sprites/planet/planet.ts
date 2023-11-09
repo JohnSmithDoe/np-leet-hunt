@@ -1,4 +1,4 @@
-import { randomElement } from '@shared/np-library';
+import { rngElement } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../../scenes/np-scene';
@@ -31,7 +31,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponen
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
-        return randomElement(types);
+        return rngElement(types);
     }
 
     constructor(public scene: NPScene, type: keyof typeof IMAGES) {

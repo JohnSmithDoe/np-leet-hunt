@@ -1,7 +1,8 @@
+import { rng } from '@shared/np-library';
+
 import { NPScene } from '../../scenes/np-scene';
 import { NPSceneComponent } from '../../scenes/np-scene-component';
 import { NPTimer } from '../../utilities/np-timer';
-import { rng } from '../paradroid/utils';
 
 interface TBinareTimerOptions {
     startTime?: number; // if set counts down to zero
