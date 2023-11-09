@@ -1,15 +1,15 @@
 // noinspection JSSuspiciousNameCombination
 
+import { PI, PIAndAHalf, PIHalf } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
-import { EFlowFrom, EFlowTo, EParadroidOwner } from '../../paradroid/paradroid.consts';
-import { TParadroidPath, TParadroidPlayer } from '../../paradroid/paradroid.types';
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { EFlowFrom, EFlowTo, EParadroidOwner } from '../@types/paradroid.consts';
+import { TParadroidPath, TParadroidPlayer } from '../@types/paradroid.types';
 import { ParadroidField } from './paradroid.field';
-import { PI, PIAndAHalf, PIHalf } from './utils';
 
-const SHEET = { key: 'pipes-paths', url: 'np-phaser/paradroid/assets/paths.png', frameWidth: 32, frameHeight: 16 };
+const SHEET = { key: 'pipes-paths', url: 'np-paradroid/paths.png', frameWidth: 32, frameHeight: 16 };
 
 export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     static readonly EVENT_ACTIVATED = 'activated';

@@ -1,4 +1,5 @@
-import { rngElement, rngPercentageHit } from '../sprites/paradroid/utils';
+import { rngElement, rngPercentageHit } from '@shared/np-library';
+
 import {
     CParadroidModes,
     CParadroidShapeInfo,
@@ -10,7 +11,7 @@ import {
     EParadroidOwner,
     EParadroidShape,
     EParadroidTileType,
-} from './paradroid.consts';
+} from '../@types/paradroid.consts';
 import {
     TParadroidPath,
     TParadroidPlayer,
@@ -18,8 +19,8 @@ import {
     TParadroidSubTileDefinition,
     TParadroidTile,
     TParadroidTileDefinition,
-} from './paradroid.types';
-import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow, oppositeOwner } from './paradroid.utils';
+} from '../@types/paradroid.types';
+import { getRowCount, getRowKeyByIndex, isCombineShape, isNextFlow, oppositeOwner } from '../@types/paradroid.utils';
 
 export interface TParadroidFactoryOptions {
     rows: number;
@@ -45,7 +46,7 @@ export const defaultFactoryOptions: TParadroidFactoryOptions = {
     owner: EParadroidOwner.Player,
 };
 
-const hasCombineShapeOnPath = (path: TParadroidPath) =>
+const hasCombineShapeOnPath = (path: TParadroidPath): boolean =>
     isCombineShape(path.subTile.shape) ||
     path.next.reduce((hasCombine, p) => hasCombine || hasCombineShapeOnPath(p), false);
 

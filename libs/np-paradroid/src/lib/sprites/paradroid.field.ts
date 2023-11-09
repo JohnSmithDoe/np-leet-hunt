@@ -1,13 +1,13 @@
 import * as Phaser from 'phaser';
 
-import { EFlowFrom, EParadroidShape } from '../../paradroid/paradroid.consts';
-import { TParadroidFx, TParadroidSubTile } from '../../paradroid/paradroid.types';
-import { isCombineShape, isExpandShape } from '../../paradroid/paradroid.utils';
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent, NPSceneContainer } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent, NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { EFlowFrom, EParadroidShape } from '../@types/paradroid.consts';
+import { TParadroidFx, TParadroidSubTile } from '../@types/paradroid.types';
+import { isCombineShape, isExpandShape } from '../@types/paradroid.utils';
 import { ParadroidPath } from './paradroid.path';
 
-const SHEET = { key: 'pipes', url: 'np-phaser/paradroid/assets/paradroid.png', frameWidth: 120, frameHeight: 120 };
+const SHEET = { key: 'pipes', url: 'np-paradroid/paradroid.png', frameWidth: 120, frameHeight: 120 };
 
 type SHAPES =
     | 'bottom_endCap'

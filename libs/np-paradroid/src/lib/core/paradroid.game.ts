@@ -1,15 +1,16 @@
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../scenes/np-scene';
-import { NPSceneComponent, NPSceneContainer } from '../scenes/np-scene-component';
-import { ParadroidButton } from '../sprites/paradroid/paradroid.button';
-import { ParadroidField } from '../sprites/paradroid/paradroid.field';
-import { ParadroidMiddle } from '../sprites/paradroid/paradroid.middle';
-import { BinaryTimer } from '../sprites/timer/binarytimer';
-import { EParadroidOwner } from './paradroid.consts';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent, NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { BinaryTimer } from '../../../../np-phaser/src/lib/sprites/timer/binarytimer';
+import { EParadroidOwner } from '../@types/paradroid.consts';
+import { TParadroidPlayer } from '../@types/paradroid.types';
+import { ParadroidButton } from '../sprites/paradroid.button';
+import { ParadroidField } from '../sprites/paradroid.field';
+import { ParadroidImage } from '../sprites/paradroid.image';
+import { ParadroidMiddle } from '../sprites/paradroid.middle';
 import { ParadroidEngine } from './paradroid.engine';
 import { defaultFactoryOptions, ParadroidFactory, TParadroidFactoryOptions } from './paradroid.factory';
-import { TParadroidPlayer } from './paradroid.types';
 
 export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     readonly #options: TParadroidFactoryOptions;
@@ -18,16 +19,15 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #droidFields: NPSceneContainer<ParadroidField>;
     #droidEngine: ParadroidEngine;
     #droidButtons: NPSceneContainer<ParadroidButton>;
-    // move to button -> then no map is needed
-    #deactivateMap: Phaser.Time.TimerEvent[] = [];
 
-    #middle: NPSceneContainer<ParadroidMiddle>;
+    #middleCol: NPSceneContainer<ParadroidMiddle>;
 
     #fields: NPSceneContainer<ParadroidField>;
     #engine: ParadroidEngine;
     #buttons: NPSceneContainer<ParadroidButton>;
     #timer: BinaryTimer;
     container: Phaser.GameObjects.Container;
+    private imageTest: ParadroidImage;
 
     constructor(scene: NPScene, options?: TParadroidFactoryOptions) {
         super(scene);
@@ -36,21 +36,17 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
 
     init() {
         this.#factory = new ParadroidFactory(this.#options);
-
         this.#fields = this.#generateFields(EParadroidOwner.Player);
         this.#engine = new ParadroidEngine(this.#fields.list);
         this.#engine.on(ParadroidEngine.EVENT_ACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middleElement(row).activate(owner)
+            this.#middle(row).activate(owner)
         );
         this.#engine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middleElement(row).deactivate(owner)
+            this.#middle(row).deactivate(owner)
         );
         this.add(this.#fields);
 
-        this.#buttons = this.#generateButtons();
-        this.#buttons.list.forEach((button, idx) => {
-            button.on('pointerdown', () => this.#onRowClick(idx));
-        });
+        this.#buttons = this.#generateButtons(this.#engine);
 
         this.add(this.#buttons);
 
@@ -60,23 +56,33 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         });
         this.add(this.#timer);
 
-        this.#middle = this.#generateMiddleRow();
-        this.add(this.#middle);
+        this.#middleCol = this.#generateMiddleRow();
+        this.add(this.#middleCol);
 
         this.#droidFields = this.#generateFields(EParadroidOwner.Droid);
         this.#droidEngine = new ParadroidEngine(this.#droidFields.list);
 
         this.#droidEngine.on(ParadroidEngine.EVENT_ACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middleElement(row).activate(owner)
+            this.#middle(row).activate(owner)
         );
         this.#droidEngine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middleElement(row).deactivate(owner)
+            this.#middle(row).deactivate(owner)
         );
         this.add(this.#droidFields);
 
-        this.#droidButtons = this.#generateButtons();
+        this.#droidButtons = this.#generateButtons(this.#droidEngine);
         this.add(this.#droidButtons);
-
+        this.imageTest = new ParadroidImage(this.scene, 400, -200, 'vsDroid');
+        this.add(this.imageTest);
+        const intro = this.scene.tweens.add({
+            targets: this.imageTest,
+            y: 400,
+            ease: 'Power1',
+            duration: 2000,
+        });
+        intro.on(Phaser.Tweens.Events.TWEEN_COMPLETE, () => {
+            this.imageTest.destroy(true);
+        });
         super.init();
     }
 
@@ -90,7 +96,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         this.#fields.create(fields);
         x += this.#factory.columns * 64;
         const middle = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#middle.create(middle);
+        this.#middleCol.create(middle);
         x += 64;
         x += this.#factory.columns * 64;
         const droid = new Phaser.GameObjects.Container(this.scene, x, y, []);
@@ -106,6 +112,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         container?.add(droid);
         container?.add(buttons2);
         this.container = container;
+        this.imageTest.create(container);
     }
 
     #generateFields(owner: EParadroidOwner) {
@@ -123,11 +130,11 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         return result;
     }
 
-    #generateButtons() {
+    #generateButtons(engine: ParadroidEngine) {
         const result = new NPSceneContainer<ParadroidButton>(this.scene);
-        const firstRow = this.#engine.grid[0];
+        const firstRow = engine.grid[0];
         for (const field of firstRow) {
-            const paradroidButton = new ParadroidButton(this.scene, 0, field.y);
+            const paradroidButton = new ParadroidButton(this.scene, field);
             result.add(paradroidButton);
         }
         return result;
@@ -147,31 +154,12 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         return result;
     }
 
-    #onRowClick(row: number) {
-        const field = this.#fields.list.find(f => f.col === 0 && f.row === row);
-        this.#engine.activate(field.col, field.row);
-        this.#droidEngine.activate(field.col, field.row);
-        const key = field.row;
-        const config: Phaser.Types.Time.TimerEventConfig = {
-            delay: 3000,
-            callback: () => {
-                delete this.#deactivateMap[key];
-                field.deactivate();
-            },
-        };
-        if (this.#deactivateMap[key]) {
-            this.#deactivateMap[key].reset(config);
-        } else {
-            this.#deactivateMap[key] = this.scene.time.addEvent(config);
-        }
-    }
-
-    #middleElement(row: number) {
-        return this.#middle.list.find(m => m.row === row);
+    #middle(row: number) {
+        return this.#middleCol.list.find(m => m.row === row);
     }
 
     #updateMiddleTotal() {
-        const all = this.#middle.list.reduce(
+        const all = this.#middleCol.list.reduce(
             (stats, middle) => {
                 if (middle.row < 0) return stats; // total
                 switch (middle.owner) {
@@ -191,13 +179,13 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
             { none: 0, player: 0, droid: 0 }
         );
         if (all.droid === 0 && all.player === 0) {
-            this.#middleElement(-1).owner = 'middle';
+            this.#middle(-1).owner = 'middle';
         } else if (all.droid === all.player) {
-            this.#middleElement(-1).owner = 'middle-both';
+            this.#middle(-1).owner = 'middle-both';
         } else if (all.droid > all.player) {
-            this.#middleElement(-1).owner = 'middle-droid';
+            this.#middle(-1).owner = 'middle-droid';
         } else if (all.droid < all.player) {
-            this.#middleElement(-1).owner = 'middle-player';
+            this.#middle(-1).owner = 'middle-player';
         }
         console.log(all);
     }

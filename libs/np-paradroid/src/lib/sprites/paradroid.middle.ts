@@ -1,7 +1,7 @@
-import { EParadroidOwner } from '../../paradroid/paradroid.consts';
-import { TParadroidPlayer } from '../../paradroid/paradroid.types';
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { EParadroidOwner } from '../@types/paradroid.consts';
+import { TParadroidPlayer } from '../@types/paradroid.types';
 
 type IMAGE_KEY = 'middle' | 'middle-player' | 'middle-droid' | 'middle-both';
 

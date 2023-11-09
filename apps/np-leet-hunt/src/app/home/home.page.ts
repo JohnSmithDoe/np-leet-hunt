@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Component, inject, OnInit } from '@angular/core';
 import { NPBaseSubscriber } from '@shared/np-library';
+import { ParadroidScene } from '@shared/np-paradroid';
 import { StageService } from '@shared/np-phaser';
 import { filter } from 'rxjs';
 
@@ -17,7 +18,8 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
         this.listen(
             this.#stage.initialized$.pipe(filter(isInitialized => isInitialized)).subscribe(() => {
                 console.log('start', 'ngOnInit');
-                this.#stage.startScene('spacemap');
+                // this.#stage.startScene('spacemap', new SpaceScene(this.#stage));
+                this.#stage.startScene('paradroid', new ParadroidScene(this.#stage));
             })
         );
         console.log('HomePageComponent', 'ngOnInit');

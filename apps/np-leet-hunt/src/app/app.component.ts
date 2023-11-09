@@ -19,7 +19,6 @@ export class AppComponent implements OnDestroy {
      */
     public async createWarrior(): Promise<void> {
         console.log('createWarrior()');
-        this.npStage.startScene('spacemap');
     }
 
     /**

@@ -1,7 +1,7 @@
-import { ParadroidField } from '../sprites/paradroid/paradroid.field';
-import { ParadroidPath } from '../sprites/paradroid/paradroid.path';
-import { EFlowFrom } from './paradroid.consts';
-import { getNextFlow } from './paradroid.utils';
+import { EFlowFrom } from '../@types/paradroid.consts';
+import { getNextFlow } from '../@types/paradroid.utils';
+import { ParadroidField } from '../sprites/paradroid.field';
+import { ParadroidPath } from '../sprites/paradroid.path';
 
 export class ParadroidEngine extends Phaser.Events.EventEmitter {
     static readonly EVENT_ACTIVATE_MIDDLE = 'activate_middle';

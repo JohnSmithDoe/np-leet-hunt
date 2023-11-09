@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 
-import { SpaceScene } from '../scenes/space.scene';
+import { NPScene } from '../scenes/np-scene';
 import { PhaserService } from './phaser.service';
 
 @Injectable({
@@ -12,9 +12,9 @@ export class StageService {
     #initialized = new BehaviorSubject(false);
     initialized$ = this.#initialized.asObservable();
 
-    startScene(sceneKey: string) {
+    startScene(sceneKey: string, scene: NPScene) {
         console.log('14:startScene-');
-        this.#phaser.game.scene.add(sceneKey, new SpaceScene(this), true);
+        this.#phaser.game.scene.add(sceneKey, scene, true);
     }
 
     initStage(stageContainer: HTMLElement) {

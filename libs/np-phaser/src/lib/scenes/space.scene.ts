@@ -3,11 +3,9 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 
 import { NPSpaceMap } from '../container/np-space-map';
 import { createSpeechBubble } from '../factories/graphics.factory';
-import { ParadroidGame } from '../paradroid/paradroid.game';
 import { StageService } from '../service/stage.service';
 import { TextButton } from '../sprites/button/text-button';
 import { NPMovableSprite } from '../sprites/np-movable-sprite';
-import { ParadroidField } from '../sprites/paradroid/paradroid.field';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../types/np-phaser';
 import { vectorToStr } from '../utilities/np-phaser-utils';
 import { NPScene } from './np-scene';
@@ -22,28 +20,18 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private map: NPSpaceMap;
     private stars: Phaser.GameObjects.TileSprite;
 
-    private pipes: ParadroidField[] = [];
-    private gs = [];
-    #paradroidGame: ParadroidGame;
-
     constructor(private npStage: StageService) {
         super({ key: 'space-scene' });
     }
 
     async setupComponents() {
         this.generateStuff();
-        this.addComponent(this.pipes);
     }
 
     private generateStuff() {
-        this.pipes = [];
-        this.gs = [];
         // this.map = new NPSpaceMap(this);
         // this.addComponent(this.map);
         // this.addComponent(new Reality(this, 'reality1'));
-
-        this.#paradroidGame = new ParadroidGame(this);
-        this.addComponent(this.#paradroidGame);
     }
 
     init() {
@@ -72,7 +60,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
      * * Phaser will only call create after all assets in Preload have been loaded
      */
     create() {
-        this.gs.forEach(g => this.addToLayer('ui', g));
         const container = new Phaser.GameObjects.Container(this, 0, 0, []);
 
         super.create(container);
@@ -100,20 +87,6 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
             this.cameras.main.setZoom(this.cameras.main.zoom + 0.1);
         });
         this.addToLayer('ui', zoomInTxtBtn);
-
-        const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
-        recreateBtn.on('pointerup', () => {
-            this.removeFromContainer(this.#paradroidGame);
-            this.removeFromLayer('ui', this.#paradroidGame.container);
-            console.log(this.layer('ui').list, this.components);
-            const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
-            this.generateStuff();
-            this.#paradroidGame.init();
-            this.#paradroidGame.create(newcontainer);
-            this.addToLayer('ui', newcontainer);
-            // this.generateStuff();
-        });
-        this.addToLayer('ui', recreateBtn);
 
         const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
         zoomOutTxtBtn.on('pointerup', () => {

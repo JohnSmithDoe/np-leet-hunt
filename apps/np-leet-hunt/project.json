@@ -33,6 +33,11 @@
             "glob": "**/assets/**/*",
             "input": "libs/np-phaser/src/lib/sprites",
             "output": "./np-phaser"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/np-paradroid/assets",
+            "output": "./np-paradroid"
           }
         ],
         "styles": [
