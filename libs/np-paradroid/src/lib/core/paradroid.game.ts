@@ -7,6 +7,7 @@ import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer } from '../@types/paradroid.types';
 import { ParadroidButton } from '../sprites/paradroid.button';
 import { ParadroidField } from '../sprites/paradroid.field';
+import { ParadroidImage } from '../sprites/paradroid.image';
 import { ParadroidMiddle } from '../sprites/paradroid.middle';
 import { ParadroidEngine } from './paradroid.engine';
 import { defaultFactoryOptions, ParadroidFactory, TParadroidFactoryOptions } from './paradroid.factory';
@@ -18,12 +19,14 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #droidFields: NPSceneContainer<ParadroidField>;
     #droidEngine: ParadroidEngine;
     #droidButtons: NPSceneContainer<ParadroidButton>;
+    #droidShots: NPSceneContainer<ParadroidImage>;
 
     #middleCol: NPSceneContainer<ParadroidMiddle>;
 
     #fields: NPSceneContainer<ParadroidField>;
     #engine: ParadroidEngine;
     #buttons: NPSceneContainer<ParadroidButton>;
+    #shots: NPSceneContainer<ParadroidImage>;
     #timer: BinaryTimer;
     container: Phaser.GameObjects.Container;
 
@@ -45,8 +48,9 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         this.add(this.#fields);
 
         this.#buttons = this.#generateButtons(this.#engine);
-
         this.add(this.#buttons);
+        this.#shots = this.#generateShots();
+        this.add(this.#shots);
 
         this.#timer = new BinaryTimer(this.scene, -125 + 32, (this.#factory.columns + 3) * 64, {
             startTime: 30e3,
@@ -70,12 +74,15 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
 
         this.#droidButtons = this.#generateButtons(this.#droidEngine);
         this.add(this.#droidButtons);
+        this.#droidShots = this.#generateShots();
+        this.add(this.#droidShots);
+
         super.init();
     }
 
     create(container?: Phaser.GameObjects.Container) {
         let x = 0;
-        const y = 100;
+        let y = 100;
         const buttons = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#buttons.create(buttons);
         x += 64;
@@ -91,6 +98,16 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         droid.setScale(-1, 1);
         const buttons2 = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidButtons.create(buttons2);
+        x = 64;
+        y = 100 - 32;
+        const shots = new Phaser.GameObjects.Container(this.scene, x, y, []);
+        this.#shots.create(shots);
+        this.#shots.list.forEach(s => s.setDisplaySize(16, 16));
+        x = 900;
+        const droidshots = new Phaser.GameObjects.Container(this.scene, x, y, []);
+        this.#droidShots.create(droidshots);
+        droidshots.setScale(-1, 1);
+        this.#droidShots.list.forEach(s => s.setDisplaySize(16, 16));
 
         this.#timer.create(middle);
         container?.add(buttons);
@@ -98,6 +115,8 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         container?.add(middle);
         container?.add(droid);
         container?.add(buttons2);
+        container?.add(shots);
+        container?.add(droidshots);
         this.container = container;
     }
 
@@ -121,6 +140,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         const firstRow = engine.grid[0];
         for (const field of firstRow) {
             const paradroidButton = new ParadroidButton(this.scene, field);
+            paradroidButton.on(ParadroidButton.EVENT_CLICK, () => this.#onClick(engine === this.#engine));
             result.add(paradroidButton);
         }
         return result;
@@ -174,5 +194,22 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
             this.#middle(-1).owner = 'middle-player';
         }
         console.log(all);
+    }
+
+    #generateShots() {
+        const result = new NPSceneContainer<ParadroidImage>(this.scene);
+        for (let i = 0; i < 12; i++) {
+            result.add(new ParadroidImage(this.scene, i * 32, 0, 'shot'));
+        }
+        return result;
+    }
+
+    #onClick(isPlayer: boolean) {
+        const { list } = isPlayer ? this.#shots : this.#droidShots;
+        list.pop().destroy();
+        if (!list.length) {
+            const buttons = isPlayer ? this.#buttons : this.#droidButtons;
+            buttons.list.forEach(b => (b.disabled = true));
+        }
     }
 }
