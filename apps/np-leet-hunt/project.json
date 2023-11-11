@@ -38,6 +38,11 @@
             "glob": "**/*",
             "input": "libs/np-space/src/assets",
             "output": "./np-space"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/np-pixel-dungeon/src/assets",
+            "output": "./np-pixel-dungeon"
           }
         ],
         "styles": [
