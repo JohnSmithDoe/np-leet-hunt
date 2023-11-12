@@ -1,15 +1,23 @@
 // https://github.com/munificent/hauberk
 // https://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/
 
-import { AllDirections, CardinalDirections, directionToPos, EDirection, NPRect, NPRng, Pos } from '@shared/np-library';
+import {
+    AllDirections,
+    array2D,
+    CardinalDirections,
+    directionToPos,
+    EDirection,
+    NPRect,
+    NPRng,
+    NPVec2,
+} from '@shared/np-library';
 
 export enum ETileType {
     none,
     floor,
     wall,
-    opendoor,
-    closeddoor,
     room,
+    junction,
 }
 
 /// The random dungeon generator.
@@ -33,224 +41,131 @@ export enum ETileType {
 /// 5. The mazes will have a lot of dead ends. Finally, we remove those by
 ///    repeatedly filling in any open tile that's closed on three sides. When
 ///    this is done, every corridor in a maze actually leads somewhere.
-///
+/// 6. The maze has a lot of walls now. We remove those walls that are surrounded
+///    only by walls
+/// 7. This leads to big empty spaces "rooms?" we could use them by carving them out
 /// The end result of this is a multiply-connected dungeon with rooms and lots
 /// of winding corridors.
 
-type Callback<T> = (col: number, row: number) => T;
-
 interface TDungeonTile {
     type: ETileType;
+    // The position in the dungeon grid
+    x: number;
+    y: number;
+    // For each open position in the dungeon, the index of the connected region that that tile is a part of.
     region: number;
 }
+
 interface TDungeon {
     width: number;
     height: number;
     roomTries?: number;
-}
-
-export class PixelDungeonFactory {
+    roomArea?: number;
+    /// Increasing this allows rooms to be larger.
+    roomExtraSize?: number;
     /// The inverse chance of adding a connector between two regions that have
     /// already been joined. Increasing this leads to more loosely connected
-    /// dungeons.
-    #extraConnectorChance = 20;
+    /// dungeons. (oneIn(X))
+    extraConnectorChance?: number;
+    straightenPercentage?: number;
+}
 
-    /// Increasing this allows rooms to be larger.
-    #roomExtraSize = 0;
+const defaultDungeon: TDungeon = {
+    roomArea: 75,
+    height: 25,
+    width: 25,
+    extraConnectorChance: 20,
+    roomExtraSize: 0,
+    straightenPercentage: 50,
+};
 
-    #windingPercent = 0;
+export class PixelDungeonFactory implements Iterable<TDungeonTile> {
+    // readonly #rng = new NPRng(`${Date.now()}#`);
+    readonly #rng = new NPRng(`##<#`);
+
+    #options: TDungeon;
     #dungeon: TDungeonTile[][];
 
-    #rooms: NPRect[] = [];
-
-    /// For each open position in the dungeon, the index of the connected region
-    /// that that position is a part of.
-    #regions: number[][];
-    #bounds: NPRect;
     /// The index of the current region being carved.
     #currentRegion = 0;
-    #options: TDungeon;
-    readonly #rng = new NPRng(`${Date.now()}#`);
-    // readonly #rng = new NPRandom(`Leto`);
+    #bounds: NPRect;
+    #rooms: NPRect[] = [];
 
-    array2D<T>(width: number, height: number, value?: T, callback?: Callback<T>) {
-        const result: T[][] = [];
-        for (let i = 0; i <= height; i++) {
-            const row: T[] = [];
-            for (let j = 0; j <= width; j++) {
-                row.push(value ?? callback(i, j) ?? undefined);
+    *[Symbol.iterator](): Iterator<TDungeonTile> {
+        for (const tileRow of this.#dungeon) {
+            for (const tile of tileRow) {
+                yield tile;
             }
-            result.push(row);
         }
-        return result;
+        return undefined;
     }
 
-    generate(options: TDungeon) {
+    generate(options?: TDungeon) {
+        this.#initializeDungeon(options);
+
+        this.#addRooms();
+        this.#addHallways();
+        this.#addJunctions();
+        // return this.#dungeon;
+        this.#removeDeadEnds();
+        this.#removeFullWalls();
+        return this;
+    }
+
+    #initializeDungeon(options: TDungeon) {
+        options = Object.assign({}, defaultDungeon, options ?? {});
         if (options.width % 2 === 0 || options.height % 2 === 0) {
             throw new Error('The options must be odd-sized');
         }
         this.#options = options;
-        this.#options.roomTries ??= Math.sqrt(options.width * options.height ?? options.width) * 2;
+        this.#options.roomTries ??= options.width * options.height ?? options.width;
+
         this.#bounds = new NPRect(0, 0, options.width, options.height);
-        this.#dungeon = this.array2D(options.width, options.height, undefined, () => ({
+        this.#dungeon = array2D(options.height, options.width, (row, col) => ({
             type: ETileType.wall,
             region: this.#currentRegion,
+            x: col,
+            y: row,
         }));
-        this.#regions = this.array2D(options.width, options.height, 0);
-        this.#addRooms();
-        console.log(this.#regions, this.#rooms);
+    }
+
+    #addHallways() {
         // Fill in all the empty space with mazes.
         for (let y = 1; y < this.#options.height; y += 2) {
             for (let x = 1; x < this.#options.width; x += 2) {
-                const pos = new Pos(x, y);
+                const pos = new NPVec2(x, y);
                 if (this.#getTileType(pos) !== ETileType.wall) continue;
-                this.#growMaze(pos);
-            }
-        }
-        console.log(this.#dungeon.map(row => row.map(t => t.type)));
-        console.log(this.#regions);
-        this.#connectRegions();
-        this.#removeDeadEnds();
-        this.#removeFullWalls();
-        return this.#dungeon;
-
-        this.#rooms.forEach(this.#onDecorateRoom);
-        console.log(this, this.#dungeon, this.#bounds, this.#regions, this.#rooms);
-    }
-
-    #getTileType(pos: Pos) {
-        return this.#dungeon[pos.y][pos.x].type;
-    }
-
-    #setTileType(pos: Pos, type: ETileType) {
-        this.#dungeon[pos.y][pos.x].type = type;
-    }
-
-    /// Randomly turns some [wall] tiles into [floor] and vice versa.
-    // erode(iterations: number, floor = ETileType.floor, wall = ETileType.wall) {
-    // const bounds = this.stage.bounds.inflate(-1);
-    // for (let i = 0; i < iterations; i++) {
-    //     // TODO: This way this works is super inefficient. Would be better to
-    //     // keep track of the floor tiles near open ones and choose from them.
-    //     let pos = this.#rng.vecInRect(bounds);
-    //
-    //     let here = this.#getTileType(pos);
-    //     if (here != wall) continue;
-    //
-    //     // Keep track of how many floors we're adjacent too. We will only erode
-    //     // if we are directly next to a floor.
-    //     let floors = 0;
-    //
-    //     for (let dir in Direction.ALL) {
-    //         let tile = this.#getTileType(pos + dir);
-    //         if (tile == floor) floors++;
-    //     }
-    //
-    //     // Prefer to erode tiles near more floor tiles so the erosion isn't too
-    //     // spiky.
-    //     if (floors < 2) continue;
-    //     if (this.#rng.oneIn(9 - floors)) this.#setTileType(pos, floor);
-    // }
-    // }
-
-    #onDecorateRoom(room: NPRect) {
-        console.log('83:#onDecorateRoom', room);
-    }
-
-    /// Implementation of the "growing tree" algorithm from here:
-    /// http://www.astrolog.org/labyrnth/algrithm.htm.
-    #growMaze(start: Pos) {
-        const cells: Pos[] = [];
-        let lastDir;
-
-        this.#startRegion();
-        this.#carve(start);
-
-        cells.push(start);
-        while (cells.length) {
-            if (cells.length > 100) throw new Error('dddd');
-            const cell = cells.pop();
-
-            // See which adjacent cells are open.
-            const unmadeCells: EDirection[] = [];
-
-            CardinalDirections.forEach(dir => {
-                if (this.#canCarve(cell, dir)) unmadeCells.push(dir);
-            });
-
-            if (unmadeCells.length) {
-                // Based on how "windy" passages are, try to prefer carving in the
-                // same direction.
-                let dir: EDirection;
-                if (lastDir && unmadeCells.includes(lastDir) && this.#rng.range(100) > this.#windingPercent) {
-                    dir = lastDir;
-                } else {
-                    dir = this.#rng.item(unmadeCells);
-                }
-                const pos = directionToPos(dir);
-                this.#carve(cell.add(pos));
-                this.#carve(cell.add(pos.mul(2)));
-
-                cells.push(cell.add(pos.mul(2)));
-                lastDir = dir;
-            } else {
-                // No adjacent uncarved cells.
-                cells.pop();
-
-                // This path has ended.
-                lastDir = null;
+                this.#growHallway(pos);
             }
         }
     }
 
-    /// Places rooms ignoring the existing maze corridors.
     #addRooms() {
-        for (let i = 0; i < this.#options.roomTries; i++) {
-            // Pick a random room size. The funny math here does two things:
-            // - It makes sure rooms are odd-sized to line up with maze.
-            // - It avoids creating rooms that are too rectangular: too tall and
-            //   narrow or too wide and flat.
-            // TODO: This isn't very flexible or tunable. Do something better here. min max room size
-            const size = this.#rng.range(1, 3 + this.#roomExtraSize) * 2 + 1;
-            const rectangularity = this.#rng.range(0, 1 + Math.trunc(size / 2)) * 2;
-            let width = size;
-            let height = size;
-            if (this.#rng.oneIn(2)) {
-                width += rectangularity;
-            } else {
-                height += rectangularity;
-            }
-
-            const x = this.#rng.range(Math.trunc((this.#bounds.width - 1 - width) / 2)) * 2 + 1; // Todo -1 on bounds width for the border is not needed in the original
-            const y = this.#rng.range(Math.trunc((this.#bounds.height - 1 - height) / 2)) * 2 + 1;
-
-            const room = new NPRect(x, y, width, height);
-
-            let overlaps = false;
-            for (const other of this.#rooms) {
-                if (room.distanceTo(other) <= 0) {
-                    overlaps = true;
-                    break;
-                }
-            }
-
-            if (overlaps) continue;
+        /// Places rooms randomly inside the grid
+        let roomArea = 0;
+        let roomAreaPercentage = 0;
+        // try to create rooms until roomTries runs out or the requested room area is covered
+        while (--this.#options.roomTries > 0 && roomAreaPercentage < this.#options.roomArea) {
+            const room = this.#createRoom();
+            if (!room) continue;
 
             this.#rooms.push(room);
-
             this.#startRegion();
-            const roomRect = new NPRect(x, y, width, height);
-            for (const pos of roomRect) {
+            for (const pos of room) {
                 this.#carve(pos, ETileType.room);
             }
-            console.log(this.#regions);
+
+            // this counts the paths around a room double for some rooms
+            // without no paths around would be accounted for
+            roomArea += room.inflate(1).area;
+            roomAreaPercentage = (roomArea / this.#bounds.inflate(-1).area) * 100;
         }
     }
 
-    #connectRegions() {
-        // Find all of the tiles that can connect two (or more) regions.
+    #addJunctions() {
+        // Find all the tiles that can connect two (or more) regions.
         const connectorRegions: Record<string, Set<number>> = {};
-        const connectorPoss: Record<string, Pos> = {};
+        const connectorPoss: Record<string, NPVec2> = {};
         for (const pos of this.#bounds.inflate(-1)) {
             // only walls can't already be part of a region.
             if (this.#getTileType(pos) !== ETileType.wall) continue;
@@ -259,10 +174,10 @@ export class PixelDungeonFactory {
             // collect cardinal regions of the wall
             CardinalDirections.forEach(dir => {
                 const next = pos.add(directionToPos(dir));
-                const region = this.#regions[next.y][next.x];
+                const region = this.#getRegion(next);
                 if (region !== 0) regions.add(region);
             });
-            // if there are two or more regions its a possible connector
+            // if there are two or more regions it's a possible connector
             if (regions.size < 2) continue;
 
             connectorRegions[pos.hashCode()] = regions;
@@ -299,7 +214,7 @@ export class PixelDungeonFactory {
                     sources.push(region);
                 }
             }
-            // Merge all of the affected regions. We have to look at *all* of the
+            // Merge the affected regions. We have to look at *all* of the
             // regions because other regions may have previously been merged with
             // some of the ones we're merging now.
             for (let i = 0; i <= this.#currentRegion; i++) {
@@ -310,7 +225,7 @@ export class PixelDungeonFactory {
 
             // The sources are no longer in use.
             sources.forEach(s => openRegions.delete(s));
-            const extras = [] as Pos[];
+            const extras = [] as NPVec2[];
             // Remove any connectors that aren't needed anymore.
             connectors = connectors.filter(other => {
                 // Don't allow connectors right next to each other.
@@ -327,7 +242,7 @@ export class PixelDungeonFactory {
                 // dungeon isn't singly-connected.
                 // this can lead to adjacent connections...
                 // add max extra connections to prevent tooo much -> probably distribute a bit
-                if (this.#rng.oneIn(this.#extraConnectorChance)) {
+                if (this.#rng.oneIn(this.#options.extraConnectorChance)) {
                     // check if cardinal neighbours are already added
                     const neighbours = CardinalDirections.map(dir => directionToPos(dir).add(other));
                     const isAdjacent = neighbours.reduce(
@@ -343,16 +258,6 @@ export class PixelDungeonFactory {
                 return false;
             });
         }
-    }
-
-    #addJunction(pos: Pos, force = false) {
-        if (this.#rng.oneIn(4)) {
-            this.#setTileType(pos, this.#rng.oneIn(3) ? ETileType.opendoor : ETileType.floor);
-        } else {
-            this.#setTileType(pos, ETileType.closeddoor);
-        }
-        this.#setTileType(pos, ETileType.closeddoor);
-        if (force) this.#setTileType(pos, ETileType.opendoor);
     }
 
     #removeDeadEnds() {
@@ -388,9 +293,9 @@ export class PixelDungeonFactory {
                 // If it only has walls as neighbours it can go
                 let exits = 0;
                 AllDirections.forEach(dir => {
-                    const neighbour = pos.add(directionToPos(dir));
-                    if (!this.#bounds.contains(neighbour)) return;
-                    const eTileType = this.#getTileType(neighbour);
+                    const neighbourPos = pos.add(directionToPos(dir));
+                    if (!this.#bounds.contains(neighbourPos)) return;
+                    const eTileType = this.#getTileType(neighbourPos);
                     if (eTileType !== ETileType.wall && eTileType !== ETileType.none) exits++;
                 });
 
@@ -402,11 +307,93 @@ export class PixelDungeonFactory {
         }
     }
 
-    /// Gets whether or not an opening can be carved from the given starting
-    /// [Cell] at [pos] to the adjacent Cell facing [direction]. Returns `true`
-    /// if the starting Cell is in bounds and the destination Cell is filled
-    /// (or out of bounds).</returns>
-    #canCarve(pos: Pos, direction: EDirection): boolean {
+    // helper
+
+    #growHallway(start: NPVec2) {
+        /// Implementation of the "growing tree" algorithm from here:
+        /// http://www.astrolog.org/labyrnth/algrithm.htm.
+        const cells: NPVec2[] = [];
+        let lastDir;
+
+        this.#startRegion();
+        this.#carve(start);
+
+        cells.push(start);
+        while (cells.length) {
+            const cell = cells.pop();
+
+            // See which adjacent cells are open.
+            const possibleCells = CardinalDirections.filter(dir => this.#canCarve(cell, dir));
+
+            if (possibleCells.length) {
+                // Based on how "straight" passages are, try to prefer carving in the
+                // same direction.
+                let dir: EDirection;
+                if (
+                    lastDir &&
+                    possibleCells.includes(lastDir) &&
+                    this.#rng.percentageHit(this.#options.straightenPercentage)
+                ) {
+                    dir = lastDir;
+                } else {
+                    dir = this.#rng.item(possibleCells);
+                }
+                const pos = directionToPos(dir);
+                const nextPos = cell.add(pos);
+                this.#carve(nextPos);
+                const secondPos = cell.add(pos.mul(2));
+                this.#carve(secondPos);
+                cells.push(secondPos);
+                lastDir = dir;
+            } else {
+                // No adjacent uncarved cells.
+                cells.pop();
+
+                // This path has ended.
+                lastDir = null;
+            }
+        }
+    }
+
+    #createRoom() {
+        // Pick a random room size. The funny math here does two things:
+        // - It makes sure rooms are odd-sized to line up with maze.
+        // - It avoids creating rooms that are too rectangular: too tall and
+        //   narrow or too wide and flat.
+        // TODO: This isn't very flexible or tunable. Do something better here. min max room size
+        const size = this.#rng.range(1, 3 + this.#options.roomExtraSize) * 2 + 1;
+        // const size = 3;
+        const rectangularity = this.#rng.range(0, 1 + Math.trunc(size / 2)) * 2;
+        let width = size;
+        let height = size;
+        if (this.#rng.oneIn(2)) {
+            width += rectangularity;
+        } else {
+            height += rectangularity;
+        }
+
+        const x = this.#rng.range(Math.trunc((this.#bounds.width - 1 - width) / 2)) * 2 + 1; // Todo -1 on bounds width for the border is not needed in the original
+        const y = this.#rng.range(Math.trunc((this.#bounds.height - 1 - height) / 2)) * 2 + 1;
+
+        const room = new NPRect(x, y, width, height);
+
+        let overlaps = false;
+        for (const other of this.#rooms) {
+            if (room.distanceTo(other) <= 0) {
+                overlaps = true;
+                break;
+            }
+        }
+        return overlaps ? null : room;
+    }
+
+    // utils
+
+    #canCarve(pos: NPVec2, direction: EDirection): boolean {
+        /// Gets whether an opening can be carved from the given starting
+        /// [Cell] at [pos] to the adjacent Cell facing [direction]. Returns `true`
+        /// if the starting Cell is in bounds and the destination Cell is filled
+        /// (or out of bounds).
         // Must end in bounds.
         const offsetThree = directionToPos(direction).mul(3);
         const posOffsetThree = pos.add(offsetThree);
@@ -418,13 +405,74 @@ export class PixelDungeonFactory {
         return this.#getTileType(posOffSetTwo) === ETileType.wall;
     }
 
+    #addJunction(pos: NPVec2) {
+        this.#setTileType(pos, ETileType.junction);
+    }
+
     #startRegion() {
         this.#currentRegion++;
     }
 
-    #carve(pos: Pos, type: ETileType = ETileType.floor, reg = true) {
+    #carve(pos: NPVec2, type: ETileType = ETileType.floor, region?: number) {
         this.#setTileType(pos, type);
-        if (reg) this.#dungeon[pos.y][pos.x].region = this.#currentRegion;
-        if (reg) this.#regions[pos.y][pos.x] = this.#currentRegion;
+        this.#setRegion(pos, region ?? this.#currentRegion);
+    }
+
+    #getTileType(pos: NPVec2) {
+        return this.#dungeon[pos.y][pos.x].type;
+    }
+
+    #setTileType(pos: NPVec2, type: ETileType) {
+        this.#dungeon[pos.y][pos.x].type = type;
+    }
+
+    #setRegion(pos: NPVec2, region: number) {
+        this.#dungeon[pos.y][pos.x].region = region;
+    }
+
+    #getRegion(pos: NPVec2) {
+        return this.#dungeon[pos.y][pos.x].region;
+    }
+
+    // not yet
+
+    #carveRoundRoom(room: NPRect) {
+        const centerX = room.center.x;
+        const centerY = room.center.y;
+        const circleRadius = room.circleRadius;
+        console.log(centerX, centerY, circleRadius);
+        for (const pos of room) {
+            this.#carve(pos, ETileType.floor);
+        }
+        // Draw the maximum pixel circle in the grid
+        this.#fillCircle(centerX, centerY, circleRadius);
+    }
+
+    #fillCircle(centerX: number, centerY: number, radius: number, type = ETileType.room): void {
+        let x = radius;
+        let y = 0;
+        let decisionOver2 = 1 - x; // Decision criterion divided by 2 evaluated at x=r, y=0
+
+        while (y <= x) {
+            // Draw horizontal lines in the octants where y is incremented
+            for (let i = centerX - x; i <= centerX + x; i++) {
+                this.#carve(new NPVec2(i, centerY - y), type); // Octant 1
+                this.#carve(new NPVec2(i, centerY + y), type); // Octant 8
+            }
+
+            // Draw horizontal lines in the octants where x is incremented
+            for (let i = centerX - y; i <= centerX + y; i++) {
+                this.#carve(new NPVec2(i, centerY - x), type); // Octant 2
+                this.#carve(new NPVec2(i, centerY + x), type); // Octant 7
+            }
+
+            y++;
+            if (decisionOver2 <= 0) {
+                decisionOver2 += 2 * y + 1; // Change in decision criterion for y -> y+1
+            } else {
+                x--;
+                decisionOver2 += 2 * (y - x) + 1; // Change for y -> y+1, x -> x-1
+            }
+        }
     }
 }

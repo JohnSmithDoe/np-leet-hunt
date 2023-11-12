@@ -15,3 +15,6 @@ export const nyanConsole = (message: string) => {
 
 export const clamp = (value: number, upper: number, lower: number) =>
     value > upper ? upper : value < lower ? lower : value;
+
+export const array2D = <T>(rows: number, cols: number, generator: (row: number, col: number) => T): T[][] =>
+    Array.from({ length: rows }, (_, row) => Array.from({ length: cols }, (__, col) => generator(row, col)));

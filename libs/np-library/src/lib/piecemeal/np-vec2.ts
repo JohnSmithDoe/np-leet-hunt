@@ -3,28 +3,28 @@ import { AllDirections, CardinalDirections, EDirection, IntercardinalDirections 
 export const directionToPos = (dir: EDirection) => {
     switch (dir) {
         case EDirection.NONE:
-            return new Pos(0, 0);
+            return new NPVec2(0, 0);
         case EDirection.N:
-            return new Pos(0, -1);
+            return new NPVec2(0, -1);
         case EDirection.NE:
-            return new Pos(1, -1);
+            return new NPVec2(1, -1);
         case EDirection.E:
-            return new Pos(1, 0);
+            return new NPVec2(1, 0);
         case EDirection.SE:
-            return new Pos(1, 1);
+            return new NPVec2(1, 1);
         case EDirection.S:
-            return new Pos(0, 1);
+            return new NPVec2(0, 1);
         case EDirection.SW:
-            return new Pos(-1, 1);
+            return new NPVec2(-1, 1);
         case EDirection.W:
-            return new Pos(-1, 0);
+            return new NPVec2(-1, 0);
         case EDirection.NW:
-            return new Pos(-1, -1);
+            return new NPVec2(-1, -1);
     }
 };
 
-export class Pos {
-    static readonly zero = new Pos(0, 0);
+export class NPVec2 {
+    static readonly zero = new NPVec2(0, 0);
 
     x: number;
     y: number;
@@ -134,12 +134,12 @@ export class Pos {
 
     /// Scales this Vec by [other].
     mul(value: number) {
-        return new Pos(this.x * value, this.y * value);
+        return new NPVec2(this.x * value, this.y * value);
     }
 
     /// Scales this Vec by [other].
     div(value: number) {
-        return new Pos(Math.trunc(this.x / value), Math.trunc(this.y / value));
+        return new NPVec2(Math.trunc(this.x / value), Math.trunc(this.y / value));
     }
 
     /// Adds [other] to this Vec.
@@ -148,10 +148,10 @@ export class Pos {
     ///  *  If [other] is an [int], adds that value to both coordinates.
     ///
     /// Any other type is an error.
-    add(value: Pos | number) {
+    add(value: NPVec2 | number) {
         return typeof value === 'number'
-            ? new Pos(this.x + value, this.y + value)
-            : new Pos(this.x + value.x, this.y + value.y);
+            ? new NPVec2(this.x + value, this.y + value)
+            : new NPVec2(this.x + value.x, this.y + value.y);
     }
 
     /// Substracts [other] from this Vec.
@@ -161,14 +161,14 @@ export class Pos {
     ///  *  If [other] is an [int], subtracts that value from both coordinates.
     ///
     /// Any other type is an error.
-    subtract(value: Pos | number) {
+    subtract(value: NPVec2 | number) {
         return typeof value === 'number'
-            ? new Pos(this.x - value, this.y - value)
-            : new Pos(this.x - value.x, this.y - value.y);
+            ? new NPVec2(this.x - value, this.y - value)
+            : new NPVec2(this.x - value.x, this.y - value.y);
     }
 
     /// Returns `true` if the magnitude of this vector is greater than [other].
-    grt(value: Pos | number) {
+    grt(value: NPVec2 | number) {
         return typeof value === 'number'
             ? this.lengthSquared > value * value
             : this.lengthSquared > value.lengthSquared;
@@ -176,14 +176,14 @@ export class Pos {
 
     /// Returns `true` if the magnitude of this vector is greater than or equal
     /// to [other].
-    grtEq(value: Pos | number) {
+    grtEq(value: NPVec2 | number) {
         return typeof value === 'number'
             ? this.lengthSquared >= value * value
             : this.lengthSquared >= value.lengthSquared;
     }
 
     /// Returns `true` if the magnitude of this vector is less than [other].
-    isSmaller(value: Pos | number) {
+    isSmaller(value: NPVec2 | number) {
         return typeof value === 'number'
             ? this.lengthSquared < value * value
             : this.lengthSquared < value.lengthSquared;
@@ -191,13 +191,13 @@ export class Pos {
 
     /// Returns `true` if the magnitude of this vector is less than or equal to
     /// [other].
-    isSmallerOrEqual(value: Pos | number) {
+    isSmallerOrEqual(value: NPVec2 | number) {
         return typeof value === 'number'
             ? this.lengthSquared <= value * value
             : this.lengthSquared <= value.lengthSquared;
     }
 
-    equals(value: Pos | number) {
+    equals(value: NPVec2 | number) {
         return typeof value === 'number'
             ? this.lengthSquared === value * value
             : this.x === value.x && this.y === value.y;
@@ -215,7 +215,7 @@ export class Pos {
 
     /// Returns `true` if [pos] is within a rectangle from (0,0) to this vector
     /// (half-inclusive).
-    contains(pos: Pos) {
+    contains(pos: NPVec2) {
         const left = Math.min(0, this.x);
         if (pos.x < left) return false;
 
@@ -234,25 +234,25 @@ export class Pos {
     /// Returns a new [Vec] with the absolute value of the coordinates of this
     /// one.
     abs() {
-        return new Pos(Math.abs(this.x), Math.abs(this.y));
+        return new NPVec2(Math.abs(this.x), Math.abs(this.y));
     }
 
     /// Returns a new [Vec] whose coordinates are this one's translated by [x] and
     /// [y].
     offset(x: number, y: number) {
-        return new Pos(this.x + x, this.y + y);
+        return new NPVec2(this.x + x, this.y + y);
     }
 
     /// Returns a new [Vec] whose coordinates are this one's but with the X
     /// coordinate translated by [x].
     offsetX(x: number) {
-        return new Pos(this.x + x, this.y);
+        return new NPVec2(this.x + x, this.y);
     }
 
     /// Returns a new [Vec] whose coordinates are this one's but with the Y
     /// coordinate translated by [y].
     offsetY(y: number) {
-        return new Pos(this.x, this.y + y);
+        return new NPVec2(this.x, this.y + y);
     }
 
     toString() {

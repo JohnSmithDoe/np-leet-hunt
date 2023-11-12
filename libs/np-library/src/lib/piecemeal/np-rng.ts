@@ -105,7 +105,7 @@ export class NPRng {
     /**
      * Returns if a 100 percent roll is lower than the given percentage
      */
-    rngPercentageHit(percent: number) {
+    percentageHit(percent: number) {
         return this.rng(100) <= percent;
     }
 }

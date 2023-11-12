@@ -45,7 +45,7 @@
 ///       '-------------'
 import { clamp } from '@shared/np-library';
 
-import { Pos } from './np-pos';
+import { NPVec2 } from './np-vec2';
 
 export const intersect = (a: NPRect, b: NPRect) => {
     const left = Math.max(a.left, b.left);
@@ -64,16 +64,17 @@ export const centerIn = (toCenter: NPRect, main: NPRect) => {
     return NPRect.posAndSize(pos, toCenter.size);
 };
 
-export class NPRect implements Iterable<Pos> {
+export class NPRect implements Iterable<NPVec2> {
     /// Gets the empty rectangle.
-    static empty = NPRect.posAndSize(Pos.zero, Pos.zero);
+    static empty = NPRect.posAndSize(NPVec2.zero, NPVec2.zero);
 
-    readonly pos: Pos;
-    readonly size: Pos;
+    readonly pos: NPVec2;
+    readonly size: NPVec2;
 
-    static posAndSize(pos: Pos, size: Pos) {
+    static posAndSize(pos: NPVec2, size: NPVec2) {
         return new NPRect(pos.x, pos.y, size.x, size.y);
     }
+
     /// Creates a new rectangle a single row in height, as wide as [size],
     /// with its top left corner at [pos].
     static row(x: number, y: number, size: number) {
@@ -84,18 +85,18 @@ export class NPRect implements Iterable<Pos> {
     /// with its top left corner at [pos].
     static column = (x: number, y: number, size: number) => new NPRect(x, y, 1, size);
 
-    *[Symbol.iterator](): Iterator<Pos> {
+    *[Symbol.iterator](): Iterator<NPVec2> {
         for (let i = this.left; i < this.right; i++) {
             for (let j = this.top; j < this.bottom; j++) {
-                yield new Pos(i, j);
+                yield new NPVec2(i, j);
             }
         }
         return undefined;
     }
 
     constructor(x: number, y: number, width: number, height: number) {
-        this.pos = new Pos(x, y);
-        this.size = new Pos(width, height);
+        this.pos = new NPVec2(x, y);
+        this.size = new NPVec2(width, height);
     }
 
     get x() {
@@ -133,23 +134,27 @@ export class NPRect implements Iterable<Pos> {
     }
 
     get topLeft() {
-        return new Pos(this.left, this.top);
+        return new NPVec2(this.left, this.top);
     }
 
     get topRight() {
-        return new Pos(this.right, this.top);
+        return new NPVec2(this.right, this.top);
     }
 
     get bottomLeft() {
-        return new Pos(this.left, this.bottom);
+        return new NPVec2(this.left, this.bottom);
     }
 
     get bottomRight() {
-        return new Pos(this.right, this.bottom);
+        return new NPVec2(this.right, this.bottom);
     }
 
     get center() {
-        return new Pos(Math.trunc((this.left + this.right) / 2), Math.trunc((this.top + this.bottom) / 2));
+        return new NPVec2(Math.trunc((this.left + this.right) / 2), Math.trunc((this.top + this.bottom) / 2));
+    }
+
+    get circleRadius() {
+        return Math.floor(Math.min(this.width, this.height) / 2);
     }
 
     get area() {
@@ -178,7 +183,7 @@ export class NPRect implements Iterable<Pos> {
         return new NPRect(this.x + x, this.y + y, this.width, this.height);
     }
 
-    contains(pos: Pos) {
+    contains(pos: NPVec2) {
         if (pos.x < this.pos.x) return false;
         if (pos.x >= this.pos.x + this.size.x) return false;
         if (pos.y < this.pos.y) return false;
@@ -196,10 +201,10 @@ export class NPRect implements Iterable<Pos> {
 
     /// Returns a new [Pos] that is as near to [pos] as possible while being in
     /// bounds.
-    clamp(pos: Pos) {
+    clamp(pos: NPVec2) {
         const x = clamp(pos.x, this.left, this.right);
         const y = clamp(pos.y, this.top, this.bottom);
-        return new Pos(x, y);
+        return new NPVec2(x, y);
     }
 
     // get iterator => RectIterator(this);
@@ -233,16 +238,16 @@ export class NPRect implements Iterable<Pos> {
             // TODO(bob): Implement an iterator class here if building the list is
             // slow.
             // Trace all four sides.
-            const result = [] as Pos[];
+            const result = [] as NPVec2[];
 
             for (let x = this.left; x < this.right; x++) {
-                result.push(new Pos(x, this.top));
-                result.push(new Pos(x, this.bottom - 1));
+                result.push(new NPVec2(x, this.top));
+                result.push(new NPVec2(x, this.bottom - 1));
             }
 
             for (let y = this.top + 1; y < this.bottom - 1; y++) {
-                result.push(new Pos(this.left, y));
-                result.push(new Pos(this.right - 1, y));
+                result.push(new NPVec2(this.left, y));
+                result.push(new NPVec2(this.right - 1, y));
             }
 
             return result;

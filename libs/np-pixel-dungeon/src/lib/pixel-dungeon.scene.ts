@@ -87,19 +87,25 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //     },
         // });
 
-        const pixelDungeonFactory = new PixelDungeonFactory();
-        // const options = { width: 97, height: 49, roomTries: 50 };
-        const options = { width: 151, height: 151 };
-        const dungeon = pixelDungeonFactory.generate(options);
-        // const grid = [];
-        // for (let i = 0; i < 200; i++) {
-        //     const col = [];
-        //     for (let j = 0; j < 200; j++) {
-        //         col.push(tiles[i * 200 + j].region);
-        //     }
-        //     grid.push(col);
-        // }
-        // console.log(grid);
+        const options = { width: 25, height: 25, roomArea: 50 };
+        const pixelDungeon = new PixelDungeonFactory().generate();
+        const juns = [];
+        const allhallways = {};
+        const allrooms = {};
+        for (const tile of pixelDungeon) {
+            if (tile.type === ETileType.junction) juns.push(tile);
+            if (tile.type === ETileType.floor) {
+                if (!allhallways[tile.region]) allhallways[tile.region] = [];
+                allhallways[tile.region].push(tile);
+            }
+            if (tile.type === ETileType.room) {
+                if (!allrooms[tile.region]) allrooms[tile.region] = [];
+                allrooms[tile.region].push(tile);
+            }
+        }
+        console.log(juns, ' juns');
+        console.log(allhallways, ' hlla');
+        console.log(allrooms, ' rooms');
 
         // Creating a blank tilemap with dimensions matching the dungeon
         this.map = this.make.tilemap({
@@ -112,9 +118,10 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         const tileset = this.map.addTilesetImage('tiles', 'tiles', 16, 16, 1, 2);
         //
         this.tilelayer = this.map.createBlankLayer('Layer 1', tileset);
+
         //
         // if (!debug) {
-        this.tilelayer.setScale(1.5);
+        this.tilelayer.setScale(2);
         // }
         //
         // // Fill with black tiles
@@ -122,35 +129,27 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //
         let startX;
         let startY;
-        for (let rowIdx = 0; rowIdx < dungeon.length; rowIdx++) {
-            const row = dungeon[rowIdx];
-            for (let colIdx = 0; colIdx < row.length; colIdx++) {
-                // const { region } = row[colIdx];
-                // this.map.putTileAt(region ?? 20, colIdx, rowIdx);
-                // continue;
-                const { type } = row[colIdx];
-                switch (type) {
-                    case ETileType.none:
-                        this.map.putTileAt(20, colIdx, rowIdx);
-                        break;
-                    case ETileType.floor:
-                        startX = colIdx;
-                        startY = rowIdx;
-                        this.map.weightedRandomize(TILES.FLOOR, colIdx, rowIdx, 1, 1);
-                        break;
-                    case ETileType.opendoor:
-                        this.map.putTileAt(20, colIdx, rowIdx);
-                        break;
-                    case ETileType.closeddoor:
-                        this.map.putTileAt(TILES.DOOR, colIdx, rowIdx);
-                        break;
-                    case ETileType.wall:
-                        this.map.weightedRandomize(TILES.TOP_WALL, colIdx, rowIdx, 1, 1);
-                        break;
-                    case ETileType.room:
-                        this.map.weightedRandomize(TILES.ROOM, colIdx, rowIdx, 1, 1);
-                        break;
-                }
+        for (const tile of pixelDungeon) {
+            switch (tile.type) {
+                case ETileType.none:
+                    this.map.putTileAt(20, tile.x, tile.y);
+                    break;
+                case ETileType.floor:
+                    startX = tile.x;
+                    startY = tile.y;
+                    this.map.weightedRandomize(TILES.FLOOR, tile.x, tile.y, 1, 1);
+                    break;
+                case ETileType.junction:
+                    this.map.putTileAt(TILES.DOOR, tile.x, tile.y);
+                    break;
+                case ETileType.wall:
+                    this.map.weightedRandomize(TILES.TOP_WALL, tile.x, tile.y, 1, 1);
+                    break;
+                case ETileType.room:
+                    startX = tile.x;
+                    startY = tile.y;
+                    this.map.weightedRandomize(TILES.ROOM, tile.x, tile.y, 1, 1);
+                    break;
             }
         }
         // // Use the array of rooms generated to place tiles in the map
