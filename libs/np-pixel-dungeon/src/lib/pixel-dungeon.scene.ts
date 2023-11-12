@@ -1,8 +1,13 @@
 import { NPRect } from '@shared/np-library';
 import * as Phaser from 'phaser';
+import Quad from 'phaser3-rex-plugins/plugins/board/grid/quad/Quad';
+import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
-import { ETileType, PixelDungeonFactory } from './core/pixel-dungeon.factory';
+import { ETileType } from './@types/pixel-dungeon.types';
+import { PixelDungeon } from './core/pixel-dungeon';
+import QuadGridDirTypes = Quad.QuadGridDirTypes;
 // Tile index mapping to make the code more readable
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TILES = {
@@ -45,8 +50,10 @@ const TILES = {
 };
 
 export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate {
+    rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
+
     map: Phaser.Tilemaps.Tilemap;
-    player: Phaser.GameObjects.Graphics;
+    player;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     cam: Phaser.Cameras.Scene2D.Camera;
     tilelayer: Phaser.Tilemaps.TilemapLayer;
@@ -63,49 +70,9 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     }
 
     create() {
-        // Note: Dungeon is not a Phaser element - it's from the custom script embedded at the bottom :)
-        // It generates a simple set of connected rectangular rooms that then we can turn into a tilemap
-
-        //  2,500 tile test
-        // dungeon = new Dungeon({
-        //     width: 50,
-        //     height: 50,
-        //     rooms: {
-        //         width: { min: 7, max: 15, onlyOdd: true },
-        //         height: { min: 7, max: 15, onlyOdd: true }
-        //     }
-        // });
-
-        // //  40,000 tile test
-        // this.dungeon = new Dungeon({
-        //     width: 200,
-        //     height: 200,
-        //     doorPadding: 1,
-        //     rooms: {
-        //         width: { min: 7, max: 20, onlyOdd: true },
-        //         height: { min: 7, max: 20, onlyOdd: true },
-        //     },
-        // });
-
-        const options = { width: 25, height: 25, roomArea: 50 };
-        const pixelDungeon = new PixelDungeonFactory().generate();
-        const juns = [];
-        const allhallways = {};
-        const allrooms = {};
-        for (const tile of pixelDungeon) {
-            if (tile.type === ETileType.junction) juns.push(tile);
-            if (tile.type === ETileType.floor) {
-                if (!allhallways[tile.region]) allhallways[tile.region] = [];
-                allhallways[tile.region].push(tile);
-            }
-            if (tile.type === ETileType.room) {
-                if (!allrooms[tile.region]) allrooms[tile.region] = [];
-                allrooms[tile.region].push(tile);
-            }
-        }
-        console.log(juns, ' juns');
-        console.log(allhallways, ' hlla');
-        console.log(allrooms, ' rooms');
+        const options = { width: 251, height: 25, seed: 'My-Seed' };
+        const pixelDungeon = new PixelDungeon(options);
+        pixelDungeon.init();
 
         // Creating a blank tilemap with dimensions matching the dungeon
         this.map = this.make.tilemap({
@@ -119,13 +86,18 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //
         this.tilelayer = this.map.createBlankLayer('Layer 1', tileset);
 
-        //
-        // if (!debug) {
-        this.tilelayer.setScale(2);
+        this.tilelayer.setScale(1);
+        this.tilelayer.setInteractive({ useHandcursor: true });
+
+        this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
+            this.tilelayer.off(Phaser.Input.Events.POINTER_UP);
+        });
+
         // }
         //
         // // Fill with black tiles
         this.tilelayer.fill(20);
+        this.tilelayer.setCollisionByExclusion([6, 7, 8, 26, TILES.DOOR]);
         //
         let startX;
         let startY;
@@ -152,6 +124,44 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
                     break;
             }
         }
+
+        const board = this.rexBoard.createBoardFromTilemap(this.map);
+        const grid = board.grid as unknown as { setDirectionMode: (mode: QuadGridDirTypes) => void };
+        grid.setDirectionMode('8dir');
+        const costs = (curTile: PathFinder.NodeType): number | PathFinder.BLOCKER | PathFinder.INFINITY => {
+            const tile = this.map.getTileAt(curTile.x, curTile.y);
+            return [6, 7, 8, 26, TILES.DOOR].includes(tile.index) ? 1 : null;
+        };
+
+        const pathGraphics = this.add.graphics({ lineStyle: { width: 8 } });
+        const chess = this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
+        const p2 = this.rexBoard.add.pathFinder(chess, {
+            pathMode: 'straight',
+            blockerTest: true,
+            occupiedTest: true,
+            costCallback: curTile => costs(curTile),
+        });
+        let pathToMove: PathFinder.NodeType[] | undefined;
+        const drawPath = (tileXYArray: PathFinder.NodeType[]) => {
+            const p = tileXYArray.map(tile => this.map.tileToWorldXY(tile.x, tile.y)).map(pv => pv.add({ x: 8, y: 8 }));
+            pathGraphics.strokePoints(p);
+        };
+        const moveTo = this.rexBoard.add.moveTo(chess);
+
+        this.tilelayer.on(Phaser.Input.Events.POINTER_UP, ({ worldX, worldY }: Phaser.Input.Pointer) => {
+            const targetTile = this.map.getTileAtWorldXY(worldX, worldY);
+            // generate the path
+            pathToMove = p2.findPath({ x: targetTile.x, y: targetTile.y });
+            drawPath(pathToMove);
+            moveTo.moveTo(pathToMove.shift());
+        });
+
+        moveTo.on('complete', () => {
+            const next = pathToMove.shift();
+            if (next) moveTo.moveTo(next);
+            if (!next) pathGraphics.clear();
+        });
+        // moveTo.moveToRandomNeighbor();
         // // Use the array of rooms generated to place tiles in the map
         // this.dungeon.rooms.forEach(function (room) {
         //     const x = room.x;
@@ -216,7 +226,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //
         // // Not exactly correct for the tileset since there are more possible floor tiles, but this will
         // // do for the example.
-        this.tilelayer.setCollisionByExclusion([6, 7, 8, 26, TILES.DOOR]);
+
         //
         // // Hide all the rooms
         // if (!debug) {
@@ -228,12 +238,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         // // Place the player in the first room
         // const playerRoom = this.dungeon.rooms[0];
         //
-        this.player = this.add
-            .graphics({ fillStyle: { color: 0xedca40, alpha: 1 } })
-            .fillRect(0, 0, this.map.tileWidth * this.tilelayer.scaleX, this.map.tileHeight * this.tilelayer.scaleY);
-
-        this.player.x = this.map.tileToWorldX(startX);
-        this.player.y = this.map.tileToWorldY(startY);
+        this.player = chess;
         //
         // if (!debug) {
         //     this.setRoomAlpha(playerRoom, 1); // Make the starting room visible
@@ -241,6 +246,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //
         // // Scroll to the player
         this.cam = this.cameras.main;
+        this.cam.setZoom(3);
         //
         this.cam.setBounds(
             0,
@@ -303,33 +309,33 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     }
 
     updatePlayerMovement(time: number) {
-        const tw = this.map.tileWidth * this.tilelayer.scaleX;
-        const th = this.map.tileHeight * this.tilelayer.scaleY;
+        // const tw = this.map.tileWidth * this.tilelayer.scaleX;
+        // const th = this.map.tileHeight * this.tilelayer.scaleY;
         const repeatMoveDelay = 100;
 
         if (time > this.lastMoveTime + repeatMoveDelay) {
             if (this.cursors.down.isDown) {
-                if (this.isTileOpenAt(this.player.x, this.player.y + th)) {
-                    this.player.y += th;
-                    this.lastMoveTime = time;
-                }
+                // if (this.isTileOpenAt(this.player.x, this.player.y + th)) {
+                // this.player.y += th;
+                // this.lastMoveTime = time;
+                // }
             } else if (this.cursors.up.isDown) {
-                if (this.isTileOpenAt(this.player.x, this.player.y - th)) {
-                    this.player.y -= th;
-                    this.lastMoveTime = time;
-                }
+                // if (this.isTileOpenAt(this.player.x, this.player.y - th)) {
+                // this.player.y -= th;
+                // this.lastMoveTime = time;
+                // }
             }
 
             if (this.cursors.left.isDown) {
-                if (this.isTileOpenAt(this.player.x - tw, this.player.y)) {
-                    this.player.x -= tw;
-                    this.lastMoveTime = time;
-                }
+                // if (this.isTileOpenAt(this.player.x - tw, this.player.y)) {
+                // this.player.x -= tw;
+                // this.lastMoveTime = time;
+                // }
             } else if (this.cursors.right.isDown) {
-                if (this.isTileOpenAt(this.player.x + tw, this.player.y)) {
-                    this.player.x += tw;
-                    this.lastMoveTime = time;
-                }
+                // if (this.isTileOpenAt(this.player.x + tw, this.player.y)) {
+                // this.player.x += tw;
+                // this.lastMoveTime = time;
+                // }
             }
         }
     }

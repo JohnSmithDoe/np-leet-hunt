@@ -12,13 +12,7 @@ import {
     NPVec2,
 } from '@shared/np-library';
 
-export enum ETileType {
-    none,
-    floor,
-    wall,
-    room,
-    junction,
-}
+import { ETileType, TDungeonOptions, TDungeonTile } from '../@types/pixel-dungeon.types';
 
 /// The random dungeon generator.
 ///
@@ -47,30 +41,7 @@ export enum ETileType {
 /// The end result of this is a multiply-connected dungeon with rooms and lots
 /// of winding corridors.
 
-interface TDungeonTile {
-    type: ETileType;
-    // The position in the dungeon grid
-    x: number;
-    y: number;
-    // For each open position in the dungeon, the index of the connected region that that tile is a part of.
-    region: number;
-}
-
-interface TDungeon {
-    width: number;
-    height: number;
-    roomTries?: number;
-    roomArea?: number;
-    /// Increasing this allows rooms to be larger.
-    roomExtraSize?: number;
-    /// The inverse chance of adding a connector between two regions that have
-    /// already been joined. Increasing this leads to more loosely connected
-    /// dungeons. (oneIn(X))
-    extraConnectorChance?: number;
-    straightenPercentage?: number;
-}
-
-const defaultDungeon: TDungeon = {
+const defaultDungeon: TDungeonOptions = {
     roomArea: 75,
     height: 25,
     width: 25,
@@ -79,11 +50,10 @@ const defaultDungeon: TDungeon = {
     straightenPercentage: 50,
 };
 
-export class PixelDungeonFactory implements Iterable<TDungeonTile> {
-    // readonly #rng = new NPRng(`${Date.now()}#`);
-    readonly #rng = new NPRng(`##<#`);
+export class PixelDungeonFactory {
+    #rng: NPRng;
 
-    #options: TDungeon;
+    #options: TDungeonOptions;
     #dungeon: TDungeonTile[][];
 
     /// The index of the current region being carved.
@@ -91,16 +61,7 @@ export class PixelDungeonFactory implements Iterable<TDungeonTile> {
     #bounds: NPRect;
     #rooms: NPRect[] = [];
 
-    *[Symbol.iterator](): Iterator<TDungeonTile> {
-        for (const tileRow of this.#dungeon) {
-            for (const tile of tileRow) {
-                yield tile;
-            }
-        }
-        return undefined;
-    }
-
-    generate(options?: TDungeon) {
+    generate(options?: TDungeonOptions) {
         this.#initializeDungeon(options);
 
         this.#addRooms();
@@ -109,10 +70,10 @@ export class PixelDungeonFactory implements Iterable<TDungeonTile> {
         // return this.#dungeon;
         this.#removeDeadEnds();
         this.#removeFullWalls();
-        return this;
+        return this.#dungeon;
     }
 
-    #initializeDungeon(options: TDungeon) {
+    #initializeDungeon(options: TDungeonOptions) {
         options = Object.assign({}, defaultDungeon, options ?? {});
         if (options.width % 2 === 0 || options.height % 2 === 0) {
             throw new Error('The options must be odd-sized');
@@ -120,6 +81,7 @@ export class PixelDungeonFactory implements Iterable<TDungeonTile> {
         this.#options = options;
         this.#options.roomTries ??= options.width * options.height ?? options.width;
 
+        this.#rng = new NPRng(this.#options.seed ?? `${Date.now()}#PixelDungeon`);
         this.#bounds = new NPRect(0, 0, options.width, options.height);
         this.#dungeon = array2D(options.height, options.width, (row, col) => ({
             type: ETileType.wall,
