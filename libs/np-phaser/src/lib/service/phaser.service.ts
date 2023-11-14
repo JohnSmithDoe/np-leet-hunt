@@ -1,6 +1,5 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import * as Phaser from 'phaser';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
 import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
 import { BehaviorSubject } from 'rxjs';
@@ -81,13 +80,7 @@ export class PhaserService {
             scene: [],
             plugins: {
                 global: [...globalPlugins],
-                scene: [
-                    {
-                        key: 'rexBoard',
-                        plugin: BoardPlugin,
-                        mapping: 'rexBoard',
-                    },
-                ],
+                scene: [],
             },
             fps: {
                 forceSetTimeOut: true,

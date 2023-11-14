@@ -1,13 +1,11 @@
 import { NPRect } from '@shared/np-library';
 import * as Phaser from 'phaser';
-import Quad from 'phaser3-rex-plugins/plugins/board/grid/quad/Quad';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { ETileType } from './@types/pixel-dungeon.types';
 import { PixelDungeon } from './core/pixel-dungeon';
-import QuadGridDirTypes = Quad.QuadGridDirTypes;
 // Tile index mapping to make the code more readable
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TILES = {
@@ -59,6 +57,10 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     tilelayer: Phaser.Tilemaps.TilemapLayer;
     lastMoveTime = 0;
 
+    constructor() {
+        super();
+    }
+
     setupComponents(): void {
         console.log('nope');
     }
@@ -67,6 +69,8 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         // Credits! Michele "Buch" Bucelli (tilset artist) & Abram Connelly (tileset sponser)
         // https://opengameart.org/content/top-down-dungeon-tileset
         this.load.image('tiles', 'np-pixel-dungeon/buch-dungeon-tileset-extruded.png');
+        // locally -> TODO build process....
+        this.load.scenePlugin('rexboardplugin', 'np-pixel-dungeon/rexboardplugin.min.js', 'rexBoard', 'rexBoard');
     }
 
     create() {
@@ -126,7 +130,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         }
 
         const board = this.rexBoard.createBoardFromTilemap(this.map);
-        const grid = board.grid as unknown as { setDirectionMode: (mode: QuadGridDirTypes) => void };
+        const grid = board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
         grid.setDirectionMode('8dir');
         const costs = (curTile: PathFinder.NodeType): number | PathFinder.BLOCKER | PathFinder.INFINITY => {
             const tile = this.map.getTileAt(curTile.x, curTile.y);
@@ -136,7 +140,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         const pathGraphics = this.add.graphics({ lineStyle: { width: 8 } });
         const chess = this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
         const p2 = this.rexBoard.add.pathFinder(chess, {
-            pathMode: 'straight',
+            pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
             blockerTest: true,
             occupiedTest: true,
             costCallback: curTile => costs(curTile),
