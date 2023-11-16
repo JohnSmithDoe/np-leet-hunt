@@ -58,7 +58,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     #type: TLpcSheetType;
 
     constructor(scene: Phaser.Scene, x: number, y: number, type: TLpcSheetType) {
-        super(scene, x, y, 'brawler', 1);
+        super(scene, x, y, '');
         this.#type = type;
     }
 
@@ -67,14 +67,14 @@ export class Player extends Phaser.GameObjects.Sprite {
             frameWidth: 64,
             frameHeight: 64,
         });
-        this.scene.load.image('grid', 'np-pixel-dungeon/grid-ps1.png');
+        // this.scene.load.image('grid', 'np-pixel-dungeon/grid-ps1.png');
     }
 
     create() {
         // Text section
-        this.scene.add.tileSprite(0, 0, 832, 1344, 'grid').setOrigin(0);
-        this.scene.add.image(0, 0, 'brawler', '__BASE').setOrigin(0, 0);
-        this.scene.add.grid(0, 0, 832, 1344, 64, 64).setOrigin(0, 0).setOutlineStyle(0x00ff00);
+        // this.scene.add.tileSprite(0, 0, 832, 1344, 'grid').setOrigin(0);
+        // this.scene.add.image(0, 0, 'brawler', '__BASE').setOrigin(0, 0);
+        // this.scene.add.grid(0, 0, 832, 1344, 64, 64).setOrigin(0, 0).setOutlineStyle(0x00ff00);
 
         this.#createAnimations();
 
@@ -108,13 +108,13 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.setTexture('brawler', 1);
         this.play('walk right');
         this.setScale(1);
-        this.scene.input.on('pointerdown', () => {
-            this.play('die');
-        });
+        // this.scene.input.on('pointerdown', () => {
+        //     this.play('die');
+        // });
     }
 
-    play(key: TLpcAnimationKey, ignoreIfPlaying?: boolean): this {
-        return super.play(key, ignoreIfPlaying);
+    play(key: TLpcAnimationKey): this {
+        return super.play(key, true);
     }
 
     #createAnimations() {
@@ -125,7 +125,7 @@ export class Player extends Phaser.GameObjects.Sprite {
                 this.anims.create({
                     key,
                     frames: this.anims.generateFrameNumbers('brawler', { ...animation }),
-                    frameRate: animation.frameRate ?? 8,
+                    frameRate: animation.frameRate ?? 16,
                     repeat: animation.repeat ?? -1,
                 });
             }

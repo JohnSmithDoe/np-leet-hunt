@@ -1,4 +1,4 @@
-import { NPRect } from '@shared/np-library';
+import { EDirection, NPRect } from '@shared/np-library';
 import * as Phaser from 'phaser';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
@@ -7,6 +7,29 @@ import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/
 import { ETileType } from './@types/pixel-dungeon.types';
 import { PixelDungeon } from './core/pixel-dungeon';
 import { Player } from './sprites/player';
+
+const mapRexDirection = (dir: number): EDirection => {
+    switch (dir) {
+        case 0:
+            return EDirection.E;
+        case 1:
+            return EDirection.S;
+        case 2:
+            return EDirection.W;
+        case 3:
+            return EDirection.N;
+        case 4:
+            return EDirection.SE;
+        case 5:
+            return EDirection.SW;
+        case 6:
+            return EDirection.NW;
+        case 7:
+            return EDirection.NE;
+        default:
+            return EDirection.NONE;
+    }
+};
 // Tile index mapping to make the code more readable
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TILES = {
@@ -52,13 +75,12 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
     map: Phaser.Tilemaps.Tilemap;
-    player: BoardPlugin.Shape;
+    player: Player;
     moveTo: BoardPlugin.MoveTo;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     cam: Phaser.Cameras.Scene2D.Camera;
     tilelayer: Phaser.Tilemaps.TilemapLayer;
     lastMoveTime = 0;
-    private anim: Player;
 
     constructor() {
         super();
@@ -66,12 +88,12 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
 
     setupComponents(): void {
         console.log('nope');
-        this.anim = new Player(this, 0, 0, 'standard');
+        this.player = new Player(this, 0, 0, 'standard');
     }
 
     preload() {
         this.setupComponents();
-        this.anim.preload();
+        this.player.preload();
         // Credits! Michele "Buch" Bucelli (tilset artist) & Abram Connelly (tileset sponser)
         // https://opengameart.org/content/top-down-dungeon-tileset
         this.load.image('tiles', 'np-pixel-dungeon/buch-dungeon-tileset-extruded.png');
@@ -134,29 +156,32 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
                     break;
             }
         }
+        const pathGraphics = this.add.graphics({ lineStyle: { width: 3 } });
+        this.player.create();
+        this.add.existing(this.player);
+        const size = 32;
+        this.player.setOrigin((size - 16) / 2 / size, (size - 16) / size);
+        this.player.setDisplaySize(size, size);
 
         const board = this.rexBoard.createBoardFromTilemap(this.map);
+        board.addChess(this.player, startX, startY, 5);
         const grid = board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
         grid.setDirectionMode('8dir');
         const costs = (curTile: PathFinder.NodeType): number | PathFinder.BLOCKER | PathFinder.INFINITY => {
             const tile = this.map.getTileAt(curTile.x, curTile.y);
             return [6, 7, 8, 26, TILES.DOOR].includes(tile.index) ? 1 : null;
         };
-
-        const pathGraphics = this.add.graphics({ lineStyle: { width: 8 } });
-        const chess = this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
-        const p2 = this.rexBoard.add.pathFinder(chess, {
-            pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
-            blockerTest: true,
-            occupiedTest: true,
-            costCallback: curTile => costs(curTile),
-        });
         let pathToMove: PathFinder.NodeType[] | undefined;
         const drawPath = (tileXYArray: PathFinder.NodeType[]) => {
             const p = tileXYArray.map(tile => this.map.tileToWorldXY(tile.x, tile.y)).map(pv => pv.add({ x: 8, y: 8 }));
             pathGraphics.strokePoints(p);
         };
-        this.moveTo = this.rexBoard.add.moveTo(chess, {
+
+        // const chess = this.player; //this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
+        const pos = this.map.tileToWorldXY(startX, startY);
+        this.player.setPosition(pos.x, pos.y);
+
+        this.moveTo = this.rexBoard.add.moveTo(this.player, {
             blockerTest: true,
             occupiedTest: true,
             speed: 200,
@@ -166,19 +191,34 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
             },
         });
 
+        //this.add.existing(this.anim);
+        const p2 = this.rexBoard.add.pathFinder(this.player, {
+            pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
+            blockerTest: true,
+            occupiedTest: true,
+            costCallback: curTile => costs(curTile),
+        });
+
         this.tilelayer.on(Phaser.Input.Events.POINTER_UP, ({ worldX, worldY }: Phaser.Input.Pointer) => {
             const targetTile = this.map.getTileAtWorldXY(worldX, worldY);
             // generate the path
             pathToMove = p2.findPath({ x: targetTile.x, y: targetTile.y });
             drawPath(pathToMove);
             this.moveTo.moveTo(pathToMove.shift());
+            this.faceMoveTo();
         });
 
         this.moveTo.on('complete', () => {
             const next = pathToMove.shift();
             if (next) this.moveTo.moveTo(next);
+            this.faceMoveTo();
+
             if (!next) pathGraphics.clear();
+            if (!next) this.player.play('die');
         });
+
+        this.cam = this.cameras.main;
+        this.cam.setZoom(2);
         // moveTo.moveToRandomNeighbor();
         // // Use the array of rooms generated to place tiles in the map
         // this.dungeon.rooms.forEach(function (room) {
@@ -256,30 +296,49 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         // // Place the player in the first room
         // const playerRoom = this.dungeon.rooms[0];
         //
-        this.tilelayer.setVisible(false);
-        this.player = chess;
-        this.anim.create();
-        this.anim.setPosition(768, 64);
-        this.add.existing(this.anim);
+
         //
         // if (!debug) {
         //     this.setRoomAlpha(playerRoom, 1); // Make the starting room visible
         // }
         //
         // // Scroll to the player
-        this.cam = this.cameras.main;
-        this.cam.setZoom(1);
+
         //
-        // this.cam.setBounds(
-        //     0,
-        //     0,
-        //     this.tilelayer.width * this.tilelayer.scaleX,
-        //     this.tilelayer.height * this.tilelayer.scaleY
-        // );
-        // this.cam.scrollX = this.player.x - this.cam.width * 0.5;
-        // this.cam.scrollY = this.player.y - this.cam.height * 0.5;
+        this.cam.setBounds(
+            0,
+            0,
+            this.tilelayer.width * this.tilelayer.scaleX,
+            this.tilelayer.height * this.tilelayer.scaleY
+        );
+        this.cam.scrollX = this.player.x - this.cam.width * 0.5;
+        this.cam.scrollY = this.player.y - this.cam.height * 0.5;
         //
         this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    private faceMoveTo() {
+        switch (mapRexDirection(this.moveTo.destinationDirection)) {
+            case EDirection.NONE:
+                this.player.play('die');
+                break;
+            case EDirection.N:
+                this.player.play('walk up');
+                break;
+            case EDirection.NE:
+            case EDirection.E:
+            case EDirection.SE:
+                this.player.play('walk right');
+                break;
+            case EDirection.S:
+                this.player.play('walk down');
+                break;
+            case EDirection.SW:
+            case EDirection.W:
+            case EDirection.NW:
+                this.player.play('walk left');
+                break;
+        }
     }
 
     update() {
@@ -302,10 +361,10 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         // Smooth follow the player
         const smoothFactor = 0.9;
         //
-        // this.cam.scrollX =
-        //     smoothFactor * this.cam.scrollX + (1 - smoothFactor) * (this.player.x - this.cam.width * 0.5);
-        // this.cam.scrollY =
-        //     smoothFactor * this.cam.scrollY + (1 - smoothFactor) * (this.player.y - this.cam.height * 0.5);
+        this.cam.scrollX =
+            smoothFactor * this.cam.scrollX + (1 - smoothFactor) * (this.player.x - this.cam.width * 0.5);
+        this.cam.scrollY =
+            smoothFactor * this.cam.scrollY + (1 - smoothFactor) * (this.player.y - this.cam.height * 0.5);
     }
 
     // Helpers functions
