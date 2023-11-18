@@ -1,9 +1,11 @@
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+
 export enum ETileType {
-    none,
-    floor,
-    wall,
-    room,
-    junction,
+    none = 'empty',
+    floor = 'floor',
+    wall = 'wall',
+    room = 'room',
+    junction = 'junction',
 }
 
 export interface TDungeonTile {
@@ -28,4 +30,8 @@ export interface TDungeonOptions {
     extraConnectorChance?: number;
     straightenPercentage?: number;
     seed?: string; // random seed
+}
+
+export interface SceneWithBoard {
+    rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 }

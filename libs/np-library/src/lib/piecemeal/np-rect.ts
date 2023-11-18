@@ -183,6 +183,10 @@ export class NPRect implements Iterable<NPVec2> {
         return new NPRect(this.x + x, this.y + y, this.width, this.height);
     }
 
+    extrude(distanceX: number, distanceY?: number) {
+        return new NPRect(this.x, this.y, this.width + distanceX, this.height + (distanceY ?? distanceX));
+    }
+
     contains(pos: NPVec2) {
         if (pos.x < this.pos.x) return false;
         if (pos.x >= this.pos.x + this.size.x) return false;

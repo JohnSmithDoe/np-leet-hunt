@@ -1,289 +1,90 @@
-import { EDirection, NPRect } from '@shared/np-library';
 import * as Phaser from 'phaser';
-import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
-import { ETileType } from './@types/pixel-dungeon.types';
-import { PixelDungeon } from './core/pixel-dungeon';
+import { SceneWithBoard } from './@types/pixel-dungeon.types';
+import { PixelDungeonMap } from './sprites/pixel-dungeon.map';
 import { Player } from './sprites/player';
 
-const mapRexDirection = (dir: number): EDirection => {
-    switch (dir) {
-        case 0:
-            return EDirection.E;
-        case 1:
-            return EDirection.S;
-        case 2:
-            return EDirection.W;
-        case 3:
-            return EDirection.N;
-        case 4:
-            return EDirection.SE;
-        case 5:
-            return EDirection.SW;
-        case 6:
-            return EDirection.NW;
-        case 7:
-            return EDirection.NE;
-        default:
-            return EDirection.NONE;
-    }
-};
-// Tile index mapping to make the code more readable
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TILES = {
-    TOP_LEFT_WALL: 3,
-    TOP_RIGHT_WALL: 4,
-    BOTTOM_RIGHT_WALL: 23,
-    BOTTOM_LEFT_WALL: 22,
-    DOOR: 118,
-    TOP_WALL: [
-        { index: 39, weight: 4 },
-        { index: 57, weight: 1 },
-        { index: 58, weight: 1 },
-        { index: 59, weight: 1 },
-    ],
-    LEFT_WALL: [
-        { index: 21, weight: 4 },
-        { index: 76, weight: 1 },
-        { index: 95, weight: 1 },
-        { index: 114, weight: 1 },
-    ],
-    RIGHT_WALL: [
-        { index: 19, weight: 4 },
-        { index: 77, weight: 1 },
-        { index: 96, weight: 1 },
-        { index: 115, weight: 1 },
-    ],
-    BOTTOM_WALL: [
-        { index: 1, weight: 4 },
-        { index: 78, weight: 1 },
-        { index: 79, weight: 1 },
-        { index: 80, weight: 1 },
-    ],
-    FLOOR: [
-        { index: 6, weight: 120 },
-        { index: 7, weight: 1 },
-        { index: 8, weight: 1 },
-        { index: 26, weight: 1 },
-    ],
-    ROOM: [{ index: 26, weight: 20 }],
-};
-
-export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate {
+export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate, SceneWithBoard {
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
-    map: Phaser.Tilemaps.Tilemap;
+    map: PixelDungeonMap;
     player: Player;
+
     moveTo: BoardPlugin.MoveTo;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     cam: Phaser.Cameras.Scene2D.Camera;
-    tilelayer: Phaser.Tilemaps.TilemapLayer;
-    lastMoveTime = 0;
+    private cameraDrag: boolean;
 
     constructor() {
         super();
     }
 
-    setupComponents(): void {
+    init(): void {
         console.log('nope');
         this.player = new Player(this, 0, 0, 'standard');
+        this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
+        this.map.init();
     }
 
     preload() {
-        this.setupComponents();
-        this.player.preload();
-        // Credits! Michele "Buch" Bucelli (tilset artist) & Abram Connelly (tileset sponser)
-        // https://opengameart.org/content/top-down-dungeon-tileset
-        this.load.image('tiles', 'np-pixel-dungeon/buch-dungeon-tileset-extruded.png');
-        // locally -> TODO build process....
         this.load.scenePlugin('rexboardplugin', 'np-pixel-dungeon/rexboardplugin.min.js', 'rexBoard', 'rexBoard');
+        this.player.preload();
+        this.map.preload();
     }
 
     create() {
-        const options = { width: 251, height: 25, seed: 'My-Seed' };
-        const pixelDungeon = new PixelDungeon(options);
-        pixelDungeon.init();
-
-        // Creating a blank tilemap with dimensions matching the dungeon
-        this.map = this.make.tilemap({
-            tileWidth: 16,
-            tileHeight: 16,
-            width: options.width,
-            height: options.height,
-        });
-        //
-        const tileset = this.map.addTilesetImage('tiles', 'tiles', 16, 16, 1, 2);
-        //
-        this.tilelayer = this.map.createBlankLayer('Layer 1', tileset);
-
-        this.tilelayer.setScale(1);
-        this.tilelayer.setInteractive({ useHandcursor: true });
-
-        this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-            this.tilelayer.off(Phaser.Input.Events.POINTER_UP);
-        });
-
-        // }
-        //
-        // // Fill with black tiles
-        this.tilelayer.fill(20);
-        this.tilelayer.setCollisionByExclusion([6, 7, 8, 26, TILES.DOOR]);
-        //
-        let startX;
-        let startY;
-        for (const tile of pixelDungeon) {
-            switch (tile.type) {
-                case ETileType.none:
-                    this.map.putTileAt(20, tile.x, tile.y);
-                    break;
-                case ETileType.floor:
-                    startX = tile.x;
-                    startY = tile.y;
-                    this.map.weightedRandomize(TILES.FLOOR, tile.x, tile.y, 1, 1);
-                    break;
-                case ETileType.junction:
-                    this.map.putTileAt(TILES.DOOR, tile.x, tile.y);
-                    break;
-                case ETileType.wall:
-                    this.map.weightedRandomize(TILES.TOP_WALL, tile.x, tile.y, 1, 1);
-                    break;
-                case ETileType.room:
-                    startX = tile.x;
-                    startY = tile.y;
-                    this.map.weightedRandomize(TILES.ROOM, tile.x, tile.y, 1, 1);
-                    break;
-            }
-        }
-        const pathGraphics = this.add.graphics({ lineStyle: { width: 3 } });
         this.player.create();
-        this.add.existing(this.player);
-        const size = 32;
+        const size = 24;
         this.player.setOrigin((size - 16) / 2 / size, (size - 16) / size);
         this.player.setDisplaySize(size, size);
 
-        const board = this.rexBoard.createBoardFromTilemap(this.map);
-        board.addChess(this.player, startX, startY, 5);
-        const grid = board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
-        grid.setDirectionMode('8dir');
-        const costs = (curTile: PathFinder.NodeType): number | PathFinder.BLOCKER | PathFinder.INFINITY => {
-            const tile = this.map.getTileAt(curTile.x, curTile.y);
-            return [6, 7, 8, 26, TILES.DOOR].includes(tile.index) ? 1 : null;
-        };
-        let pathToMove: PathFinder.NodeType[] | undefined;
-        const drawPath = (tileXYArray: PathFinder.NodeType[]) => {
-            const p = tileXYArray.map(tile => this.map.tileToWorldXY(tile.x, tile.y)).map(pv => pv.add({ x: 8, y: 8 }));
-            pathGraphics.strokePoints(p);
-        };
-
-        // const chess = this.player; //this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
-        const pos = this.map.tileToWorldXY(startX, startY);
-        this.player.setPosition(pos.x, pos.y);
-
-        this.moveTo = this.rexBoard.add.moveTo(this.player, {
-            blockerTest: true,
-            occupiedTest: true,
-            speed: 200,
-            moveableTest: (from, to) => {
-                const tile = this.map.getTileAt(to.x, to.y);
-                return [6, 7, 8, 26, TILES.DOOR].includes(tile.index);
-            },
-        });
-
-        //this.add.existing(this.anim);
-        const p2 = this.rexBoard.add.pathFinder(this.player, {
-            pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
-            blockerTest: true,
-            occupiedTest: true,
-            costCallback: curTile => costs(curTile),
-        });
-
-        this.tilelayer.on(Phaser.Input.Events.POINTER_UP, ({ worldX, worldY }: Phaser.Input.Pointer) => {
-            const targetTile = this.map.getTileAtWorldXY(worldX, worldY);
-            // generate the path
-            pathToMove = p2.findPath({ x: targetTile.x, y: targetTile.y });
-            drawPath(pathToMove);
-            this.moveTo.moveTo(pathToMove.shift());
-            this.faceMoveTo();
-        });
-
-        this.moveTo.on('complete', () => {
-            const next = pathToMove.shift();
-            if (next) this.moveTo.moveTo(next);
-            this.faceMoveTo();
-
-            if (!next) pathGraphics.clear();
-            if (!next) this.player.play('die');
-        });
+        this.map.create(this.player); // TODO: add.existing
+        this.add.existing(this.player);
 
         this.cam = this.cameras.main;
-        this.cam.setZoom(2);
+        const camera = this.cameras.main;
+        let cameraDragStartX = 0;
+        let cameraDragStartY = 0;
+        this.cameraDrag = false;
+        this.input.on('pointerdown', () => {
+            cameraDragStartX = camera.scrollX;
+            cameraDragStartY = camera.scrollY;
+        });
+
+        this.input.on(Phaser.Input.Events.POINTER_UP, (pointer: Phaser.Input.Pointer) => {
+            if (this.cameraDrag) {
+                this.cameraDrag = false;
+            } else {
+                this.map.moveToPointer(pointer);
+            }
+        });
+
+        this.input.on('pointermove', pointer => {
+            if (pointer.isDown) {
+                camera.scrollX = cameraDragStartX + (pointer.downX - pointer.x) / camera.zoom;
+                camera.scrollY = cameraDragStartY + (pointer.downY - pointer.y) / camera.zoom;
+                if (Math.abs(camera.scrollX - cameraDragStartX) > 3) this.cameraDrag = true;
+            }
+        });
+
+        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY) => {
+            // Get the current world point under pointer.
+            const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+            const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
+            camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 6);
+
+            // Update camera matrix, so `getWorldPoint` returns zoom-adjusted coordinates.
+            const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+            // Scroll the camera to keep the pointer under the same world point.
+            camera.scrollX -= newWorldPoint.x - worldPoint.x;
+            camera.scrollY -= newWorldPoint.y - worldPoint.y; //TODO not working
+            this.cam.scrollX = this.player.x - this.cam.width * 0.5;
+            this.cam.scrollY = this.player.y - this.cam.height * 0.5;
+        });
+
         // moveTo.moveToRandomNeighbor();
-        // // Use the array of rooms generated to place tiles in the map
-        // this.dungeon.rooms.forEach(function (room) {
-        //     const x = room.x;
-        //     const y = room.y;
-        //     const w = room.width;
-        //     const h = room.height;
-        //     const cx = Math.floor(x + w / 2);
-        //     const cy = Math.floor(y + h / 2);
-        //     const left = x;
-        //     const right = x + (w - 1);
-        //     const top = y;
-        //     const bottom = y + (h - 1);
-        //
-        //     // Fill the floor with mostly clean tiles, but occasionally place a dirty tile
-        //     // See "Weighted Randomize" example for more information on how to use weightedRandomize.
-        //     this.map.weightedRandomize(TILES.FLOOR, x, y, w, h);
-        //
-        //     // Place the room corners tiles
-        //     this.map.putTileAt(TILES.TOP_LEFT_WALL, left, top);
-        //     this.map.putTileAt(TILES.TOP_RIGHT_WALL, right, top);
-        //     this.map.putTileAt(TILES.BOTTOM_RIGHT_WALL, right, bottom);
-        //     this.map.putTileAt(TILES.BOTTOM_LEFT_WALL, left, bottom);
-        //
-        //     // Fill the walls with mostly clean tiles, but occasionally place a dirty tile
-        //     this.map.weightedRandomize(TILES.TOP_WALL, left + 1, top, w - 2, 1);
-        //     this.map.weightedRandomize(TILES.BOTTOM_WALL, left + 1, bottom, w - 2, 1);
-        //     this.map.weightedRandomize(TILES.LEFT_WALL, left, top + 1, 1, h - 2);
-        //     this.map.weightedRandomize(TILES.RIGHT_WALL, right, top + 1, 1, h - 2);
-        //
-        //     // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the rooms location
-        //     const doors = room.getDoorLocations();
-        //
-        //     for (const item of doors) {
-        //         this.map.putTileAt(6, x + item.x, y + item.y);
-        //     }
-        //
-        //     // Place some random stuff in rooms occasionally
-        //     const rand = Math.random();
-        //     if (rand <= 0.25) {
-        //         this.tilelayer.putTileAt(166, cx, cy); // Chest
-        //     } else if (rand <= 0.3) {
-        //         this.tilelayer.putTileAt(81, cx, cy); // Stairs
-        //     } else if (rand <= 0.4) {
-        //         this.tilelayer.putTileAt(167, cx, cy); // Trap door
-        //     } else if (rand <= 0.6) {
-        //         if (room.height >= 9) {
-        //             // We have room for 4 towers
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy + 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy + 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy - 2);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy - 2);
-        //         } else {
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy - 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy - 1);
-        //         }
-        //     }
-        // }, this);
-        //
-        // // Not exactly correct for the tileset since there are more possible floor tiles, but this will
-        // // do for the example.
 
         //
         // // Hide all the rooms
@@ -305,49 +106,19 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         // // Scroll to the player
 
         //
-        this.cam.setBounds(
-            0,
-            0,
-            this.tilelayer.width * this.tilelayer.scaleX,
-            this.tilelayer.height * this.tilelayer.scaleY
-        );
-        this.cam.scrollX = this.player.x - this.cam.width * 0.5;
-        this.cam.scrollY = this.player.y - this.cam.height * 0.5;
-        //
+        // this.cam.setViewport(0, 0, this.scale.width, this.scale.height);
+
+        this.cam.setZoom(4);
         this.cursors = this.input.keyboard.createCursorKeys();
     }
 
-    private faceMoveTo() {
-        switch (mapRexDirection(this.moveTo.destinationDirection)) {
-            case EDirection.NONE:
-                this.player.play('die');
-                break;
-            case EDirection.N:
-                this.player.play('walk up');
-                break;
-            case EDirection.NE:
-            case EDirection.E:
-            case EDirection.SE:
-                this.player.play('walk right');
-                break;
-            case EDirection.S:
-                this.player.play('walk down');
-                break;
-            case EDirection.SW:
-            case EDirection.W:
-            case EDirection.NW:
-                this.player.play('walk left');
-                break;
-        }
-    }
-
     update() {
+        if (this.cameraDrag) return;
         //this.updatePlayerMovement();
         // const playerTileX = this.map.worldToTileX(this.player.x);
         // const playerTileY = this.map.worldToTileY(this.player.y);
         // Another helper method from the dungeon - dungeon XY (in tiles) -> room
         // const room = this.dungeon.getRoomAt(playerTileX, playerTileY);
-
         // If the player has entered a new room, make it visible and dim the last room
         // if (room && this.activeRoom && this.activeRoom !== room) {
         //     if (!debug) {
@@ -358,9 +129,9 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         //
         // this.activeRoom = room;
         //
-        // Smooth follow the player
+        // // Smooth follow the player
         const smoothFactor = 0.9;
-        //
+        // //
         this.cam.scrollX =
             smoothFactor * this.cam.scrollX + (1 - smoothFactor) * (this.player.x - this.cam.width * 0.5);
         this.cam.scrollY =
@@ -368,26 +139,26 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     }
 
     // Helpers functions
-    setRoomAlpha(room: NPRect, alpha: number) {
-        this.map.forEachTile(
-            tile => {
-                tile.alpha = alpha;
-            },
-            this,
-            room.x,
-            room.y,
-            room.width,
-            room.height
-        );
-    }
+    // setRoomAlpha(room: NPRect, alpha: number) {
+    //     this.map.forEachTile(
+    //     tile => {
+    //         tile.alpha = alpha;
+    //     },
+    //     this,
+    //     room.x,
+    //     room.y,
+    //     room.width,
+    //     room.height
+    // );
+    // }
 
-    isTileOpenAt(worldX: number, worldY: number) {
-        // nonNull = true, don't return null for empty tiles. This means null will be returned only for
-        // tiles outside the bounds of the map.
-        const tile = this.map.getTileAtWorldXY(worldX, worldY, true);
-
-        return tile && !tile.collides;
-    }
+    // isTileOpenAt(worldX: number, worldY: number) {
+    // nonNull = true, don't return null for empty tiles. This means null will be returned only for
+    // tiles outside the bounds of the map.
+    // const tile = this.map.getTileAtWorldXY(worldX, worldY, true);
+    //
+    // return tile && !tile.collides;
+    // }
 
     updatePlayerMovement() {
         if (!this.moveTo.isRunning) {

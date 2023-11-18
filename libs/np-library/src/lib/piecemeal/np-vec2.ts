@@ -118,7 +118,7 @@ export class NPVec2 {
     /// The eight Vecs surrounding this one to the north, south, east, and west
     /// and points in between.
     get neighbors() {
-        return AllDirections.map(dir => this.add(directionToPos(dir)));
+        return AllDirections.map(dir => ({ dir, pos: this.add(directionToPos(dir)) }));
     }
 
     /// The four Vecs surrounding this one to the north, south, east, and west.

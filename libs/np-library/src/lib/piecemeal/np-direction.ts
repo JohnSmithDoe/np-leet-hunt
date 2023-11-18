@@ -5,7 +5,7 @@ export enum EDirection {
     E = 'east',
     SE = 'southeast',
     S = 'south',
-    SW = ' southwest',
+    SW = 'southwest',
     W = 'west',
     NW = 'northwest',
 }

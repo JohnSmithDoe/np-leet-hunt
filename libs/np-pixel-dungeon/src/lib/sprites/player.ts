@@ -1,3 +1,4 @@
+import { EDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 type TLpcSheetType = 'standard' | 'extended';
@@ -40,11 +41,11 @@ type TLpcConfig = Record<TLpcSheetType, TLpcSheetConfig>;
 const NPLpcConfig: TLpcConfig = {
     standard: {
         animations: {
-            die: { direction: 'down', start: 261, end: 265, repeat: 0 },
-            'walk up': { direction: 'down', start: 105, end: 112 },
-            'walk left': { direction: 'down', start: 118, end: 125 },
-            'walk down': { direction: 'down', start: 131, end: 138 },
-            'walk right': { direction: 'down', start: 144, end: 151 },
+            die: { direction: 'down', start: 260, end: 265, repeat: 0 },
+            'walk up': { direction: 'down', start: 104, end: 112 },
+            'walk left': { direction: 'down', start: 117, end: 125 },
+            'walk down': { direction: 'down', start: 130, end: 138 },
+            'walk right': { direction: 'down', start: 143, end: 151 },
         },
     },
     extended: {
@@ -63,7 +64,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
 
     preload() {
-        this.scene.load.spritesheet('brawler', 'np-pixel-dungeon/Download96156.png', {
+        this.scene.load.spritesheet('brawler', 'np-pixel-dungeon/Download19233.png', {
             frameWidth: 64,
             frameHeight: 64,
         });
@@ -117,6 +118,57 @@ export class Player extends Phaser.GameObjects.Sprite {
         return super.play(key, true);
     }
 
+    faceMoveTo(dir: EDirection) {
+        switch (dir) {
+            case EDirection.NONE:
+                this.play('die');
+                break;
+            case EDirection.N:
+                this.play('walk up');
+                break;
+            case EDirection.NE:
+            case EDirection.E:
+            case EDirection.SE:
+                this.play('walk right');
+                break;
+            case EDirection.S:
+                this.play('walk down');
+                break;
+            case EDirection.SW:
+            case EDirection.W:
+            case EDirection.NW:
+                this.play('walk left');
+                break;
+        }
+    }
+    faceToAnimation(key: TLpcAnimationKey) {
+        //this.stop();
+        this.setFrame(this.anims.get(key).getFrameByProgress(0).frame);
+    }
+    faceToDirection(dir: EDirection) {
+        switch (dir) {
+            case EDirection.NONE:
+                this.faceToAnimation('die');
+                break;
+            case EDirection.N:
+                this.faceToAnimation('walk up');
+                break;
+            case EDirection.NE:
+            case EDirection.E:
+            case EDirection.SE:
+                this.faceToAnimation('walk right');
+                break;
+            case EDirection.S:
+                this.faceToAnimation('walk down');
+                break;
+            case EDirection.SW:
+            case EDirection.W:
+            case EDirection.NW:
+                this.faceToAnimation('walk left');
+                break;
+        }
+    }
+
     #createAnimations() {
         const animations = NPLpcConfig[this.#type].animations;
         for (const key in animations) {
@@ -125,7 +177,7 @@ export class Player extends Phaser.GameObjects.Sprite {
                 this.anims.create({
                     key,
                     frames: this.anims.generateFrameNumbers('brawler', { ...animation }),
-                    frameRate: animation.frameRate ?? 16,
+                    frameRate: animation.frameRate ?? 12,
                     repeat: animation.repeat ?? -1,
                 });
             }

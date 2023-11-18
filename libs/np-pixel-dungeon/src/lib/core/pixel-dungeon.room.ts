@@ -1,24 +1,43 @@
-import { NPRect } from '@shared/np-library';
-
-import { TDungeonTile } from '../@types/pixel-dungeon.types';
+import { PixelDungeon } from './pixel-dungeon';
 import { PixelDungeonJunction } from './pixel-dungeon.junction';
+import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonRoom {
-    bounds: NPRect;
     region: number;
     junctions: PixelDungeonJunction[];
     connects: number[];
 
-    constructor(region: number) {
-        this.region = region;
-        this.bounds = new NPRect(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 0, 0);
+    #tiles: PixelDungeonTile[] = [];
+    #dungeon: PixelDungeon;
+    #topLeft: PixelDungeonTile;
+    #topRight: PixelDungeonTile;
+
+    *[Symbol.iterator](): Iterator<PixelDungeonTile> {
+        for (const tile of this.#tiles) {
+            yield tile;
+        }
+        return undefined;
     }
 
-    addTile(tile: TDungeonTile) {
-        const x = Math.min(this.bounds.x, tile.x);
-        const width = Math.max(this.bounds.width, tile.x - this.bounds.x + 1); // hmm is this the other +1
-        const y = Math.min(this.bounds.y, tile.y);
-        const height = Math.max(this.bounds.height, tile.y - this.bounds.y + 1);
-        this.bounds = new NPRect(x, y, width, height);
+    constructor(dungeon: PixelDungeon, tiles: PixelDungeonTile[]) {
+        this.#dungeon = dungeon;
+        this.#tiles = tiles;
+        this.#tiles.sort((a, b) => a.tileX - b.tileX).sort((a, b) => a.tileY - b.tileY);
+        console.log(this.#tiles[0], this.#tiles[this.#tiles.length - 1]);
+        this.region ??= tiles[0].region;
+    }
+
+    topLeft() {
+        return (this.#topLeft ??= this.#tiles.reduce((tile, curr) => {
+            tile ??= curr;
+            return tile.tileX <= curr.tileX && tile.tileY <= curr.tileY ? tile : curr;
+        }, null));
+    }
+
+    topRight() {
+        return (this.#topRight ??= this.#tiles.reduce((tile, curr) => {
+            tile ??= curr;
+            return tile.tileX >= curr.tileX && tile.tileY <= curr.tileY ? tile : curr;
+        }, null));
     }
 }

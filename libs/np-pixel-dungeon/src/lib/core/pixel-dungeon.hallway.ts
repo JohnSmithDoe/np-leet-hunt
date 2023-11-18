@@ -1,17 +1,17 @@
 import { NPVec2 } from '@shared/np-library';
 
-import { TDungeonTile } from '../@types/pixel-dungeon.types';
+import { PixelDungeon } from './pixel-dungeon';
+import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonHallway {
     fields: NPVec2[] = [];
     region: number;
     connects: number[];
+    #dungeon: PixelDungeon;
+    #tiles: PixelDungeonTile[];
 
-    constructor(region: number) {
-        this.region = region;
-    }
-
-    addTile({ x, y }: TDungeonTile) {
-        this.fields.push(new NPVec2(x, y));
+    constructor(dungeon: PixelDungeon, tiles: PixelDungeonTile[]) {
+        this.#dungeon = dungeon;
+        this.#tiles = tiles;
     }
 }
