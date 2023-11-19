@@ -1,41 +1,15 @@
-import { EDirection, NPVec2 } from '@shared/np-library';
 import * as Phaser from 'phaser';
-import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
-import { ETileType, SceneWithBoard, TDungeonOptions, TDungeonTile } from '../@types/pixel-dungeon.types';
+import { ETileType, SceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from '../core/pixel-dungeon';
-import { PixelDungeonRoom } from '../core/pixel-dungeon.room';
-import { PixelDungeonTile } from '../core/pixel-dungeon.tile';
-import { Player } from './player';
-import MoveTo = BoardPlugin.MoveTo;
+import { PixelDungeonTilelayer } from '../core/pixel-dungeon-tilelayer';
+import { PixelDungeonTileset } from '../core/pixel-dungeon-tileset';
+import { PixelDungeonPlayer } from './pixelDungeonPlayer';
 
-const mapRexDirection = (dir: number): EDirection => {
-    switch (dir) {
-        case 0:
-            return EDirection.E;
-        case 1:
-            return EDirection.S;
-        case 2:
-            return EDirection.W;
-        case 3:
-            return EDirection.N;
-        case 4:
-            return EDirection.SE;
-        case 5:
-            return EDirection.SW;
-        case 6:
-            return EDirection.NW;
-        case 7:
-            return EDirection.NE;
-        default:
-            return EDirection.NONE;
-    }
-};
-
-type NPTilemapConfig = Phaser.Types.Tilemaps.TilemapConfig & {
+export type NPTilemapConfig = Phaser.Types.Tilemaps.TilemapConfig & {
     tileSetImage: string;
     tileSetMargin: number;
     tileSetSpacing: number;
@@ -153,26 +127,20 @@ export class PixelDungeonMap {
     #dungeon: PixelDungeon;
     #config: NPTilemapConfig & TDungeonOptions;
     #map: Phaser.Tilemaps.Tilemap;
-    #tilelayer: Phaser.Tilemaps.TilemapLayer;
-    moveTo: MoveTo;
+    #tilelayer: PixelDungeonTilelayer;
     #pathfinder: PathFinder;
-    #pathToMove: PathFinder.NodeType[];
     private pathGraphics: Phaser.GameObjects.Graphics;
-    #player: Player;
-    private fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
-    private view: TileXYType[];
-
-    get width(): number {
-        return this.#tilelayer.width * this.#tilelayer.scaleX;
-    }
-
-    get height(): number {
-        return this.#tilelayer.height * this.#tilelayer.scaleY;
-    }
+    #player: PixelDungeonPlayer;
+    #board: BoardPlugin.Board;
+    private openTileIdx: number[];
 
     constructor(public scene: Phaser.Scene & SceneWithBoard, options: TDungeonOptions, type: TNPTilesetKey) {
         this.#dungeon = new PixelDungeon(options);
         this.#config = Object.assign({}, TILESETS[type], options);
+    }
+
+    init(): void {
+        this.#dungeon.init();
     }
 
     preload(): void {
@@ -181,7 +149,7 @@ export class PixelDungeonMap {
         this.scene.load.image(this.#config.key, this.#config.tileSetImage);
     }
 
-    create(player: Player) {
+    create(player: PixelDungeonPlayer) {
         // Creating a blank tilemap with dimensions matching the dungeon
         this.#player = player;
         this.#map = this.scene.make.tilemap({
@@ -190,102 +158,44 @@ export class PixelDungeonMap {
             width: this.#config.width,
             height: this.#config.height,
         });
-        //
-        const tileset = this.#map.addTilesetImage(
-            this.#config.key,
-            this.#config.key,
-            this.#config.tileWidth,
-            this.#config.tileHeight,
-            this.#config.tileSetMargin,
-            this.#config.tileSetSpacing
-        );
-        //
-        this.#tilelayer = this.#map.createBlankLayer('Layer 1', tileset);
-        this.#tilelayer.setScale(1);
-        this.#tilelayer.setInteractive({ useHandcursor: true });
 
-        this.scene.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-            this.#tilelayer.off(Phaser.Input.Events.POINTER_UP);
-        });
+        const tileset = new PixelDungeonTileset(this.#map, this.#config);
+        this.#tilelayer = new PixelDungeonTilelayer(this.scene, this.#map, tileset);
+        this.openTileIdx = [6, 7, 8, 26, tileset.getFirstTileIndex('DOOR')];
 
-        // }
-        //
-        // // Fill with black tiles
-        // this.#tilelayer.fill(this.#getFirstTileIndex('EMPTY'));
-        this.#tilelayer.setCollisionByExclusion([6, 7, 8, 26, ...this.#getTileIndexes('DOOR')]);
-        //
-        const start = this.#mapDungeonToTilemap();
+        const start = this.#tilelayer.mapDungeonToLayer(this.#dungeon);
+
         start.x--;
         this.pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
 
-        const board = this.scene.rexBoard.createBoardFromTilemap(this.#map);
-        board.addChess(player, start.x, start.y, 1);
-        const grid = board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
+        this.#board = this.scene.rexBoard.createBoardFromTilemap(this.#map);
+        this.#player.addToMap(this, start);
+        let targetGoal;
+        for (const tile of this.#dungeon) {
+            if (tile.type === ETileType.room) {
+                targetGoal = tile;
+                break;
+            }
+        }
+        const goal = this.scene.rexBoard.add.shape(this.board, targetGoal.x, targetGoal.y, 2, 0x00ff00, 0.5);
+        goal.setOrigin(0);
+        //<editor-fold desc="*** TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that? ***">
+        const grid = this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
         grid.setDirectionMode('8dir');
-        const openTileIdx = [6, 7, 8, 26, this.#getFirstTileIndex('DOOR')];
-        const costs = (
-            curTile: PathFinder.NodeType | TileXYType
-        ): number | PathFinder.BLOCKER | PathFinder.INFINITY => {
-            const tile = this.#map.getTileAt(curTile.x, curTile.y);
-            return openTileIdx.includes(tile.index) ? 1 : null;
-        };
-
-        // const chess = this.player; //this.rexBoard.add.shape(board, startX, startY, 1, 0xff0000, 0.5).setOrigin(0);
-        const pos = this.#map.tileToWorldXY(start.x, start.y);
-        player.setPosition(pos.x, pos.y);
-
-        this.moveTo = this.scene.rexBoard.add.moveTo(player, {
-            blockerTest: true,
-            occupiedTest: true,
-            speed: 200,
-            moveableTest: (from, to) => {
-                const tile = this.#map.getTileAt(to.x, to.y);
-                return openTileIdx.includes(tile.index);
-            },
-        });
+        //</editor-fold>
 
         //this.add.existing(this.anim);
         this.#pathfinder = this.scene.rexBoard.add.pathFinder(player, {
             pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
             blockerTest: true,
             occupiedTest: true,
-            costCallback: curTile => costs(curTile),
+            costCallback: curTile => this.costs(curTile),
         });
-        this.fieldOfView = this.scene.rexBoard.add.fieldOfView(player, {
-            preTestCallback: (a, visiblePoints) => {
-                const first = a[0];
-                const target = a[a.length - 1];
-                const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-                return !visiblePoints || distance <= visiblePoints;
-            },
-            coneMode: 'angle',
-            // cone: 270,
-            // debug: {
-            //     graphics: this.pathGraphics,
-            //     visibleLineColor: 0x0f0f0f0,
-            // },
-            costCallback: curTile => costs(curTile),
-        });
-        this.moveTo.on('complete', () => {
-            const next = this.#pathToMove.shift();
-            if (next) this.moveTo.moveTo(next);
-            player.faceMoveTo(mapRexDirection(this.moveTo.destinationDirection));
-            this.#updateFoV();
-            // if (!next) this.pathGraphics.clear();
-            if (!next) player.faceToDirection(mapRexDirection(this.moveTo.destinationDirection));
-        });
-        this.#updateFoV();
     }
 
-    #updateFoV() {
-        this.view?.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 0.5));
-        this.fieldOfView.setFace(this.moveTo.destinationDirection);
-        this.view = this.fieldOfView.findFOV(15);
-        const tileAt = this.moveTo.destinationTileX
-            ? this.#map.getTileAt(this.moveTo.destinationTileX, this.moveTo.destinationTileY)
-            : this.#map.getTileAtWorldXY(this.#player.x, this.#player.y);
-        if (tileAt) this.view.push(tileAt);
-        this.view.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 1));
+    costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {
+        const tile = this.#map.getTileAt(tileXY.x, tileXY.y);
+        return this.openTileIdx.includes(tile.index) ? 1 : null;
     }
 
     moveToPointer({ worldX, worldY }: Phaser.Input.Pointer) {
@@ -298,143 +208,30 @@ export class PixelDungeonMap {
 
         const targetTile = this.#map.getTileAtWorldXY(worldX, worldY);
         // generate the path
-        this.#pathToMove = this.#pathfinder.findPath({ x: targetTile.x, y: targetTile.y });
+        const pathToMove = this.#pathfinder.findPath({ x: targetTile.x, y: targetTile.y });
         this.pathGraphics.clear();
-        drawPath(this.#pathToMove);
-        this.moveTo.moveTo(this.#pathToMove.shift());
-        this.#player.faceMoveTo(mapRexDirection(this.moveTo.destinationDirection));
-        this.#updateFoV();
+        drawPath(pathToMove);
+        this.#player.moveOnPath(pathToMove);
     }
 
-    #getTileIndexes(key: keyof NPTilesetMapping) {
-        const mappingElement = this.#config.mapping[key];
-        return typeof mappingElement === 'number' ? [mappingElement] : mappingElement.map(({ index }) => index);
+    loseVision(tileXYTypes?: TileXYType[]) {
+        tileXYTypes?.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 0.5));
     }
 
-    #getFirstTileIndex(key: keyof NPTilesetMapping) {
-        return this.#getTileIndexes(key)[0];
+    gainVision(view?: TileXYType[]) {
+        view?.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 1));
     }
 
-    #putTileAt(tile: TDungeonTile | NPVec2, key: keyof NPTilesetMapping) {
-        const mappingElement = this.#config.mapping[key];
-        if (typeof mappingElement === 'number') {
-            this.#map.putTileAt(mappingElement, tile.x, tile.y);
-        } else {
-            this.#map.weightedRandomize(mappingElement, tile.x, tile.y, 1, 1);
-        }
+    get board() {
+        if (!this.#board) throw new Error('Board not initialized');
+        return this.#board;
     }
 
-    #putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMapping) {
-        const mappingElement = this.#config.mapping[key];
-        if (typeof mappingElement === 'number') {
-            this.#map.putTileAt(mappingElement, tile.tileX, tile.tileY);
-        } else {
-            this.#map.weightedRandomize(mappingElement, tile.tileX, tile.tileY, 1, 1);
-        }
+    get width(): number {
+        return this.#tilelayer.tilelayer.width * this.#tilelayer.tilelayer.scaleX;
     }
 
-    init(): void {
-        this.#dungeon.init();
-    }
-
-    mapTileToTileIndex(type: ETileType): keyof NPTilesetMapping {
-        switch (type) {
-            case ETileType.none:
-                return 'EMPTY';
-            case ETileType.floor:
-                return 'FLOOR';
-            case ETileType.junction:
-                return 'DOOR';
-            case ETileType.wall:
-                return 'TOP_WALL';
-        }
-    }
-
-    #mapDungeonToTilemap() {
-        let start: TDungeonTile;
-        for (const room of this.#dungeon.rooms) {
-            this.#mapDungeonRoomToTilemap(room);
-        }
-        for (const junction of this.#dungeon.junctions) {
-            this.#putTileAt(junction.pos, junction.toTileIndex());
-        }
-
-        for (const tile of this.#dungeon) {
-            if (tile.type === ETileType.room) {
-                start = tile;
-            } else {
-                if (!this.#tilelayer.hasTileAt(tile.x, tile.y))
-                    this.#putTileAt(tile, this.mapTileToTileIndex(tile.type));
-            }
-            this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0;
-        }
-        return start;
-    }
-
-    dfg() {
-        // // Use the array of rooms generated to place tiles in the map
-        // this.dungeon.rooms.forEach(function (room) {
-        //     const x = room.x;
-        //     const y = room.y;
-        //     const w = room.width;
-        //     const h = room.height;
-        //     const cx = Math.floor(x + w / 2);
-        //     const cy = Math.floor(y + h / 2);
-        //     const left = x;
-        //     const right = x + (w - 1);
-        //     const top = y;
-        //     const bottom = y + (h - 1);
-        //
-        //
-        //     // Fill the walls with mostly clean tiles, but occasionally place a dirty tile
-        //     this.map.weightedRandomize(TILES.TOP_WALL, left + 1, top, w - 2, 1);
-        //     this.map.weightedRandomize(TILES.BOTTOM_WALL, left + 1, bottom, w - 2, 1);
-        //     this.map.weightedRandomize(TILES.LEFT_WALL, left, top + 1, 1, h - 2);
-        //     this.map.weightedRandomize(TILES.RIGHT_WALL, right, top + 1, 1, h - 2);
-        //
-        //     // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the rooms location
-        //     const doors = room.getDoorLocations();
-        //
-        //     for (const item of doors) {
-        //         this.map.putTileAt(6, x + item.x, y + item.y);
-        //     }
-        //
-        //     // Place some random stuff in rooms occasionally
-        //     const rand = Math.random();
-        //     if (rand <= 0.25) {
-        //         this.tilelayer.putTileAt(166, cx, cy); // Chest
-        //     } else if (rand <= 0.3) {
-        //         this.tilelayer.putTileAt(81, cx, cy); // Stairs
-        //     } else if (rand <= 0.4) {
-        //         this.tilelayer.putTileAt(167, cx, cy); // Trap door
-        //     } else if (rand <= 0.6) {
-        //         if (room.height >= 9) {
-        //             // We have room for 4 towers
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy + 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy + 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy - 2);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy - 2);
-        //         } else {
-        //             this.tilelayer.putTilesAt([[186], [205]], cx - 1, cy - 1);
-        //
-        //             this.tilelayer.putTilesAt([[186], [205]], cx + 1, cy - 1);
-        //         }
-        //     }
-        // }, this);
-        //
-        // // Not exactly correct for the tileset since there are more possible floor tiles, but this will
-        // // do for the example.
-    }
-
-    #mapDungeonRoomToTilemap(room: PixelDungeonRoom) {
-        for (const tile of room) {
-            // Fill the floor with mostly clean tiles, but occasionally place a dirty tile
-            this.#putPixeldungeonTileAt(tile, 'ROOM');
-        }
-        // this.#putPixeldungeonTileAt(room.topLeft(), 'TOP_LEFT_WALL');
-        // this.#putPixeldungeonTileAt(room.topRight(), 'TOP_RIGHT_WALL');
+    get height(): number {
+        return this.#tilelayer.tilelayer.height * this.#tilelayer.tilelayer.scaleY;
     }
 }

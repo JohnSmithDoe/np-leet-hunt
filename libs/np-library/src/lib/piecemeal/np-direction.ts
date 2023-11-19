@@ -162,3 +162,48 @@ export const directionToString = (dir: EDirection) => {
             return 'NW';
     }
 };
+
+export const mapRexPluginDirection = (dir: number): EDirection => {
+    switch (dir) {
+        case 0:
+            return EDirection.E;
+        case 1:
+            return EDirection.S;
+        case 2:
+            return EDirection.W;
+        case 3:
+            return EDirection.N;
+        case 4:
+            return EDirection.SE;
+        case 5:
+            return EDirection.SW;
+        case 6:
+            return EDirection.NW;
+        case 7:
+            return EDirection.NE;
+        default:
+            return EDirection.NONE;
+    }
+};
+export const mapToRexPluginDirection = (dir: EDirection): number => {
+    switch (dir) {
+        case EDirection.E:
+            return 0;
+        case EDirection.S:
+            return 1;
+        case EDirection.W:
+            return 2;
+        case EDirection.N:
+            return 3;
+        case EDirection.SE:
+            return 4;
+        case EDirection.SW:
+            return 5;
+        case EDirection.NW:
+            return 6;
+        case EDirection.NE:
+            return 7;
+        default:
+            return -1;
+    }
+};

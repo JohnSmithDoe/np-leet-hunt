@@ -1,5 +1,12 @@
-import { EDirection } from '@shared/np-library';
+import { EDirection, mapRexPluginDirection, mapToRexPluginDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
+import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
+import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
+import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+
+import { SceneWithBoard, TDungeonTile } from '../@types/pixel-dungeon.types';
+import { PixelDungeonMap } from './pixel-dungeon.map';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
@@ -55,12 +62,41 @@ const NPLpcConfig: TLpcConfig = {
     },
 };
 
-export class Player extends Phaser.GameObjects.Sprite {
-    #type: TLpcSheetType;
+interface TPixelDungeonPlayerOptions {
+    lpcType?: TLpcSheetType;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, type: TLpcSheetType) {
-        super(scene, x, y, '');
-        this.#type = type;
+    fovRange?: number;
+    fovConeAngle?: number;
+
+    moveSpeed?: number;
+    moveRotate?: boolean;
+    startingDirection?: EDirection;
+}
+
+const defaultOptions: TPixelDungeonPlayerOptions = {
+    startingDirection: EDirection.N,
+    lpcType: 'standard',
+    fovRange: 10,
+    moveRotate: false,
+    moveSpeed: 200,
+    fovConeAngle: undefined,
+};
+
+export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
+    #map: PixelDungeonMap;
+    #tile: TDungeonTile;
+
+    #moveTo: BoardPlugin.MoveTo;
+    #pathToMove: PathFinder.NodeType[];
+
+    #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
+    #currentView: TileXYType[];
+
+    #options: TPixelDungeonPlayerOptions;
+
+    constructor(public scene: Phaser.Scene & SceneWithBoard, options?: TPixelDungeonPlayerOptions) {
+        super(scene, 0, 0, '');
+        this.#options = Object.assign({}, defaultOptions, options ?? {});
     }
 
     preload() {
@@ -104,14 +140,9 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.on(Phaser.Animations.Events.ANIMATION_COMPLETE, (a, b, c, d) => {
             console.log(`Playing: ${d}`);
         });
-        console.log(this.scene.textures.get('brawler'));
 
         this.setTexture('brawler', 1);
-        this.play('walk right');
         this.setScale(1);
-        // this.scene.input.on('pointerdown', () => {
-        //     this.play('die');
-        // });
     }
 
     play(key: TLpcAnimationKey): this {
@@ -141,10 +172,12 @@ export class Player extends Phaser.GameObjects.Sprite {
                 break;
         }
     }
+
     faceToAnimation(key: TLpcAnimationKey) {
         //this.stop();
         this.setFrame(this.anims.get(key).getFrameByProgress(0).frame);
     }
+
     faceToDirection(dir: EDirection) {
         switch (dir) {
             case EDirection.NONE:
@@ -170,7 +203,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
 
     #createAnimations() {
-        const animations = NPLpcConfig[this.#type].animations;
+        const animations = NPLpcConfig[this.#options.lpcType].animations;
         for (const key in animations) {
             if (animations.hasOwnProperty(key)) {
                 const animation = animations[key];
@@ -182,5 +215,91 @@ export class Player extends Phaser.GameObjects.Sprite {
                 });
             }
         }
+    }
+
+    addToMap(map: PixelDungeonMap, start: TDungeonTile) {
+        this.#map = map;
+        this.#tile = start;
+        map.board.addChess(this, start.x, start.y, 1);
+        this.#createMoveTo();
+        this.#createFieldOfView();
+    }
+
+    #createMoveTo() {
+        this.#moveTo = this.scene.rexBoard.add.moveTo(this, {
+            speed: this.#options.moveSpeed,
+            rotateToTarget: this.#options.moveRotate,
+            blockerTest: false,
+            occupiedTest: false,
+            sneak: false,
+            moveableTestScope: undefined,
+            moveableTest: undefined,
+        });
+        this.#moveTo.on('complete', () => this.moveToNext());
+    }
+
+    #createFieldOfView() {
+        this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
+            preTestCallback: (a, visiblePoints) => {
+                const first = a[0];
+                const target = a[a.length - 1];
+                const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
+                return !visiblePoints || distance <= visiblePoints;
+            },
+            coneMode: 'angle',
+            cone: this.#options.fovConeAngle,
+            costCallback: a => this.#map.costs(a),
+        });
+
+        this.#fieldOfView.setFace(mapToRexPluginDirection(this.#options.startingDirection));
+        this.#updateFoV();
+    }
+
+    #updateFoV() {
+        this.#map.loseVision(this.#currentView);
+        this.#currentView = this.#fieldOfView.findFOV(this.#options.fovRange);
+        // put the players tile into vision as well
+        this.#currentView.push({ ...this.tile });
+        this.#map.gainVision(this.#currentView);
+    }
+
+    moveOnPath(path: PathFinder.NodeType[], startMoving = true) {
+        this.#pathToMove = path;
+        if (startMoving) {
+            this.moveToNext();
+        }
+    }
+
+    hasMoves() {
+        return !!this.#pathToMove.length;
+    }
+
+    isMoving() {
+        return !!this.#moveTo.destinationTileX;
+    }
+
+    moveToNext() {
+        if (this.hasMoves()) {
+            this.tile = this.#pathToMove.shift();
+            this.#moveTo.moveTo(this.tile);
+            this.faceMoveTo(mapRexPluginDirection(this.#moveTo.destinationDirection));
+        } else {
+            this.faceToDirection(mapRexPluginDirection(this.#moveTo.destinationDirection));
+        }
+        this.#fieldOfView.setFace(this.#moveTo.destinationDirection);
+        this.#updateFoV();
+    }
+
+    set tile(next: PathFinder.NodeType | TileXYType) {
+        this.#tile.x = next.x;
+        this.#tile.y = next.y;
+    }
+
+    get tile() {
+        return this.#tile;
+    }
+
+    get moveToTile(): TileXYType {
+        return { x: this.#moveTo.destinationTileX, y: this.#moveTo.destinationTileY };
     }
 }

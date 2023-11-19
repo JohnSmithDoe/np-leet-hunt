@@ -4,13 +4,13 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { SceneWithBoard } from './@types/pixel-dungeon.types';
 import { PixelDungeonMap } from './sprites/pixel-dungeon.map';
-import { Player } from './sprites/player';
+import { PixelDungeonPlayer } from './sprites/pixelDungeonPlayer';
 
 export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate, SceneWithBoard {
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
     map: PixelDungeonMap;
-    player: Player;
+    player: PixelDungeonPlayer;
 
     moveTo: BoardPlugin.MoveTo;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -22,9 +22,8 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     }
 
     init(): void {
-        console.log('nope');
-        this.player = new Player(this, 0, 0, 'standard');
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
+        this.player = new PixelDungeonPlayer(this, { fovRange: 10, fovConeAngle: 245 });
         this.map.init();
     }
 
@@ -73,7 +72,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
             // Get the current world point under pointer.
             const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
             const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
-            camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 6);
+            camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 10);
 
             // Update camera matrix, so `getWorldPoint` returns zoom-adjusted coordinates.
             const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);

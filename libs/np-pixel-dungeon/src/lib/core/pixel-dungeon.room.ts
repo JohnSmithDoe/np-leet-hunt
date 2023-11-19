@@ -23,7 +23,6 @@ export class PixelDungeonRoom {
         this.#dungeon = dungeon;
         this.#tiles = tiles;
         this.#tiles.sort((a, b) => a.tileX - b.tileX).sort((a, b) => a.tileY - b.tileY);
-        console.log(this.#tiles[0], this.#tiles[this.#tiles.length - 1]);
         this.region ??= tiles[0].region;
     }
 
