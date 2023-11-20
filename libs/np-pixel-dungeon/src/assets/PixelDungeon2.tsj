@@ -1,0 +1,145 @@
+{ "columns":16,
+ "image":"tiles_sewers.png",
+ "imageheight":256,
+ "imagewidth":256,
+ "margin":0,
+ "name":"PixelDungeon",
+ "spacing":0,
+ "tilecount":256,
+ "tiledversion":"git",
+ "tileheight":16,
+ "tiles":[
+        {
+         "id":80,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":81,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":82,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":83,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":84,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":85,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":86,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":87,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":96,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":97,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":98,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":99,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":100,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":101,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":102,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":103,
+         "type":"Top Wall"
+        }, 
+        {
+         "id":144,
+         "type":"Empty"
+        }, 
+        {
+         "id":146,
+         "type":"Right Wall"
+        }, 
+        {
+         "id":147,
+         "type":"Right Wall"
+        }, 
+        {
+         "id":160,
+         "type":"Empty"
+        }, 
+        {
+         "id":162,
+         "type":"Right Wall"
+        }, 
+        {
+         "id":163,
+         "type":"Right Wall"
+        }, 
+        {
+         "id":176,
+         "type":"Empty"
+        }],
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10",
+ "wangsets":[
+        {
+         "colors":[
+                {
+                 "color":"#ff0000",
+                 "name":"",
+                 "probability":1,
+                 "tile":-1
+                }],
+         "name":"corner",
+         "tile":-1,
+         "type":"corner",
+         "wangtiles":[
+                {
+                 "tileid":147,
+                 "wangid":[0, 1, 0, 1, 0, 0, 0, 0]
+                }, 
+                {
+                 "tileid":148,
+                 "wangid":[0, 0, 0, 0, 0, 1, 0, 1]
+                }, 
+                {
+                 "tileid":162,
+                 "wangid":[0, 1, 0, 1, 0, 0, 0, 0]
+                }, 
+                {
+                 "tileid":163,
+                 "wangid":[0, 1, 0, 1, 0, 0, 0, 0]
+                }, 
+                {
+                 "tileid":164,
+                 "wangid":[0, 0, 0, 0, 0, 1, 0, 1]
+                }, 
+                {
+                 "tileid":165,
+                 "wangid":[0, 0, 0, 0, 0, 1, 0, 1]
+                }]
+        }]
+}

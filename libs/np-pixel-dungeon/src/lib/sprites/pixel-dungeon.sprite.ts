@@ -1,6 +1,5 @@
-import { EDirection, mapRexPluginDirection, mapToRexPluginDirection } from '@shared/np-library';
+import { EDirection, mapRexPluginDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
-import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
@@ -25,25 +24,6 @@ interface TLpcSheetConfig {
 }
 
 type TLpcConfig = Record<TLpcSheetType, TLpcSheetConfig>;
-// this.makeAnimation('walk1', 1, 6);
-// this.makeAnimation('walk2', 14, 19);
-// this.makeAnimation('walk3', 27, 32);
-// this.makeAnimation('walk4', 40, 45);
-//
-// this.makeAnimation('walk5', 53, 59);
-// this.makeAnimation('walk6', 66, 72);
-// this.makeAnimation('walk7', 79, 85);
-// this.makeAnimation('walk8', 92, 98);
-//
-// this.makeAnimation('walk13', 157, 161);
-// this.makeAnimation('walk14', 170, 174);
-// this.makeAnimation('walk15', 183, 187);
-// this.makeAnimation('walk16', 196, 200);
-//
-// this.makeAnimation('walk17', 209, 220);
-// this.makeAnimation('walk18', 222, 233);
-// this.makeAnimation('walk19', 235, 246);
-// this.makeAnimation('walk20', 248, 259);
 
 const NPLpcConfig: TLpcConfig = {
     standard: {
@@ -62,45 +42,39 @@ const NPLpcConfig: TLpcConfig = {
     },
 };
 
-interface TPixelDungeonPlayerOptions {
+export interface TPixelDungeonSpriteOptions {
     lpcType?: TLpcSheetType;
-
-    fovRange?: number;
-    fovConeAngle?: number;
 
     moveSpeed?: number;
     moveRotate?: boolean;
     startingDirection?: EDirection;
 }
 
-const defaultOptions: TPixelDungeonPlayerOptions = {
+const defaultOptions: TPixelDungeonSpriteOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
-    fovRange: 10,
     moveRotate: false,
     moveSpeed: 200,
-    fovConeAngle: undefined,
 };
 
-export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
+export class PixelDungeonSprite extends Phaser.GameObjects.Sprite {
     #map: PixelDungeonMap;
     #tile: TDungeonTile;
 
     #moveTo: BoardPlugin.MoveTo;
     #pathToMove: PathFinder.NodeType[];
 
-    #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
-    #currentView: TileXYType[];
+    #options: TPixelDungeonSpriteOptions;
+    key: string;
 
-    #options: TPixelDungeonPlayerOptions;
-
-    constructor(public scene: Phaser.Scene & SceneWithBoard, options?: TPixelDungeonPlayerOptions) {
+    constructor(public scene: Phaser.Scene & SceneWithBoard, options?: TPixelDungeonSpriteOptions) {
         super(scene, 0, 0, '');
         this.#options = Object.assign({}, defaultOptions, options ?? {});
     }
 
     preload() {
-        this.scene.load.spritesheet('brawler', 'np-pixel-dungeon/Download19233.png', {
+        this.key = 'brawler';
+        this.scene.load.spritesheet(this.key, 'np-pixel-dungeon/Download19233.png', {
             frameWidth: 64,
             frameHeight: 64,
         });
@@ -108,13 +82,7 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
     }
 
     create() {
-        // Text section
-        // this.scene.add.tileSprite(0, 0, 832, 1344, 'grid').setOrigin(0);
-        // this.scene.add.image(0, 0, 'brawler', '__BASE').setOrigin(0, 0);
-        // this.scene.add.grid(0, 0, 832, 1344, 64, 64).setOrigin(0, 0).setOutlineStyle(0x00ff00);
-
         this.#createAnimations();
-
         // Animation set
         //   1   2   3   4   5   6   7   8   9  10  11  12  13
         //  14  15  16  17  18  19  20  21  22  23  24  25  26
@@ -141,7 +109,7 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
             console.log(`Playing: ${d}`);
         });
 
-        this.setTexture('brawler', 1);
+        this.setTexture(this.key, 1);
         this.setScale(1);
     }
 
@@ -209,7 +177,7 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
                 const animation = animations[key];
                 this.anims.create({
                     key,
-                    frames: this.anims.generateFrameNumbers('brawler', { ...animation }),
+                    frames: this.anims.generateFrameNumbers(this.key, { ...animation }),
                     frameRate: animation.frameRate ?? 12,
                     repeat: animation.repeat ?? -1,
                 });
@@ -222,7 +190,6 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
         this.#tile = start;
         map.board.addChess(this, start.x, start.y, 1);
         this.#createMoveTo();
-        this.#createFieldOfView();
     }
 
     #createMoveTo() {
@@ -236,31 +203,6 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
             moveableTest: undefined,
         });
         this.#moveTo.on('complete', () => this.moveToNext());
-    }
-
-    #createFieldOfView() {
-        this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
-            preTestCallback: (a, visiblePoints) => {
-                const first = a[0];
-                const target = a[a.length - 1];
-                const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-                return !visiblePoints || distance <= visiblePoints;
-            },
-            coneMode: 'angle',
-            cone: this.#options.fovConeAngle,
-            costCallback: a => this.#map.costs(a),
-        });
-
-        this.#fieldOfView.setFace(mapToRexPluginDirection(this.#options.startingDirection));
-        this.#updateFoV();
-    }
-
-    #updateFoV() {
-        this.#map.loseVision(this.#currentView);
-        this.#currentView = this.#fieldOfView.findFOV(this.#options.fovRange);
-        // put the players tile into vision as well
-        this.#currentView.push({ ...this.tile });
-        this.#map.gainVision(this.#currentView);
     }
 
     moveOnPath(path: PathFinder.NodeType[], startMoving = true) {
@@ -286,8 +228,14 @@ export class PixelDungeonPlayer extends Phaser.GameObjects.Sprite {
         } else {
             this.faceToDirection(mapRexPluginDirection(this.#moveTo.destinationDirection));
         }
-        this.#fieldOfView.setFace(this.#moveTo.destinationDirection);
-        this.#updateFoV();
+    }
+
+    get map() {
+        return this.#map;
+    }
+
+    get moveToDirection() {
+        return this.#moveTo.destinationDirection;
     }
 
     set tile(next: PathFinder.NodeType | TileXYType) {

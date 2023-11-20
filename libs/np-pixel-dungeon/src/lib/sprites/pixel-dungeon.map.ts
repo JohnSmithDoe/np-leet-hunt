@@ -7,7 +7,7 @@ import { ETileType, SceneWithBoard, TDungeonOptions } from '../@types/pixel-dung
 import { PixelDungeon } from '../core/pixel-dungeon';
 import { PixelDungeonTilelayer } from '../core/pixel-dungeon-tilelayer';
 import { PixelDungeonTileset } from '../core/pixel-dungeon-tileset';
-import { PixelDungeonPlayer } from './pixelDungeonPlayer';
+import { PixelDungeonPlayer } from './pixel-dungeon.player';
 
 export type NPTilemapConfig = Phaser.Types.Tilemaps.TilemapConfig & {
     tileSetImage: string;
@@ -191,6 +191,7 @@ export class PixelDungeonMap {
             occupiedTest: true,
             costCallback: curTile => this.costs(curTile),
         });
+        return { ...start };
     }
 
     costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {

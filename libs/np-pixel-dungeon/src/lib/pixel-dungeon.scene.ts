@@ -3,8 +3,9 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { SceneWithBoard } from './@types/pixel-dungeon.types';
+import { PixelDungeonEnemy } from './sprites/pixel-dungeon.enemy';
 import { PixelDungeonMap } from './sprites/pixel-dungeon.map';
-import { PixelDungeonPlayer } from './sprites/pixelDungeonPlayer';
+import { PixelDungeonPlayer } from './sprites/pixel-dungeon.player';
 
 export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate, SceneWithBoard {
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
@@ -16,6 +17,7 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     cam: Phaser.Cameras.Scene2D.Camera;
     private cameraDrag: boolean;
+    private enemy: PixelDungeonEnemy;
 
     constructor() {
         super();
@@ -24,12 +26,14 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
     init(): void {
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { fovRange: 10, fovConeAngle: 245 });
+        this.enemy = new PixelDungeonEnemy(this);
         this.map.init();
     }
 
     preload() {
         this.load.scenePlugin('rexboardplugin', 'np-pixel-dungeon/rexboardplugin.min.js', 'rexBoard', 'rexBoard');
         this.player.preload();
+        this.enemy.preload();
         this.map.preload();
     }
 
@@ -38,9 +42,17 @@ export class PixelDungeonScene extends Phaser.Scene implements OnScenePreload, O
         const size = 24;
         this.player.setOrigin((size - 16) / 2 / size, (size - 16) / size);
         this.player.setDisplaySize(size, size);
+        this.enemy.create();
+        this.enemy.setOrigin((size - 16) / 2 / size, (size - 16) / size);
+        this.enemy.setDisplaySize(size, size);
 
-        this.map.create(this.player); // TODO: add.existing
+        const start = this.map.create(this.player); // TODO: add.existing
+        start.x++;
+        start.y--;
+        start.y--;
+        this.enemy.addToMap(this.map, start);
         this.add.existing(this.player);
+        this.add.existing(this.enemy);
 
         this.cam = this.cameras.main;
         const camera = this.cameras.main;
