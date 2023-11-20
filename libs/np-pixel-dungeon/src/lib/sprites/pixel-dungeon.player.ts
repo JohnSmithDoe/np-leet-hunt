@@ -3,9 +3,9 @@ import * as Phaser from 'phaser';
 import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { SceneWithBoard, TDungeonTile } from '../@types/pixel-dungeon.types';
+import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonMap } from './pixel-dungeon.map';
-import { PixelDungeonSprite, TPixelDungeonSpriteOptions } from './pixel-dungeon.sprite';
+import { PixelDungeonMob, TPixelDungeonSpriteOptions } from './pixel-dungeon.mob';
 
 // this.makeAnimation('walk1', 1, 6);
 // this.makeAnimation('walk2', 14, 19);
@@ -41,14 +41,14 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
     fovConeAngle: undefined,
 };
 
-export class PixelDungeonPlayer extends PixelDungeonSprite {
+export class PixelDungeonPlayer extends PixelDungeonMob {
     #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
     #currentView: TileXYType[];
 
     #options: TPixelDungeonPlayerOptions;
 
-    constructor(public scene: Phaser.Scene & SceneWithBoard, options?: TPixelDungeonPlayerOptions) {
-        super(scene, options);
+    constructor(engine: PixelDungeonEngine, options?: TPixelDungeonPlayerOptions) {
+        super(engine, options);
         this.#options = Object.assign({}, defaultOptions, options ?? {});
     }
 
@@ -60,7 +60,7 @@ export class PixelDungeonPlayer extends PixelDungeonSprite {
         });
     }
 
-    addToMap(map: PixelDungeonMap, start: TDungeonTile) {
+    addToMap(map: PixelDungeonMap, start: TileXYType) {
         super.addToMap(map, start);
         this.#createFieldOfView();
     }
@@ -73,9 +73,10 @@ export class PixelDungeonPlayer extends PixelDungeonSprite {
                 const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
                 return !visiblePoints || distance <= visiblePoints;
             },
+            costCallback: a => this.map.costs(a),
             coneMode: 'angle',
             cone: this.#options.fovConeAngle,
-            costCallback: a => this.map.costs(a),
+            occupiedTest: true,
         });
 
         this.#fieldOfView.setFace(mapToRexPluginDirection(this.#options.startingDirection));

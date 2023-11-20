@@ -2,6 +2,7 @@ import { inject, Injectable, NgZone } from '@angular/core';
 import * as Phaser from 'phaser';
 import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
 import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
+import StateManagerPlugin from 'phaser3-rex-plugins/plugins/statemanager-plugin';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
@@ -64,6 +65,11 @@ export class PhaserService {
             {
                 key: 'rexShip',
                 plugin: ShipPlugin,
+                start: true,
+            },
+            {
+                key: 'rexStateManager',
+                plugin: StateManagerPlugin,
                 start: true,
             },
         ];

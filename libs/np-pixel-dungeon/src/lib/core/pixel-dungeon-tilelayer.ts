@@ -24,6 +24,7 @@ export class PixelDungeonTilelayer {
             this.#tilelayer.off(Phaser.Input.Events.POINTER_UP);
         });
     }
+
     #putTileAt(tile: TDungeonTile | NPVec2, key: keyof NPTilesetMapping) {
         const mappingElement = this.#tileset.mapping(key);
         if (typeof mappingElement === 'number') {

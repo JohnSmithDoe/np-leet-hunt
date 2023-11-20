@@ -4,7 +4,8 @@ import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder'
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
-import { SceneWithBoard, TDungeonTile } from '../@types/pixel-dungeon.types';
+import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
+import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonMap } from './pixel-dungeon.map';
 
 type TLpcSheetType = 'standard' | 'extended';
@@ -57,18 +58,19 @@ const defaultOptions: TPixelDungeonSpriteOptions = {
     moveSpeed: 200,
 };
 
-export class PixelDungeonSprite extends Phaser.GameObjects.Sprite {
-    #map: PixelDungeonMap;
-    #tile: TDungeonTile;
+export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
+    scene: NPSceneWithBoard;
 
+    #map: PixelDungeonMap;
+    #tile: TileXYType;
     #moveTo: BoardPlugin.MoveTo;
     #pathToMove: PathFinder.NodeType[];
 
     #options: TPixelDungeonSpriteOptions;
     key: string;
 
-    constructor(public scene: Phaser.Scene & SceneWithBoard, options?: TPixelDungeonSpriteOptions) {
-        super(scene, 0, 0, '');
+    constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonSpriteOptions) {
+        super(engine.scene, 0, 0, '');
         this.#options = Object.assign({}, defaultOptions, options ?? {});
     }
 
@@ -111,6 +113,9 @@ export class PixelDungeonSprite extends Phaser.GameObjects.Sprite {
 
         this.setTexture(this.key, 1);
         this.setScale(1);
+        const size = 24;
+        this.setOrigin((size - 16) / 2 / size, (size - 16) / size);
+        this.setDisplaySize(size, size);
     }
 
     play(key: TLpcAnimationKey): this {
@@ -185,7 +190,7 @@ export class PixelDungeonSprite extends Phaser.GameObjects.Sprite {
         }
     }
 
-    addToMap(map: PixelDungeonMap, start: TDungeonTile) {
+    addToMap(map: PixelDungeonMap, start: TileXYType) {
         this.#map = map;
         this.#tile = start;
         map.board.addChess(this, start.x, start.y, 1);
@@ -207,6 +212,13 @@ export class PixelDungeonSprite extends Phaser.GameObjects.Sprite {
 
     moveOnPath(path: PathFinder.NodeType[], startMoving = true) {
         this.#pathToMove = path;
+        if (startMoving) {
+            this.moveToNext();
+        }
+    }
+
+    moveOnTile(tileX: number, tileY: number, startMoving = true) {
+        this.#pathToMove = [{ x: tileX, y: tileY, pathCost: 0, preNodes: [] }];
         if (startMoving) {
             this.moveToNext();
         }

@@ -1,5 +1,5 @@
 {
-    "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "exclude": [
     "jest.config.ts"
   ],
@@ -7,5 +7,5 @@
     "target": "es2020",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-    }
+  }
 }

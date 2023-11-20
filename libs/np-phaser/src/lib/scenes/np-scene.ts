@@ -1,7 +1,7 @@
+import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { NPLayer } from './np-layer';
-import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
@@ -9,6 +9,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     protected components = new NPSceneContainer<NPSceneComponent>(this);
     #layers = new NPSceneContainer<NPLayer>(this);
     #debugOut: Phaser.GameObjects.Text;
+    #onlyComponent = true;
 
     abstract setupComponents(): void;
 
@@ -48,6 +49,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     layer(name: TNPLayerKeys) {
         return this.#layers.getByName(name);
     }
+
     addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
         if (Array.isArray(gameObject)) {
             gameObject.forEach(gameObj => this.addToLayer(name, gameObj));
@@ -61,6 +63,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             }
         }
     }
+
     removeFromLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
         if (Array.isArray(gameObject)) {
             gameObject.forEach(gameObj => this.removeFromLayer(name, gameObj));
@@ -73,6 +76,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             }
         }
     }
+
     removeFromContainer(component: NPSceneComponent | NPSceneComponent[]) {
         if (Array.isArray(component)) {
             component.forEach(comp => this.removeFromContainer(comp));
@@ -80,30 +84,41 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             this.components.remove(component);
         }
     }
+
     createLayer(name: TNPLayerKeys, makeMain = false) {
         this.#layers.add(new NPLayer(this, name, makeMain));
     }
 
     init() {
-        this.#initScene();
+        if (!this.#onlyComponent) {
+            this.#initScene();
+        }
         this.setupComponents();
-        this.#layers.init();
+        if (!this.#onlyComponent) {
+            this.#layers.init();
+        }
         this.components.init();
     }
 
     preload() {
         this.components.preload();
-        this.#layers.preload();
+        if (!this.#onlyComponent) {
+            this.#layers.preload();
+        }
     }
 
     create(container?: Phaser.GameObjects.Container) {
-        this.#layers.create(container);
+        if (!this.#onlyComponent) {
+            this.#layers.create(container);
+        }
         this.components.create(container);
     }
 
     update(time: number, delta: number) {
         super.update(time, delta);
-        this.#layers.update(time, delta);
+        if (!this.#onlyComponent) {
+            this.#layers.update(time, delta);
+        }
         this.components.update(time, delta);
     }
 }

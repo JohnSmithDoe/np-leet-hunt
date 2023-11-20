@@ -1,5 +1,7 @@
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
+import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
+
 export enum ETileType {
     none = 'empty',
     floor = 'floor',
@@ -35,3 +37,5 @@ export interface TDungeonOptions {
 export interface SceneWithBoard {
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 }
+
+export type NPSceneWithBoard = NPScene & SceneWithBoard;

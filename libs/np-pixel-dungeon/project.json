@@ -1,31 +1,38 @@
 {
-    "name": "np-pixel-dungeon",
-    "$schema": "../node_modules/nx/schemas/project-schema.json",
-    "projectType": "library",
-    "sourceRoot": "libs/np-pixel-dungeon/src",
-    "prefix": "np-afterwork",
-    "targets": {
-        "test": {
-            "executor": "@nrwl/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-            "options": {
-                "jestConfig": "libs/np-pixel-dungeon/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
-            }
-        },
-        "lint": {
-            "executor": "@nrwl/linter:eslint",
-            "outputs": ["{options.outputFile}"],
-            "options": {
-                "lintFilePatterns": ["libs/np-pixel-dungeon/**/*.ts", "libs/np-pixel-dungeon/**/*.html"]
-            }
+  "name": "np-pixel-dungeon",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/np-pixel-dungeon/src",
+  "prefix": "np-afterwork",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "libs/np-pixel-dungeon/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
         }
+      }
     },
-    "tags": []
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "libs/np-pixel-dungeon/**/*.ts",
+          "libs/np-pixel-dungeon/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
 }
