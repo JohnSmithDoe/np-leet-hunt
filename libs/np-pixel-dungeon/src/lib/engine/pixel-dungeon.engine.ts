@@ -22,7 +22,7 @@ export class StartTurnState extends PixelDungeonState {
     name = States.StartTurn;
     next = States.PlayersTurn;
 
-    public enter() {
+    public enter(engine: PixelDungeonEngine) {
         console.log('enter start turn');
         // apply stuff that happens when the players turn start
         // e.g. oxygen is running out
@@ -40,12 +40,38 @@ export class StartTurnState extends PixelDungeonState {
     }
 }
 
+export class MobsState extends PixelDungeonState {
+    name = States.StartTurn;
+    next = States.PlayersTurn;
+    private mobs: PixelDungeonEnemy[];
+    private current?: PixelDungeonEnemy;
+
+    public enter(engine: PixelDungeonEngine) {
+        console.log('enter start turn enemies');
+        this.mobs = [engine.enemy, engine.enemy2];
+        this.current = this.mobs.shift();
+    }
+
+    public exit(p0) {
+        console.log(p0, 'exit enemies turn');
+    }
+
+    public update(engine: PixelDungeonEngine) {
+        console.log('update enemies turn', engine);
+        if (this.current) {
+            this.current.moveOnRandom();
+        }
+    }
+}
+
 export class PlayerState extends PixelDungeonState {
     name = States.PlayersTurn;
-    next = States.MobsTurn;
+    next = States.StartTurn;
 
-    public enter() {
-        console.log('enter players turn');
+    toggle = true;
+
+    public enter(engine: PixelDungeonEngine) {
+        console.log('enter players turn', engine.player);
         // apply stuff that happens when the players turn start
         // e.g. oxygen is running out
         // could be done in start turn
@@ -56,8 +82,8 @@ export class PlayerState extends PixelDungeonState {
         console.log('exit players turn');
     }
 
-    public update() {
-        console.log('update players turn');
+    public update(engine: PixelDungeonEngine) {
+        console.log('update players turn', engine);
     }
 }
 
@@ -84,9 +110,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     public create(): void {
-        this.player.addToMap(this.map, this.map.start);
         this.enemy.addToMap(this.map, { x: this.map.start.x - 1, y: this.map.start.y - 1 });
         this.enemy2.addToMap(this.map, { x: this.map.start.x - 1, y: this.map.start.y - 2 });
+        this.player.addToMap(this.map, this.map.start);
         this.scene.add.existing(this.player);
         this.scene.add.existing(this.enemy);
         this.scene.add.existing(this.enemy2);

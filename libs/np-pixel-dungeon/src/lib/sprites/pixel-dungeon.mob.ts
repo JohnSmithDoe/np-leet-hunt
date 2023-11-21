@@ -1,8 +1,8 @@
 import { EDirection, mapRexPluginDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
@@ -222,6 +222,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         if (startMoving) {
             this.moveToNext();
         }
+
     }
 
     hasMoves() {
@@ -229,8 +230,15 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
     }
 
     isMoving() {
-        return !!this.#moveTo.destinationTileX;
+        return this.#moveTo.isRunning;
     }
+
+    this;
+.
+    #moveTo;
+.
+
+    moveToRandomNeighbor()
 
     moveToNext() {
         if (this.hasMoves()) {
