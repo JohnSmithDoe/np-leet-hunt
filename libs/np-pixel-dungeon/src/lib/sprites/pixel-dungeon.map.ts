@@ -1,6 +1,5 @@
 import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
@@ -130,10 +129,8 @@ export class PixelDungeonMap implements NPSceneComponent {
     #config: NPTilemapConfig & TDungeonOptions;
     #map: Phaser.Tilemaps.Tilemap;
     #tilelayer: PixelDungeonTilelayer;
-    #pathfinder: PathFinder;
-    #pathGraphics: Phaser.GameObjects.Graphics;
     #board: BoardPlugin.Board;
-    #openTileIdx: number[];
+    openTileIdx: number[];
     #engine: PixelDungeonEngine;
     start: TileXYType;
 
@@ -165,11 +162,9 @@ export class PixelDungeonMap implements NPSceneComponent {
 
         const tileset = new PixelDungeonTileset(this.#map, this.#config);
         this.#tilelayer = new PixelDungeonTilelayer(this.scene, this.#map, tileset);
-        this.#openTileIdx = [6, 7, 8, 26, tileset.getFirstTileIndex('DOOR')];
+        this.openTileIdx = [6, 7, 8, 26, tileset.getFirstTileIndex('DOOR')];
 
         this.start = this.#tilelayer.mapDungeonToLayer(this.#dungeon);
-
-        this.#pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
 
         this.#board = this.scene.rexBoard.createBoardFromTilemap(this.#map);
 
@@ -186,34 +181,12 @@ export class PixelDungeonMap implements NPSceneComponent {
         const grid = this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
         grid.setDirectionMode('8dir');
         //</editor-fold>
-
-        //this.add.existing(this.anim);
-        this.#pathfinder = this.scene.rexBoard.add.pathFinder(this.#engine.player, {
-            pathMode: 'A*-line', // only works with adjusted plugin tileXYToWroldX
-            blockerTest: true,
-            occupiedTest: true,
-            costCallback: curTile => this.costs(curTile),
-        });
-    }
-
-    costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {
-        const tile = this.#map.getTileAt(tileXY.x, tileXY.y);
-        return this.#openTileIdx.includes(tile.index) ? 1 : null;
     }
 
     moveToPointer({ worldX, worldY }: Phaser.Input.Pointer) {
-        const drawPath = (tileXYArray: PathFinder.NodeType[]) => {
-            const p = tileXYArray
-                .map(tile => this.#map.tileToWorldXY(tile.x, tile.y))
-                .map(pv => pv.add({ x: 8, y: 8 }));
-            this.#pathGraphics.strokePoints(p);
-        };
-
         const targetTile = this.#map.getTileAtWorldXY(worldX, worldY);
         // generate the path
-        const pathToMove = this.#pathfinder.findPath({ x: targetTile.x, y: targetTile.y });
-        this.#pathGraphics.clear();
-        drawPath(pathToMove);
+        const pathToMove = this.#engine.findPath({ x: targetTile.x, y: targetTile.y });
         this.#engine.player.moveOnPath(pathToMove);
     }
 
@@ -236,5 +209,9 @@ export class PixelDungeonMap implements NPSceneComponent {
 
     get height(): number {
         return this.#tilelayer.tilelayer.height * this.#tilelayer.tilelayer.scaleY;
+    }
+
+    get map() {
+        return this.#map;
     }
 }

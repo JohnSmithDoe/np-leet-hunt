@@ -28,8 +28,4 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
         });
         // this.scene.load.image('grid', 'np-pixel-dungeon/grid-ps1.png');
     }
-
-    moveOnRandom() {
-        this.moveto;
-    }
 }

@@ -1,8 +1,9 @@
 import { EDirection, mapRexPluginDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
@@ -59,6 +60,7 @@ const defaultOptions: TPixelDungeonSpriteOptions = {
 };
 
 export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
+    rexChess: ChessData;
     scene: NPSceneWithBoard;
 
     #map: PixelDungeonMap;
@@ -201,13 +203,24 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         this.#moveTo = this.scene.rexBoard.add.moveTo(this, {
             speed: this.#options.moveSpeed,
             rotateToTarget: this.#options.moveRotate,
-            blockerTest: false,
-            occupiedTest: false,
+            blockerTest: true,
+            occupiedTest: true,
             sneak: false,
             moveableTestScope: undefined,
-            moveableTest: undefined,
+            moveableTest: (from, to) => !!this.engine.costs(to),
         });
+        //On reached target
         this.#moveTo.on('complete', () => this.moveToNext());
+    }
+
+    onceMoved(fn: () => void) {
+        this.#moveTo.once('complete', () => fn());
+        return this;
+    }
+
+    onceMovedOccupied(fn: () => void) {
+        this.#moveTo.once('occupy', () => fn());
+        return this;
     }
 
     moveOnPath(path: PathFinder.NodeType[], startMoving = true) {
@@ -215,6 +228,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         if (startMoving) {
             this.moveToNext();
         }
+        return this;
     }
 
     moveOnTile(tileX: number, tileY: number, startMoving = true) {
@@ -222,23 +236,32 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         if (startMoving) {
             this.moveToNext();
         }
-
+        return this;
     }
 
     hasMoves() {
-        return !!this.#pathToMove.length;
+        return !!this.#pathToMove?.length;
     }
 
     isMoving() {
         return this.#moveTo.isRunning;
     }
 
-    this;
-.
-    #moveTo;
-.
+    isNotMoving() {
+        return !this.isMoving();
+    }
 
-    moveToRandomNeighbor()
+    moveOnRandomTile() {
+        this.#moveTo.moveToRandomNeighbor();
+        console.log(this.engine.map.board.isEmptyTileXYZ(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY));
+
+        let i = 0;
+        while (!this.#moveTo.canMoveTo(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY)) {
+            this.#moveTo.moveToRandomNeighbor();
+            if (i++ > 500) break;
+        }
+        return this;
+    }
 
     moveToNext() {
         if (this.hasMoves()) {

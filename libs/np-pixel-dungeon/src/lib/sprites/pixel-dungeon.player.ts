@@ -67,26 +67,31 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
 
     #createFieldOfView() {
         this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
-            preTestCallback: (a, visiblePoints) => {
+            preTestCallback: a => {
                 const first = a[0];
                 const target = a[a.length - 1];
                 const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-                return !visiblePoints || distance <= visiblePoints;
+                let lastWasOccupied = false;
+                if (a.length > 2) {
+                    const preLast = a[a.length - 2];
+                    lastWasOccupied = !this.map.board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
+                }
+                return !lastWasOccupied && distance <= this.#options.fovRange;
             },
-            costCallback: a => this.map.costs(a),
+            costCallback: a => this.engine.costs(a),
             coneMode: 'angle',
             cone: this.#options.fovConeAngle,
-            occupiedTest: true,
+            occupiedTest: false,
         });
 
         this.#fieldOfView.setFace(mapToRexPluginDirection(this.#options.startingDirection));
-        this.#updateFoV();
+        this.updateFoV();
     }
 
-    #updateFoV() {
+    updateFoV() {
         this.map.loseVision(this.#currentView);
         this.#currentView = this.#fieldOfView.findFOV(this.#options.fovRange);
-        // put the players tile into vision as well
+        // put the players tile into vision as well hmmmmmm and the enemies... occupied seems to be blocked
         this.#currentView.push({ ...this.tile });
         this.map.gainVision(this.#currentView);
     }
@@ -94,6 +99,6 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     moveToNext() {
         super.moveToNext();
         this.#fieldOfView.setFace(this.moveToDirection);
-        this.#updateFoV();
+        this.updateFoV();
     }
 }
