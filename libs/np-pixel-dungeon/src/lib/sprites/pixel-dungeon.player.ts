@@ -1,10 +1,6 @@
-import { EDirection, mapToRexPluginDirection } from '@shared/np-library';
-import * as Phaser from 'phaser';
-import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import { EDirection } from '@shared/np-library';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMap } from './pixel-dungeon.map';
 import { PixelDungeonMob, TPixelDungeonSpriteOptions } from './pixel-dungeon.mob';
 
 // this.makeAnimation('walk1', 1, 6);
@@ -42,14 +38,12 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
 };
 
 export class PixelDungeonPlayer extends PixelDungeonMob {
-    #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
-    #currentView: TileXYType[];
-
-    #options: TPixelDungeonPlayerOptions;
+    options: TPixelDungeonPlayerOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonPlayerOptions) {
         super(engine, options);
-        this.#options = Object.assign({}, defaultOptions, options ?? {});
+        this.options = Object.assign({}, defaultOptions, options ?? {});
+        this.facingTo = this.options.startingDirection;
     }
 
     preload() {
@@ -58,47 +52,5 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
             frameWidth: 64,
             frameHeight: 64,
         });
-    }
-
-    addToMap(map: PixelDungeonMap, start: TileXYType) {
-        super.addToMap(map, start);
-        this.#createFieldOfView();
-    }
-
-    #createFieldOfView() {
-        this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
-            preTestCallback: a => {
-                const first = a[0];
-                const target = a[a.length - 1];
-                const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-                let lastWasOccupied = false;
-                if (a.length > 2) {
-                    const preLast = a[a.length - 2];
-                    lastWasOccupied = !this.map.board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
-                }
-                return !lastWasOccupied && distance <= this.#options.fovRange;
-            },
-            costCallback: a => this.engine.costs(a),
-            coneMode: 'angle',
-            cone: this.#options.fovConeAngle,
-            occupiedTest: false,
-        });
-
-        this.#fieldOfView.setFace(mapToRexPluginDirection(this.#options.startingDirection));
-        this.updateFoV();
-    }
-
-    updateFoV() {
-        this.map.loseVision(this.#currentView);
-        this.#currentView = this.#fieldOfView.findFOV(this.#options.fovRange);
-        // put the players tile into vision as well hmmmmmm and the enemies... occupied seems to be blocked
-        this.#currentView.push({ ...this.tile });
-        this.map.gainVision(this.#currentView);
-    }
-
-    moveToNext() {
-        super.moveToNext();
-        this.#fieldOfView.setFace(this.moveToDirection);
-        this.updateFoV();
     }
 }

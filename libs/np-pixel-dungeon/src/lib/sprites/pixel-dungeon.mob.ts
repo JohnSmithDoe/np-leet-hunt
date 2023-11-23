@@ -1,9 +1,9 @@
 import { EDirection, mapRexPluginDirection } from '@shared/np-library';
 import * as Phaser from 'phaser';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
@@ -64,16 +64,20 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
     scene: NPSceneWithBoard;
 
     #map: PixelDungeonMap;
-    #tile: TileXYType;
     #moveTo: BoardPlugin.MoveTo;
     #pathToMove: PathFinder.NodeType[];
 
     #options: TPixelDungeonSpriteOptions;
     key: string;
+    facingTo?: EDirection;
 
     constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonSpriteOptions) {
         super(engine.scene, 0, 0, '');
         this.#options = Object.assign({}, defaultOptions, options ?? {});
+    }
+
+    public setMoveSpeed(speed: number) {
+        this.#moveTo.setSpeed(speed);
     }
 
     preload() {
@@ -194,7 +198,6 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
 
     addToMap(map: PixelDungeonMap, start: TileXYType) {
         this.#map = map;
-        this.#tile = start;
         map.board.addChess(this, start.x, start.y, 1);
         this.#createMoveTo();
     }
@@ -209,8 +212,6 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
             moveableTestScope: undefined,
             moveableTest: (from, to) => !!this.engine.costs(to),
         });
-        //On reached target
-        this.#moveTo.on('complete', () => this.moveToNext());
     }
 
     onceMoved(fn: () => void) {
@@ -251,46 +252,45 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         return !this.isMoving();
     }
 
-    moveOnRandomTile() {
+    moveOnRandomTile(warp = false) {
         this.#moveTo.moveToRandomNeighbor();
-        console.log(this.engine.map.board.isEmptyTileXYZ(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY));
-
         let i = 0;
         while (!this.#moveTo.canMoveTo(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY)) {
             this.#moveTo.moveToRandomNeighbor();
             if (i++ > 500) break;
+        }
+        if (warp) {
+            const pos = this.engine.map.map.tileToWorldXY(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY);
+            this.setPosition(pos.x, pos.y);
         }
         return this;
     }
 
     moveToNext() {
         if (this.hasMoves()) {
-            this.tile = this.#pathToMove.shift();
-            this.#moveTo.moveTo(this.tile);
-            this.faceMoveTo(mapRexPluginDirection(this.#moveTo.destinationDirection));
+            const tile = this.#pathToMove.shift();
+            this.#moveTo.moveTo(tile);
+            this.facingTo = mapRexPluginDirection(this.#moveTo.destinationDirection);
+            this.faceMoveTo(this.facingTo);
         } else {
-            this.faceToDirection(mapRexPluginDirection(this.#moveTo.destinationDirection));
+            this.faceToDirection(this.facingTo);
         }
+        this.updateFov();
     }
 
     get map() {
         return this.#map;
     }
 
-    get moveToDirection() {
-        return this.#moveTo.destinationDirection;
-    }
-
-    set tile(next: PathFinder.NodeType | TileXYType) {
-        this.#tile.x = next.x;
-        this.#tile.y = next.y;
-    }
-
     get tile() {
-        return this.#tile;
+        return this.rexChess.tileXYZ;
     }
 
     get moveToTile(): TileXYType {
         return { x: this.#moveTo.destinationTileX, y: this.#moveTo.destinationTileY };
+    }
+
+    protected updateFov() {
+        this.engine.updateFoV();
     }
 }

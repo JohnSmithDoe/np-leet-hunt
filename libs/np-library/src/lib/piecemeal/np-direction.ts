@@ -185,7 +185,7 @@ export const mapRexPluginDirection = (dir: number): EDirection => {
             return EDirection.NONE;
     }
 };
-export const mapToRexPluginDirection = (dir: EDirection): number => {
+export const mapToRexPluginDirection = (dir: EDirection): number | undefined => {
     switch (dir) {
         case EDirection.E:
             return 0;
@@ -204,6 +204,6 @@ export const mapToRexPluginDirection = (dir: EDirection): number => {
         case EDirection.NE:
             return 7;
         default:
-            return -1;
+            return undefined;
     }
 };

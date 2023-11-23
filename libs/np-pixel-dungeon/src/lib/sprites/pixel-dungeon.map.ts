@@ -1,7 +1,7 @@
 import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { ETileType, NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from '../core/pixel-dungeon';
@@ -185,6 +185,7 @@ export class PixelDungeonMap implements NPSceneComponent {
 
     moveToPointer({ worldX, worldY }: Phaser.Input.Pointer) {
         const targetTile = this.#map.getTileAtWorldXY(worldX, worldY);
+        if (!targetTile) return;
         // generate the path
         const pathToMove = this.#engine.findPath({ x: targetTile.x, y: targetTile.y });
         this.#engine.player.moveOnPath(pathToMove);
