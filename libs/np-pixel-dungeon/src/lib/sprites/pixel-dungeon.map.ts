@@ -1,9 +1,8 @@
 import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { ETileType, NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
+import { NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from '../core/pixel-dungeon';
 import { PixelDungeonTilelayer } from '../core/pixel-dungeon-tilelayer';
 import { PixelDungeonTileset } from '../core/pixel-dungeon-tileset';
@@ -129,8 +128,6 @@ export class PixelDungeonMap implements NPSceneComponent {
     #config: NPTilemapConfig & TDungeonOptions;
     #map: Phaser.Tilemaps.Tilemap;
     #tilelayer: PixelDungeonTilelayer;
-    #board: BoardPlugin.Board;
-    openTileIdx: number[];
     #engine: PixelDungeonEngine;
     start: TileXYType;
 
@@ -162,25 +159,8 @@ export class PixelDungeonMap implements NPSceneComponent {
 
         const tileset = new PixelDungeonTileset(this.#map, this.#config);
         this.#tilelayer = new PixelDungeonTilelayer(this.scene, this.#map, tileset);
-        this.openTileIdx = [6, 7, 8, 26, tileset.getFirstTileIndex('DOOR')];
 
         this.start = this.#tilelayer.mapDungeonToLayer(this.#dungeon);
-
-        this.#board = this.scene.rexBoard.createBoardFromTilemap(this.#map);
-
-        let targetGoal;
-        for (const tile of this.#dungeon) {
-            if (tile.type === ETileType.room) {
-                targetGoal = tile;
-                break;
-            }
-        }
-        const goal = this.scene.rexBoard.add.shape(this.board, targetGoal.x, targetGoal.y, 2, 0x00ff00, 0.5);
-        goal.setOrigin(0);
-        //<editor-fold desc="*** TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that? ***">
-        const grid = this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void };
-        grid.setDirectionMode('8dir');
-        //</editor-fold>
     }
 
     moveToPointer({ worldX, worldY }: Phaser.Input.Pointer) {
@@ -199,11 +179,6 @@ export class PixelDungeonMap implements NPSceneComponent {
         view?.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 1));
     }
 
-    get board() {
-        if (!this.#board) throw new Error('Board not initialized');
-        return this.#board;
-    }
-
     get width(): number {
         return this.#tilelayer.tilelayer.width * this.#tilelayer.tilelayer.scaleX;
     }
@@ -212,7 +187,7 @@ export class PixelDungeonMap implements NPSceneComponent {
         return this.#tilelayer.tilelayer.height * this.#tilelayer.tilelayer.scaleY;
     }
 
-    get map() {
+    get tileMap() {
         return this.#map;
     }
 }

@@ -1,7 +1,7 @@
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMob, TPixelDungeonSpriteOptions } from './pixel-dungeon.mob';
+import { PixelDungeonMob, TPixelDungeonMobOptions } from './pixel-dungeon.mob';
 
-interface TPixelDungeonEnemyOptions extends TPixelDungeonSpriteOptions {
+interface TPixelDungeonEnemyOptions extends TPixelDungeonMobOptions {
     type: 'skeleton';
 }
 

@@ -1,10 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
-import { mapToRexPluginDirection } from '@shared/np-library';
 import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
@@ -12,125 +11,21 @@ import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../sprites/pixel-dungeon.player';
-
-export enum States {
-    StartTurn = 'start',
-    PlayersTurn = 'player',
-    MobsTurn = 'mobs',
-    EndTurn = 'end',
-}
-
-export abstract class PixelDungeonState implements StateManager.IState {
-    name: string;
-    protected engine: PixelDungeonEngine;
-
-    abstract next: string | (() => string);
-
-    enter(engine: PixelDungeonEngine) {
-        this.engine = engine;
-    }
-
-    // in update we dont have a this reference
-    // so we call engine next and handle the state change in the next call
-    // for this we save the engine in the enter state
-    public update(engine: PixelDungeonEngine) {
-        engine.next();
-    }
-}
-
-export class StartTurnState extends PixelDungeonState {
-    name = States.StartTurn;
-    next = States.PlayersTurn;
-}
-
-export class MobsState extends PixelDungeonState {
-    name = States.MobsTurn;
-    // next = States.PlayersTurn;
-    private mobs: PixelDungeonEnemy[];
-    private current?: PixelDungeonEnemy;
-    private player: PixelDungeonPlayer;
-
-    next = () => {
-        if (!this.current) {
-            return States.PlayersTurn;
-        } else {
-            if (this.current.isNotMoving()) {
-                if (this.engine.canSee(this.current)) {
-                    this.current.moveOnRandomTile();
-                    this.current.onceMoved(() => {
-                        if (this.engine.canSee(this.current)) this.engine.updateFoV();
-                        this.current = this.mobs.shift();
-                    });
-                } else {
-                    this.current.moveOnRandomTile(true);
-                    if (this.engine.canSee(this.current)) this.engine.updateFoV();
-                    this.current = this.mobs.shift();
-                    if (!this.current) {
-                        return States.PlayersTurn;
-                    }
-                }
-            }
-        }
-        return States.MobsTurn;
-    };
-
-    public enter(engine: PixelDungeonEngine) {
-        super.enter(engine);
-        console.log('enter start turn enemies');
-        this.mobs = [engine.enemy, engine.enemy2];
-        this.current = this.mobs.shift();
-        this.player = engine.player;
-    }
-
-    public exit(p0) {
-        console.log(p0, 'exit enemies turn');
-    }
-}
-
-export class PlayerState extends PixelDungeonState {
-    name = States.PlayersTurn;
-
-    private hasMoved = false;
-    next = () => {
-        const player = this.engine.player;
-        if (player.isMoving()) {
-            this.hasMoved = true;
-            return States.PlayersTurn;
-        }
-        // has more moving to do in the next round
-        if (player.hasMoves() || this.hasMoved) return States.MobsTurn;
-        // nothing to move -> wait for input
-        return States.PlayersTurn;
-    };
-
-    public enter(engine: PixelDungeonEngine) {
-        super.enter(engine);
-        console.log('enter players turn', engine.player, this);
-        this.hasMoved = false;
-        const player = this.engine.player;
-        if (player.hasMoves()) {
-            player.moveToNext();
-        }
-        // apply stuff that happens when the players turn start
-        // e.g. oxygen is running out
-        // could be done in start turn
-        // how do i wait for stuff?
-    }
-
-    public exit() {
-        console.log('exit players turn');
-    }
-}
+import { MobsState } from './mobs.state';
+import { PlayerState } from './player.state';
+import { StartTurnState } from './start-turn.state';
+import { States } from './states';
 
 export class PixelDungeonEngine extends StateManager implements NPSceneComponent {
     map: PixelDungeonMap;
     player: PixelDungeonPlayer;
+    mobs: PixelDungeonMob[];
     enemy: PixelDungeonEnemy;
     enemy2: PixelDungeonEnemy;
+    #board: BoardPlugin.Board;
+    #openTileIdx: number[];
     #pathfinder: PathFinder;
     #pathGraphics: Phaser.GameObjects.Graphics;
-    #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
-    #currentView: TileXYType[];
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
@@ -143,22 +38,42 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.player = new PixelDungeonPlayer(this, { fovRange: 10, fovConeAngle: 210 });
         this.enemy = new PixelDungeonEnemy(this, { moveSpeed: 50, type: 'skeleton' });
         this.enemy2 = new PixelDungeonEnemy(this, { moveSpeed: 50, type: 'skeleton' });
+        this.mobs = [this.player, this.enemy, this.enemy2];
+    }
 
-        this.scene.addComponent([this.map, this.player, this.enemy, this.enemy2]);
-        this.scene.addComponent(this);
+    init(): void {
+        this.map.init();
+        this.mobs.forEach((mob: NPSceneComponent) => (mob.init ? mob.init() : null));
+    }
+
+    preload(): void {
+        this.map.preload();
+        this.mobs.forEach(mob => mob.preload());
     }
 
     public create(): void {
-        this.enemy.addToMap(this.map, { x: this.map.start.x - 1, y: this.map.start.y - 1 });
-        this.enemy2.addToMap(this.map, { x: this.map.start.x - 1, y: this.map.start.y - 2 });
-        this.player.addToMap(this.map, this.map.start);
-
+        this.map.create();
+        this.#createBoard();
+        this.mobs.forEach(mob => mob.create());
         this.#createPathfinder();
-        this.#createFieldOfView();
-        this.scene.add.existing(this.player);
-        this.scene.add.existing(this.enemy);
-        this.scene.add.existing(this.enemy2);
+        this.updateFoV();
+
         this.#pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
+        this.mobs.forEach(mob => {
+            this.scene.add.existing(mob);
+        });
+    }
+
+    #createBoard() {
+        this.#openTileIdx = [6, 7, 8, 26, 118];
+        this.#board = this.scene.rexBoard.createBoardFromTilemap(this.map.tileMap);
+        // TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that?
+        (this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void }).setDirectionMode('8dir');
+        let pos = this.#board.getRandomEmptyTileXYInRange(this.map.start, 4, 1);
+        this.#board.addChess(this.enemy, pos.x, pos.y, 1);
+        pos = this.#board.getRandomEmptyTileXYInRange(this.map.start, 4, 1);
+        this.#board.addChess(this.enemy2, pos.x, pos.y, 1);
+        this.#board.addChess(this.player, this.map.start.x, this.map.start.y, 1);
     }
 
     #createPathfinder() {
@@ -170,35 +85,11 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         });
     }
 
-    #createFieldOfView() {
-        this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this.player, {
-            preTestCallback: a => {
-                const first = a[0];
-                const target = a[a.length - 1];
-                const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-                let lastWasOccupied = false;
-                if (a.length > 2) {
-                    const preLast = a[a.length - 2];
-                    lastWasOccupied = !this.map.board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
-                }
-                return !lastWasOccupied && distance <= this.player.options.fovRange;
-            },
-            costCallback: a => this.costs(a),
-            coneMode: 'angle',
-            cone: this.player.options.fovConeAngle,
-            occupiedTest: false,
-        });
-        this.updateFoV();
-    }
-
     updateFoV() {
-        this.#fieldOfView.setFace(mapToRexPluginDirection(this.player.facingTo));
-        this.map.loseVision(this.#currentView);
-        this.#currentView = this.#fieldOfView.findFOV(this.player.options.fovRange);
-        // put the players tile into vision as well hmmmmmm and the enemies... occupied seems to be blocked
-        this.#currentView.push({ ...this.player.tile });
-        this.map.gainVision(this.#currentView);
-        [this.enemy, this.enemy2].forEach(mob => (mob.alpha = this.canSee(mob) ? 1 : 0.1));
+        this.map.loseVision(this.player.vision);
+        this.player.updateVision();
+        this.map.gainVision(this.player.vision);
+        [this.enemy, this.enemy2].forEach(mob => (mob.alpha = this.player.canSee(mob) ? 1 : 0.1));
     }
 
     startTurn() {
@@ -212,7 +103,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
             if (path && path.length) {
                 this.#pathGraphics.clear();
                 const p = path
-                    .map(tile => this.map.map.tileToWorldXY(tile.x, tile.y))
+                    .map(tile => this.map.tileMap.tileToWorldXY(tile.x, tile.y))
                     .map(pv => pv.add({ x: 8, y: 8 }));
                 this.#pathGraphics.strokePoints(p);
             }
@@ -221,12 +112,20 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {
-        const tile = this.map.map.getTileAt(tileXY.x, tileXY.y);
-        const occupied = !this.map.board.isEmptyTileXYZ(tileXY.x, tileXY.y, 1);
-        return this.map.openTileIdx.includes(tile.index) && !occupied ? 1 : null;
+        const tile = this.map.tileMap.getTileAt(tileXY.x, tileXY.y, true);
+        const occupied = !this.#board.isEmptyTileXYZ(tileXY.x, tileXY.y, 1);
+        return this.#openTileIdx.includes(tile.index) && !occupied ? 1 : null;
     }
 
-    public canSee(mob: PixelDungeonMob) {
-        return this.#fieldOfView.isInLOS(mob);
+    preTestCallback(a: TileXYType[], fovRange: number) {
+        const first = a[0];
+        const target = a[a.length - 1];
+        const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
+        let lastWasOccupied = false;
+        if (a.length > 2) {
+            const preLast = a[a.length - 2];
+            lastWasOccupied = !this.#board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
+        }
+        return !lastWasOccupied && distance <= fovRange;
     }
 }

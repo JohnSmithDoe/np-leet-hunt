@@ -1,7 +1,7 @@
 import { EDirection } from '@shared/np-library';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMob, TPixelDungeonSpriteOptions } from './pixel-dungeon.mob';
+import { PixelDungeonMob, TPixelDungeonMobOptions } from './pixel-dungeon.mob';
 
 // this.makeAnimation('walk1', 1, 6);
 // this.makeAnimation('walk2', 14, 19);
@@ -23,10 +23,7 @@ import { PixelDungeonMob, TPixelDungeonSpriteOptions } from './pixel-dungeon.mob
 // this.makeAnimation('walk19', 235, 246);
 // this.makeAnimation('walk20', 248, 259);
 
-interface TPixelDungeonPlayerOptions extends TPixelDungeonSpriteOptions {
-    fovRange?: number;
-    fovConeAngle?: number;
-}
+type TPixelDungeonPlayerOptions = TPixelDungeonMobOptions;
 
 const defaultOptions: TPixelDungeonPlayerOptions = {
     startingDirection: EDirection.N,
@@ -41,9 +38,11 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     options: TPixelDungeonPlayerOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonPlayerOptions) {
-        super(engine, options);
-        this.options = Object.assign({}, defaultOptions, options ?? {});
-        this.facingTo = this.options.startingDirection;
+        super(engine, Object.assign({}, defaultOptions, options ?? {}));
+    }
+
+    init(): void {
+        console.log('init player');
     }
 
     preload() {

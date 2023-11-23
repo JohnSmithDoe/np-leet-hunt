@@ -1,13 +1,14 @@
-import { EDirection, mapRexPluginDirection } from '@shared/np-library';
+import { EDirection, mapRexPluginDirection, mapToRexPluginDirection } from '@shared/np-library';
+import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
+import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMap } from './pixel-dungeon.map';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
@@ -44,40 +45,63 @@ const NPLpcConfig: TLpcConfig = {
     },
 };
 
-export interface TPixelDungeonSpriteOptions {
+export interface TPixelDungeonMobOptions {
     lpcType?: TLpcSheetType;
 
     moveSpeed?: number;
     moveRotate?: boolean;
+
+    fovRange?: number;
+    fovConeAngle?: number;
+
     startingDirection?: EDirection;
 }
 
-const defaultOptions: TPixelDungeonSpriteOptions = {
+const defaultOptions: TPixelDungeonMobOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
     moveRotate: false,
     moveSpeed: 200,
+    fovRange: 3,
 };
 
-export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
+export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     rexChess: ChessData;
     scene: NPSceneWithBoard;
+    options: TPixelDungeonMobOptions;
 
-    #map: PixelDungeonMap;
     #moveTo: BoardPlugin.MoveTo;
     #pathToMove: PathFinder.NodeType[];
-
-    #options: TPixelDungeonSpriteOptions;
+    #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
+    #currentVision: TileXYType[];
     key: string;
-    facingTo?: EDirection;
 
-    constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonSpriteOptions) {
+    constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
         super(engine.scene, 0, 0, '');
-        this.#options = Object.assign({}, defaultOptions, options ?? {});
+        this.options = Object.assign({}, defaultOptions, options ?? {});
     }
 
-    public setMoveSpeed(speed: number) {
+    get vision() {
+        return this.#currentVision;
+    }
+
+    faceTowards(rexDirection: number) {
+        this.#fieldOfView.setFace(rexDirection);
+    }
+    get faceDirection() {
+        return mapRexPluginDirection(this.#fieldOfView.face);
+    }
+    updateVision() {
+        this.#currentVision = this.#fieldOfView.findFOV(this.options.fovRange);
+        this.#currentVision.push({ ...this.tile });
+    }
+
+    setMoveSpeed(speed: number) {
         this.#moveTo.setSpeed(speed);
+    }
+
+    canSee(mob: PixelDungeonMob) {
+        return this.#fieldOfView.isInLOS(mob);
     }
 
     preload() {
@@ -91,6 +115,9 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
 
     create() {
         this.#createAnimations();
+        this.#createMoveTo();
+        this.#createFieldOfView();
+
         // Animation set
         //   1   2   3   4   5   6   7   8   9  10  11  12  13
         //  14  15  16  17  18  19  20  21  22  23  24  25  26
@@ -182,7 +209,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
     }
 
     #createAnimations() {
-        const animations = NPLpcConfig[this.#options.lpcType].animations;
+        const animations = NPLpcConfig[this.options.lpcType].animations;
         for (const key in animations) {
             if (animations.hasOwnProperty(key)) {
                 const animation = animations[key];
@@ -196,22 +223,28 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         }
     }
 
-    addToMap(map: PixelDungeonMap, start: TileXYType) {
-        this.#map = map;
-        map.board.addChess(this, start.x, start.y, 1);
-        this.#createMoveTo();
-    }
-
     #createMoveTo() {
         this.#moveTo = this.scene.rexBoard.add.moveTo(this, {
-            speed: this.#options.moveSpeed,
-            rotateToTarget: this.#options.moveRotate,
+            speed: this.options.moveSpeed,
+            rotateToTarget: this.options.moveRotate,
             blockerTest: true,
             occupiedTest: true,
             sneak: false,
             moveableTestScope: undefined,
             moveableTest: (from, to) => !!this.engine.costs(to),
         });
+    }
+
+    #createFieldOfView() {
+        this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
+            preTestCallback: a => this.engine.preTestCallback(a, this.options.fovRange),
+            costCallback: a => this.engine.costs(a),
+            coneMode: 'angle',
+            cone: this.options.fovConeAngle,
+            occupiedTest: false,
+        });
+        this.#fieldOfView.setFace(mapToRexPluginDirection(this.options.startingDirection));
+        this.updateVision();
     }
 
     onceMoved(fn: () => void) {
@@ -260,7 +293,10 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
             if (i++ > 500) break;
         }
         if (warp) {
-            const pos = this.engine.map.map.tileToWorldXY(this.#moveTo.destinationTileX, this.#moveTo.destinationTileY);
+            const pos = this.engine.map.tileMap.tileToWorldXY(
+                this.#moveTo.destinationTileX,
+                this.#moveTo.destinationTileY
+            );
             this.setPosition(pos.x, pos.y);
         }
         return this;
@@ -270,16 +306,12 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite {
         if (this.hasMoves()) {
             const tile = this.#pathToMove.shift();
             this.#moveTo.moveTo(tile);
-            this.facingTo = mapRexPluginDirection(this.#moveTo.destinationDirection);
-            this.faceMoveTo(this.facingTo);
+            this.faceTowards(this.#moveTo.destinationDirection);
+            this.faceMoveTo(this.faceDirection);
         } else {
-            this.faceToDirection(this.facingTo);
+            this.faceToDirection(this.faceDirection);
         }
         this.updateFov();
-    }
-
-    get map() {
-        return this.#map;
     }
 
     get tile() {

@@ -16,6 +16,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
 
     public setupComponents(): void {
         this.engine = new PixelDungeonEngine(this);
+        this.addComponent(this.engine);
     }
 
     preload() {
