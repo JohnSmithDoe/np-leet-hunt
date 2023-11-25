@@ -163,14 +163,6 @@ export class PixelDungeonMap implements NPSceneComponent {
         this.start = this.#tilelayer.mapDungeonToLayer(this.#dungeon);
     }
 
-    moveToPointer({ worldX, worldY }: Phaser.Input.Pointer) {
-        const targetTile = this.#map.getTileAtWorldXY(worldX, worldY);
-        if (!targetTile) return;
-        // generate the path
-        const pathToMove = this.#engine.findPath({ x: targetTile.x, y: targetTile.y });
-        this.#engine.player.moveOnPath(pathToMove);
-    }
-
     loseVision(tileXYTypes?: TileXYType[]) {
         tileXYTypes?.forEach(tile => (this.#map.getTileAt(tile.x, tile.y).alpha = 0.5));
     }

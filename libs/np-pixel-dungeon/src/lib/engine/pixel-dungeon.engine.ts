@@ -11,10 +11,11 @@ import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../sprites/pixel-dungeon.player';
-import { MobsState } from './mobs.state';
-import { PlayerState } from './player.state';
-import { StartTurnState } from './start-turn.state';
-import { States } from './states';
+import { EndTurnState } from './states/end-turn.state';
+import { GainEnergyState } from './states/gain-energy.state';
+import { HandleActionState } from './states/handle-action.state';
+import { StartTurnState } from './states/start-turn.state';
+import { States } from './states/states';
 
 export class PixelDungeonEngine extends StateManager implements NPSceneComponent {
     map: PixelDungeonMap;
@@ -29,15 +30,24 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
-        this.addStates([new StartTurnState(), new PlayerState(), new MobsState()]);
+        this.addStates([new StartTurnState(), new GainEnergyState(), new HandleActionState(), new EndTurnState()]);
         this.setupComponents();
+    }
+
+    get board() {
+        return this.#board;
+    }
+
+    update(time: number, delta: number) {
+        console.log(time, delta);
+        super.update(time, delta);
     }
 
     private setupComponents() {
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
-        this.player = new PixelDungeonPlayer(this, { fovRange: 10, fovConeAngle: 210 });
-        this.enemy = new PixelDungeonEnemy(this, { moveSpeed: 50, type: 'skeleton' });
-        this.enemy2 = new PixelDungeonEnemy(this, { moveSpeed: 50, type: 'skeleton' });
+        this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
+        this.enemy = new PixelDungeonEnemy(this, { type: 'skeleton' });
+        this.enemy2 = new PixelDungeonEnemy(this, { type: 'skeleton' });
         this.mobs = [this.player, this.enemy, this.enemy2];
     }
 
@@ -69,10 +79,8 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.#board = this.scene.rexBoard.createBoardFromTilemap(this.map.tileMap);
         // TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that?
         (this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void }).setDirectionMode('8dir');
-        let pos = this.#board.getRandomEmptyTileXYInRange(this.map.start, 4, 1);
-        this.#board.addChess(this.enemy, pos.x, pos.y, 1);
-        pos = this.#board.getRandomEmptyTileXYInRange(this.map.start, 4, 1);
-        this.#board.addChess(this.enemy2, pos.x, pos.y, 1);
+        this.#board.addChess(this.enemy, this.map.start.x - 1, this.map.start.y - 1, 1);
+        this.#board.addChess(this.enemy2, this.map.start.x, this.map.start.y - 1, 1);
         this.#board.addChess(this.player, this.map.start.x, this.map.start.y, 1);
     }
 
@@ -93,7 +101,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     startTurn() {
-        this.start(States.StartTurn);
+        this.goto(States.StartTurn);
     }
 
     findPath(endTileXY: TileXYType) {
@@ -127,5 +135,11 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
             lastWasOccupied = !this.#board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
         }
         return !lastWasOccupied && distance <= fovRange;
+    }
+
+    gainEnery() {
+        let canAct = false;
+        this.mobs.forEach(mob => (canAct = mob.gainEnergy() || canAct));
+        return canAct;
     }
 }

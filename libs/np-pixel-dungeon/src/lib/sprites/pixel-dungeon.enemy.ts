@@ -8,16 +8,15 @@ interface TPixelDungeonEnemyOptions extends TPixelDungeonMobOptions {
 const defaultOptions: TPixelDungeonEnemyOptions = {
     lpcType: 'standard',
     moveRotate: false,
-    moveSpeed: 200,
     type: 'skeleton',
+    energyGain: 20,
 };
 
 export class PixelDungeonEnemy extends PixelDungeonMob {
-    #options: TPixelDungeonEnemyOptions;
+    options: TPixelDungeonEnemyOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonEnemyOptions) {
-        super(engine, options);
-        this.#options = Object.assign({}, defaultOptions, options ?? {});
+        super(engine, Object.assign({}, defaultOptions, options ?? {}));
     }
 
     preload() {

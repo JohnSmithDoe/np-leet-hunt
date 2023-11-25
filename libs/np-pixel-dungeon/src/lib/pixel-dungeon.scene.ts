@@ -40,9 +40,12 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             if (this.cameraDrag) {
                 this.cameraDrag = false;
             } else {
-                this.engine.map.moveToPointer(pointer);
-                // wait for a single step then
-                this.engine.next();
+                const { worldX, worldY } = pointer;
+                const targetTile = this.engine.map.tileMap.getTileAtWorldXY(worldX, worldY);
+                if (!targetTile) return;
+                // generate the path
+                const pathToMove = this.engine.findPath({ x: targetTile.x, y: targetTile.y });
+                this.engine.player.moveOnPath(pathToMove);
             }
         });
 
@@ -96,11 +99,11 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         this.cam.setZoom(4);
         this.cursors = this.input.keyboard.createCursorKeys();
         this.engine.startTurn();
+        this.engine.startUpdate();
     }
 
     update() {
         if (this.cameraDrag) return;
-        this.engine.startUpdate();
 
         //this.updatePlayerMovement();
         // const playerTileX = this.map.worldToTileX(this.player.x);

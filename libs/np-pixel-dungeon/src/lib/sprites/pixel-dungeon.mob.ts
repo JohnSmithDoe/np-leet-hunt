@@ -9,6 +9,7 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
+import { PixelDungeonAction, RestAction, WalkToAction } from '../engine/states/handle-action.state';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
@@ -47,11 +48,12 @@ const NPLpcConfig: TLpcConfig = {
 
 export interface TPixelDungeonMobOptions {
     lpcType?: TLpcSheetType;
+    energyGain?: number;
 
     moveSpeed?: number;
     moveRotate?: boolean;
 
-    fovRange?: number;
+    visionRange?: number;
     fovConeAngle?: number;
 
     startingDirection?: EDirection;
@@ -62,8 +64,11 @@ const defaultOptions: TPixelDungeonMobOptions = {
     lpcType: 'standard',
     moveRotate: false,
     moveSpeed: 200,
-    fovRange: 3,
+    visionRange: 3,
+    energyGain: 50,
 };
+
+const FULL_ENERGY = 100;
 
 export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     rexChess: ChessData;
@@ -74,6 +79,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     #pathToMove: PathFinder.NodeType[];
     #fieldOfView: FieldOfView<Phaser.GameObjects.GameObject>;
     #currentVision: TileXYType[];
+    #energy = 0;
     key: string;
 
     constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
@@ -88,11 +94,13 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     faceTowards(rexDirection: number) {
         this.#fieldOfView.setFace(rexDirection);
     }
+
     get faceDirection() {
         return mapRexPluginDirection(this.#fieldOfView.face);
     }
+
     updateVision() {
-        this.#currentVision = this.#fieldOfView.findFOV(this.options.fovRange);
+        this.#currentVision = this.#fieldOfView.findFOV(this.options.visionRange);
         this.#currentVision.push({ ...this.tile });
     }
 
@@ -237,7 +245,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
 
     #createFieldOfView() {
         this.#fieldOfView = this.scene.rexBoard.add.fieldOfView(this, {
-            preTestCallback: a => this.engine.preTestCallback(a, this.options.fovRange),
+            preTestCallback: a => this.engine.preTestCallback(a, this.options.visionRange),
             costCallback: a => this.engine.costs(a),
             coneMode: 'angle',
             cone: this.options.fovConeAngle,
@@ -257,19 +265,13 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         return this;
     }
 
-    moveOnPath(path: PathFinder.NodeType[], startMoving = true) {
+    moveOnPath(path: PathFinder.NodeType[]) {
+        console.log('269:moveOnPath');
         this.#pathToMove = path;
-        if (startMoving) {
-            this.moveToNext();
-        }
-        return this;
     }
 
-    moveOnTile(tileX: number, tileY: number, startMoving = true) {
+    moveOnTile(tileX: number, tileY: number) {
         this.#pathToMove = [{ x: tileX, y: tileY, pathCost: 0, preNodes: [] }];
-        if (startMoving) {
-            this.moveToNext();
-        }
         return this;
     }
 
@@ -277,12 +279,12 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         return !!this.#pathToMove?.length;
     }
 
-    isMoving() {
-        return this.#moveTo.isRunning;
+    nextMove() {
+        return this.#pathToMove.shift();
     }
 
-    isNotMoving() {
-        return !this.isMoving();
+    isMoving() {
+        return this.#moveTo.isRunning;
     }
 
     moveOnRandomTile(warp = false) {
@@ -302,15 +304,10 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         return this;
     }
 
-    moveToNext() {
-        if (this.hasMoves()) {
-            const tile = this.#pathToMove.shift();
-            this.#moveTo.moveTo(tile);
-            this.faceTowards(this.#moveTo.destinationDirection);
-            this.faceMoveTo(this.faceDirection);
-        } else {
-            this.faceToDirection(this.faceDirection);
-        }
+    moveToTile(tile: TileXYType) {
+        this.#moveTo.moveTo(tile);
+        this.faceTowards(this.#moveTo.destinationDirection);
+        this.faceMoveTo(this.faceDirection);
         this.updateFov();
     }
 
@@ -318,11 +315,35 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         return this.rexChess.tileXYZ;
     }
 
-    get moveToTile(): TileXYType {
-        return { x: this.#moveTo.destinationTileX, y: this.#moveTo.destinationTileY };
-    }
-
     protected updateFov() {
         this.engine.updateFoV();
+    }
+
+    gainEnergy() {
+        // console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
+        return (this.#energy += this.options.energyGain) >= FULL_ENERGY;
+    }
+
+    canAct() {
+        return this.#energy >= FULL_ENERGY;
+    }
+
+    getAction(): PixelDungeonAction | null {
+        return new RestAction(this);
+        let tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+        let i = 0;
+        while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
+            tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+            if (i++ > 500) {
+                tile = null;
+                break;
+            }
+        }
+
+        return tile ? new WalkToAction(this, tile) : null;
+    }
+
+    drainEnergy(amount: number) {
+        this.#energy -= amount;
     }
 }

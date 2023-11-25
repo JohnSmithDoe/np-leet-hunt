@@ -6,8 +6,6 @@ export abstract class PixelDungeonState implements StateManager.IState {
     name: string;
     protected engine: PixelDungeonEngine;
 
-    abstract next: string | (() => string);
-
     enter(engine: PixelDungeonEngine) {
         this.engine = engine;
     }

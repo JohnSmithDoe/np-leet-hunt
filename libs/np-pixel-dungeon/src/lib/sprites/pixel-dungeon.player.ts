@@ -1,6 +1,7 @@
 import { EDirection } from '@shared/np-library';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
+import { PixelDungeonAction, WalkToAction } from '../engine/states/handle-action.state';
 import { PixelDungeonMob, TPixelDungeonMobOptions } from './pixel-dungeon.mob';
 
 // this.makeAnimation('walk1', 1, 6);
@@ -28,10 +29,11 @@ type TPixelDungeonPlayerOptions = TPixelDungeonMobOptions;
 const defaultOptions: TPixelDungeonPlayerOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
-    fovRange: 10,
+    visionRange: 10,
     moveRotate: false,
     moveSpeed: 200,
     fovConeAngle: undefined,
+    energyGain: 100,
 };
 
 export class PixelDungeonPlayer extends PixelDungeonMob {
@@ -51,5 +53,14 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
             frameWidth: 64,
             frameHeight: 64,
         });
+    }
+
+    getAction(): PixelDungeonAction | null {
+        if (this.hasMoves()) {
+            const pathTile = this.nextMove();
+            return new WalkToAction(this, pathTile);
+        }
+
+        return null;
     }
 }
