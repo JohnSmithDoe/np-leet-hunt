@@ -18,7 +18,9 @@ export interface PixelDungeonAction {
 export class WalkToAction implements PixelDungeonAction {
     costs = 100;
 
-    constructor(public mob: PixelDungeonMob, public tile: TileXYType) {}
+    constructor(public mob: PixelDungeonMob, public tile: TileXYType) {
+        console.log(tile);
+    }
 
     finish(): void {
         this.mob.drainEnergy(this.costs);
@@ -44,6 +46,8 @@ export class RestAction implements PixelDungeonAction {
 
     perform(): boolean {
         this.mob.gainEnergy(); // extra energy
+        console.log('Resting', this.mob.energy);
+
         return true;
     }
 }
@@ -57,6 +61,7 @@ export class HandleActionState extends PixelDungeonState {
 
     enter(engine: PixelDungeonEngine) {
         super.enter(engine);
+        this.engine.startTurn();
         this.#mobs = this.engine.mobs.filter(mob => mob.canAct());
         this.#nextMob();
     }
@@ -67,25 +72,32 @@ export class HandleActionState extends PixelDungeonState {
     }
 
     next = () => {
-        if (!this.#mob) {
-            console.log('end turn');
-            return States.EndTurn;
-        }
-        // console.log('handle action');
-        this.#handleAction();
-        return States.HandleAction;
-    };
-
-    #handleAction() {
-        this.#action ??= this.#mob.getAction();
-        if (this.#action) {
-            console.log('handle');
-
-            const success = this.#action.perform();
-            if (success) {
-                this.#action.finish();
+        while (this.#mob) {
+            this.#action = this.#mob.getAction();
+            if (this.#action) {
+                const done = this.#action.perform();
+                if (done) {
+                    this.#action.finish();
+                    console.log('action done');
+                    this.#nextMob();
+                } else {
+                    // action is not done wait a cycle
+                    //break;
+                    console.log('action should do some more');
+                    this.#nextMob();
+                }
+            } else {
+                // no action should be the player waiting for input
+                break;
+            }
+            if (!this.#mob) {
+                this.engine.endTurn();
+                this.engine.gainEnery();
+                this.engine.startTurn();
+                this.#mobs = this.engine.mobs.filter(mob => mob.canAct());
                 this.#nextMob();
             }
         }
-    }
+        return States.HandleAction;
+    };
 }

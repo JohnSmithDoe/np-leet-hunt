@@ -98,7 +98,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
 
         this.cam.setZoom(4);
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.engine.startTurn();
+        this.engine.startUP();
         this.engine.startUpdate();
     }
 

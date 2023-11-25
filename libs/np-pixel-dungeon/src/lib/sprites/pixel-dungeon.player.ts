@@ -31,7 +31,7 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
     lpcType: 'standard',
     visionRange: 10,
     moveRotate: false,
-    moveSpeed: 200,
+    moveSpeed: 160,
     fovConeAngle: undefined,
     energyGain: 100,
 };
@@ -56,8 +56,10 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     }
 
     getAction(): PixelDungeonAction | null {
-        if (this.hasMoves()) {
+        if (this.hasMoves() && !this.isMoving()) {
             const pathTile = this.nextMove();
+            console.log('new action walk');
+
             return new WalkToAction(this, pathTile);
         }
 

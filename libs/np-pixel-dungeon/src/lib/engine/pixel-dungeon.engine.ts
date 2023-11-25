@@ -21,8 +21,6 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     map: PixelDungeonMap;
     player: PixelDungeonPlayer;
     mobs: PixelDungeonMob[];
-    enemy: PixelDungeonEnemy;
-    enemy2: PixelDungeonEnemy;
     #board: BoardPlugin.Board;
     #openTileIdx: number[];
     #pathfinder: PathFinder;
@@ -39,16 +37,17 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     update(time: number, delta: number) {
-        console.log(time, delta);
+        console.log('update cycle', this.player.x, this.player.y); // this.scene.game.loop.actualFps
         super.update(time, delta);
     }
 
     private setupComponents() {
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
-        this.enemy = new PixelDungeonEnemy(this, { type: 'skeleton' });
-        this.enemy2 = new PixelDungeonEnemy(this, { type: 'skeleton' });
-        this.mobs = [this.player, this.enemy, this.enemy2];
+        this.mobs = [this.player];
+        for (let i = 0; i < 50; i++) {
+            this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton' }));
+        }
     }
 
     init(): void {
@@ -79,9 +78,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.#board = this.scene.rexBoard.createBoardFromTilemap(this.map.tileMap);
         // TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that?
         (this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void }).setDirectionMode('8dir');
-        this.#board.addChess(this.enemy, this.map.start.x - 1, this.map.start.y - 1, 1);
-        this.#board.addChess(this.enemy2, this.map.start.x, this.map.start.y - 1, 1);
-        this.#board.addChess(this.player, this.map.start.x, this.map.start.y, 1);
+        for (let i = 0; i < this.mobs.length; i++) {
+            this.#board.addChess(this.mobs[i], this.map.start.x, this.map.start.y - i, 1);
+        }
     }
 
     #createPathfinder() {
@@ -97,10 +96,10 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.map.loseVision(this.player.vision);
         this.player.updateVision();
         this.map.gainVision(this.player.vision);
-        [this.enemy, this.enemy2].forEach(mob => (mob.alpha = this.player.canSee(mob) ? 1 : 0.1));
+        this.mobs.forEach(mob => (mob.alpha = this.player.canSee(mob) ? 1 : 0.3));
     }
 
-    startTurn() {
+    startUP() {
         this.goto(States.StartTurn);
     }
 
@@ -141,5 +140,13 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         let canAct = false;
         this.mobs.forEach(mob => (canAct = mob.gainEnergy() || canAct));
         return canAct;
+    }
+
+    endTurn() {
+        console.log('end turn on cycle');
+    }
+
+    startTurn() {
+        console.log('start turn on cycle');
     }
 }

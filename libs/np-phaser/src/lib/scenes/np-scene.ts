@@ -25,10 +25,6 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         this.createLayer('debug');
         // DEBUG -> start
 
-        this.#debugOut = new Phaser.GameObjects.Text(this, 0, 0, '', {
-            backgroundColor: '#2f6c38',
-        });
-        this.addToLayer('debug', this.#debugOut);
         // this.#layers.getByName('np').camera.setZoom(0.1);
         // DEBUG <- end
     }

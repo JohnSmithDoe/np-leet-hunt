@@ -63,7 +63,7 @@ const defaultOptions: TPixelDungeonMobOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
     moveRotate: false,
-    moveSpeed: 200,
+    moveSpeed: 160,
     visionRange: 3,
     energyGain: 50,
 };
@@ -85,6 +85,10 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
         super(engine.scene, 0, 0, '');
         this.options = Object.assign({}, defaultOptions, options ?? {});
+    }
+
+    get energy() {
+        return this.#energy;
     }
 
     get vision() {
@@ -109,7 +113,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     canSee(mob: PixelDungeonMob) {
-        return this.#fieldOfView.isInLOS(mob);
+        return mob === this || this.#fieldOfView.isInLOS(mob);
     }
 
     preload() {
@@ -241,6 +245,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
             moveableTestScope: undefined,
             moveableTest: (from, to) => !!this.engine.costs(to),
         });
+        this.#moveTo.on('complete', () => console.log('complete move'));
     }
 
     #createFieldOfView() {
@@ -306,6 +311,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
 
     moveToTile(tile: TileXYType) {
         this.#moveTo.moveTo(tile);
+        console.log('move to tile');
         this.faceTowards(this.#moveTo.destinationDirection);
         this.faceMoveTo(this.faceDirection);
         this.updateFov();
@@ -320,7 +326,8 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     gainEnergy() {
-        // console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
+        console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
+
         return (this.#energy += this.options.energyGain) >= FULL_ENERGY;
     }
 
@@ -329,18 +336,17 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     getAction(): PixelDungeonAction | null {
-        return new RestAction(this);
         let tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
         let i = 0;
         while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
             tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-            if (i++ > 500) {
+            if (i++ > 5) {
                 tile = null;
                 break;
             }
         }
 
-        return tile ? new WalkToAction(this, tile) : null;
+        return tile ? new WalkToAction(this, tile) : new RestAction(this);
     }
 
     drainEnergy(amount: number) {
