@@ -11,10 +11,9 @@ import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../sprites/pixel-dungeon.player';
-import { EndTurnState } from './states/end-turn.state';
-import { GainEnergyState } from './states/gain-energy.state';
+import { EndGameState } from './states/end-game.state';
 import { HandleActionState } from './states/handle-action.state';
-import { StartTurnState } from './states/start-turn.state';
+import { StartGameState } from './states/start-game.state';
 import { States } from './states/states';
 
 export class PixelDungeonEngine extends StateManager implements NPSceneComponent {
@@ -28,7 +27,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
-        this.addStates([new StartTurnState(), new GainEnergyState(), new HandleActionState(), new EndTurnState()]);
+        this.addStates([new StartGameState(), new HandleActionState(), new EndGameState()]);
         this.setupComponents();
     }
 
@@ -100,7 +99,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     startUP() {
-        this.goto(States.StartTurn);
+        this.goto(States.StartGame);
     }
 
     findPath(endTileXY: TileXYType) {
@@ -148,5 +147,6 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     startTurn() {
         console.log('start turn on cycle');
+        this.mobs.forEach(mob => mob.startTurn());
     }
 }

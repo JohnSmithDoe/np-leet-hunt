@@ -115,6 +115,6 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         if (!this.#onlyComponent) {
             this.#layers.update(time, delta);
         }
-        this.components.update(time, delta);
+        // this.components.update(time, delta);
     }
 }

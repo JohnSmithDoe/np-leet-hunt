@@ -81,6 +81,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     #currentVision: TileXYType[];
     #energy = 0;
     key: string;
+    #nextAction: PixelDungeonAction | null;
 
     constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
         super(engine.scene, 0, 0, '');
@@ -273,6 +274,11 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     moveOnPath(path: PathFinder.NodeType[]) {
         console.log('269:moveOnPath');
         this.#pathToMove = path;
+        if (this.hasMoves()) {
+            const pathTile = this.nextMove();
+            console.log('new action walk');
+            this.setNextAction(new WalkToAction(this, pathTile));
+        }
     }
 
     moveOnTile(tileX: number, tileY: number) {
@@ -289,7 +295,12 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     isMoving() {
-        return this.#moveTo.isRunning;
+        const s = (this.#moveTo as unknown as { moveToTask: { targetX: number; targetY: number } }).moveToTask;
+        const { targetX, targetY } = s;
+        // console.log(this.#moveTo.lastMoveResult, this.#moveTo.isRunning, targetX, targetY, this.x, this.y);
+
+        return this.#moveTo.isRunning && !(targetX === this.x && targetY === this.y);
+        // return this.#moveTo.isRunning;
     }
 
     moveOnRandomTile(warp = false) {
@@ -326,7 +337,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     gainEnergy() {
-        console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
+        //console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
 
         return (this.#energy += this.options.energyGain) >= FULL_ENERGY;
     }
@@ -335,18 +346,28 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         return this.#energy >= FULL_ENERGY;
     }
 
-    getAction(): PixelDungeonAction | null {
-        let tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-        let i = 0;
-        while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
-            tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-            if (i++ > 5) {
-                tile = null;
-                break;
+    startTurn() {
+        if (!this.getAction() && this.canAct()) {
+            let tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+            let i = 0;
+            while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
+                tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+                if (i++ > 5) {
+                    tile = null;
+                    break;
+                }
             }
-        }
 
-        return tile ? new WalkToAction(this, tile) : new RestAction(this);
+            this.setNextAction(tile ? new WalkToAction(this, tile) : new RestAction(this));
+        }
+    }
+
+    setNextAction(action: PixelDungeonAction) {
+        this.#nextAction = action;
+    }
+
+    getAction(): PixelDungeonAction | null {
+        return this.#nextAction;
     }
 
     drainEnergy(amount: number) {

@@ -1,6 +1,5 @@
 export enum States {
-    StartTurn = 'start',
-    GainEnergy = 'wait',
+    StartGame = 'start',
     HandleAction = 'action',
-    EndTurn = 'end',
+    EndGame = 'end',
 }
