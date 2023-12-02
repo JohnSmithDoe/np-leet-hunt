@@ -16,7 +16,7 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
     options: TPixelDungeonEnemyOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonEnemyOptions) {
-        options.energyGain = (Math.trunc(Math.random() * 5) + 1) * 10;
+        // options.energyGain = (Math.trunc(Math.random() * 5) + 1) * 10;
         super(engine, Object.assign({}, defaultOptions, options ?? {}));
     }
 

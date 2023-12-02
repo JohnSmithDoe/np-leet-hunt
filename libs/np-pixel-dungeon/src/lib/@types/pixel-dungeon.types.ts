@@ -10,6 +10,24 @@ export enum ETileType {
     junction = 'junction',
 }
 
+export enum EWallType {
+    CORNER_TOP_LEFT,
+    CORNER_TOP_RIGHT_,
+    CORNER_BOTTOM_RIGHT,
+    CORNER_BOTTOM_LEFT,
+    STRAIGHT_VERT,
+    STRAIGHT_HORIZ,
+    TSHAPE_UP,
+    TSHAPE_DOWN,
+    TSHAPE_LEFT,
+    TSHAPE_RIGHT,
+    DEADEND_UP,
+    DEADEND_DOWN,
+    DEADEND_LEFT,
+    DEADEND_RIGHT,
+    CROSS,
+}
+
 export interface TDungeonTile {
     type: ETileType;
     // The position in the dungeon grid

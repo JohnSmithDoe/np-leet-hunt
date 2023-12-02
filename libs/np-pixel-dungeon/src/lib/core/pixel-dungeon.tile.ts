@@ -18,7 +18,7 @@ export class PixelDungeonTile {
     }
 
     wallTo(dir: EDirection) {
-        return this.neighbours[dir]?.type === ETileType.wall;
+        return this.neighbours[dir]?.type === ETileType.wall || this.neighbours[dir]?.type === ETileType.junction;
     }
 
     get tileX(): number {

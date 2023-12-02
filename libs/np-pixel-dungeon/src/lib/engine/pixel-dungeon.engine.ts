@@ -44,7 +44,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
         this.mobs = [this.player];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 50; i++) {
             this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton' }));
         }
     }

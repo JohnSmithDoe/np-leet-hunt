@@ -61,8 +61,12 @@ export class PixelDungeonTilelayer {
                 if (!this.#tilelayer.hasTileAt(tile.x, tile.y))
                     this.#putTileAt(tile, this.#tileset.mapTileToTileIndex(tile.type));
             }
-            this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0;
+            this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0.7;
         }
+        for (const wall of dungeon.walls) {
+            this.#putTileAt(wall.pos, wall.toTileIndex());
+        }
+
         return start;
     }
 

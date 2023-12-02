@@ -297,7 +297,6 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
             try {
                 tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
             } catch (e) {
-                console.log(this.rexChess.tileXYZ);
                 console.log('no random tile');
             }
             if (tile) {
@@ -314,6 +313,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
             this.setNextAction(tile ? new WarpAction(this, tile) : new RestAction(this));
         }
     }
+
     setNextAction(action: PixelDungeonAction) {
         this.#nextAction = action;
     }
@@ -327,10 +327,9 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     warp(tile: TileXYType) {
-        // const worldXY = this.engine.map.tileMap.tileToWorldXY(tile.x, tile.y);
-        // this.setPosition(worldXY.x, worldXY.y);
-        //    this.engine.board.moveChess(this, tile.x, tile.y, 1);
-        console.log(tile);
+        if (this.#moveTo.canMoveTo(tile.x, tile.y)) {
+            this.engine.board.moveChess(this, tile.x, tile.y, 1);
+        }
     }
 }
 
@@ -384,7 +383,7 @@ const defaultOptions: TPixelDungeonMobOptions = {
     moveRotate: false,
     moveSpeed: 160,
     visionRange: 3,
-    energyGain: 50,
+    energyGain: 25,
 };
 
 const FULL_ENERGY = 100;

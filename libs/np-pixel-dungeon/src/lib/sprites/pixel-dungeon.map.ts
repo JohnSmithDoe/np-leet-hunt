@@ -52,6 +52,11 @@ export interface NPTilesetMapping {
     BOTTOM_DOOR: NPTileIndex;
     DOOR: NPTileIndex;
     EMPTY: NPTileIndex;
+    BOTTOM_T_WALL: NPTileIndex;
+    TOP_T_WALL: NPTileIndex;
+    LEFT_T_WALL: NPTileIndex;
+    CROSS_WALL: NPTileIndex;
+    RIGHT_T_WALL: NPTileIndex;
     TOP_WALL: NPWeightedTileIndex[];
     LEFT_DOOR: NPTileIndex;
     LEFT_WALL: NPWeightedTileIndex[];
@@ -81,6 +86,11 @@ const TILESETS: Record<TNPTilesetKey, NPTilemapConfig> = {
             DOOR: 118,
             LEFT_DOOR: 118,
             BOTTOM_DOOR: 118,
+            TOP_T_WALL: 3,
+            BOTTOM_T_WALL: 4,
+            RIGHT_T_WALL: 5,
+            LEFT_T_WALL: 6,
+            CROSS_WALL: 4,
             TOP_WALL: [
                 { index: 39, weight: 4 },
                 { index: 57, weight: 1 },

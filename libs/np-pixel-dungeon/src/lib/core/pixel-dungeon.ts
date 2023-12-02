@@ -6,6 +6,7 @@ import { PixelDungeonHallway } from './pixel-dungeon.hallway';
 import { PixelDungeonJunction } from './pixel-dungeon.junction';
 import { PixelDungeonRoom } from './pixel-dungeon.room';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
+import { PixelDungeonWall } from './pixel-dungeon.wall';
 
 const defaultDungeon: TDungeonOptions = {
     roomArea: 75,
@@ -24,7 +25,7 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
     #rooms: PixelDungeonRoom[];
     #halls: PixelDungeonHallway[];
     #junctions: PixelDungeonJunction[];
-    #walls: PixelDungeonTile[];
+    #walls: PixelDungeonWall[];
 
     *[Symbol.iterator](): Iterator<TDungeonTile> {
         for (const tileRow of this.#dungeon) {
@@ -56,7 +57,7 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
                     (this.#regionTiles[tile.region] ??= []).push(new PixelDungeonTile(this, tile));
                     break;
                 case ETileType.wall:
-                    (this.#regionTiles[0] ??= []).push(new PixelDungeonTile(this, tile));
+                    (this.#regionTiles[0] ??= []).push(new PixelDungeonWall(this, tile));
                     break;
                 case ETileType.junction:
                     (this.#regionTiles[0] ??= []).push(new PixelDungeonJunction(this, tile));
@@ -77,7 +78,7 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
                 case ETileType.junction:
                     for (const wall of tiles) {
                         if (wall.type === ETileType.wall) {
-                            (this.#walls ??= []).push(wall);
+                            (this.#walls ??= []).push(wall as PixelDungeonWall);
                         } else {
                             (this.#junctions ??= []).push(wall as PixelDungeonJunction);
                         }
@@ -97,6 +98,10 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
 
     get rooms() {
         return this.#rooms;
+    }
+
+    get walls() {
+        return this.#walls;
     }
 
     get junctions() {
