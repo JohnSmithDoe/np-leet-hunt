@@ -44,7 +44,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
         this.mobs = [this.player];
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 5; i++) {
             this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton' }));
         }
     }
@@ -135,18 +135,18 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         return !lastWasOccupied && distance <= fovRange;
     }
 
-    gainEnery() {
+    gainEnergy() {
         let canAct = false;
         this.mobs.forEach(mob => (canAct = mob.gainEnergy() || canAct));
         return canAct;
     }
 
     endTurn() {
-        console.log('end turn on cycle');
+        // console.log('end turn on cycle');
     }
 
     startTurn() {
-        console.log('start turn on cycle');
+        // console.log('start turn on cycle');
         this.mobs.forEach(mob => mob.startTurn());
     }
 }

@@ -41,6 +41,17 @@ export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeon
     }
 }
 
+export class WarpAction extends WalkToAction implements PixelDungeonAction {
+    perform(): boolean {
+        if (this.tile) {
+            this.mob.warp(this.tile);
+            console.log('Warping', this);
+            this.tile = undefined;
+        }
+        return true;
+    }
+}
+
 export class RestAction extends PixelDungeonBaseAction implements PixelDungeonAction {
     perform(): boolean {
         // this.mob.gainEnergy(); // extra energy
@@ -96,11 +107,14 @@ export class HandleActionState extends PixelDungeonState {
                     return States.HandleAction; // handle actions before move on
                 }
             }
+
+            // gain energy until one can act
             while (!this.#mobs?.length) {
-                this.engine.gainEnery();
+                this.engine.gainEnergy();
                 this.#mobs = this.engine.mobs.filter(mob => mob.canAct());
             }
 
+            // start a new turn ... hmm
             this.engine.startTurn();
             // get the actions of all actors that can act
             while (this.#mobs.length) {

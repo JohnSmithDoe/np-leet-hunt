@@ -58,8 +58,17 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     startTurn() {
         if (!this.getAction() && this.hasMoves()) {
             const pathTile = this.nextMove();
-            console.log('new action walk');
             this.setNextAction(new WalkToAction(this, pathTile));
+            console.log('62:startTurn- drop move');
         }
+    }
+
+    getAction() {
+        if (!super.getAction() && this.hasMoves()) {
+            const pathTile = this.nextMove();
+            this.setNextAction(new WalkToAction(this, pathTile));
+            console.log('62:getaction- drop move');
+        }
+        return super.getAction();
     }
 }

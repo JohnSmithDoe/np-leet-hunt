@@ -9,66 +9,11 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonAction, RestAction, WalkToAction } from '../engine/states/handle-action.state';
+import { PixelDungeonAction, RestAction, WalkToAction, WarpAction } from '../engine/states/handle-action.state';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
 type TLpcAnimationKey = 'walk up' | 'walk down' | 'walk left' | 'walk right' | 'die';
-
-interface TLpcAnimation {
-    start: number;
-    end: number;
-    frameRate?: number;
-    repeat?: number;
-    direction: TLpcAnimationDirection;
-}
-
-interface TLpcSheetConfig {
-    animations: Partial<Record<TLpcAnimationKey, TLpcAnimation>>;
-}
-
-type TLpcConfig = Record<TLpcSheetType, TLpcSheetConfig>;
-
-const NPLpcConfig: TLpcConfig = {
-    standard: {
-        animations: {
-            die: { direction: 'down', start: 260, end: 265, repeat: 0 },
-            'walk up': { direction: 'down', start: 104, end: 112 },
-            'walk left': { direction: 'down', start: 117, end: 125 },
-            'walk down': { direction: 'down', start: 130, end: 138 },
-            'walk right': { direction: 'down', start: 143, end: 151 },
-        },
-    },
-    extended: {
-        animations: {
-            die: { direction: 'down', start: 1, end: 2, frameRate: 8 },
-        },
-    },
-};
-
-export interface TPixelDungeonMobOptions {
-    lpcType?: TLpcSheetType;
-    energyGain?: number;
-
-    moveSpeed?: number;
-    moveRotate?: boolean;
-
-    visionRange?: number;
-    fovConeAngle?: number;
-
-    startingDirection?: EDirection;
-}
-
-const defaultOptions: TPixelDungeonMobOptions = {
-    startingDirection: EDirection.N,
-    lpcType: 'standard',
-    moveRotate: false,
-    moveSpeed: 160,
-    visionRange: 3,
-    energyGain: 50,
-};
-
-const FULL_ENERGY = 100;
 
 export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     rexChess: ChessData;
@@ -162,6 +107,8 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         const size = 24;
         this.setOrigin((size - 16) / 2 / size, (size - 16) / size);
         this.setDisplaySize(size, size);
+        console.log(this.rexChess);
+        this.rexChess.setBlocker(true);
     }
 
     play(key: TLpcAnimationKey): this {
@@ -256,6 +203,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
             coneMode: 'angle',
             cone: this.options.fovConeAngle,
             occupiedTest: false,
+            blockerTest: true,
         });
         this.#fieldOfView.setFace(mapToRexPluginDirection(this.options.startingDirection));
         this.updateVision();
@@ -297,10 +245,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     isMoving() {
         const s = (this.#moveTo as unknown as { moveToTask: { targetX: number; targetY: number } }).moveToTask;
         const { targetX, targetY } = s;
-        // console.log(this.#moveTo.lastMoveResult, this.#moveTo.isRunning, targetX, targetY, this.x, this.y);
-
         return this.#moveTo.isRunning && !(targetX === this.x && targetY === this.y);
-        // return this.#moveTo.isRunning;
     }
 
     moveOnRandomTile(warp = false) {
@@ -348,20 +293,27 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
 
     startTurn() {
         if (!this.getAction() && this.canAct()) {
-            let tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-            let i = 0;
-            while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
+            let tile: TileXYType;
+            try {
                 tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-                if (i++ > 5) {
-                    tile = null;
-                    break;
+            } catch (e) {
+                console.log(this.rexChess.tileXYZ);
+                console.log('no random tile');
+            }
+            if (tile) {
+                let i = 0;
+                while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
+                    tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+                    if (i++ > 5) {
+                        tile = null;
+                        break;
+                    }
                 }
             }
 
-            this.setNextAction(tile ? new WalkToAction(this, tile) : new RestAction(this));
+            this.setNextAction(tile ? new WarpAction(this, tile) : new RestAction(this));
         }
     }
-
     setNextAction(action: PixelDungeonAction) {
         this.#nextAction = action;
     }
@@ -373,4 +325,66 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     drainEnergy(amount: number) {
         this.#energy -= amount;
     }
+
+    warp(tile: TileXYType) {
+        // const worldXY = this.engine.map.tileMap.tileToWorldXY(tile.x, tile.y);
+        // this.setPosition(worldXY.x, worldXY.y);
+        //    this.engine.board.moveChess(this, tile.x, tile.y, 1);
+        console.log(tile);
+    }
 }
+
+interface TLpcAnimation {
+    start: number;
+    end: number;
+    frameRate?: number;
+    repeat?: number;
+    direction: TLpcAnimationDirection;
+}
+
+interface TLpcSheetConfig {
+    animations: Partial<Record<TLpcAnimationKey, TLpcAnimation>>;
+}
+
+type TLpcConfig = Record<TLpcSheetType, TLpcSheetConfig>;
+
+const NPLpcConfig: TLpcConfig = {
+    standard: {
+        animations: {
+            die: { direction: 'down', start: 260, end: 265, repeat: 0 },
+            'walk up': { direction: 'down', start: 104, end: 112 },
+            'walk left': { direction: 'down', start: 117, end: 125 },
+            'walk down': { direction: 'down', start: 130, end: 138 },
+            'walk right': { direction: 'down', start: 143, end: 151 },
+        },
+    },
+    extended: {
+        animations: {
+            die: { direction: 'down', start: 1, end: 2, frameRate: 8 },
+        },
+    },
+};
+
+export interface TPixelDungeonMobOptions {
+    lpcType?: TLpcSheetType;
+    energyGain?: number;
+
+    moveSpeed?: number;
+    moveRotate?: boolean;
+
+    visionRange?: number;
+    fovConeAngle?: number;
+
+    startingDirection?: EDirection;
+}
+
+const defaultOptions: TPixelDungeonMobOptions = {
+    startingDirection: EDirection.N,
+    lpcType: 'standard',
+    moveRotate: false,
+    moveSpeed: 160,
+    visionRange: 3,
+    energyGain: 50,
+};
+
+const FULL_ENERGY = 100;
