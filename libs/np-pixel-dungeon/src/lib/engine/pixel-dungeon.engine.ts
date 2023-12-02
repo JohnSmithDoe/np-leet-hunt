@@ -73,7 +73,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     #createBoard() {
-        this.#openTileIdx = [6, 7, 8, 26, 118];
+        this.#openTileIdx = [6, 7, 8, 26, ...this.map.tileLayer.tileset.getTileIndexes('DOOR')];
+        // this.#tilelayer.setCollisionByExclusion([6, 7, 8, 26, ...this.#tileset.getTileIndexes('DOOR')]);
+
         this.#board = this.scene.rexBoard.createBoardFromTilemap(this.map.tileMap);
         // TODO: Grid can not publicly set the direction mode afterwards. Is there a reason for that?
         (this.#board.grid as unknown as { setDirectionMode: (mode: '4dir' | '8dir') => void }).setDirectionMode('8dir');

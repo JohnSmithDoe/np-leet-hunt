@@ -10,14 +10,14 @@ export class PixelDungeonJunction extends PixelDungeonTile {
 
     constructor(dungeon: PixelDungeon, tile: TDungeonTile) {
         super(dungeon, tile);
-        this.vertical = this.wallTo(EDirection.E) && this.wallTo(EDirection.W);
+        this.vertical = this.wallTo(EDirection.N) && this.wallTo(EDirection.S);
     }
 
     toTileIndex(): keyof NPTilesetMapping {
         if (this.vertical) {
-            return 'LEFT_DOOR';
+            return 'DOOR_VERT';
         } else {
-            return 'BOTTOM_DOOR';
+            return 'DOOR_HORIZ';
         }
     }
 }

@@ -50,13 +50,21 @@ export interface NPTilesetMapping {
     BOTTOM_RIGHT_WALL: NPTileIndex;
     BOTTOM_LEFT_WALL: NPTileIndex;
     BOTTOM_DOOR: NPTileIndex;
-    DOOR: NPTileIndex;
+    DOOR: NPTilesetMap;
     EMPTY: NPTileIndex;
+    DOOR_VERT: NPTileIndex;
+    DOOR_HORIZ: NPTileIndex;
     BOTTOM_T_WALL: NPTileIndex;
     TOP_T_WALL: NPTileIndex;
     LEFT_T_WALL: NPTileIndex;
     CROSS_WALL: NPTileIndex;
+    STRAIGHT_WALL_HORIZ: NPTileIndex;
+    STRAIGHT_WALL_VERT: NPTileIndex;
     RIGHT_T_WALL: NPTileIndex;
+    BOTTOM_DEADEND_WALL: NPTileIndex;
+    TOP_DEADEND_WALL: NPTileIndex;
+    LEFT_DEADEND_WALL: NPTileIndex;
+    RIGHT_DEADEND_WALL: NPTileIndex;
     TOP_WALL: NPWeightedTileIndex[];
     LEFT_DOOR: NPTileIndex;
     LEFT_WALL: NPWeightedTileIndex[];
@@ -78,19 +86,31 @@ const TILESETS: Record<TNPTilesetKey, NPTilemapConfig> = {
         tileSetMargin: 1,
         tileSetSpacing: 2,
         mapping: {
-            TOP_LEFT_WALL: 3,
-            TOP_RIGHT_WALL: 4,
-            BOTTOM_RIGHT_WALL: 23,
-            BOTTOM_LEFT_WALL: 22,
+            TOP_LEFT_WALL: 101,
+            TOP_RIGHT_WALL: 102,
+            BOTTOM_RIGHT_WALL: 121,
+            BOTTOM_LEFT_WALL: 120,
             EMPTY: 20,
-            DOOR: 118,
+            DOOR_VERT: 105,
+            DOOR_HORIZ: 84,
+            DOOR: [
+                { index: 118, weight: 4 },
+                { index: 105, weight: 1 },
+                { index: 84, weight: 1 },
+            ],
             LEFT_DOOR: 118,
             BOTTOM_DOOR: 118,
-            TOP_T_WALL: 3,
-            BOTTOM_T_WALL: 4,
-            RIGHT_T_WALL: 5,
-            LEFT_T_WALL: 6,
-            CROSS_WALL: 4,
+            TOP_T_WALL: 103,
+            LEFT_DEADEND_WALL: 82,
+            RIGHT_DEADEND_WALL: 85,
+            TOP_DEADEND_WALL: 86,
+            BOTTOM_DEADEND_WALL: 143,
+            BOTTOM_T_WALL: 123,
+            RIGHT_T_WALL: 104,
+            LEFT_T_WALL: 122,
+            CROSS_WALL: 142,
+            STRAIGHT_WALL_VERT: 124,
+            STRAIGHT_WALL_HORIZ: 83,
             TOP_WALL: [
                 { index: 39, weight: 4 },
                 { index: 57, weight: 1 },
@@ -169,8 +189,11 @@ export class PixelDungeonMap implements NPSceneComponent {
 
         const tileset = new PixelDungeonTileset(this.#map, this.#config);
         this.#tilelayer = new PixelDungeonTilelayer(this.scene, this.#map, tileset);
-
         this.start = this.#tilelayer.mapDungeonToLayer(this.#dungeon);
+    }
+
+    get tileLayer() {
+        return this.#tilelayer;
     }
 
     loseVision(tileXYTypes?: TileXYType[]) {

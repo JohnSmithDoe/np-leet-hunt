@@ -24,9 +24,9 @@ export class PixelDungeonWall extends PixelDungeonTile {
         if (wallToN && wallToE && wallToS && wallToW) {
             return EWallType.CROSS;
         } else if (wallToN && wallToE && wallToS && !wallToW) {
-            return EWallType.TSHAPE_RIGHT;
-        } else if (wallToN && !wallToE && wallToS && wallToW) {
             return EWallType.TSHAPE_LEFT;
+        } else if (wallToN && !wallToE && wallToS && wallToW) {
+            return EWallType.TSHAPE_RIGHT;
         } else if (!wallToN && wallToE && wallToS && wallToW) {
             return EWallType.TSHAPE_UP;
         } else if (wallToN && wallToE && !wallToS && wallToW) {
@@ -44,13 +44,13 @@ export class PixelDungeonWall extends PixelDungeonTile {
         } else if (!wallToN && wallToE && wallToS && !wallToW) {
             return EWallType.CORNER_TOP_LEFT;
         } else if (!wallToN && !wallToE && !wallToS && wallToW) {
-            return EWallType.DEADEND_LEFT;
-        } else if (!wallToN && !wallToE && wallToS && !wallToW) {
-            return EWallType.DEADEND_DOWN;
-        } else if (!wallToN && wallToE && !wallToS && !wallToW) {
             return EWallType.DEADEND_RIGHT;
-        } else if (wallToN && !wallToE && !wallToS && !wallToW) {
+        } else if (!wallToN && !wallToE && wallToS && !wallToW) {
             return EWallType.DEADEND_UP;
+        } else if (!wallToN && wallToE && !wallToS && !wallToW) {
+            return EWallType.DEADEND_LEFT;
+        } else if (wallToN && !wallToE && !wallToS && !wallToW) {
+            return EWallType.DEADEND_DOWN;
         }
         console.log(this);
         throw new Error('wrong tile');
@@ -67,27 +67,27 @@ export class PixelDungeonWall extends PixelDungeonTile {
             case EWallType.CORNER_BOTTOM_LEFT:
                 return 'BOTTOM_LEFT_WALL';
             case EWallType.STRAIGHT_VERT:
-                return 'LEFT_WALL';
+                return 'STRAIGHT_WALL_VERT';
             case EWallType.STRAIGHT_HORIZ:
-                return 'TOP_WALL';
+                return 'STRAIGHT_WALL_HORIZ';
             case EWallType.TSHAPE_DOWN:
                 return 'BOTTOM_T_WALL';
             case EWallType.TSHAPE_UP:
                 return 'TOP_T_WALL';
-            case EWallType.TSHAPE_LEFT:
-                return 'LEFT_T_WALL';
-            case EWallType.CROSS:
-                return 'CROSS_WALL';
             case EWallType.TSHAPE_RIGHT:
                 return 'RIGHT_T_WALL';
+            case EWallType.CROSS:
+                return 'CROSS_WALL';
+            case EWallType.TSHAPE_LEFT:
+                return 'LEFT_T_WALL';
             case EWallType.DEADEND_DOWN:
-                return 'BOTTOM_WALL';
+                return 'BOTTOM_DEADEND_WALL';
             case EWallType.DEADEND_UP:
-                return 'TOP_WALL';
+                return 'TOP_DEADEND_WALL';
             case EWallType.DEADEND_LEFT:
-                return 'LEFT_WALL';
+                return 'LEFT_DEADEND_WALL';
             case EWallType.DEADEND_RIGHT:
-                return 'RIGHT_WALL';
+                return 'RIGHT_DEADEND_WALL';
         }
     }
 }
