@@ -10,6 +10,7 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonAction, RestAction, WalkToAction, WarpAction } from '../engine/states/handle-action.state';
+import { EMobInfoType } from './pixel-dungeon.info-text';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
@@ -329,7 +330,12 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     warp(tile: TileXYType) {
         if (this.#moveTo.canMoveTo(tile.x, tile.y)) {
             this.engine.board.moveChess(this, tile.x, tile.y, 1);
+            this.showInfo(`3`, EMobInfoType.GainHealth);
         }
+    }
+
+    showInfo(msg: string, type: EMobInfoType) {
+        this.engine.displayText(msg, this.tile, type);
     }
 }
 

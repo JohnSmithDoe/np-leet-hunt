@@ -8,6 +8,7 @@ import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateMa
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
+import { EMobInfoType, PixelDungeonInfoText } from '../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../sprites/pixel-dungeon.player';
@@ -150,5 +151,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     startTurn() {
         // console.log('start turn on cycle');
         this.mobs.forEach(mob => mob.startTurn());
+    }
+
+    displayText(msg: string, tile: TileXYType, type: EMobInfoType) {
+        this.scene.add.existing(new PixelDungeonInfoText(this, tile, msg, type));
     }
 }
