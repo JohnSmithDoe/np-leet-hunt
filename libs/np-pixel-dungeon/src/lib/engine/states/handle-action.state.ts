@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
+import { EMobInfoType } from '../../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../../sprites/pixel-dungeon.mob';
 import { PixelDungeonState } from '../pixel-dungeon.state';
 import { States } from './states';
@@ -25,6 +26,39 @@ export abstract class PixelDungeonBaseAction implements PixelDungeonAction {
     }
 
     abstract perform(): boolean;
+}
+
+export class AttackMobAction extends PixelDungeonBaseAction implements PixelDungeonAction {
+    #isRunning = false;
+    #done = false;
+
+    constructor(mob: PixelDungeonMob, public target: PixelDungeonMob) {
+        super(mob);
+    }
+
+    perform(): boolean {
+        if (!this.#isRunning) {
+            this.#isRunning = true;
+            const angle = this.mob.engine.board.angleBetween(this.mob, this.target);
+            const pos = new Phaser.Math.Vector2(this.mob.x, this.mob.y);
+            Phaser.Math.RotateTo(pos, this.mob.x, this.mob.y, angle, 8);
+            this.mob.scene.tweens.add({
+                targets: this.mob,
+                x: pos.x,
+                y: pos.y,
+                ease: 'Power1',
+                duration: 250,
+                yoyo: true,
+                onComplete: () => {
+                    this.#done = true;
+                },
+                onYoyo: () => {
+                    this.target.showInfo('3', EMobInfoType.LoseHealth);
+                },
+            });
+        }
+        return this.#done;
+    }
 }
 
 export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeonAction {
@@ -86,10 +120,10 @@ export class HandleActionState extends PixelDungeonState {
         // eslint-disable-next-line no-constant-condition
         while (true) {
             if (this.#actions.length) {
-                const pending = [];
                 // perform each action once -> keep pending actions until they are done
                 // some actions take longer some are faster
                 // waiting for the longest action to finish creates sync point
+                // hmm i think this could make some serious trouble when attack and move are executed at the same time
                 while (this.#actions.length) {
                     let action = this.#actions.shift();
                     if (action instanceof WaitForInputAction) {
@@ -99,13 +133,18 @@ export class HandleActionState extends PixelDungeonState {
                     if (done) {
                         action.finish();
                     } else {
-                        pending.push(action);
+                        this.#actions.unshift(action);
+                        // pending.push(action);
+                        break;
                     }
                 }
-                if (pending.length) {
-                    this.#actions = pending;
+                if (this.#actions.length) {
                     return States.HandleAction; // handle actions before move on
                 }
+                // if (pending.length) {
+                //     this.#actions = pending;
+                //     return States.HandleAction; // handle actions before move on
+                // }
             }
 
             // gain energy until one can act

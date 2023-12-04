@@ -9,7 +9,7 @@ import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonAction, RestAction, WalkToAction, WarpAction } from '../engine/states/handle-action.state';
+import { PixelDungeonAction, WalkToAction } from '../engine/states/handle-action.state';
 import { EMobInfoType } from './pixel-dungeon.info-text';
 
 type TLpcSheetType = 'standard' | 'extended';
@@ -29,7 +29,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     key: string;
     #nextAction: PixelDungeonAction | null;
 
-    constructor(protected engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
+    constructor(public engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
         super(engine.scene, 0, 0, '');
         this.options = Object.assign({}, defaultOptions, options ?? {});
     }
@@ -40,6 +40,10 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
 
     get vision() {
         return this.#currentVision;
+    }
+
+    get hasNextAction() {
+        return !!this.#nextAction;
     }
 
     faceTowards(rexDirection: number) {
@@ -204,7 +208,8 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
             coneMode: 'angle',
             cone: this.options.fovConeAngle,
             occupiedTest: false,
-            blockerTest: true,
+            blockerTest: false,
+            perspective: false,
         });
         this.#fieldOfView.setFace(mapToRexPluginDirection(this.options.startingDirection));
         this.updateVision();
@@ -293,26 +298,7 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
     }
 
     startTurn() {
-        if (!this.getAction() && this.canAct()) {
-            let tile: TileXYType;
-            try {
-                tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-            } catch (e) {
-                console.log('no random tile');
-            }
-            if (tile) {
-                let i = 0;
-                while (!this.#moveTo.canMoveTo(tile.x, tile.y)) {
-                    tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
-                    if (i++ > 5) {
-                        tile = null;
-                        break;
-                    }
-                }
-            }
-
-            this.setNextAction(tile ? new WarpAction(this, tile) : new RestAction(this));
-        }
+        console.log('start turn mob');
     }
 
     setNextAction(action: PixelDungeonAction) {
@@ -336,6 +322,10 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
 
     showInfo(msg: string, type: EMobInfoType) {
         this.engine.displayText(msg, this.tile, type);
+    }
+
+    canMoveTo(tile: TileXYType) {
+        return this.#moveTo.canMoveTo(tile.x, tile.y);
     }
 }
 

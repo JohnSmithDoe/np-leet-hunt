@@ -33,8 +33,9 @@ export class PixelDungeonInfoText extends Phaser.GameObjects.Text {
         this.scene.tweens.add({
             targets: this,
             y: worldXY.y - 8,
+            alpha: 0.3,
             ease: 'Power1',
-            duration: 500,
+            duration: 750,
             onComplete: () => {
                 this.destroy(true);
             },

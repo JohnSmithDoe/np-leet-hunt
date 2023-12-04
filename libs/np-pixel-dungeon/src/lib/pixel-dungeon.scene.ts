@@ -43,9 +43,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
                 const { worldX, worldY } = pointer;
                 const targetTile = this.engine.map.tileMap.getTileAtWorldXY(worldX, worldY);
                 if (!targetTile) return;
-                // generate the path
-                const pathToMove = this.engine.findPath({ x: targetTile.x, y: targetTile.y });
-                this.engine.player.moveOnPath(pathToMove);
+                this.engine.movePlayer(targetTile);
             }
         });
 

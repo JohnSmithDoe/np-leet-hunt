@@ -45,7 +45,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
         this.mobs = [this.player];
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 5; i++) {
             this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton' }));
         }
     }
@@ -155,5 +155,19 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     displayText(msg: string, tile: TileXYType, type: EMobInfoType) {
         this.scene.add.existing(new PixelDungeonInfoText(this, tile, msg, type));
+    }
+
+    public getMobAt(tile: TileXYType) {
+        return this.board.tileXYZToChess(tile.x, tile.y, 1) as PixelDungeonMob;
+    }
+
+    public movePlayer(targetTile: TileXYType) {
+        const mob = this.getMobAt(targetTile);
+        if (mob) {
+            this.player.attack(mob);
+        } else {
+            const pathToMove = this.findPath({ x: targetTile.x, y: targetTile.y });
+            this.player.moveOnPath(pathToMove);
+        }
     }
 }
