@@ -40,6 +40,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             if (this.cameraDrag) {
                 this.cameraDrag = false;
             } else {
+                if (!this.engine.player.canAct()) return;
                 const { worldX, worldY } = pointer;
                 const targetTile = this.engine.map.tileMap.getTileAtWorldXY(worldX, worldY);
                 if (!targetTile) return;

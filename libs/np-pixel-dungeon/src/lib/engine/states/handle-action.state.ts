@@ -3,6 +3,7 @@ import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { EMobInfoType } from '../../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../../sprites/pixel-dungeon.mob';
+import { PixelDungeonPlayer } from '../../sprites/pixel-dungeon.player';
 import { PixelDungeonState } from '../pixel-dungeon.state';
 import { States } from './states';
 
@@ -115,59 +116,43 @@ export class HandleActionState extends PixelDungeonState {
     name = States.HandleAction;
     #mobs: PixelDungeonMob[];
     #actions: PixelDungeonAction[] = [];
+    #waitForInputAction: WaitForInputAction;
+
+    constructor(player: PixelDungeonPlayer) {
+        super();
+        this.#waitForInputAction = new WaitForInputAction(player);
+    }
 
     next = () => {
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            if (this.#actions.length) {
-                // perform each action once -> keep pending actions until they are done
-                // some actions take longer some are faster
-                // waiting for the longest action to finish creates sync point
-                // hmm i think this could make some serious trouble when attack and move are executed at the same time
-                while (this.#actions.length) {
-                    let action = this.#actions.shift();
-                    if (action instanceof WaitForInputAction) {
-                        action = action.mob.getAction() ?? action;
-                    }
-                    const done = action.perform();
-                    if (done) {
-                        action.finish();
-                    } else {
-                        this.#actions.unshift(action);
-                        // pending.push(action);
-                        break;
-                    }
-                }
-                if (this.#actions.length) {
-                    return States.HandleAction; // handle actions before move on
-                }
-                // if (pending.length) {
-                //     this.#actions = pending;
-                //     return States.HandleAction; // handle actions before move on
-                // }
-            }
-
-            // gain energy until one can act
+            // gain energy until one or more mobs can act
             while (!this.#mobs?.length) {
                 this.engine.gainEnergy();
-                this.#mobs = this.engine.mobs.filter(mob => mob.canAct());
+                this.#mobs = this.engine.mobs.filter(mob => {
+                    const canAct = mob.canAct();
+                    if (canAct && mob === this.engine.player) {
+                        // start a new turn if the player is on
+                        this.engine.startTurn();
+                    }
+                    return canAct;
+                });
             }
-
-            // start a new turn ... hmm
-            this.engine.startTurn();
-            // get the actions of all actors that can act
+            // get the action of the first one and if animated wait for it to end
             while (this.#mobs.length) {
                 const mob = this.#mobs.shift();
-                const action = mob.getAction();
-                if (action) {
-                    this.#actions.push(action);
+
+                const action = mob.getAction() ?? this.#waitForInputAction;
+                const done = action.perform();
+                if (done) {
+                    // done -> finish action and continue with the next mob instantly
+                    action.finish();
                 } else {
-                    // no action should be the waiting for input
-                    this.#actions.push(new WaitForInputAction(mob));
+                    // not done -> enqueue first and wait an update cylce
+                    this.#mobs.unshift(mob);
+                    return States.HandleAction;
                 }
             }
-            this.engine.endTurn();
         }
-        // return States.HandleAction;
     };
 }

@@ -40,10 +40,12 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
     #aiAction() {
         if (!this.hasNextAction && this.canAct()) {
             let tile: TileXYType;
-            const neighbours = this.engine.board.getNeighborChess(this, null);
-            if (neighbours && Array.isArray(neighbours)) {
-                const other = neighbours.pop() as PixelDungeonMob;
-                this.setNextAction(new AttackMobAction(this, other));
+            const neighbours = this.engine.board.getNeighborChess(this, null) ?? [];
+            const playerAsNeigbour = (neighbours && Array.isArray(neighbours) ? neighbours : [neighbours]).find(
+                n => n === this.engine.player
+            );
+            if (playerAsNeigbour) {
+                this.setNextAction(new AttackMobAction(this, this.engine.player));
             } else {
                 try {
                     tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);

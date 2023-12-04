@@ -28,8 +28,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
-        this.addStates([new StartGameState(), new HandleActionState(), new EndGameState()]);
-        this.setupComponents();
+        this.#setup();
     }
 
     get board() {
@@ -41,13 +40,14 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         super.update(time, delta);
     }
 
-    private setupComponents() {
+    #setup() {
         this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, fovConeAngle: 210 });
         this.mobs = [this.player];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 25; i++) {
             this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton' }));
         }
+        this.addStates([new StartGameState(), new HandleActionState(this.player), new EndGameState()]);
     }
 
     init(): void {
