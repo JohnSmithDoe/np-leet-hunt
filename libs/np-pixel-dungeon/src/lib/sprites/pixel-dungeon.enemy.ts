@@ -1,7 +1,13 @@
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { AttackMobAction, PixelDungeonAction, RestAction, WarpAction } from '../engine/states/handle-action.state';
+import {
+    AttackMobAction,
+    PixelDungeonAction,
+    RestAction,
+    WalkToAction,
+    WarpAction,
+} from '../engine/states/handle-action.state';
 import { PixelDungeonMob, TPixelDungeonMobOptions } from './pixel-dungeon.mob';
 
 interface TPixelDungeonEnemyOptions extends TPixelDungeonMobOptions {
@@ -62,7 +68,16 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
                         }
                     }
                 }
-                this.setNextAction(tile ? new WarpAction(this, tile) : new RestAction(this));
+
+                if (tile) {
+                    if (this.engine.player.canSee(this.tile) || this.engine.player.canSee(tile)) {
+                        this.setNextAction(new WalkToAction(this, tile));
+                    } else {
+                        this.setNextAction(new WarpAction(this, tile));
+                    }
+                } else {
+                    this.setNextAction(new RestAction(this));
+                }
             }
         }
     }

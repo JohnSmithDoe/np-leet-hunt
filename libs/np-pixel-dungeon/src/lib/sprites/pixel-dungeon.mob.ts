@@ -16,6 +16,8 @@ type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
 type TLpcAnimationKey = 'walk up' | 'walk down' | 'walk left' | 'walk right' | 'die';
 
+const equalTile = (tile: TileXYType, other: TileXYType) => tile.x === other.x && tile.y === other.y;
+
 export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPSceneComponent {
     rexChess: ChessData;
     scene: NPSceneWithBoard;
@@ -63,8 +65,8 @@ export class PixelDungeonMob extends Phaser.GameObjects.Sprite implements NPScen
         this.#moveTo.setSpeed(speed);
     }
 
-    canSee(mob: PixelDungeonMob) {
-        return mob === this || this.#fieldOfView.isInLOS(mob);
+    canSee(tile: TileXYType) {
+        return !!this.#currentVision.find(other => equalTile(tile, other));
     }
 
     preload() {
