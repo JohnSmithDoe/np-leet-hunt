@@ -64,7 +64,6 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
                     break;
             }
         }
-        console.log(this.#regionTiles);
 
         for (const tiles of Object.values(this.#regionTiles)) {
             switch (tiles[0].type) {

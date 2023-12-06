@@ -48,8 +48,6 @@ export class PixelDungeonTilelayer {
     }
 
     mapDungeonToLayer(dungeon: PixelDungeon) {
-        console.log(this.#tilelayer);
-
         let start: TDungeonTile;
         for (const room of dungeon.rooms) {
             this.#mapDungeonRoomToTilemap(room);

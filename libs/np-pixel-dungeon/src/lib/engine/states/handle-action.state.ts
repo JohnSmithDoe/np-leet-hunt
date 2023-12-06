@@ -80,7 +80,6 @@ export class WarpAction extends WalkToAction implements PixelDungeonAction {
     perform(): boolean {
         if (this.tile) {
             this.mob.warp(this.tile);
-            console.log('Warping', this);
             this.tile = undefined;
         }
         return true;
@@ -90,7 +89,6 @@ export class WarpAction extends WalkToAction implements PixelDungeonAction {
 export class RestAction extends PixelDungeonBaseAction implements PixelDungeonAction {
     perform(): boolean {
         // this.mob.gainEnergy(); // extra energy
-        console.log('Resting', this.mob.energy);
         return true;
     }
 }

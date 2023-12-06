@@ -30,9 +30,10 @@ type TPixelDungeonPlayerOptions = TPixelDungeonMobOptions;
 const defaultOptions: TPixelDungeonPlayerOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
+    key: 'brawler',
     visionRange: 10,
     moveRotate: false,
-    moveSpeed: 160,
+    moveSpeed: 60,
     fovConeAngle: undefined,
     energyGain: 100,
 };
@@ -48,17 +49,9 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
         console.log('init player');
     }
 
-    preload() {
-        this.key = 'brawler';
-        this.scene.load.spritesheet('brawler', 'np-pixel-dungeon/Download96156.png', {
-            frameWidth: 64,
-            frameHeight: 64,
-        });
-    }
-
     getAction() {
-        if (!super.getAction() && this.hasMoves()) {
-            const pathTile = this.nextMove();
+        if (!super.getAction() && this.moveTo.hasMoves()) {
+            const pathTile = this.moveTo.nextMove();
             this.setNextAction(new WalkToAction(this, pathTile));
             this.showInfo('mov', EMobInfoType.Doged);
         }
@@ -66,6 +59,12 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     }
 
     attack(mob: PixelDungeonMob) {
-        this.setNextAction(new AttackMobAction(this, mob));
+        if (this.engine.board.areNeighbors(this.tile, mob.tile)) {
+            this.setNextAction(new AttackMobAction(this, mob));
+        }
+    }
+
+    lookAround() {
+        this.fieldOfView.updateVision();
     }
 }
