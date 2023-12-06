@@ -22,8 +22,8 @@ export abstract class PixelDungeonBaseAction implements PixelDungeonAction {
     constructor(public mob: PixelDungeonMob) {}
 
     finish(): void {
-        this.mob.drainEnergy(this.costs);
-        this.mob.setNextAction(null);
+        this.mob.activity.drainEnergy(this.costs);
+        this.mob.activity.setNextAction(null);
     }
 
     abstract perform(): boolean;
@@ -54,7 +54,7 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
                     this.#done = true;
                 },
                 onYoyo: () => {
-                    this.target.showInfo('3', EMobInfoType.LoseHealth);
+                    this.target.info('3', EMobInfoType.LoseHealth);
                 },
             });
         }
@@ -69,17 +69,17 @@ export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeon
 
     perform(): boolean {
         if (this.tile) {
-            this.mob.moveToTile(this.tile);
+            this.mob.movement.moveToTile(this.tile);
             this.tile = undefined;
         }
-        return !this.mob.isMoving();
+        return !this.mob.movement.isMoving;
     }
 }
 
 export class WarpAction extends WalkToAction implements PixelDungeonAction {
     perform(): boolean {
         if (this.tile) {
-            this.mob.warp(this.tile);
+            this.mob.movement.warp(this.tile);
             this.tile = undefined;
         }
         return true;
@@ -128,7 +128,7 @@ export class HandleActionState extends PixelDungeonState {
             while (!this.#mobs?.length) {
                 this.engine.gainEnergy();
                 this.#mobs = this.engine.mobs.filter(mob => {
-                    const canAct = mob.canAct();
+                    const canAct = mob.activity.canAct();
                     if (canAct && mob === this.engine.player) {
                         // start a new turn if the player is on
                         this.engine.startTurn();
@@ -140,7 +140,7 @@ export class HandleActionState extends PixelDungeonState {
             while (this.#mobs.length) {
                 const mob = this.#mobs.shift();
 
-                const action = mob.getAction() ?? this.#waitForInputAction;
+                const action = mob.action ?? this.#waitForInputAction;
                 const done = action.perform();
                 if (done) {
                     // done -> finish action and continue with the next mob instantly

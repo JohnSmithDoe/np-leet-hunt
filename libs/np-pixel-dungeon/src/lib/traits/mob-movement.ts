@@ -1,10 +1,13 @@
+import { mapRexPluginDirection } from '@shared/np-library';
 import MoveToTask from 'phaser3-rex-plugins/plugins/behaviors/moveto/MoveTo';
 import MoveTo from 'phaser3-rex-plugins/plugins/board/moveto/MoveTo';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
+import { WalkToAction } from '../engine/states/handle-action.state';
+import { EMobInfoType } from '../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 
-export class NPMoveTo extends MoveTo<PixelDungeonMob> {
+export class MobMovement extends MoveTo<PixelDungeonMob> {
     moveToTask: MoveToTask & {
         targetX: number;
         targetY: number;
@@ -28,7 +31,15 @@ export class NPMoveTo extends MoveTo<PixelDungeonMob> {
     //     const occupied = !this.#board.isEmptyTileXYZ(tileXY.x, tileXY.y, 1);
     //     return this.#openTileIdx.includes(tile.index) && !occupied ? 1 : null;
     // }
+    onceMoved(fn: () => void) {
+        this.once('complete', () => fn());
+        return this;
+    }
 
+    onceMovedOccupied(fn: () => void) {
+        this.once('occupy', () => fn());
+        return this;
+    }
     update(time, delta) {
         // Do the move first and then check if completed
         // Parent checks complete and then moves
@@ -47,7 +58,7 @@ export class NPMoveTo extends MoveTo<PixelDungeonMob> {
             return this;
         }
     }
-    isMoving() {
+    get isMoving() {
         return this.moveToTask.isRunning;
     }
 
@@ -61,5 +72,32 @@ export class NPMoveTo extends MoveTo<PixelDungeonMob> {
 
     nextMove() {
         return this.#pathToMove.shift();
+    }
+    canMoveToTile(tile: TileXYType) {
+        return this.canMoveTo(tile.x, tile.y);
+    }
+
+    warp(tile: TileXYType) {
+        if (this.canMoveToTile(tile)) {
+            this.mob.engine.board.moveChess(this.mob, tile.x, tile.y, 1);
+            this.mob.info(`!`, EMobInfoType.GainHealth);
+        }
+    }
+    moveOnPath(path: TileXYType[]) {
+        console.log('269:moveOnPath');
+        this.setPath(path);
+        if (this.hasMoves()) {
+            const pathTile = this.nextMove();
+            console.log('new action walk');
+            this.mob.activity.setNextAction(new WalkToAction(this.mob, pathTile));
+        }
+    }
+
+    moveToTile(tile: TileXYType) {
+        this.moveTo(tile);
+        console.log('move to tile');
+        this.mob.faceToDirection(mapRexPluginDirection(this.destinationDirection));
+        this.mob.faceMoveTo(mapRexPluginDirection(this.destinationDirection));
+        this.mob.engine.updateFoV();
     }
 }

@@ -30,20 +30,21 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
         super(engine, Object.assign({}, defaultOptions, options ?? {}));
     }
 
-    public getAction(): PixelDungeonAction | null {
+    get action(): PixelDungeonAction | null {
         this.#aiAction();
-        return super.getAction();
+        return super.action;
     }
 
     #aiAction() {
-        if (!this.hasNextAction && this.canAct()) {
+        const activity = this.activity;
+        if (!activity.hasNextAction && activity.canAct()) {
             let tile: TileXYType;
             const neighbours = this.engine.board.getNeighborChess(this, null) ?? [];
             const playerAsNeigbour = (neighbours && Array.isArray(neighbours) ? neighbours : [neighbours]).find(
                 n => n === this.engine.player
             );
             if (playerAsNeigbour) {
-                this.setNextAction(new AttackMobAction(this, this.engine.player));
+                activity.setNextAction(new AttackMobAction(this, this.engine.player));
             } else {
                 try {
                     tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
@@ -52,7 +53,7 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
                 }
                 if (tile) {
                     let i = 0;
-                    while (!this.canMoveTo(tile)) {
+                    while (!this.movement.canMoveToTile(tile)) {
                         tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
                         if (i++ > 5) {
                             tile = null;
@@ -62,13 +63,13 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
                 }
 
                 if (tile) {
-                    if (this.engine.player.canSee(this.tile) || this.engine.player.canSee(tile)) {
-                        this.setNextAction(new WalkToAction(this, tile));
+                    if (this.engine.player.vision.canSee(this.tile) || this.engine.player.vision.canSee(tile)) {
+                        activity.setNextAction(new WalkToAction(this, tile));
                     } else {
-                        this.setNextAction(new WarpAction(this, tile));
+                        activity.setNextAction(new WarpAction(this, tile));
                     }
                 } else {
-                    this.setNextAction(new RestAction(this));
+                    activity.setNextAction(new RestAction(this));
                 }
             }
         }

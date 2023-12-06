@@ -33,7 +33,7 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
     key: 'brawler',
     visionRange: 10,
     moveRotate: false,
-    moveSpeed: 60,
+    moveSpeed: 120,
     fovConeAngle: undefined,
     energyGain: 100,
 };
@@ -49,22 +49,22 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
         console.log('init player');
     }
 
-    getAction() {
-        if (!super.getAction() && this.moveTo.hasMoves()) {
-            const pathTile = this.moveTo.nextMove();
-            this.setNextAction(new WalkToAction(this, pathTile));
-            this.showInfo('mov', EMobInfoType.Doged);
+    get action() {
+        if (!super.action && this.movement.hasMoves()) {
+            const pathTile = this.movement.nextMove();
+            this.activity.setNextAction(new WalkToAction(this, pathTile));
+            this.info('mov', EMobInfoType.Doged);
         }
-        return super.getAction();
+        return super.action;
     }
 
     attack(mob: PixelDungeonMob) {
         if (this.engine.board.areNeighbors(this.tile, mob.tile)) {
-            this.setNextAction(new AttackMobAction(this, mob));
+            this.activity.setNextAction(new AttackMobAction(this, mob));
         }
     }
 
     lookAround() {
-        this.fieldOfView.updateVision();
+        this.vision.updateVision();
     }
 }

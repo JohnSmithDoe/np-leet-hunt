@@ -1,11 +1,11 @@
 import PathFinder from 'phaser3-rex-plugins/plugins/board/pathfinder/PathFinder';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { PixelDungeonBoard } from '../core/pixel-dungeon-board';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
+import { PixelDungeonBoard } from './pixel-dungeon-board';
 import Vector2 = Phaser.Math.Vector2;
 
-export class NPPathfinder extends PathFinder {
+export class PixelDungeonPathfinder extends PathFinder {
     #board: PixelDungeonBoard;
     #pathGraphics: Phaser.GameObjects.Graphics;
     constructor(engine: PixelDungeonEngine) {

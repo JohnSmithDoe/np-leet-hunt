@@ -4,8 +4,8 @@ import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
+import { PixelDungeonPathfinder } from '../core/pixel-dungeon.pathfinder';
 import { PixelDungeonBoard } from '../core/pixel-dungeon-board';
-import { NPPathfinder } from '../rex-rainbow/np-pathfinder';
 import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { EMobInfoType, PixelDungeonInfoText } from '../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
@@ -21,7 +21,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     player: PixelDungeonPlayer;
     mobs: PixelDungeonMob[];
     #board: PixelDungeonBoard;
-    #pathfinder: NPPathfinder;
+    #pathfinder: PixelDungeonPathfinder;
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
@@ -69,7 +69,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         }
         this.mobs.forEach(mob => mob.create());
 
-        this.#pathfinder = new NPPathfinder(this);
+        this.#pathfinder = new PixelDungeonPathfinder(this);
 
         this.updateFoV();
         this.mobs.forEach(mob => {
@@ -78,10 +78,11 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     updateFoV() {
-        this.map.loseVision(this.player.vision);
+        const vision = this.player.vision;
+        this.map.loseVision(vision.currentView);
         this.player.lookAround();
-        this.map.gainVision(this.player.vision);
-        this.mobs.forEach(mob => (mob.alpha = this.player.canSee(mob.tile) ? 1 : 0.2));
+        this.map.gainVision(vision.currentView);
+        this.mobs.forEach(mob => (mob.alpha = vision.canSee(mob.tile) ? 1 : 0.2));
     }
 
     startUP() {
@@ -90,7 +91,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     gainEnergy() {
         let canAct = false;
-        this.mobs.forEach(mob => (canAct = mob.gainEnergy() || canAct));
+        this.mobs.forEach(mob => (canAct = mob.activity.gainEnergy() || canAct));
         return canAct;
     }
 
@@ -117,7 +118,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
             this.player.attack(mob as PixelDungeonMob);
         } else {
             const pathToMove = this.#pathfinder.findPath({ x: targetTile.x, y: targetTile.y });
-            this.player.moveOnPath(pathToMove);
+            this.player.movement.moveOnPath(pathToMove);
         }
     }
 }
