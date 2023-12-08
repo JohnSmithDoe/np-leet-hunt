@@ -54,8 +54,9 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPSceneCom
         this.#activity = new MobAction(this);
         this.setTexture(this.options.key, 1);
         this.setScale(1);
-        const size = 24;
+        const size = 16;
         this.setOrigin((size - 16) / 2 / size, (size - 16) / size);
+        this.setOrigin(0, 0.5); // just put on an own tile layer and move the layer up
         this.setDisplaySize(size, size);
     }
 

@@ -2,10 +2,10 @@ import { NPVec2 } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { ETileType, TDungeonTile } from '../@types/pixel-dungeon.types';
+import { PixelDungeon } from '../dungeon/pixel-dungeon';
+import { PixelDungeonRoom } from '../dungeon/pixel-dungeon.room';
+import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
 import { NPTilesetMapping } from '../sprites/pixel-dungeon.map';
-import { PixelDungeon } from './pixel-dungeon';
-import { PixelDungeonRoom } from './pixel-dungeon.room';
-import { PixelDungeonTile } from './pixel-dungeon.tile';
 import { PixelDungeonTileset } from './pixel-dungeon-tileset';
 
 export class PixelDungeonTilelayer {
@@ -63,7 +63,7 @@ export class PixelDungeonTilelayer {
                 if (!this.#tilelayer.hasTileAt(tile.x, tile.y))
                     this.#putTileAt(tile, this.#tileset.mapTileToTileIndex(tile.type));
             }
-            this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0.1;
+            this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 1;
         }
         for (const wall of dungeon.walls) {
             this.#putTileAt(wall.pos, wall.toTileIndex());

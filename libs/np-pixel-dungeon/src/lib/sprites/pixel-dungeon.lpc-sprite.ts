@@ -103,7 +103,7 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
         return super.play(key, true);
     }
 
-    faceMoveTo(dir: EDirection) {
+    animateWalk(dir: EDirection) {
         switch (dir) {
             case EDirection.NONE:
                 this.play('die');
@@ -127,31 +127,31 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
         }
     }
 
-    faceToAnimation(key: TLpcAnimationKey) {
+    #setFirstAnimationFrame(key: TLpcAnimationKey) {
         //this.stop();
         this.setFrame(this.anims.get(key).getFrameByProgress(0).frame);
     }
 
-    faceToDirection(dir: EDirection) {
+    animateFaceToDirection(dir: EDirection) {
         switch (dir) {
             case EDirection.NONE:
-                this.faceToAnimation('die');
+                this.#setFirstAnimationFrame('die');
                 break;
             case EDirection.N:
-                this.faceToAnimation('walk up');
+                this.#setFirstAnimationFrame('walk up');
                 break;
             case EDirection.NE:
             case EDirection.E:
             case EDirection.SE:
-                this.faceToAnimation('walk right');
+                this.#setFirstAnimationFrame('walk right');
                 break;
             case EDirection.S:
-                this.faceToAnimation('walk down');
+                this.#setFirstAnimationFrame('walk down');
                 break;
             case EDirection.SW:
             case EDirection.W:
             case EDirection.NW:
-                this.faceToAnimation('walk left');
+                this.#setFirstAnimationFrame('walk left');
                 break;
         }
     }

@@ -323,9 +323,9 @@ export class PixelDungeonFactory {
         // - It avoids creating rooms that are too rectangular: too tall and
         //   narrow or too wide and flat.
         // TODO: This isn't very flexible or tunable. Do something better here. min max room size
-        const size = this.#rng.range(1, 3 + this.#options.roomExtraSize) * 2 + 1;
+        const size = this.#rng.inRange(1, 3 + this.#options.roomExtraSize) * 2 + 1;
         // const size = 3;
-        const rectangularity = this.#rng.range(0, 1 + Math.trunc(size / 2)) * 2;
+        const rectangularity = this.#rng.inRange(0, 1 + Math.trunc(size / 2)) * 2;
         let width = size;
         let height = size;
         if (this.#rng.oneIn(2)) {
@@ -334,8 +334,8 @@ export class PixelDungeonFactory {
             height += rectangularity;
         }
 
-        const x = this.#rng.range(Math.trunc((this.#bounds.width - 1 - width) / 2)) * 2 + 1; // Todo -1 on bounds width for the border is not needed in the original
-        const y = this.#rng.range(Math.trunc((this.#bounds.height - 1 - height) / 2)) * 2 + 1;
+        const x = this.#rng.inRange(Math.trunc((this.#bounds.width - 1 - width) / 2)) * 2 + 1; // Todo -1 on bounds width for the border is not needed in the original
+        const y = this.#rng.inRange(Math.trunc((this.#bounds.height - 1 - height) / 2)) * 2 + 1;
 
         const room = new NPRect(x, y, width, height);
 

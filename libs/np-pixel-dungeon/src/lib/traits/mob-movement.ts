@@ -96,8 +96,8 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
     moveToTile(tile: TileXYType) {
         this.moveTo(tile);
         console.log('move to tile');
-        this.mob.faceToDirection(mapRexPluginDirection(this.destinationDirection));
-        this.mob.faceMoveTo(mapRexPluginDirection(this.destinationDirection));
+        this.mob.animateFaceToDirection(mapRexPluginDirection(this.destinationDirection));
+        this.mob.animateWalk(mapRexPluginDirection(this.destinationDirection));
         this.mob.engine.updateFoV();
     }
 }

@@ -3,9 +3,9 @@ import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
-import { PixelDungeon } from '../core/pixel-dungeon';
 import { PixelDungeonTilelayer } from '../core/pixel-dungeon-tilelayer';
 import { PixelDungeonTileset } from '../core/pixel-dungeon-tileset';
+import { PixelDungeon } from '../dungeon/pixel-dungeon';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 
 export type NPTilemapConfig = Phaser.Types.Tilemaps.TilemapConfig & {
