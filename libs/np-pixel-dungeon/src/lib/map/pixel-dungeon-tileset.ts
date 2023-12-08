@@ -1,5 +1,5 @@
 import { ETileType } from '../@types/pixel-dungeon.types';
-import { NPTilemapConfig, NPTilesetMapping } from '../sprites/pixel-dungeon.map';
+import { NPTilemapConfig, NPTilesetMapping } from './pixel-dungeon.map';
 
 export class PixelDungeonTileset {
     #map: Phaser.Tilemaps.Tilemap;

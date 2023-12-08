@@ -6,9 +6,9 @@ import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateMa
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonPathfinder } from '../core/pixel-dungeon.pathfinder';
 import { PixelDungeonBoard } from '../core/pixel-dungeon-board';
+import { PixelDungeonMap } from '../map/pixel-dungeon.map';
 import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { EMobInfoType, PixelDungeonInfoText } from '../sprites/pixel-dungeon.info-text';
-import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../sprites/pixel-dungeon.player';
 import { EndGameState } from './states/end-game.state';
@@ -33,7 +33,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     update(time: number, delta: number) {
-        if (this.scene.game.loop.actualFps < 55) {
+        if (this.scene.game.loop.actualFps < 58) {
             console.log('40:update-laaag:', this.scene.game.loop.actualFps);
         }
         // console.log('update cycle', this.player.x, this.player.y, this.scene.game.loop.actualFps);
@@ -41,10 +41,10 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     #setup() {
-        this.map = new PixelDungeonMap(this, { height: 151, width: 51, seed: '##' }, 'example');
+        this.map = new PixelDungeonMap(this, { height: 115, width: 115, seed: '##' }, 'shattered');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, key: 'brawler' });
         this.mobs = [this.player];
-        for (let i = 0; i < 36; i++) {
+        for (let i = 0; i < 3; i++) {
             this.mobs.push(new PixelDungeonEnemy(this, { type: 'skeleton', key: 'skeleton' }));
         }
         this.addStates([new StartGameState(), new HandleActionState(this.player), new EndGameState()]);

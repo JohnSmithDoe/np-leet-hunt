@@ -9,7 +9,12 @@ export class PixelDungeonHallway {
     connects: number[];
     #dungeon: PixelDungeon;
     #tiles: PixelDungeonTile[];
-
+    *[Symbol.iterator](): Iterator<PixelDungeonTile> {
+        for (const tile of this.#tiles) {
+            yield tile;
+        }
+        return undefined;
+    }
     constructor(dungeon: PixelDungeon, tiles: PixelDungeonTile[]) {
         this.#dungeon = dungeon;
         this.#tiles = tiles;

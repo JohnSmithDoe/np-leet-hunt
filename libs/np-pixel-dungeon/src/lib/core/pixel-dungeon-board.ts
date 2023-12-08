@@ -2,7 +2,7 @@ import Board from 'phaser3-rex-plugins/plugins/board/board/Board';
 import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMap } from '../sprites/pixel-dungeon.map';
+import { PixelDungeonMap } from '../map/pixel-dungeon.map';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 
 type NPChessTypes = PixelDungeonMob | (Phaser.Tilemaps.Tile & { rexChess?: ChessData });
@@ -47,7 +47,16 @@ export class PixelDungeonBoard extends Board<NPChessTypes> {
 
     #setBlocker(map: PixelDungeonMap) {
         // this.#tilelayer.setCollisionByExclusion([6, 7, 8, 26, ...this.#tileset.getTileIndexes('DOOR')]);
-        const openTileIdx = [6, 7, 8, 26, ...map.tileLayer.tileset.getTileIndexes('DOOR')];
+        // this.#tilelayer.setCollisionByExclusion([
+        //     ...this.#tileset.getTileIndexes('FLOOR'),
+        //     ...this.#tileset.getTileIndexes('DOOR'),
+        // ]);
+        // hmm tile -> pd hall, junc, room ... let them decide...hmm
+        const openTileIdx = [
+            ...map.tileLayer.tileset.getTileIndexes('FLOOR'),
+            ...map.tileLayer.tileset.getTileIndexes('DOOR'),
+        ];
+
         this.getAllChess().forEach(t => {
             if (t instanceof Phaser.Tilemaps.Tile) {
                 t.rexChess.setBlocker(!openTileIdx.includes(t.index));

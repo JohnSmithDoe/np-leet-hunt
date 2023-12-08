@@ -154,6 +154,10 @@ export class NPVec2 {
             : new NPVec2(this.x + value.x, this.y + value.y);
     }
 
+    addDirection(direction: EDirection) {
+        return this.add(directionToPos(direction));
+    }
+
     /// Substracts [other] from this Vec.
     ///
     ///  *  If [other] is a [Vec] or [Direction], subtracts each pair of
@@ -202,6 +206,7 @@ export class NPVec2 {
             ? this.lengthSquared === value * value
             : this.x === value.x && this.y === value.y;
     }
+
     hashCode() {
         // Map negative coordinates to positive and spread out the positive ones to
         // make room for them.

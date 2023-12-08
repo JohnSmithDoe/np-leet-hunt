@@ -1,7 +1,7 @@
 import { EDirection } from '@shared/np-library';
 
 import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { NPTilesetMapping } from '../sprites/pixel-dungeon.map';
+import { NPTilesetMapping } from '../map/pixel-dungeon.map';
 import { PixelDungeon } from './pixel-dungeon';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 

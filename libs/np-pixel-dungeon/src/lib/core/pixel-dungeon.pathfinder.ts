@@ -11,7 +11,7 @@ export class PixelDungeonPathfinder extends PathFinder {
     constructor(engine: PixelDungeonEngine) {
         super(engine.player, {
             pathMode: 'A*-line',
-            blockerTest: true,
+            blockerTest: false,
             occupiedTest: true,
         });
         this.#board = engine.board;

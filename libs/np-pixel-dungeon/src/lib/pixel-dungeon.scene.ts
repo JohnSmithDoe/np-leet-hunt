@@ -27,6 +27,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     create() {
         super.create();
         this.cam = this.cameras.main;
+        // this.cam.setRoundPixels(true);
         const camera = this.cameras.main;
         let cameraDragStartX = 0;
         let cameraDragStartY = 0;
@@ -42,7 +43,9 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             } else {
                 if (!this.engine.player.activity.isIdle()) return;
                 const { worldX, worldY } = pointer;
+                console.log(this.engine.map.tileMap.setLayer('floors'));
                 const targetTile = this.engine.map.tileMap.getTileAtWorldXY(worldX, worldY);
+                console.log('click', targetTile);
                 if (!targetTile) return;
                 this.engine.movePlayer(targetTile);
             }
@@ -95,7 +98,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         //
         // this.cam.setViewport(0, 0, this.scale.width, this.scale.height);
 
-        this.cam.setZoom(4);
+        this.cam.setZoom(1);
         this.cursors = this.input.keyboard.createCursorKeys();
         this.engine.startUP();
         this.engine.startUpdate();

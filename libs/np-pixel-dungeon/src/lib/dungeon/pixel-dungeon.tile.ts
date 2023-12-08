@@ -1,4 +1,5 @@
 import { EDirection, NPVec2 } from '@shared/np-library';
+import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { ETileType, TDungeonTile } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from './pixel-dungeon';
@@ -21,6 +22,17 @@ export class PixelDungeonTile {
         return this.neighbours[dir]?.type === ETileType.wall || this.neighbours[dir]?.type === ETileType.junction;
     }
 
+    emptyTo(dir: EDirection) {
+        return !this.neighbours[dir] || this.neighbours[dir].type === ETileType.none;
+    }
+
+    roomTo(dir: EDirection) {
+        return this.neighbours[dir]?.type === ETileType.room || this.neighbours[dir]?.type === ETileType.floor;
+    }
+
+    get tile(): TileXYType {
+        return this.pos;
+    }
     get tileX(): number {
         return this.pos.x;
     }
