@@ -2,12 +2,12 @@ import { NPVec2 } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { PixelDungeonRoom } from '../dungeon/pixel-dungeon.room';
+import { PixelDungeon } from '../dungeon/pixel-dungeon';
 import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
 import { NPTilesetMappingNew } from './pixel-dungeon.map';
 import { PixelDungeonTileset } from './pixel-dungeon-tileset';
 
-export class PixelDungeonTilelayer {
+export abstract class PixelDungeonTilelayer {
     #map: Phaser.Tilemaps.Tilemap;
     #tilelayer: Phaser.Tilemaps.TilemapLayer;
     #tileset: PixelDungeonTileset;
@@ -45,43 +45,7 @@ export class PixelDungeonTilelayer {
         }
     }
 
-    mapDungeonToLayer() {
-        // for (const junction of dungeon.junctions) {
-        //     if (!junction.vertical) {
-        //         this.putTileAt(junction.pos, junction.toTileIndex());
-        //         const right = junction.pos.addDirection(EDirection.E);
-        //         const left = junction.pos.addDirection(EDirection.W);
-        //         const top = junction.pos.addDirection(EDirection.N);
-        //         this.putTileAt(top, 'FLOOR');
-        //         this.#tilelayer.putTileAt(194, right.x, right.y - 1);
-        //         this.#tilelayer.putTileAt(193, left.x, left.y - 1);
-        //     } else {
-        //         const top = junction.pos.addDirection(EDirection.N);
-        //         const bottom = junction.pos;
-        //         this.#tilelayer.putTileAt(88, top.x, top.y);
-        //         this.#tilelayer.putTileAt(215, bottom.x, bottom.y);
-        //     }
-        // }
-        //
-        // for (const tile of dungeon) {
-        //     if (tile.type === ETileType.room) {
-        //         start = tile;
-        //     } else {
-        //         if (!this.#tilelayer.hasTileAt(tile.x, tile.y))
-        //             this.#putTileAt(tile, this.#tileset.mapTileToTileIndex(tile.type));
-        //     }
-        //     this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 1;
-        // }
-    }
-
-    #mapDungeonRoomToTilemap(room: PixelDungeonRoom) {
-        for (const tile of room) {
-            // Fill the floor with mostly clean tiles, but occasionally place a dirty tile
-            this.putPixeldungeonTileAt(tile, 'ROOM');
-        }
-        // this.#putPixeldungeonTileAt(room.topLeft(), 'TOP_LEFT_WALL');
-        // this.#putPixeldungeonTileAt(room.topRight(), 'TOP_RIGHT_WALL');
-    }
+    abstract mapDungeonToLayer(dungeon: PixelDungeon): void;
 
     get tilelayer() {
         return this.#tilelayer;
