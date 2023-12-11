@@ -41,7 +41,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     #setup() {
-        this.map = new PixelDungeonMap(this, { height: 151, width: 151, seed: '##' }, 'shattered');
+        this.map = new PixelDungeonMap(this, { height: 25, width: 25, seed: '##' }, 'shattered');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, key: 'brawler' });
         this.mobs = [this.player];
         for (let i = 0; i < 3; i++) {
@@ -86,6 +86,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     startUP() {
+        console.log(this.board);
         this.goto(States.StartGame);
     }
 
@@ -120,5 +121,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
             const pathToMove = this.#pathfinder.findPath({ x: targetTile.x, y: targetTile.y });
             this.player.movement.moveOnPath(pathToMove);
         }
+    }
+
+    get dungeon() {
+        return this.map.dungeon;
     }
 }

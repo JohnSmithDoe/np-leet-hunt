@@ -20,7 +20,12 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     }
 
     preload() {
-        this.load.scenePlugin('rexboardplugin', 'np-pixel-dungeon/rexboardplugin.min.js', 'rexBoard', 'rexBoard');
+        this.load.scenePlugin({
+            key: 'rexboardplugin',
+            sceneKey: 'rexBoard',
+            systemKey: 'rexBoard',
+            url: BoardPlugin,
+        });
         super.preload();
     }
 
@@ -43,8 +48,8 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             } else {
                 if (!this.engine.player.activity.isIdle()) return;
                 const { worldX, worldY } = pointer;
-                console.log(this.engine.map.tileMap.setLayer('floors'));
-                const targetTile = this.engine.map.tileMap.getTileAtWorldXY(worldX, worldY);
+                console.log(this.engine.map.tilemap.setLayer('floors'));
+                const targetTile = this.engine.map.tilemap.getTileAtWorldXY(worldX, worldY);
                 console.log('click', targetTile);
                 if (!targetTile) return;
                 this.engine.movePlayer(targetTile);

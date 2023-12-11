@@ -1,10 +1,12 @@
 import { EDirection, NPVec2 } from '@shared/np-library';
+import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { ETileType, TDungeonTile } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from './pixel-dungeon';
 
 export class PixelDungeonTile {
+    rexChess: ChessData;
     pos: NPVec2;
     neighbours: Record<EDirection, TDungeonTile | null>;
     vertical = true;

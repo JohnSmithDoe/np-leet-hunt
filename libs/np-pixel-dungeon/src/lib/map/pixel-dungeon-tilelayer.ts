@@ -4,8 +4,7 @@ import * as Phaser from 'phaser';
 import { TDungeonTile } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from '../dungeon/pixel-dungeon';
 import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
-import { NPTilesetMappingNew } from './pixel-dungeon.map';
-import { PixelDungeonTileset } from './pixel-dungeon-tileset';
+import { NPTilesetMappingNew, PixelDungeonTileset } from './pixel-dungeon-tileset';
 
 export abstract class PixelDungeonTilelayer {
     #map: Phaser.Tilemaps.Tilemap;
@@ -17,10 +16,6 @@ export abstract class PixelDungeonTilelayer {
         this.#tileset = tileset;
         this.#tilelayer = this.#map.createBlankLayer(name, tileset.tileset);
         this.#tilelayer.setScale(1);
-        this.#tilelayer.setCollisionByExclusion([
-            ...this.#tileset.getTileIndexes('FLOOR'),
-            ...this.#tileset.getTileIndexes('DOOR'),
-        ]);
     }
 
     get tileset() {
@@ -43,6 +38,7 @@ export abstract class PixelDungeonTilelayer {
         } else {
             this.#tilelayer.weightedRandomize(mappingElement, tile.tileX, tile.tileY, 1, 1);
         }
+        this.#tilelayer.getTileAt(tile.tileX, tile.tileY);
     }
 
     abstract mapDungeonToLayer(dungeon: PixelDungeon): void;

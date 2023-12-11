@@ -27,7 +27,7 @@ export class PixelDungeonInfoText extends Phaser.GameObjects.Text {
             fontSize: 10,
             color: CMobInfoColors[type],
         };
-        const worldXY = engine.map.tileMap.tileToWorldXY(tile.x, tile.y);
+        const worldXY = engine.map.tilemap.tileToWorldXY(tile.x, tile.y);
         super(engine.scene, worldXY.x + 8, worldXY.y, text, style);
         this.setOrigin(0.5);
         this.scene.tweens.add({
