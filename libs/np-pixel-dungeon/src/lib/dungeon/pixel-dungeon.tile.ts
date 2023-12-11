@@ -19,7 +19,7 @@ export class PixelDungeonTile {
     }
 
     wallTo(dir: EDirection) {
-        return this.neighbours[dir]?.type === ETileType.wall || this.neighbours[dir]?.type === ETileType.junction;
+        return this.neighbours[dir]?.type === ETileType.wall;
     }
 
     emptyTo(dir: EDirection) {
@@ -27,7 +27,11 @@ export class PixelDungeonTile {
     }
 
     roomTo(dir: EDirection) {
-        return this.neighbours[dir]?.type === ETileType.room || this.neighbours[dir]?.type === ETileType.floor;
+        return (
+            this.neighbours[dir]?.type === ETileType.room ||
+            this.neighbours[dir]?.type === ETileType.floor ||
+            this.neighbours[dir]?.type === ETileType.junction
+        );
     }
 
     get tile(): TileXYType {

@@ -15,7 +15,7 @@ export type NPTilemapConfig = Phaser.Types.Tilemaps.TilemapConfig & {
     tileSetImage: string;
     tileSetMargin: number;
     tileSetSpacing: number;
-    mapping: NPTilesetMapping;
+    mapping: NPTilesetMappingNew;
 };
 // Tile index mapping to make the code more readable
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,21 +29,35 @@ interface NPWeightedTileIndex {
 type NPTilesetMap = NPTileIndex | NPWeightedTileIndex[];
 
 export interface NPTilesetMappingNew {
-    CORNER_TOP_LEFT: NPTilesetMap;
-    CORNER_TOP_RIGHT: NPTilesetMap;
-    CORNER_BOTTOM_RIGHT: NPTilesetMap;
-    CORNER_BOTTOM_LEFT: NPTilesetMap;
+    WALL_TOP_OUTER: NPTilesetMap;
+    WALL_TOP: NPTilesetMap;
+    WALL_VERT: NPTilesetMap;
+    WALL_VERT_T: NPTilesetMap;
+    WALL_TOP_STITCH: NPTilesetMap;
+    WALL_TOP_LEFT_STITCH: NPTilesetMap;
+    WALL_TOP_RIGHT_STITCH: NPTilesetMap;
+    WALL_TOP_DEADEND_STITCH: NPTilesetMap;
+    WALL_TOP_RIGHT: NPTilesetMap;
+    WALL_TOP_LEFT: NPTilesetMap;
+    WALL_BOTTOM: NPTilesetMap;
+    WALL_LEFT: NPTilesetMap;
+    WALL_LEFT_TOP: NPTilesetMap;
+    WALL_LEFT_BOTTOM: NPTilesetMap;
+    WALL_RIGHT: NPTilesetMap;
+    WALL_RIGHT_TOP: NPTilesetMap;
+    WALL_RIGHT_BOTTOM: NPTilesetMap;
 
-    DOOR_VERTICAL: NPTilesetMap;
-    DOOR_HORIZONTAL: NPTilesetMap;
-
-    WALL_VERTICAL: NPTilesetMap;
-    WALL_HORIZONTAL: NPTilesetMap;
-
+    // WALL_TOP_LEFT: NPTilesetMap;
+    // TOP_RIGHT: NPTilesetMap;
+    // BOTTOM_RIGHT: NPTilesetMap;
+    // BOTTOM_LEFT: NPTilesetMap;
+    //
+    // DOOR_VERTICAL: NPTilesetMap;
+    // DOOR_HORIZONTAL: NPTilesetMap;
+    //
+    DOOR: NPTilesetMap;
     EMPTY: NPTilesetMap;
-
     FLOOR: NPTilesetMap;
-
     ROOM: NPTilesetMap;
 }
 
@@ -91,52 +105,60 @@ const TILESETS: Record<TNPTilesetKey, NPTilemapConfig> = {
         tileSetMargin: 1,
         tileSetSpacing: 2,
         mapping: {
-            TOP_LEFT_WALL: 101,
-            TOP_RIGHT_WALL: 102,
-            BOTTOM_RIGHT_WALL: 121,
-            CORNER_BOTTOM_LEFT_OUTSIDE: 152,
-            CORNER_BOTTOM_RIGHT_OUTSIDE: 152,
-            BOTTOM_LEFT_WALL: 120,
+            WALL_LEFT_TOP: 101,
+            WALL_LEFT_BOTTOM: 120,
+            WALL_TOP_OUTER: 120,
+            WALL_VERT: 120,
+            WALL_TOP_STITCH: 120,
+            WALL_VERT_T: 120,
+            WALL_TOP_LEFT_STITCH: 120,
+            WALL_TOP_RIGHT_STITCH: 120,
+            WALL_TOP_DEADEND_STITCH: 120,
+            WALL_RIGHT_TOP: 102,
+            WALL_RIGHT_BOTTOM: 121,
+            WALL_TOP_RIGHT: 152,
+            WALL_TOP_LEFT: 152,
+            // CORNER_BOTTOM_RIGHT_OUTSIDE: 152,
             EMPTY: 20,
-            DOOR_VERT: 105,
-            DOOR_HORIZ: 84,
+            // DOOR_VERT: 105,
+            // DOOR_HORIZ: 84,
             DOOR: [
                 { index: 118, weight: 4 },
                 { index: 105, weight: 1 },
                 { index: 84, weight: 1 },
             ],
-            LEFT_DOOR: 118,
-            BOTTOM_DOOR: 118,
-            TOP_T_WALL: 103,
-            LEFT_DEADEND_WALL: 82,
-            RIGHT_DEADEND_WALL: 85,
-            TOP_DEADEND_WALL: 86,
-            BOTTOM_DEADEND_WALL: 143,
-            BOTTOM_T_WALL: 123,
-            RIGHT_T_WALL: 104,
-            LEFT_T_WALL: 122,
-            CROSS_WALL: 142,
-            STRAIGHT_WALL_VERT: 124,
-            STRAIGHT_WALL_HORIZ: 83,
-            TOP_WALL: [
+            // LEFT_DOOR: 118,
+            // BOTTOM_DOOR: 118,
+            // TOP_T_WALL: 103,
+            // LEFT_DEADEND_WALL: 82,
+            // RIGHT_DEADEND_WALL: 85,
+            // TOP_DEADEND_WALL: 86,
+            // BOTTOM_DEADEND_WALL: 143,
+            // BOTTOM_T_WALL: 123,
+            // RIGHT_T_WALL: 104,
+            // LEFT_T_WALL: 122,
+            // CROSS_WALL: 142,
+            // STRAIGHT_WALL_VERT: 124,
+            // STRAIGHT_WALL_HORIZ: 83,
+            WALL_TOP: [
                 { index: 39, weight: 4 },
                 { index: 57, weight: 1 },
                 { index: 58, weight: 1 },
                 { index: 59, weight: 1 },
             ],
-            LEFT_WALL: [
+            WALL_LEFT: [
                 { index: 21, weight: 4 },
                 { index: 76, weight: 1 },
                 { index: 95, weight: 1 },
                 { index: 114, weight: 1 },
             ],
-            RIGHT_WALL: [
+            WALL_RIGHT: [
                 { index: 19, weight: 4 },
                 { index: 77, weight: 1 },
                 { index: 96, weight: 1 },
                 { index: 115, weight: 1 },
             ],
-            BOTTOM_WALL: [
+            WALL_BOTTOM: [
                 { index: 1, weight: 4 },
                 { index: 78, weight: 1 },
                 { index: 79, weight: 1 },
@@ -164,48 +186,48 @@ const TILESETS: Record<TNPTilesetKey, NPTilemapConfig> = {
         tileSetMargin: 1,
         tileSetSpacing: 2,
         mapping: {
-            TOP_LEFT_WALL: 147,
-            TOP_RIGHT_WALL: 148,
-            BOTTOM_RIGHT_WALL: 152,
-            CORNER_BOTTOM_LEFT_OUTSIDE: 194,
-            CORNER_BOTTOM_RIGHT_OUTSIDE: 193,
-            BOTTOM_LEFT_WALL: 145,
+            WALL_VERT: 158,
+            WALL_VERT_T: 153,
+            WALL_LEFT_TOP: 147,
+            WALL_LEFT_BOTTOM: 157,
+            //WALL_LEFT_BOTTOM: 145, single
+            WALL_RIGHT_TOP: 148,
+            WALL_RIGHT_BOTTOM: 155,
+            // WALL_RIGHT_BOTTOM: 152, single
+            WALL_TOP_RIGHT: 194,
+            WALL_TOP_LEFT: 193,
+            WALL_TOP_OUTER: 84,
+            WALL_TOP_STITCH: 192,
+            WALL_TOP_LEFT_STITCH: 194,
+            WALL_TOP_RIGHT_STITCH: 193,
+            WALL_TOP_DEADEND_STITCH: 195,
             EMPTY: 144,
-            DOOR_VERT: 227,
-            DOOR_HORIZ: 112,
+            // DOOR_VERT: 227,
+            // DOOR_HORIZ: 112,
             DOOR: [
                 { index: 112, weight: 4 },
                 { index: 227, weight: 1 },
             ],
-            LEFT_DOOR: 227,
-            BOTTOM_DOOR: 112,
-            TOP_T_WALL: 80,
-            LEFT_DEADEND_WALL: 146,
-            RIGHT_DEADEND_WALL: 156,
-            TOP_DEADEND_WALL: 195,
-            BOTTOM_DEADEND_WALL: 192,
-            BOTTOM_T_WALL: 153,
-            RIGHT_T_WALL: 156,
-            LEFT_T_WALL: 146,
-            CROSS_WALL: 224,
-            STRAIGHT_WALL_VERT: 151,
-            STRAIGHT_WALL_HORIZ: 80,
-            TOP_WALL: [{ index: 80, weight: 4 }],
-            LEFT_WALL: [{ index: 148, weight: 4 }],
-            RIGHT_WALL: [{ index: 147, weight: 4 }],
-            BOTTOM_WALL: [{ index: 192, weight: 4 }],
-            FLOOR: [
-                { index: 0, weight: 20 },
-                { index: 1, weight: 5 },
-                { index: 2, weight: 5 },
-                { index: 3, weight: 5 },
-                { index: 6, weight: 5 },
-                { index: 7, weight: 5 },
-                { index: 8, weight: 5 },
-                { index: 9, weight: 5 },
-            ],
+            // LEFT_DOOR: 227,
+            // BOTTOM_DOOR: 112,
+            // TOP_T_WALL: 80,
+            // LEFT_DEADEND_WALL: 146,
+            // RIGHT_DEADEND_WALL: 156,
+            // TOP_DEADEND_WALL: 195,
+            // BOTTOM_DEADEND_WALL: 192,
+            // BOTTOM_T_WALL: 153,
+            // RIGHT_T_WALL: 156,
+            // LEFT_T_WALL: 146,
+            // CROSS_WALL: 224,
+            // STRAIGHT_WALL_VERT: 151,
+            // STRAIGHT_WALL_HORIZ: 80,
+            WALL_TOP: [{ index: 80, weight: 4 }],
+            WALL_LEFT: [{ index: 147, weight: 4 }],
+            WALL_RIGHT: [{ index: 148, weight: 4 }],
+            WALL_BOTTOM: [{ index: 192, weight: 4 }],
+            FLOOR: [{ index: 4, weight: 80 }],
             ROOM: [
-                { index: 0, weight: 20 },
+                { index: 0, weight: 80 },
                 { index: 1, weight: 1 },
                 { index: 2, weight: 1 },
                 { index: 3, weight: 1 },
@@ -222,7 +244,7 @@ export class PixelDungeonMap implements NPSceneComponent {
     scene: NPSceneWithBoard;
 
     #dungeon: PixelDungeon;
-    #config: NPTilemapConfig & TDungeonOptions;
+    #config: NPTilemapConfig;
     #map: Phaser.Tilemaps.Tilemap;
     #floor: PixelDungeonFloorLayer;
     #walls: PixelDungeonTilelayer;
@@ -232,7 +254,7 @@ export class PixelDungeonMap implements NPSceneComponent {
 
     constructor(engine: PixelDungeonEngine, options: TDungeonOptions, type: TNPTilesetKey) {
         this.#dungeon = new PixelDungeon(options);
-        this.#config = Object.assign({}, TILESETS[type], options);
+        this.#config = Object.assign({}, TILESETS[type]);
         this.#engine = engine;
         this.scene = this.#engine.scene;
     }
@@ -253,8 +275,8 @@ export class PixelDungeonMap implements NPSceneComponent {
         this.#map = this.scene.make.tilemap({
             tileWidth: this.#config.tileWidth,
             tileHeight: this.#config.tileHeight,
-            width: this.#config.width,
-            height: this.#config.height,
+            width: this.#dungeon.width,
+            height: this.#dungeon.height,
         });
 
         const tileset = new PixelDungeonTileset(this.#map, this.#config);
