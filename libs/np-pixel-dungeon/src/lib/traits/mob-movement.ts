@@ -19,7 +19,7 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
         super(mob, {
             speed: mob.options.moveSpeed,
             rotateToTarget: mob.options.moveRotate,
-            blockerTest: false,
+            blockerTest: true,
             occupiedTest: true,
             sneak: false,
             // moveableTestScope: undefined,

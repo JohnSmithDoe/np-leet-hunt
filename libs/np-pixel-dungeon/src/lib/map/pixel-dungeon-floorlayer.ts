@@ -9,7 +9,8 @@ export class PixelDungeonFloorLayer extends PixelDungeonTilelayer {
         let start: TileXYType;
         for (const room of dungeon.rooms) {
             this.#mapDungeonRoomToTilemap(room);
-            start = room.topRight().tile;
+            const botR = room.bottomRight();
+            if (!start || botR.tileY > start.y) start = room.bottomRight().tile;
         }
         for (const hallway of dungeon.hallways) {
             for (const tile of hallway) {
@@ -18,7 +19,7 @@ export class PixelDungeonFloorLayer extends PixelDungeonTilelayer {
             }
         }
         for (const junction of dungeon.junctions) {
-            this.putTileAt(junction.pos, 'FLOOR');
+            this.putPixeldungeonTileAt(junction, 'FLOOR');
         }
         return start;
     }
