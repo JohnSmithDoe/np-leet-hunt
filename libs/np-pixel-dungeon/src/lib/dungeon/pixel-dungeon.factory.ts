@@ -29,7 +29,7 @@ import { ETileType, TDungeonOptions, TDungeonTile } from '../@types/pixel-dungeo
 ///    "connector". This is a solid tile that is adjacent to two unconnected
 ///    regions.
 /// 4. We randomly choose connectors and open them or place a door there until
-///    all of the unconnected regions have been joined. There is also a slight
+///    all the unconnected regions have been joined. There is also a slight
 ///    chance to carve a connector between two already-joined regions, so that
 ///    the dungeon isn't single connected.
 /// 5. The mazes will have a lot of dead ends. Finally, we remove those by
@@ -70,6 +70,7 @@ export class PixelDungeonFactory {
         // return this.#dungeon;
         this.#removeDeadEnds();
         this.#removeFullWalls();
+        this.#addEmptyFrame();
         return this.#dungeon;
     }
 
@@ -77,6 +78,7 @@ export class PixelDungeonFactory {
         options = Object.assign({}, defaultDungeon, options ?? {});
         if (options.width % 2 === 0 || options.height % 2 === 0) {
             throw new Error('The options must be odd-sized');
+            // hmm: why is that important for alignment
         }
         this.#options = options;
         this.#options.roomTries ??= options.width * options.height ?? options.width;
@@ -110,7 +112,6 @@ export class PixelDungeonFactory {
         while (--this.#options.roomTries > 0 && roomAreaPercentage < this.#options.roomArea) {
             const room = this.#createRoom();
             if (!room) continue;
-
             this.#rooms.push(room);
             this.#startRegion();
             for (const pos of room) {
@@ -338,7 +339,6 @@ export class PixelDungeonFactory {
         const y = this.#rng.inRange(Math.trunc((this.#bounds.height - 1 - height) / 2)) * 2 + 1;
 
         const room = new NPRect(x, y, width, height);
-
         let overlaps = false;
         for (const other of this.#rooms) {
             if (room.distanceTo(other) <= 0) {
@@ -436,5 +436,23 @@ export class PixelDungeonFactory {
                 decisionOver2 += 2 * (y - x) + 1; // Change for y -> y+1, x -> x-1
             }
         }
+    }
+
+    #addEmptyFrame() {
+        this.#dungeon = array2D(this.#options.height + 2, this.#options.width + 2, (row, col) => {
+            if (row === 0 || col === 0 || row === this.#options.height + 1 || col === this.#options.width + 1) {
+                return {
+                    type: ETileType.none,
+                    region: -1,
+                    x: col,
+                    y: row,
+                };
+            } else {
+                const cur = this.#dungeon[row - 1][col - 1];
+                cur.x = col;
+                cur.y = row;
+                return cur;
+            }
+        });
     }
 }

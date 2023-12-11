@@ -1,5 +1,5 @@
 import { ETileType } from '../@types/pixel-dungeon.types';
-import { NPTilemapConfig, NPTilesetMapping } from './pixel-dungeon.map';
+import { NPTilemapConfig, NPTilesetMapping, NPTilesetMappingNew } from './pixel-dungeon.map';
 
 export class PixelDungeonTileset {
     #map: Phaser.Tilemaps.Tilemap;
@@ -36,7 +36,7 @@ export class PixelDungeonTileset {
         return this.#tileset;
     }
 
-    mapping(key: keyof NPTilesetMapping) {
+    mapping(key: keyof NPTilesetMappingNew) {
         return this.#config.mapping[key];
     }
 

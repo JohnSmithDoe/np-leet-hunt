@@ -1,11 +1,10 @@
-import { EDirection, NPVec2 } from '@shared/np-library';
+import { NPVec2 } from '@shared/np-library';
 import * as Phaser from 'phaser';
 
 import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { PixelDungeon } from '../dungeon/pixel-dungeon';
 import { PixelDungeonRoom } from '../dungeon/pixel-dungeon.room';
 import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
-import { NPTilesetMapping } from './pixel-dungeon.map';
+import { NPTilesetMappingNew } from './pixel-dungeon.map';
 import { PixelDungeonTileset } from './pixel-dungeon-tileset';
 
 export class PixelDungeonTilelayer {
@@ -28,7 +27,7 @@ export class PixelDungeonTilelayer {
         return this.#tileset;
     }
 
-    putTileAt(tile: TDungeonTile | NPVec2, key: keyof NPTilesetMapping) {
+    putTileAt(tile: TDungeonTile | NPVec2, key: keyof NPTilesetMappingNew) {
         const mappingElement = this.#tileset.mapping(key);
         if (typeof mappingElement === 'number') {
             this.#tilelayer.putTileAt(mappingElement, tile.x, tile.y);
@@ -37,7 +36,7 @@ export class PixelDungeonTilelayer {
         }
     }
 
-    protected putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMapping) {
+    protected putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMappingNew) {
         const mappingElement = this.#tileset.mapping(key);
         if (typeof mappingElement === 'number') {
             this.#tilelayer.putTileAt(mappingElement, tile.tileX, tile.tileY);
@@ -46,23 +45,23 @@ export class PixelDungeonTilelayer {
         }
     }
 
-    mapDungeonToLayer(dungeon: PixelDungeon) {
-        for (const junction of dungeon.junctions) {
-            if (!junction.vertical) {
-                this.putTileAt(junction.pos, junction.toTileIndex());
-                const right = junction.pos.addDirection(EDirection.E);
-                const left = junction.pos.addDirection(EDirection.W);
-                const top = junction.pos.addDirection(EDirection.N);
-                this.putTileAt(top, 'CROSS_WALL');
-                this.#tilelayer.putTileAt(194, right.x, right.y - 1);
-                this.#tilelayer.putTileAt(193, left.x, left.y - 1);
-            } else {
-                const top = junction.pos.addDirection(EDirection.N);
-                const bottom = junction.pos;
-                this.#tilelayer.putTileAt(88, top.x, top.y);
-                this.#tilelayer.putTileAt(215, bottom.x, bottom.y);
-            }
-        }
+    mapDungeonToLayer() {
+        // for (const junction of dungeon.junctions) {
+        //     if (!junction.vertical) {
+        //         this.putTileAt(junction.pos, junction.toTileIndex());
+        //         const right = junction.pos.addDirection(EDirection.E);
+        //         const left = junction.pos.addDirection(EDirection.W);
+        //         const top = junction.pos.addDirection(EDirection.N);
+        //         this.putTileAt(top, 'FLOOR');
+        //         this.#tilelayer.putTileAt(194, right.x, right.y - 1);
+        //         this.#tilelayer.putTileAt(193, left.x, left.y - 1);
+        //     } else {
+        //         const top = junction.pos.addDirection(EDirection.N);
+        //         const bottom = junction.pos;
+        //         this.#tilelayer.putTileAt(88, top.x, top.y);
+        //         this.#tilelayer.putTileAt(215, bottom.x, bottom.y);
+        //     }
+        // }
         //
         // for (const tile of dungeon) {
         //     if (tile.type === ETileType.room) {

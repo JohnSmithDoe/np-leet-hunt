@@ -1,4 +1,3 @@
-import { EDirection } from '@shared/np-library';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeon } from '../dungeon/pixel-dungeon';
@@ -15,7 +14,7 @@ export class PixelDungeonFloorLayer extends PixelDungeonTilelayer {
         for (const hallway of dungeon.hallways) {
             for (const tile of hallway) {
                 this.putPixeldungeonTileAt(tile, 'FLOOR');
-                this.putTileAt(tile.pos.addDirection(EDirection.S), 'FLOOR');
+                // this.putTileAt(tile.pos.addDirection(EDirection.S), 'FLOOR');
             }
         }
         for (const junction of dungeon.junctions) {

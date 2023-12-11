@@ -42,6 +42,7 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
 
     init(mapTiles = true) {
         this.#dungeon = new PixelDungeonFactory().generate(this.#options);
+        console.log(this.#dungeon);
         if (mapTiles) this.#mapTiles();
         // console.log(this.#regions, this.#rooms, this.#halls, this.#junctions);
     }
@@ -88,11 +89,11 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
     }
 
     get width() {
-        return this.#options.width;
+        return this.#dungeon[0].length;
     }
 
     get height() {
-        return this.#options.height;
+        return this.#dungeon.length;
     }
 
     get rooms() {

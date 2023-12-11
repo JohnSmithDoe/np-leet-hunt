@@ -1,7 +1,7 @@
 import { EDirection } from '@shared/np-library';
 
 import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { NPTilesetMapping } from '../map/pixel-dungeon.map';
+import { NPTilesetMappingNew } from '../map/pixel-dungeon.map';
 import { PixelDungeon } from './pixel-dungeon';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
@@ -13,11 +13,11 @@ export class PixelDungeonJunction extends PixelDungeonTile {
         this.vertical = this.wallTo(EDirection.N) && this.wallTo(EDirection.S);
     }
 
-    toTileIndex(): keyof NPTilesetMapping {
+    toTileIndex(): keyof NPTilesetMappingNew {
         if (this.vertical) {
-            return 'DOOR_VERT';
+            return 'DOOR';
         } else {
-            return 'DOOR_HORIZ';
+            return 'DOOR';
         }
     }
 }
