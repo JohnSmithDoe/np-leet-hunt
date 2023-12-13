@@ -41,7 +41,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     #setup() {
-        this.map = new PixelDungeonMap(this, { height: 25, width: 25, seed: '##' }, 'shattered');
+        this.map = new PixelDungeonMap(this, { height: 25, width: 25, seed: '<#.#>' }, 'shattered');
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, key: 'brawler' });
         this.mobs = [this.player];
         for (let i = 0; i < 3; i++) {
@@ -103,6 +103,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     startTurn() {
         // console.log('start turn on cycle');
         this.mobs.forEach(mob => mob.startTurn());
+        this.map.doors(this.mobs);
     }
 
     displayText(msg: string, tile: TileXYType, type: EMobInfoType) {

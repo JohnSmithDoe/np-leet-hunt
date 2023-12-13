@@ -99,6 +99,7 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
     get rooms() {
         return this.#rooms;
     }
+
     get hallways() {
         return this.#halls;
     }

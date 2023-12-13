@@ -19,8 +19,10 @@ export class PixelDungeonWall extends PixelDungeonTile {
         const wallToSW = this.wallTo(EDirection.SW);
         const emptyToS = this.emptyTo(EDirection.S);
         const roomToS = this.roomTo(EDirection.S);
-        if (this.tileX === 6 && this.tileY === 1) {
-            console.log(this);
+        const junctionToS = this.junctionTo(EDirection.S);
+
+        if (junctionToS) {
+            return 'WALL_TOP_JUNCTION';
         }
         if (roomToS) {
             return 'WALL_TOP';
@@ -56,6 +58,9 @@ export class PixelDungeonWall extends PixelDungeonTile {
 
         if (!wallToE && !wallToW) {
             return 'WALL_TOP_DEADEND_STITCH';
+        }
+        if (!wallToE && wallToW) {
+            return 'WALL_TOP_RIGHT_STITCH';
         }
         if (wallToE && !wallToW) {
             return 'WALL_TOP_LEFT_STITCH';

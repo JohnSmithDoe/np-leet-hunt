@@ -32,9 +32,7 @@ export class PixelDungeonBoard extends Board<NPChessTypes> {
 
     #addDungeon(dungeon: PixelDungeon) {
         for (const wall of dungeon.walls) {
-            console.log(wall.rexChess);
             this.addChess(wall, wall.tileX, wall.tileY, 'wall', false);
-            console.log(wall.rexChess);
             wall.rexChess.setBlocker(true);
         }
     }

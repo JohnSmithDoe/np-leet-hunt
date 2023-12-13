@@ -12,6 +12,7 @@ type NPTilesetMap = NPTileIndex | NPWeightedTileIndex[];
 export interface NPTilesetMappingNew {
     WALL_TOP_OUTER: NPTilesetMap;
     WALL_TOP: NPTilesetMap;
+    WALL_TOP_JUNCTION: NPTilesetMap;
     WALL_VERT: NPTilesetMap;
     WALL_VERT_T: NPTilesetMap;
     WALL_TOP_STITCH: NPTilesetMap;
@@ -37,12 +38,21 @@ export interface NPTilesetMappingNew {
     // DOOR_HORIZONTAL: NPTilesetMap;
     //
     DOOR: NPTilesetMap;
+    DOOR_CLOSED: NPTilesetMap;
+    DOOR_II: NPTilesetMap;
+    DOOR_II_CLOSED: NPTilesetMap;
+    DOOR_II_WALLED: NPTilesetMap;
+    DOOR_II_WALLED_CLOSED: NPTilesetMap;
+    DOOR_STITCH: NPTilesetMap;
+    DOOR_STITCH_CLOSED: NPTilesetMap;
+    DOOR_STITCH_II: NPTilesetMap;
+    DOOR_STITCH_II_CLOSED: NPTilesetMap;
     EMPTY: NPTilesetMap;
     FLOOR: NPTilesetMap;
     ROOM: NPTilesetMap;
 }
 
-export type TNPTilesetKey = 'example' | 'shattered';
+export type TNPTilesetKey = 'shattered';
 type NPTilesetConfig = Phaser.Types.Tilemaps.TilemapConfig & {
     tileSetImage: string;
     tileSetMargin: number;
@@ -50,89 +60,6 @@ type NPTilesetConfig = Phaser.Types.Tilemaps.TilemapConfig & {
     mapping: NPTilesetMappingNew;
 };
 const TILESETS: Record<TNPTilesetKey, NPTilesetConfig> = {
-    // Credits! Michele "Buch" Bucelli (tilset artist) & Abram Connelly (tileset sponser)
-    // https://opengameart.org/content/top-down-dungeon-tileset
-    example: {
-        tileWidth: 16,
-        tileHeight: 16,
-        key: 'buch',
-        tileSetImage: 'np-pixel-dungeon/buch-dungeon-tileset-extruded.png',
-        tileSetMargin: 1,
-        tileSetSpacing: 2,
-        mapping: {
-            WALL_LEFT_TOP: 101,
-            WALL_LEFT_BOTTOM: 120,
-            WALL_TOP_OUTER: 120,
-            WALL_VERT: 120,
-            WALL_TOP_STITCH: 120,
-            WALL_VERT_T: 120,
-            WALL_TOP_LEFT_STITCH: 120,
-            WALL_TOP_RIGHT_STITCH: 120,
-            WALL_TOP_DEADEND_STITCH: 120,
-            WALL_RIGHT_TOP: 102,
-            WALL_RIGHT_BOTTOM: 121,
-            WALL_TOP_RIGHT: 152,
-            WALL_TOP_LEFT: 152,
-            // CORNER_BOTTOM_RIGHT_OUTSIDE: 152,
-            EMPTY: 20,
-            // DOOR_VERT: 105,
-            // DOOR_HORIZ: 84,
-            DOOR: [
-                { index: 118, weight: 4 },
-                { index: 105, weight: 1 },
-                { index: 84, weight: 1 },
-            ],
-            // LEFT_DOOR: 118,
-            // BOTTOM_DOOR: 118,
-            // TOP_T_WALL: 103,
-            // LEFT_DEADEND_WALL: 82,
-            // RIGHT_DEADEND_WALL: 85,
-            // TOP_DEADEND_WALL: 86,
-            // BOTTOM_DEADEND_WALL: 143,
-            // BOTTOM_T_WALL: 123,
-            // RIGHT_T_WALL: 104,
-            // LEFT_T_WALL: 122,
-            // CROSS_WALL: 142,
-            // STRAIGHT_WALL_VERT: 124,
-            // STRAIGHT_WALL_HORIZ: 83,
-            WALL_TOP: [
-                { index: 39, weight: 4 },
-                { index: 57, weight: 1 },
-                { index: 58, weight: 1 },
-                { index: 59, weight: 1 },
-            ],
-            WALL_LEFT: [
-                { index: 21, weight: 4 },
-                { index: 76, weight: 1 },
-                { index: 95, weight: 1 },
-                { index: 114, weight: 1 },
-            ],
-            WALL_RIGHT: [
-                { index: 19, weight: 4 },
-                { index: 77, weight: 1 },
-                { index: 96, weight: 1 },
-                { index: 115, weight: 1 },
-            ],
-            WALL_BOTTOM: [
-                { index: 1, weight: 4 },
-                { index: 78, weight: 1 },
-                { index: 79, weight: 1 },
-                { index: 80, weight: 1 },
-            ],
-            FLOOR: [
-                { index: 6, weight: 20 },
-                { index: 7, weight: 1 },
-                { index: 8, weight: 1 },
-                { index: 26, weight: 1 },
-            ],
-            ROOM: [
-                { index: 6, weight: 20 },
-                { index: 7, weight: 1 },
-                { index: 8, weight: 1 },
-                { index: 26, weight: 1 },
-            ],
-        },
-    },
     shattered: {
         tileWidth: 16,
         tileHeight: 16,
@@ -152,6 +79,11 @@ const TILESETS: Record<TNPTilesetKey, NPTilesetConfig> = {
             WALL_RIGHT_BOTTOM: 155,
             // WALL_RIGHT_BOTTOM: 152, single
             WALL_TOP: [{ index: 80, weight: 4 }],
+            WALL_TOP_JUNCTION: [
+                { index: 88, weight: 4 },
+                { index: 89, weight: 4 },
+                { index: 90, weight: 4 },
+            ],
             WALL_TOP_RIGHT: 194,
             WALL_TOP_LEFT: 193,
             WALL_TOP_OUTER: 80, //144, //192, //84,
@@ -161,13 +93,16 @@ const TILESETS: Record<TNPTilesetKey, NPTilesetConfig> = {
             WALL_TOP_DEADEND_STITCH: 195,
             WALL_BOTTOM: [{ index: 192, weight: 4 }],
             EMPTY: 144,
-            // DOOR_VERT: 227,
-            // DOOR_HORIZ: 112,
-            DOOR: [
-                { index: 112, weight: 4 },
-                { index: 227, weight: 1 },
-            ],
-            // LEFT_DOOR: 227,
+            DOOR_STITCH: 225,
+            DOOR_STITCH_CLOSED: 224,
+            DOOR_STITCH_II: 5,
+            DOOR_STITCH_II_CLOSED: 227,
+            DOOR: 113,
+            DOOR_CLOSED: 112,
+            DOOR_II: 211,
+            DOOR_II_CLOSED: 215,
+            DOOR_II_WALLED: 208,
+            DOOR_II_WALLED_CLOSED: 212,
             // BOTTOM_DOOR: 112,
             // TOP_T_WALL: 80,
             // LEFT_DEADEND_WALL: 146,

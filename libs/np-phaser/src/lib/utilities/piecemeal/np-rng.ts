@@ -8,7 +8,8 @@ export class NPRng {
 
     constructor(seed: string) {
         this.#seed = seed;
-        this.#rng = new Phaser.Math.RandomDataGenerator(seed);
+        this.#rng = new Phaser.Math.RandomDataGenerator(this.#seed);
+        this.#rng.sow([this.#seed]);
     }
 
     /**

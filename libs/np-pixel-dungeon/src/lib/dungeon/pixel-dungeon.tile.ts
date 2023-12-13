@@ -24,6 +24,10 @@ export class PixelDungeonTile {
         return this.neighbours[dir]?.type === ETileType.wall;
     }
 
+    junctionTo(dir: EDirection) {
+        return this.neighbours[dir]?.type === ETileType.junction;
+    }
+
     emptyTo(dir: EDirection) {
         return !this.neighbours[dir] || this.neighbours[dir].type === ETileType.none;
     }

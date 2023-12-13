@@ -4,7 +4,7 @@ import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 
-const equalTile = (tile: TileXYType, other: TileXYType) => tile.x === other.x && tile.y === other.y;
+export const equalTile = (tile: TileXYType, other: TileXYType) => tile.x === other.x && tile.y === other.y;
 
 export class MobVision extends FieldOfView<PixelDungeonMob> {
     #currentView: TileXYType[];
