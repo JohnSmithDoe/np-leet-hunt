@@ -4,9 +4,9 @@ import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeon } from '../dungeon/pixel-dungeon';
+import { PixelDungeonJunction } from '../dungeon/pixel-dungeon.junction';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
-import { equalTile } from '../traits/mob-vision';
 import { PixelDungeonFloorLayer } from './pixel-dungeon-floorlayer';
 import { PixelDungeonObjectlayer } from './pixel-dungeon-objectlayer';
 import { PixelDungeonTilelayer } from './pixel-dungeon-tilelayer';
@@ -87,9 +87,15 @@ export class PixelDungeonMap implements NPSceneComponent {
     }
 
     public doors(mobs: PixelDungeonMob[]) {
-        for (const junction of this.dungeon.junctions) {
-            junction.setOpen(!!mobs.find(mob => equalTile(junction.tile, mob.tile)));
+        for (const mob of mobs) {
+            const tile = this.#engine.board.getTile(mob.tile);
+            if (tile instanceof PixelDungeonJunction) {
+                tile.setOpen(true);
+            }
         }
+        // for (const junction of this.dungeon.junctions) {
+        //     junction.setOpen(!!mobs.find(mob => equalTile(junction.tile, mob.tile)));
+        // }
         this.#objects.mapDungeonToLayer(this.#dungeon);
     }
 }

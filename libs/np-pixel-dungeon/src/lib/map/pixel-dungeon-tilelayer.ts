@@ -29,6 +29,7 @@ export abstract class PixelDungeonTilelayer {
         } else {
             this.#tilelayer.weightedRandomize(mappingElement, tile.x, tile.y, 1, 1);
         }
+        // this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0.5;
     }
 
     protected putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMappingNew) {
@@ -38,7 +39,7 @@ export abstract class PixelDungeonTilelayer {
         } else {
             this.#tilelayer.weightedRandomize(mappingElement, tile.tileX, tile.tileY, 1, 1);
         }
-        this.#tilelayer.getTileAt(tile.tileX, tile.tileY);
+        // this.#tilelayer.getTileAt(tile.tileX, tile.tileY).alpha = 0.5;
     }
 
     abstract mapDungeonToLayer(dungeon: PixelDungeon): void;

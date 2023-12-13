@@ -65,8 +65,9 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
         this.#board = new PixelDungeonBoard(this);
         for (let i = 0; i < this.mobs.length; i++) {
-            this.#board.addChess(this.mobs[i], this.map.start.x, this.map.start.y - i, 1);
+            this.#board.addMob(this.mobs[i], this.map.start.x, this.map.start.y - i);
         }
+
         this.mobs.forEach(mob => mob.create());
 
         this.#pathfinder = new PixelDungeonPathfinder(this);

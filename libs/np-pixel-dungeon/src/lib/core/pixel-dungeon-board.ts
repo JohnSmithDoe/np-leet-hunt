@@ -1,4 +1,5 @@
 import Board from 'phaser3-rex-plugins/plugins/board/board/Board';
+import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeon } from '../dungeon/pixel-dungeon';
 import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
@@ -35,5 +36,17 @@ export class PixelDungeonBoard extends Board<NPChessTypes> {
             this.addChess(wall, wall.tileX, wall.tileY, 'wall', false);
             wall.rexChess.setBlocker(true);
         }
+        for (const junction of dungeon.junctions) {
+            this.addChess(junction, junction.tileX, junction.tileY, 'objects', false);
+            junction.rexChess.setBlocker(false);
+        }
+    }
+
+    addMob(mob: PixelDungeonMob, tileX: number, tileY: number) {
+        this.addChess(mob, tileX, tileY, 1);
+    }
+    getTile(tileXY: TileXYType) {
+        const res = this.tileXYZToChess(tileXY.x, tileXY.y, 'objects');
+        return res instanceof PixelDungeonTile ? res : null;
     }
 }

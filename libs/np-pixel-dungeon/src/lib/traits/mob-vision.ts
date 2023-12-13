@@ -10,7 +10,7 @@ export class MobVision extends FieldOfView<PixelDungeonMob> {
     #currentView: TileXYType[];
     constructor(private mob: PixelDungeonMob) {
         super(mob, {
-            // preTestCallback: a => this.engine.preTestCallback(a, this.options.visionRange),
+            // preTestCallback: a => this.mob.engine.preTestCallback(a, this.options.visionRange),
             // costCallback: a => this.engine.costs(a),
             preTestCallback: undefined,
             costCallback: undefined,
