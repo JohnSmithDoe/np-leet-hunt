@@ -20,4 +20,8 @@ export class PixelDungeonHallway {
         this.#tiles.push(tile);
         this.#tiles.sort((a, b) => a.x - b.x).sort((a, b) => a.y - b.y);
     }
+
+    get tiles() {
+        return this.#tiles;
+    }
 }

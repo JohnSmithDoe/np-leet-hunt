@@ -1,5 +1,5 @@
-import { PixelDungeonAction } from '../engine/states/handle-action.state';
-import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
+import { PixelDungeonAction } from '../../engine/states/handle-action.state';
+import { PixelDungeonMob } from '../pixel-dungeon.mob';
 
 const FULL_ENERGY = 100;
 

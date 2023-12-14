@@ -163,7 +163,7 @@ export class PixelDungeonFactory {
             this.#addJunction(connector);
 
             // Merge the connected regions. We'll pick one region (arbitrarily) and
-            // map all of the other regions to its index.
+            // map all other regions to its index.
             let dest;
             const sources: number[] = [];
             const mergedRegions = [];

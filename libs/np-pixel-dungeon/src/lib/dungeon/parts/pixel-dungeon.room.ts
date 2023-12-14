@@ -1,10 +1,9 @@
-import { PixelDungeon } from '../../pixel-dungeon';
+import { PixelDungeon } from '../pixel-dungeon';
 import { PixelDungeonJunction } from './pixel-dungeon.junction';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonRoom {
     junctions: PixelDungeonJunction[];
-    connects: number[];
 
     #tiles: PixelDungeonTile[] = [];
     #dungeon: PixelDungeon;
@@ -57,5 +56,12 @@ export class PixelDungeonRoom {
             tile ??= curr;
             return tile.x <= curr.x && tile.y >= curr.y ? tile : curr;
         }, null));
+    }
+    get tiles() {
+        return this.#tiles;
+    }
+
+    get region(): number {
+        return this.#region;
     }
 }

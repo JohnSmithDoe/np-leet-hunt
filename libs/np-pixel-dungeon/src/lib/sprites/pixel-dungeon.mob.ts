@@ -4,11 +4,11 @@ import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { MobAction } from '../traits/mob-action';
-import { MobMovement } from '../traits/mob-movement';
-import { MobVision } from '../traits/mob-vision';
 import { EMobInfoType } from './pixel-dungeon.info-text';
 import { PixelDungeonLPCSprite, TPixelDungeonLPCSpriteOptions } from './pixel-dungeon.lpc-sprite';
+import { MobAction } from './traits/mob-action';
+import { MobMovement } from './traits/mob-movement';
+import { MobVision } from './traits/mob-vision';
 
 export interface TPixelDungeonMobOptions extends TPixelDungeonLPCSpriteOptions {
     energyGain?: number;
@@ -69,7 +69,12 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPSceneCom
     }
 
     get tile() {
-        return this.rexChess.tileXYZ;
+        let tileXYZ = this.rexChess.tileXYZ;
+        if (!tileXYZ) {
+            console.log('no tile on mob............. player stepped on mob with path moving');
+            tileXYZ = { x: 0, y: 0, z: 0 };
+        }
+        return tileXYZ;
     }
 
     get vision() {

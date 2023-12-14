@@ -8,17 +8,19 @@ import Vector2 = Phaser.Math.Vector2;
 export class PixelDungeonPathfinder extends PathFinder {
     #board: PixelDungeonBoard;
     #pathGraphics: Phaser.GameObjects.Graphics;
-    constructor(engine: PixelDungeonEngine) {
+    #debug = false;
+    constructor(engine: PixelDungeonEngine, board: PixelDungeonBoard) {
         super(engine.player, {
             pathMode: 'A*-line',
             blockerTest: true,
             occupiedTest: true,
         });
-        this.#board = engine.level.board;
+        this.#board = board;
         this.#pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
     }
     findPath(endTileXY: TileXYType) {
         const pathToMove = super.findPath(endTileXY);
+        if (!this.#debug) return pathToMove;
         // debug
         ((path?: PathFinder.NodeType[]) => {
             if (path && path.length) {

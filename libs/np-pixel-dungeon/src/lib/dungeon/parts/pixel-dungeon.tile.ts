@@ -1,10 +1,12 @@
 import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 
-import { EDirection, NPVec2 } from '../../../../../../np-phaser/src/lib/utilities/piecemeal';
-import { TDungeonTile } from '../../../@types/pixel-dungeon.types';
-import { PixelDungeon } from '../../pixel-dungeon';
+import { EDirection, NPVec2 } from '../../../../../np-phaser/src/lib/utilities/piecemeal';
+import { TDungeonTile } from '../../@types/pixel-dungeon.types';
+import { PixelDungeonBoard } from '../../core/pixel-dungeon-board';
+import { PixelDungeonMap } from '../../map/pixel-dungeon.map';
+import { PixelDungeon } from '../pixel-dungeon';
 
-export class PixelDungeonTile {
+export abstract class PixelDungeonTile {
     rexChess: ChessData;
     #dungeon: PixelDungeon;
     #tile: TDungeonTile;
@@ -13,6 +15,8 @@ export class PixelDungeonTile {
         this.#tile = tile;
         this.#dungeon = dungeon;
     }
+
+    abstract addToLevel(map: PixelDungeonMap, board: PixelDungeonBoard): void;
 
     wallTo(dir: EDirection) {
         return this.#dungeon.wallTo(this.#tile, dir);

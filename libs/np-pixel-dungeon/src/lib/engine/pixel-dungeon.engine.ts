@@ -5,7 +5,7 @@ import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateMa
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonPathfinder } from '../core/pixel-dungeon.pathfinder';
-import { PixelDungeonLevel } from '../dungeon/levels/pixel-dungeon.level';
+import { PixelDungeonLevel } from '../dungeon/pixel-dungeon.level';
 import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { EMobInfoType, PixelDungeonInfoText } from '../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
@@ -51,18 +51,23 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     create(): void {
-        this.level.create();
         const start = this.level.start;
+        this.level.create();
+        this.#pathfinder = new PixelDungeonPathfinder(this, this.level.board);
+        this.#addMobs(start);
+
+        this.updateFoV();
+    }
+
+    #addMobs(start: { x: number; y: number }) {
         for (let i = 0; i < this.mobs.length; i++) {
             this.level.addMob(this.mobs[i], start.x, start.y - i);
         }
-
+        // needs to be added to the board to work... Field of view needs it
         this.mobs.forEach(mob => mob.create());
 
-        this.#pathfinder = new PixelDungeonPathfinder(this);
-
-        this.updateFoV();
         this.mobs.forEach(mob => {
+            mob.setDepth(5);
             this.scene.add.existing(mob);
         });
     }

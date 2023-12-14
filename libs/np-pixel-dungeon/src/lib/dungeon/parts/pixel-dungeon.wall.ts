@@ -1,12 +1,22 @@
 import { EDirection } from '@shared/np-library';
 
-import { NPTilesetMappingNew } from '../../../map/pixel-dungeon-tileset';
+import { PixelDungeonBoard } from '../../core/pixel-dungeon-board';
+import { PixelDungeonMap } from '../../map/pixel-dungeon.map';
+import { NPTilesetMappingNew } from '../../map/pixel-dungeon-tileset';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonWall extends PixelDungeonTile {
-    regions: number[];
+    addToLevel(map: PixelDungeonMap, board: PixelDungeonBoard): void {
+        board.addChess(this, this.x, this.y, 'walls', false);
+        this.rexChess.setBlocker(true);
 
-    toTileIndex(): keyof NPTilesetMappingNew {
+        map.walllayer.putTileAt(this, this.#toTileIndex());
+        if (this.#needStitching()) {
+            map.stitchlayer.putTileAt(this.pos.addDirection(EDirection.N), this.#toStichTileIndex());
+        }
+    }
+
+    #toTileIndex(): keyof NPTilesetMappingNew {
         const wallToN = this.wallTo(EDirection.N);
         const wallToSE = this.wallTo(EDirection.SE);
         const wallToS = this.wallTo(EDirection.S);
@@ -37,12 +47,12 @@ export class PixelDungeonWall extends PixelDungeonTile {
         if (wallToN || wallToS) return 'WALL_VERT';
     }
 
-    public needStitching() {
+    #needStitching() {
         const wallToN = this.wallTo(EDirection.N);
         return !wallToN;
     }
 
-    public toStichTileIndex(): keyof NPTilesetMappingNew {
+    #toStichTileIndex(): keyof NPTilesetMappingNew {
         const wallToE = this.wallTo(EDirection.E);
         const wallToS = this.wallTo(EDirection.S);
         const wallToW = this.wallTo(EDirection.W);

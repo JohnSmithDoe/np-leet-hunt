@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { PixelDungeonTile } from '../../dungeon/levels/board/pixel-dungeon.tile';
+import { PixelDungeonTile } from '../../dungeon/parts/pixel-dungeon.tile';
 import { NPTilesetMappingNew, PixelDungeonTileset } from '../pixel-dungeon-tileset';
 
 export class PixelDungeonTilelayer {

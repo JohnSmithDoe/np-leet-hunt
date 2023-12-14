@@ -3,9 +3,9 @@ import MoveToTask from 'phaser3-rex-plugins/plugins/behaviors/moveto/MoveTo';
 import MoveTo from 'phaser3-rex-plugins/plugins/board/moveto/MoveTo';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { WalkToAction } from '../engine/states/handle-action.state';
-import { EMobInfoType } from '../sprites/pixel-dungeon.info-text';
-import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
+import { WalkToAction } from '../../engine/states/handle-action.state';
+import { EMobInfoType } from '../pixel-dungeon.info-text';
+import { PixelDungeonMob } from '../pixel-dungeon.mob';
 
 export class MobMovement extends MoveTo<PixelDungeonMob> {
     moveToTask: MoveToTask & {

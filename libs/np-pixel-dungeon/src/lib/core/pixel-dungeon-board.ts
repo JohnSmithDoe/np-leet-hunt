@@ -1,7 +1,7 @@
 import Board from 'phaser3-rex-plugins/plugins/board/board/Board';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { PixelDungeonTile } from '../dungeon/levels/board/pixel-dungeon.tile';
+import { PixelDungeonTile } from '../dungeon/parts/pixel-dungeon.tile';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 

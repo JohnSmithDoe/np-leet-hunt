@@ -2,7 +2,7 @@ import { EDirection, mapRexPluginDirection, mapToRexPluginDirection } from '@sha
 import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
+import { PixelDungeonMob } from '../pixel-dungeon.mob';
 
 export const equalTile = (tile: TileXYType, other: TileXYType) => tile.x === other.x && tile.y === other.y;
 

@@ -2,7 +2,7 @@ import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
+import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonFloorLayer } from './layer/pixel-dungeon-floorlayer';
 import { PixelDungeonObjectlayer } from './layer/pixel-dungeon-objectlayer';
@@ -10,19 +10,23 @@ import { PixelDungeonTilelayer } from './layer/pixel-dungeon-tilelayer';
 import { PixelDungeonWallLayer } from './layer/pixel-dungeon-walllayer';
 import { PixelDungeonTileset, TNPTilesetKey } from './pixel-dungeon-tileset';
 
+export interface TPixelDungeonMapOptions {
+    width: number;
+    height: number;
+}
 export class PixelDungeonMap implements NPSceneComponent {
     scene: NPSceneWithBoard;
 
     #map: Phaser.Tilemaps.Tilemap;
     #tileset: PixelDungeonTileset;
-    #options: TDungeonOptions;
+    #options: TPixelDungeonMapOptions;
 
     #floor: PixelDungeonFloorLayer;
     #walls: PixelDungeonTilelayer;
     #objects: PixelDungeonTilelayer;
     #stitches: PixelDungeonTilelayer;
 
-    constructor(engine: PixelDungeonEngine, options: TDungeonOptions, type: TNPTilesetKey) {
+    constructor(engine: PixelDungeonEngine, options: TPixelDungeonMapOptions, type: TNPTilesetKey) {
         this.scene = engine.scene;
         this.#options = options;
         this.#tileset = new PixelDungeonTileset(type);
@@ -47,6 +51,7 @@ export class PixelDungeonMap implements NPSceneComponent {
         this.#walls = new PixelDungeonWallLayer('walls', this.scene, this.#map, this.#tileset);
         this.#objects = new PixelDungeonObjectlayer('objects', this.scene, this.#map, this.#tileset);
         this.#stitches = new PixelDungeonObjectlayer('stitches', this.scene, this.#map, this.#tileset);
+        this.#stitches.tilelayer.setDepth(10);
         // this.#walls.tilelayer.setVisible(false);
         this.#floor.tilelayer.setInteractive({ useHandcursor: true });
         this.tilemap.setLayer('floors');
