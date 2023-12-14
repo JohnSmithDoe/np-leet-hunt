@@ -1,16 +1,10 @@
 import { EDirection } from '@shared/np-library';
 
-import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { NPTilesetMappingNew } from '../map/pixel-dungeon-tileset';
-import { PixelDungeon } from './pixel-dungeon';
+import { NPTilesetMappingNew } from '../../../map/pixel-dungeon-tileset';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonWall extends PixelDungeonTile {
     regions: number[];
-
-    constructor(dungeon: PixelDungeon, tile: TDungeonTile) {
-        super(dungeon, tile);
-    }
 
     toTileIndex(): keyof NPTilesetMappingNew {
         const wallToN = this.wallTo(EDirection.N);
@@ -18,7 +12,7 @@ export class PixelDungeonWall extends PixelDungeonTile {
         const wallToS = this.wallTo(EDirection.S);
         const wallToSW = this.wallTo(EDirection.SW);
         const emptyToS = this.emptyTo(EDirection.S);
-        const roomToS = this.roomTo(EDirection.S);
+        const roomToS = this.floorTo(EDirection.S);
         const junctionToS = this.junctionTo(EDirection.S);
 
         if (junctionToS) {

@@ -1,12 +1,10 @@
-import { NPVec2 } from '@shared/np-library';
 import * as Phaser from 'phaser';
+import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { PixelDungeon } from '../dungeon/pixel-dungeon';
-import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
-import { NPTilesetMappingNew, PixelDungeonTileset } from './pixel-dungeon-tileset';
+import { PixelDungeonTile } from '../../dungeon/levels/board/pixel-dungeon.tile';
+import { NPTilesetMappingNew, PixelDungeonTileset } from '../pixel-dungeon-tileset';
 
-export abstract class PixelDungeonTilelayer {
+export class PixelDungeonTilelayer {
     #map: Phaser.Tilemaps.Tilemap;
     #tilelayer: Phaser.Tilemaps.TilemapLayer;
     #tileset: PixelDungeonTileset;
@@ -22,7 +20,7 @@ export abstract class PixelDungeonTilelayer {
         return this.#tileset;
     }
 
-    putTileAt(tile: TDungeonTile | NPVec2, key: keyof NPTilesetMappingNew) {
+    putTileAt(tile: TileXYType, key: keyof NPTilesetMappingNew) {
         const mappingElement = this.#tileset.mapping(key);
         if (typeof mappingElement === 'number') {
             this.#tilelayer.putTileAt(mappingElement, tile.x, tile.y);
@@ -32,17 +30,15 @@ export abstract class PixelDungeonTilelayer {
         // this.#tilelayer.getTileAt(tile.x, tile.y).alpha = 0.5;
     }
 
-    protected putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMappingNew) {
+    putPixeldungeonTileAt(tile: PixelDungeonTile, key: keyof NPTilesetMappingNew) {
         const mappingElement = this.#tileset.mapping(key);
         if (typeof mappingElement === 'number') {
-            this.#tilelayer.putTileAt(mappingElement, tile.tileX, tile.tileY);
+            this.#tilelayer.putTileAt(mappingElement, tile.x, tile.y);
         } else {
-            this.#tilelayer.weightedRandomize(mappingElement, tile.tileX, tile.tileY, 1, 1);
+            this.#tilelayer.weightedRandomize(mappingElement, tile.x, tile.y, 1, 1);
         }
         // this.#tilelayer.getTileAt(tile.tileX, tile.tileY).alpha = 0.5;
     }
-
-    abstract mapDungeonToLayer(dungeon: PixelDungeon): void;
 
     get tilelayer() {
         return this.#tilelayer;

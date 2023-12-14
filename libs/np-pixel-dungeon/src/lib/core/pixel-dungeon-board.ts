@@ -1,50 +1,37 @@
 import Board from 'phaser3-rex-plugins/plugins/board/board/Board';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { PixelDungeon } from '../dungeon/pixel-dungeon';
-import { PixelDungeonTile } from '../dungeon/pixel-dungeon.tile';
+import { PixelDungeonTile } from '../dungeon/levels/board/pixel-dungeon.tile';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 
 type NPChessTypes = PixelDungeonMob | PixelDungeonTile;
 
-export class PixelDungeonBoard extends Board<NPChessTypes> {
-    #engine: PixelDungeonEngine;
+export interface TPixelDungeonBoardOptions {
+    width: number;
+    height: number;
+    tileWidth: number;
+    tileHeight: number;
+}
 
-    constructor(engine: PixelDungeonEngine) {
-        const tilemap = engine.map.tilemap;
+export class PixelDungeonBoard extends Board<NPChessTypes> {
+    constructor(engine: PixelDungeonEngine, options: TPixelDungeonBoardOptions) {
         const config: Board.IConfig = {
             grid: {
                 gridType: 'quadGrid',
                 type: 'orthogonal', // hmm isometric...
                 dir: '8dir',
-                cellWidth: tilemap.tileWidth,
-                cellHeight: tilemap.tileHeight,
+                cellWidth: options.tileWidth,
+                cellHeight: options.tileHeight,
                 x: 0,
                 y: 0,
             },
-            width: tilemap.width,
-            height: tilemap.height,
+            width: options.width,
+            height: options.height,
         };
         super(engine.scene, config);
-        this.#addDungeon(engine.dungeon);
-        this.#engine = engine;
     }
 
-    #addDungeon(dungeon: PixelDungeon) {
-        for (const wall of dungeon.walls) {
-            this.addChess(wall, wall.tileX, wall.tileY, 'wall', false);
-            wall.rexChess.setBlocker(true);
-        }
-        for (const junction of dungeon.junctions) {
-            this.addChess(junction, junction.tileX, junction.tileY, 'objects', false);
-            junction.rexChess.setBlocker(false);
-        }
-    }
-
-    addMob(mob: PixelDungeonMob, tileX: number, tileY: number) {
-        this.addChess(mob, tileX, tileY, 1);
-    }
     getTile(tileXY: TileXYType) {
         const res = this.tileXYZToChess(tileXY.x, tileXY.y, 'objects');
         return res instanceof PixelDungeonTile ? res : null;

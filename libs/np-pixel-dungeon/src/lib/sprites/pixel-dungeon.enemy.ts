@@ -39,7 +39,7 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
         const activity = this.activity;
         if (!activity.hasNextAction && activity.canAct()) {
             let tile: TileXYType;
-            const neighbours = this.engine.board.getNeighborChess(this, null) ?? [];
+            const neighbours = this.engine.level.getNeighborChess(this.tile);
             const playerAsNeigbour = (neighbours && Array.isArray(neighbours) ? neighbours : [neighbours]).find(
                 n => n === this.engine.player
             );
@@ -47,14 +47,14 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
                 activity.setNextAction(new AttackMobAction(this, this.engine.player));
             } else {
                 try {
-                    tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+                    tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
                 } catch (e) {
                     console.log('no random tile');
                 }
                 if (tile) {
                     let i = 0;
                     while (!this.movement.canMoveToTile(tile)) {
-                        tile = this.engine.board.getRandomEmptyTileXYInRange(this, 1, 1);
+                        tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
                         if (i++ > 5) {
                             tile = null;
                             break;

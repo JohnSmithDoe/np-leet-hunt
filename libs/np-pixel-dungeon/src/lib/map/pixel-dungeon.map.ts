@@ -3,42 +3,32 @@ import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
 import { NPSceneWithBoard, TDungeonOptions } from '../@types/pixel-dungeon.types';
-import { PixelDungeon } from '../dungeon/pixel-dungeon';
-import { PixelDungeonJunction } from '../dungeon/pixel-dungeon.junction';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
-import { PixelDungeonFloorLayer } from './pixel-dungeon-floorlayer';
-import { PixelDungeonObjectlayer } from './pixel-dungeon-objectlayer';
-import { PixelDungeonTilelayer } from './pixel-dungeon-tilelayer';
+import { PixelDungeonFloorLayer } from './layer/pixel-dungeon-floorlayer';
+import { PixelDungeonObjectlayer } from './layer/pixel-dungeon-objectlayer';
+import { PixelDungeonTilelayer } from './layer/pixel-dungeon-tilelayer';
+import { PixelDungeonWallLayer } from './layer/pixel-dungeon-walllayer';
 import { PixelDungeonTileset, TNPTilesetKey } from './pixel-dungeon-tileset';
-import { PixelDungeonWallLayer } from './pixel-dungeon-walllayer';
 
 export class PixelDungeonMap implements NPSceneComponent {
     scene: NPSceneWithBoard;
 
-    #dungeon: PixelDungeon;
     #map: Phaser.Tilemaps.Tilemap;
+    #tileset: PixelDungeonTileset;
+    #options: TDungeonOptions;
+
     #floor: PixelDungeonFloorLayer;
     #walls: PixelDungeonTilelayer;
-    #engine: PixelDungeonEngine;
-    start: TileXYType;
-    #tileset: PixelDungeonTileset;
-    #objects: PixelDungeonObjectlayer;
+    #objects: PixelDungeonTilelayer;
+    #stitches: PixelDungeonTilelayer;
 
     constructor(engine: PixelDungeonEngine, options: TDungeonOptions, type: TNPTilesetKey) {
-        this.#dungeon = new PixelDungeon(options);
-        this.#engine = engine;
+        this.scene = engine.scene;
+        this.#options = options;
         this.#tileset = new PixelDungeonTileset(type);
-        this.scene = this.#engine.scene;
-    }
-
-    init(): void {
-        this.#dungeon.init();
     }
 
     preload(): void {
-        // Credits! Michele "Buch" Bucelli (tilset artist) & Abram Connelly (tileset sponser)
-        // https://opengameart.org/content/top-down-dungeon-tileset
         // shamelessly stole from shattered-pixel-dungeon
         this.scene.load.image(this.tileset.key, this.tileset.imageUrl);
     }
@@ -48,17 +38,16 @@ export class PixelDungeonMap implements NPSceneComponent {
         this.#map = this.scene.make.tilemap({
             tileWidth: this.tileset.tileWidth,
             tileHeight: this.tileset.tileHeight,
-            width: this.#dungeon.width,
-            height: this.#dungeon.height,
+            width: this.#options.width,
+            height: this.#options.height,
         });
         this.#tileset.addToMap(this.#map);
+        // having multiple tile layers
         this.#floor = new PixelDungeonFloorLayer('floors', this.scene, this.#map, this.#tileset);
-        this.start = this.#floor.mapDungeonToLayer(this.#dungeon);
         this.#walls = new PixelDungeonWallLayer('walls', this.scene, this.#map, this.#tileset);
-        this.#walls.mapDungeonToLayer(this.#dungeon);
-        // this.#walls.tilelayer.setVisible(false);
         this.#objects = new PixelDungeonObjectlayer('objects', this.scene, this.#map, this.#tileset);
-        this.#objects.mapDungeonToLayer(this.#dungeon);
+        this.#stitches = new PixelDungeonObjectlayer('stitches', this.scene, this.#map, this.#tileset);
+        // this.#walls.tilelayer.setVisible(false);
         this.#floor.tilelayer.setInteractive({ useHandcursor: true });
         this.tilemap.setLayer('floors');
         this.scene.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -82,20 +71,19 @@ export class PixelDungeonMap implements NPSceneComponent {
         return this.#tileset;
     }
 
-    get dungeon() {
-        return this.#dungeon;
+    get floorlayer() {
+        return this.#floor;
     }
 
-    public doors(mobs: PixelDungeonMob[]) {
-        for (const mob of mobs) {
-            const tile = this.#engine.board.getTile(mob.tile);
-            if (tile instanceof PixelDungeonJunction) {
-                tile.setOpen(true);
-            }
-        }
-        // for (const junction of this.dungeon.junctions) {
-        //     junction.setOpen(!!mobs.find(mob => equalTile(junction.tile, mob.tile)));
-        // }
-        this.#objects.mapDungeonToLayer(this.#dungeon);
+    get walllayer() {
+        return this.#walls;
+    }
+
+    get objectlayer() {
+        return this.#objects;
+    }
+
+    get stitchlayer() {
+        return this.#stitches;
     }
 }

@@ -79,7 +79,7 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
 
     warp(tile: TileXYType) {
         if (this.canMoveToTile(tile)) {
-            this.mob.engine.board.moveChess(this.mob, tile.x, tile.y, 1);
+            this.mob.engine.level.moveMob(this.mob, tile);
             this.mob.info(`!`, EMobInfoType.GainHealth);
         }
     }

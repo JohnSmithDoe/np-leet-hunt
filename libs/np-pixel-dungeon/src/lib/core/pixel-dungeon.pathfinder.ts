@@ -14,7 +14,7 @@ export class PixelDungeonPathfinder extends PathFinder {
             blockerTest: true,
             occupiedTest: true,
         });
-        this.#board = engine.board;
+        this.#board = engine.level.board;
         this.#pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
     }
     findPath(endTileXY: TileXYType) {

@@ -48,8 +48,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             } else {
                 if (!this.engine.player.activity.isIdle()) return;
                 const { worldX, worldY } = pointer;
-                console.log(this.engine.map.tilemap.setLayer('floors'));
-                const targetTile = this.engine.map.tilemap.getTileAtWorldXY(worldX, worldY);
+                const targetTile = this.engine.level.getTileAtWorldXY(worldX, worldY);
                 console.log('click', targetTile);
                 if (!targetTile) return;
                 this.engine.movePlayer(targetTile);

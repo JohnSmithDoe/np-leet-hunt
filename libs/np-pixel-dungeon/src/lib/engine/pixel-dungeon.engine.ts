@@ -5,8 +5,7 @@ import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateMa
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonPathfinder } from '../core/pixel-dungeon.pathfinder';
-import { PixelDungeonBoard } from '../core/pixel-dungeon-board';
-import { PixelDungeonMap } from '../map/pixel-dungeon.map';
+import { PixelDungeonLevel } from '../dungeon/levels/pixel-dungeon.level';
 import { PixelDungeonEnemy } from '../sprites/pixel-dungeon.enemy';
 import { EMobInfoType, PixelDungeonInfoText } from '../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
@@ -17,19 +16,14 @@ import { StartGameState } from './states/start-game.state';
 import { States } from './states/states';
 
 export class PixelDungeonEngine extends StateManager implements NPSceneComponent {
-    map: PixelDungeonMap;
     player: PixelDungeonPlayer;
     mobs: PixelDungeonMob[];
-    #board: PixelDungeonBoard;
     #pathfinder: PixelDungeonPathfinder;
+    #level: PixelDungeonLevel;
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });
         this.#setup();
-    }
-
-    get board() {
-        return this.#board;
     }
 
     update(time: number, delta: number) {
@@ -41,7 +35,8 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     }
 
     #setup() {
-        this.map = new PixelDungeonMap(this, { height: 25, width: 25, seed: '<#.#>' }, 'shattered');
+        const options = { height: 25, width: 25, seed: '<#.#>' };
+        this.#level = new PixelDungeonLevel(this, options);
         this.player = new PixelDungeonPlayer(this, { visionRange: 10, key: 'brawler' });
         this.mobs = [this.player];
         for (let i = 0; i < 3; i++) {
@@ -50,22 +45,16 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         this.addStates([new StartGameState(), new HandleActionState(this.player), new EndGameState()]);
     }
 
-    init(): void {
-        this.map.init();
-        this.mobs.forEach((mob: NPSceneComponent) => (mob.init ? mob.init() : null));
-    }
-
     preload(): void {
-        this.map.preload();
+        this.level.preload();
         this.mobs.forEach(mob => mob.preload());
     }
 
-    public create(): void {
-        this.map.create();
-
-        this.#board = new PixelDungeonBoard(this);
+    create(): void {
+        this.level.create();
+        const start = this.level.start;
         for (let i = 0; i < this.mobs.length; i++) {
-            this.#board.addMob(this.mobs[i], this.map.start.x, this.map.start.y - i);
+            this.level.addMob(this.mobs[i], start.x, start.y - i);
         }
 
         this.mobs.forEach(mob => mob.create());
@@ -80,14 +69,13 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
 
     updateFoV() {
         const vision = this.player.vision;
-        this.map.loseVision(vision.currentView);
+        this.level.loseVision(vision.currentView);
         this.player.lookAround();
-        this.map.gainVision(vision.currentView);
+        this.level.gainVision(vision.currentView);
         this.mobs.forEach(mob => (mob.alpha = vision.canSee(mob.tile) ? 1 : 0.2));
     }
 
     startUP() {
-        console.log(this.board);
         this.goto(States.StartGame);
     }
 
@@ -104,19 +92,15 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
     startTurn() {
         // console.log('start turn on cycle');
         this.mobs.forEach(mob => mob.startTurn());
-        this.map.doors(this.mobs);
+        this.level.doors(this.mobs);
     }
 
     displayText(msg: string, tile: TileXYType, type: EMobInfoType) {
         this.scene.add.existing(new PixelDungeonInfoText(this, tile, msg, type));
     }
 
-    public getMobAt(tile: TileXYType) {
-        return this.board.tileXYZToChess(tile.x, tile.y, 1);
-    }
-
     public movePlayer(targetTile: TileXYType) {
-        const mob = this.getMobAt(targetTile);
+        const mob = this.level.getMobAt(targetTile);
         if (mob) {
             this.player.attack(mob as PixelDungeonMob);
         } else {
@@ -125,7 +109,7 @@ export class PixelDungeonEngine extends StateManager implements NPSceneComponent
         }
     }
 
-    get dungeon() {
-        return this.map.dungeon;
+    get level() {
+        return this.#level;
     }
 }

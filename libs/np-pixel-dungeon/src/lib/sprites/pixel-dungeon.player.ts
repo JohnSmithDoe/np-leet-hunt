@@ -59,7 +59,7 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
     }
 
     attack(mob: PixelDungeonMob) {
-        if (this.engine.board.areNeighbors(this.tile, mob.tile)) {
+        if (this.engine.level.areNeighbors(this.tile, mob.tile)) {
             this.activity.setNextAction(new AttackMobAction(this, mob));
         }
     }

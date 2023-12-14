@@ -1,21 +1,16 @@
 import { EDirection } from '@shared/np-library';
 
-import { TDungeonTile } from '../@types/pixel-dungeon.types';
-import { NPTilesetMappingNew } from '../map/pixel-dungeon-tileset';
-import { PixelDungeon } from './pixel-dungeon';
+import { NPTilesetMappingNew } from '../../../map/pixel-dungeon-tileset';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonJunction extends PixelDungeonTile {
     regions: number[];
 
     #open = false;
-
-    constructor(dungeon: PixelDungeon, tile: TDungeonTile) {
-        super(dungeon, tile);
-        this.vertical = this.wallTo(EDirection.E) && this.wallTo(EDirection.W);
-    }
+    private vertical: boolean;
 
     toTileIndex(): keyof NPTilesetMappingNew {
+        this.vertical = this.wallTo(EDirection.E) && this.wallTo(EDirection.W);
         if (this.vertical) {
             return this.#open ? 'DOOR' : 'DOOR_CLOSED';
         } else {

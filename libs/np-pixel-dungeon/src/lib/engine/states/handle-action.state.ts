@@ -40,7 +40,7 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
     perform(): boolean {
         if (!this.#isRunning) {
             this.#isRunning = true;
-            const angle = this.mob.engine.board.angleBetween(this.mob, this.target);
+            const angle = this.mob.engine.level.angleBetween(this.mob, this.target);
             const pos = new Phaser.Math.Vector2(this.mob.x, this.mob.y);
             Phaser.Math.RotateTo(pos, this.mob.x, this.mob.y, angle, 8);
             this.mob.scene.tweens.add({
