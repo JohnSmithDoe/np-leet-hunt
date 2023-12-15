@@ -1,5 +1,4 @@
-import { rngElement, rngPercentageHit } from '@shared/np-library';
-
+import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import {
     CParadroidModes,
     CParadroidShapeInfo,
@@ -32,6 +31,7 @@ export interface TParadroidFactoryOptions {
     autoFireRate: number;
     tileSet: EParadroidTileType[];
     owner: TParadroidPlayer;
+    seed: string;
 }
 
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
@@ -44,6 +44,7 @@ export const defaultFactoryOptions: TParadroidFactoryOptions = {
     changerRate: 5, // percentage chance 0 - 100
     tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
     owner: EParadroidOwner.Player,
+    seed: new Date().toISOString(),
 };
 
 const hasCombineShapeOnPath = (path: TParadroidPath): boolean =>
@@ -55,9 +56,11 @@ export class ParadroidFactory {
     #tileGrid: TParadroidSubTile[][] = [];
     #paths: TParadroidPath[] = [];
     #accessGrid: EParadroidAccess[][] = [];
+    #rng: NPRng;
 
     constructor(options: TParadroidFactoryOptions) {
         this.#options = options;
+        this.#rng = new NPRng(options.seed);
     }
 
     generateGrid(owner: EParadroidOwner = EParadroidOwner.Player) {
@@ -101,10 +104,10 @@ export class ParadroidFactory {
         if (path.subTile.shape !== EParadroidShape.IShape) return;
         const prev = this.#getSubTile(path.subTile.col - 1, path.subTile.row);
         if (prev && prev.paths.find(p => p.fx !== 'none')) return;
-        if (rngPercentageHit(this.#options.changerRate) && !hasCombineShapeOnPath(path)) {
+        if (this.#rng.percentageHit(this.#options.changerRate) && !hasCombineShapeOnPath(path)) {
             path.fx = 'fx-changer';
             this.#applyFxChanger(path);
-        } else if (rngPercentageHit(this.#options.autoFireRate)) {
+        } else if (this.#rng.percentageHit(this.#options.autoFireRate)) {
             path.fx = 'fx-autofire';
         }
     }
@@ -124,6 +127,7 @@ export class ParadroidFactory {
      * @return
      */
     #initialize() {
+        this.#rng.reset();
         this.#accessGrid = [];
         this.#tileGrid = [];
         this.#paths = [];
@@ -286,7 +290,7 @@ export class ParadroidFactory {
             return result;
         };
         const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
-        return rngElement(suitableTypes);
+        return this.#rng.item(suitableTypes);
     };
 
     #last(path: TParadroidPath): TParadroidPath[] {

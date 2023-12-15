@@ -184,6 +184,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
     }
 
     activate(from: EFlowFrom = EFlowFrom.Left) {
+        console.log('188:activate-filed');
         this.#paths.list.filter(p => p.from === from).forEach(p => p.activate());
     }
 
@@ -192,6 +193,8 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
     }
 
     #onPathActivated(path: ParadroidPath) {
+        console.log('195:#onPathActivated-');
+
         if (path.isIncoming && this.isActive()) {
             // all active -> activate outgoing
             this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.activate());

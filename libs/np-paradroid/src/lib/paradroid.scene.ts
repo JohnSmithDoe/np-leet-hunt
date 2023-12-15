@@ -1,19 +1,18 @@
-import { StageService } from '@shared/np-phaser';
+import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
-import { NPScene } from '../../../np-phaser/src/lib/scenes/np-scene';
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { ParadroidGame } from './core/paradroid.game';
 import { ParadroidIntro } from './sprites/paradroid.intro';
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
+    static key = 'paradroid-scene';
     iter = 0;
     #paradroidGame: ParadroidGame;
-
-    constructor(private npStage: StageService) {
-        super({ key: 'paradroid-scene' });
+    constructor() {
+        super({ key: ParadroidScene.key });
     }
 
     async setupComponents() {
@@ -46,7 +45,6 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         recreateBtn.on('pointerup', () => {
             this.removeFromContainer(this.#paradroidGame);
             this.removeFromLayer('ui', this.#paradroidGame.container);
-            console.log(this.layer('ui').list, this.components);
             const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
             this.#paradroidGame = new ParadroidGame(this);
             this.addComponent(this.#paradroidGame);
@@ -56,9 +54,10 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
             // this.generateStuff();
         });
         this.addToLayer('ui', recreateBtn);
-
-        this.layer('ui').camera.setViewport(0, 0, 100, 100);
+        this.cameras.getCamera('ui-camera').setViewport(0, 0, 100, 100);
+        //this.layer('ui').camera.setViewport(0, 0, 100, 100);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
+        this.resize();
     }
 
     update(time: number, delta: number) {

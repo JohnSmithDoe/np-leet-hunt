@@ -1,10 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { NPBaseSubscriber } from '@shared/np-library';
+import { ParadroidScene } from '@shared/np-paradroid';
 import { StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { filter } from 'rxjs';
 
-import { NPScene } from '../../../../../libs/np-phaser/src/lib/scenes/np-scene';
+import { SpaceScene } from '../../../../../libs/np-space/src/lib/space.scene';
 
 @Component({
     selector: 'np-home',
@@ -17,11 +18,21 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     async ngOnInit(): Promise<void> {
         this.listen(
             this.#stage.initialized$.pipe(filter(isInitialized => isInitialized)).subscribe(() => {
-                console.log('start', 'ngOnInit');
-                // this.#stage.startScene('spacemap', new SpaceScene(this.#stage));
-                this.#stage.startScene('paradroid', new PixelDungeonScene() as unknown as NPScene);
+                this.goToPixeldungeon();
             })
         );
         console.log('HomePageComponent', 'ngOnInit');
+    }
+
+    public goToSpace() {
+        this.#stage.startScene(SpaceScene.key, new SpaceScene());
+    }
+
+    public goToPixeldungeon() {
+        this.#stage.startScene(PixelDungeonScene.key, new PixelDungeonScene());
+    }
+
+    public goToParadroid() {
+        this.#stage.startScene(ParadroidScene.key, new ParadroidScene());
     }
 }

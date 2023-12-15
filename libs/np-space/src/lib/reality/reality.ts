@@ -4,7 +4,7 @@ import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
 import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 
 const IMAGES = {
-    reality1: { key: 'reality-1', url: 'np-phaser/reality/assets/nebular.jpg' },
+    reality1: { key: 'reality-1', url: 'np-space/space/tileable-classic-nebula-space-patterns-1.jpg' },
 };
 
 export class Reality extends Phaser.GameObjects.TileSprite implements NPSceneComponent {

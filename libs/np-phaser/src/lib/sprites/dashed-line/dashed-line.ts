@@ -1,8 +1,7 @@
-import { rngElement } from '@shared/np-library';
+import { NPScene, NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPRNG } from '../../utilities/piecemeal';
 
 // const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
 //     frameWidth: 256 * 2,
@@ -22,7 +21,7 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPScene
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
-        return rngElement(types);
+        return NPRNG.item(types);
     }
 
     constructor(

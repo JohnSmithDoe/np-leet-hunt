@@ -1,8 +1,7 @@
-import { rng } from '@shared/np-library';
+import { NPScene, NPSceneComponent } from '@shared/np-phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
 import { NPTimer } from '../../utilities/np-timer';
+import { NPRNG } from '../../utilities/piecemeal';
 
 interface TBinareTimerOptions {
     startTime?: number; // if set counts down to zero
@@ -91,7 +90,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneC
         let time: number;
         let reachedEnd: boolean = false;
         if (this.#frenzyMode) {
-            time = rng(1000 * 60 * 60 * 24);
+            time = NPRNG.inRange(1000 * 60 * 60 * 24);
         } else {
             time = this.#getTime();
             if ((reachedEnd = this.#reachedEnd(time))) {

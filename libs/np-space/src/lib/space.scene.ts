@@ -1,16 +1,17 @@
+import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
 import { createSpeechBubble } from '../../../np-phaser/src/lib/factories/graphics.factory';
-import { NPScene } from '../../../np-phaser/src/lib/scenes/np-scene';
-import { StageService } from '../../../np-phaser/src/lib/service/stage.service';
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { NPMovableSprite } from '../../../np-phaser/src/lib/sprites/np-movable-sprite';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { vectorToStr } from '../../../np-phaser/src/lib/utilities/np-phaser-utils';
+import { Reality } from './reality/reality';
 import { NPSpaceMap } from './space/np-space-map';
 
 export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
+    static key = 'spacemap-scene';
     iter = 0;
     private container: Phaser.GameObjects.Container;
     private controls: Phaser.Cameras.Controls.SmoothedKeyControl;
@@ -20,8 +21,8 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     private map: NPSpaceMap;
     private stars: Phaser.GameObjects.TileSprite;
 
-    constructor(private npStage: StageService) {
-        super({ key: 'space-scene' });
+    constructor() {
+        super({ key: SpaceScene.key });
     }
 
     async setupComponents() {
@@ -29,9 +30,9 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
     }
 
     private generateStuff() {
-        // this.map = new NPSpaceMap(this);
-        // this.addComponent(this.map);
-        // this.addComponent(new Reality(this, 'reality1'));
+        this.map = new NPSpaceMap(this);
+        this.addComponent(this.map);
+        this.addComponent(new Reality(this, 'reality1'));
     }
 
     init() {

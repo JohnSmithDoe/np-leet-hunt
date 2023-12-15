@@ -1,18 +1,22 @@
+import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
 
-import { NPScene } from '../../../np-phaser/src/lib/scenes/np-scene';
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { NPSceneWithBoard } from './@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
 
 export class PixelDungeonScene extends NPScene implements OnScenePreload, OnSceneCreate, NPSceneWithBoard {
+    static key = 'pixel-dungeon-scene';
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     cam: Phaser.Cameras.Scene2D.Camera;
     private cameraDrag: boolean;
     private engine: PixelDungeonEngine;
+    constructor() {
+        super({ key: PixelDungeonScene.key });
+    }
 
     public setupComponents(): void {
         this.engine = new PixelDungeonEngine(this);

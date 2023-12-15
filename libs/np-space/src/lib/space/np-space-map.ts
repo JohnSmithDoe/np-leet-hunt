@@ -57,8 +57,7 @@ export class NPSpaceMap extends NPSceneContainer<NPSceneComponent> {
     }
 
     private addSpace() {
-        const type = Space.getRandom();
-        const space = new Space(this.scene, type);
+        const space = new Space(this.scene, Space.getRandom());
         this.add(space);
     }
 }

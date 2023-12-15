@@ -1,8 +1,7 @@
-import { rng } from '@shared/np-library';
+import { NPScene, NPSceneContainer } from '@shared/np-phaser';
 
 import { NPFullscreenCamera } from '../../../../np-phaser/src/lib/cameras/np-fullscreen-camera';
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { ParadroidImage } from './paradroid.image';
 
 export class ParadroidIntro extends NPSceneContainer<ParadroidImage> {
@@ -11,7 +10,7 @@ export class ParadroidIntro extends NPSceneContainer<ParadroidImage> {
     }
 
     init() {
-        const imageTest = new ParadroidImage(this.scene, 300, -200, 'vsPlayerFemale', rng(0, 20));
+        const imageTest = new ParadroidImage(this.scene, 300, -200, 'vsPlayerFemale', NPRNG.inRange(0, 20));
         const imageTest3 = new ParadroidImage(this.scene, 450, -190, 'vsImage');
         const imageTest2 = new ParadroidImage(this.scene, 600, -200, 'vsDroid');
         this.add(imageTest);

@@ -1,8 +1,7 @@
-import { rngElement } from '@shared/np-library';
+import { NPScene, NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 
 // const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
 //     frameWidth: 256 * 2,
@@ -31,7 +30,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponen
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
-        return rngElement(types);
+        return NPRNG.item(types);
     }
 
     constructor(public scene: NPScene, type: keyof typeof IMAGES) {

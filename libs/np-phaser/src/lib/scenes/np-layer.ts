@@ -5,6 +5,7 @@ import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPScene, TNPLayerKeys } from './np-scene';
 import { NPSceneComponent } from './np-scene-component';
 
+//https://github.com/photonstorm/phaser/issues/6675
 export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponent {
     camera?: NPCamera;
 

@@ -1,6 +1,8 @@
 import { NPSceneComponent, NPSceneComponentContainer, NPSceneContainer } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
+import { Observable, take } from 'rxjs';
 
+import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPLayer } from './np-layer';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
@@ -9,7 +11,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     protected components = new NPSceneContainer<NPSceneComponent>(this);
     #layers = new NPSceneContainer<NPLayer>(this);
     #debugOut: Phaser.GameObjects.Text;
-    #onlyComponent = true;
+    onlyComponent = true;
 
     abstract setupComponents(): void;
 
@@ -17,7 +19,6 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         this.cameras.resetAll();
         this.cameras.remove(this.cameras.main);
         console.log('23:#initScene');
-
         this.createLayer('bg');
         this.createLayer('np', true);
         this.createLayer('fg');
@@ -50,13 +51,22 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         if (Array.isArray(gameObject)) {
             gameObject.forEach(gameObj => this.addToLayer(name, gameObj));
         } else {
-            for (const layer of this.#layers.list) {
-                if (layer.name === name) {
-                    layer.add(gameObject, true);
-                } else {
-                    layer.camera?.ignore(gameObject); // ignore obj on every other layer
-                }
+            this.add.existing(gameObject);
+            const uiCam = this.cameras.getCamera('ui-camera');
+            if (name === 'ui') {
+                this.cameras.main.ignore(gameObject);
+            } else {
+                uiCam.ignore(gameObject);
             }
+            //https://github.com/photonstorm/phaser/issues/6675
+            return;
+            // for (const layer of this.#layers.list) {
+            //     if (layer.name === name) {
+            //         layer.add(gameObject, true);
+            //     } else {
+            //         layer.camera?.ignore(gameObject); // ignore obj on every other layer
+            //     }
+            // }
         }
     }
 
@@ -64,12 +74,14 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
         if (Array.isArray(gameObject)) {
             gameObject.forEach(gameObj => this.removeFromLayer(name, gameObj));
         } else {
-            for (const layer of this.#layers.list) {
-                if (layer.name === name) {
-                    layer.remove(gameObject);
-                    gameObject.destroy(true);
-                }
-            }
+            gameObject.destroy(true);
+
+            // for (const layer of this.#layers.list) {
+            //     if (layer.name === name) {
+            //         layer.remove(gameObject);
+            //         gameObject.destroy(true);
+            //     }
+            // }
         }
     }
 
@@ -86,11 +98,13 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     }
 
     init() {
-        if (!this.#onlyComponent) {
+        this.#debugOut = this.add.text(0, 0, '');
+        this.cameras.addExisting(new NPFullscreenCamera(this, false).setName('ui-camera'));
+        if (!this.onlyComponent) {
             this.#initScene();
         }
         this.setupComponents();
-        if (!this.#onlyComponent) {
+        if (!this.onlyComponent) {
             this.#layers.init();
         }
         this.components.init();
@@ -98,23 +112,37 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
 
     preload() {
         this.components.preload();
-        if (!this.#onlyComponent) {
+        if (!this.onlyComponent) {
             this.#layers.preload();
         }
     }
 
     create(container?: Phaser.GameObjects.Container) {
-        if (!this.#onlyComponent) {
+        if (!this.onlyComponent) {
             this.#layers.create(container);
         }
         this.components.create(container);
+        new Observable(sub => {
+            this.cameras.cameras.forEach(cam => {
+                cam.fadeIn(1000, 0, 0, 0, (cama: NPFullscreenCamera, percent: number) => {
+                    if (percent === 1) {
+                        sub.next(true);
+                        sub.complete();
+                    }
+                });
+            });
+        })
+            .pipe(take(1))
+            .subscribe(() => {
+                console.log('fade done');
+            });
     }
 
     update(time: number, delta: number) {
         super.update(time, delta);
-        if (!this.#onlyComponent) {
+        if (!this.onlyComponent) {
             this.#layers.update(time, delta);
         }
-        // this.components.update(time, delta);
+        this.components.update(time, delta);
     }
 }

@@ -68,7 +68,11 @@ export class NPRng {
     percentageHit(percent: number) {
         return this.inRange(100) <= percent;
     }
+
+    reset() {
+        this.#rng.sow([`${Date.now()}`]);
+    }
 }
 
 // Global random generator
-export const npRng = new NPRng(`${Date.now()}`);
+export const NPRNG = new NPRng(`${Date.now()}`);
