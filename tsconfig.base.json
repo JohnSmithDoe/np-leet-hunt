@@ -22,7 +22,7 @@
             "@shared/np-library": ["libs/np-library/src/index.ts"],
             "@shared/np-paradroid": ["libs/np-paradroid/src/index.ts"],
             "@shared/np-phaser": ["libs/np-phaser/src/index.ts"],
-            "@shared/np-space": ["libs/np-space/src/index.ts"]
+            "@shared/np-space-map": ["libs/np-space-map/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

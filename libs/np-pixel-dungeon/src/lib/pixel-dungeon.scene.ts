@@ -7,7 +7,7 @@ import { NPSceneWithBoard } from './@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
 
 export class PixelDungeonScene extends NPScene implements OnScenePreload, OnSceneCreate, NPSceneWithBoard {
-    static key = 'pixel-dungeon-scene';
+    static readonly key = 'pixel-dungeon-scene';
     rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;

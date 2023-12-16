@@ -36,8 +36,8 @@
           },
           {
             "glob": "**/*",
-            "input": "libs/np-space/src/assets",
-            "output": "./np-space"
+            "input": "libs/np-space-map/src/assets",
+            "output": "./np-space-map"
           },
           {
             "glob": "**/*",

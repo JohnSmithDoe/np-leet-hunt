@@ -5,6 +5,10 @@
 
 ### Overall
 * create mit addTo.. ist ungünstig -> scene soll add machen.... hmm auch nicht so gut
+* scene transitions
+* game state
+* ui
+*
 
 ### Space map
 
@@ -20,6 +24,9 @@
 
 * ai
 * deco
+* timing / intro -> select game -> play -> end -> return result
+* clean up layout
+*
 
 ### Pixel-Dungeon
 

@@ -5,7 +5,7 @@ import { StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { filter } from 'rxjs';
 
-import { SpaceScene } from '../../../../../libs/np-space/src/lib/space.scene';
+import { SpaceScene } from '../../../../../libs/np-space-map/src/lib/space.scene';
 
 @Component({
     selector: 'np-home',

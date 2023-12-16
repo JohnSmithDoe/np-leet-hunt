@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-    displayName: 'np-space',
+    displayName: 'np-space-map',
     preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {
@@ -9,7 +9,7 @@ export default {
             stringifyContentPathRegex: '\\.(html|svg)$',
         },
     },
-    coverageDirectory: '../../coverage/libs/np-space',
+    coverageDirectory: '../../coverage/libs/np-space-map',
     transform: {
         '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
     },

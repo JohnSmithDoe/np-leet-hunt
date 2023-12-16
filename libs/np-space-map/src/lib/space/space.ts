@@ -4,14 +4,14 @@ import * as Phaser from 'phaser';
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 
 const IMAGES = {
-    space1: { key: 'space-1', url: 'np-space/space/tileable-classic-nebula-space-patterns-1.jpg' },
-    space2: { key: 'space-2', url: 'np-space/space/tileable-classic-nebula-space-patterns-2.jpg' },
-    space3: { key: 'space-3', url: 'np-space/space/tileable-classic-nebula-space-patterns-3.jpg' },
-    space4: { key: 'space-4', url: 'np-space/space/tileable-classic-nebula-space-patterns-4.jpg' },
-    space5: { key: 'space-5', url: 'np-space/space/tileable-classic-nebula-space-patterns-5.jpg' },
-    space6: { key: 'space-6', url: 'np-space/space/tileable-classic-nebula-space-patterns-6.jpg' },
-    space7: { key: 'space-7', url: 'np-space/space/tileable-classic-nebula-space-patterns-7.jpg' },
-    space8: { key: 'space-8', url: 'np-space/space/tileable-classic-nebula-space-patterns-8.jpg' },
+    space1: { key: 'space-1', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-1.jpg' },
+    space2: { key: 'space-2', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-2.jpg' },
+    space3: { key: 'space-3', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-3.jpg' },
+    space4: { key: 'space-4', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-4.jpg' },
+    space5: { key: 'space-5', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-5.jpg' },
+    space6: { key: 'space-6', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-6.jpg' },
+    space7: { key: 'space-7', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-7.jpg' },
+    space8: { key: 'space-8', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-8.jpg' },
 };
 
 export class Space extends Phaser.GameObjects.TileSprite implements NPSceneComponent {

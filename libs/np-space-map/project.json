@@ -1,15 +1,15 @@
 {
-    "name": "np-space",
+    "name": "np-space-map",
     "$schema": "../node_modules/nx/schemas/project-schema.json",
     "projectType": "library",
-    "sourceRoot": "libs/np-space/src",
+    "sourceRoot": "libs/np-space-map/src",
     "prefix": "np-afterwork",
     "targets": {
         "test": {
             "executor": "@nrwl/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
-                "jestConfig": "libs/np-space/jest.config.ts",
+                "jestConfig": "libs/np-space-map/jest.config.ts",
                 "passWithNoTests": true
             },
             "configurations": {
@@ -23,7 +23,7 @@
             "executor": "@nrwl/linter:eslint",
             "outputs": ["{options.outputFile}"],
             "options": {
-                "lintFilePatterns": ["libs/np-space/**/*.ts", "libs/np-space/**/*.html"]
+                "lintFilePatterns": ["libs/np-space-map/**/*.ts", "libs/np-space-map/**/*.html"]
             }
         }
     },
