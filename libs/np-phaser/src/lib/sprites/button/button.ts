@@ -30,7 +30,7 @@ export class Button extends Phaser.GameObjects.Sprite implements NPSceneComponen
     static readonly EVENT_CLICK = 'np-click';
     #disabled = false;
 
-    constructor(public scene: NPScene, x: number, y: number) {
+    constructor(public scene: NPScene, x: number, y: number, private config = { width: 64, height: 64 }) {
         super(scene, x, y, '');
         this.setInteractive({ useHandCursor: true });
         this.on('pointerover', () => this.#updateTexture(true, false))
@@ -49,7 +49,7 @@ export class Button extends Phaser.GameObjects.Sprite implements NPSceneComponen
     create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(IMAGES.defaultBtn.key);
         this.setOrigin(0);
-        this.setDisplaySize(64, 64);
+        this.setDisplaySize(this.config.width, this.config.height);
         container?.add(this);
         if (!container) this.scene.addToLayer('ui', this);
     }

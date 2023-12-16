@@ -39,12 +39,14 @@ export class PixelDungeonMap implements NPSceneComponent {
 
     create() {
         // Creating a blank tilemap with dimensions matching the dungeon
-        this.#map = this.scene.make.tilemap({
+        const mapData = new Phaser.Tilemaps.MapData({
             tileWidth: this.tileset.tileWidth,
             tileHeight: this.tileset.tileHeight,
             width: this.#options.width,
             height: this.#options.height,
         });
+
+        this.#map = new Phaser.Tilemaps.Tilemap(this.scene, mapData);
         this.#tileset.addToMap(this.#map);
         // having multiple tile layers
         this.#floor = new PixelDungeonFloorLayer('floors', this.scene, this.#map, this.#tileset);

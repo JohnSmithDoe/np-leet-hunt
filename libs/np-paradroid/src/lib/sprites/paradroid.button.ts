@@ -1,6 +1,6 @@
+import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
 import { Button } from '../../../../np-phaser/src/lib/sprites/button/button';
 import { ParadroidField } from './paradroid.field';
 
@@ -8,8 +8,8 @@ export class ParadroidButton extends Button {
     #field: ParadroidField;
     #debounce?: Phaser.Time.TimerEvent;
 
-    constructor(scene: NPScene, field: ParadroidField) {
-        super(scene, 0, field.y);
+    constructor(scene: NPScene, field: ParadroidField, config = { width: 64, height: 64 }) {
+        super(scene, 0, field.y, config);
         this.#field = field;
         this.on(Button.EVENT_CLICK, () => this.#onClick());
     }

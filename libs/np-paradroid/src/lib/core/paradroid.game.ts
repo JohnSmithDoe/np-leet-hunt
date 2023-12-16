@@ -1,7 +1,6 @@
+import { NPScene, NPSceneComponent, NPSceneContainer } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneComponent, NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 import { BinaryTimer } from '../../../../np-phaser/src/lib/sprites/timer/binarytimer';
 import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer } from '../@types/paradroid.types';
@@ -52,10 +51,15 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         this.#shots = this.#generateShots();
         this.add(this.#shots);
 
-        this.#timer = new BinaryTimer(this.scene, -125 + 32, (this.#factory.columns + 3) * 64, {
-            startTime: 30e3,
-            min: false,
-        });
+        this.#timer = new BinaryTimer(
+            this.scene,
+            -125 + this.#options.tileWidth / 2,
+            this.#factory.rows * this.#options.tileHeight + this.#options.tileHeight / 4,
+            {
+                startTime: 30e3,
+                min: false,
+            }
+        );
         this.add(this.#timer);
 
         this.#middleCol = this.#generateMiddleRow();
@@ -85,29 +89,29 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         let y = 100;
         const buttons = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#buttons.create(buttons);
-        x += 64;
+        x += this.#options.tileWidth;
         const fields = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#fields.create(fields);
-        x += this.#factory.columns * 64;
+        x += this.#factory.columns * this.#options.tileWidth;
         const middle = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#middleCol.create(middle);
-        x += 64;
-        x += this.#factory.columns * 64;
+        x += this.#options.tileWidth;
+        x += this.#factory.columns * this.#options.tileWidth;
         const droid = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidFields.create(droid);
         droid.setScale(-1, 1);
         const buttons2 = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidButtons.create(buttons2);
-        x = 64;
-        y = 100 - 32;
+        x = this.#options.tileWidth;
+        y = 100 - this.#options.tileHeight / 2;
         const shots = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#shots.create(shots);
-        this.#shots.list.forEach(s => s.setDisplaySize(16, 16));
-        x = 900;
+        this.#shots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));
+        x = this.#options.tileWidth * (this.#options.columns * 2 + 2); // +2 player buttons and middle row
         const droidshots = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidShots.create(droidshots);
         droidshots.setScale(-1, 1);
-        this.#droidShots.list.forEach(s => s.setDisplaySize(16, 16));
+        this.#droidShots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));
 
         this.#timer.create(middle);
         container?.add(buttons);
@@ -139,7 +143,10 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
         const result = new NPSceneContainer<ParadroidButton>(this.scene);
         const firstRow = engine.grid[0];
         for (const field of firstRow) {
-            const paradroidButton = new ParadroidButton(this.scene, field);
+            const paradroidButton = new ParadroidButton(this.scene, field, {
+                width: this.#options.tileWidth,
+                height: this.#options.tileHeight,
+            });
             paradroidButton.on(ParadroidButton.EVENT_CLICK, () => this.#onClick(engine === this.#engine));
             result.add(paradroidButton);
         }
@@ -149,11 +156,17 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #generateMiddleRow() {
         const result = new NPSceneContainer<ParadroidMiddle>(this.scene);
         const firstRow = this.#engine.grid[0];
-        const total = new ParadroidMiddle(this.scene, -1, 0, -64); // TODO button size
+        const total = new ParadroidMiddle(this.scene, -1, 0, -this.#options.tileWidth, {
+            width: this.#options.tileWidth,
+            height: this.#options.tileHeight,
+        });
         result.add(total);
 
         for (const field of firstRow) {
-            const middle = new ParadroidMiddle(this.scene, field.row, 0, field.y);
+            const middle = new ParadroidMiddle(this.scene, field.row, 0, field.y, {
+                width: this.#options.tileWidth,
+                height: this.#options.tileHeight,
+            });
             middle.on(ParadroidMiddle.EVENT_CHANGED, () => this.#updateMiddleTotal());
             result.add(middle);
         }
@@ -199,7 +212,7 @@ export class ParadroidGame extends NPSceneContainer<NPSceneComponent> {
     #generateShots() {
         const result = new NPSceneContainer<ParadroidImage>(this.scene);
         for (let i = 0; i < 12; i++) {
-            result.add(new ParadroidImage(this.scene, i * 32, 0, 'shot'));
+            result.add(new ParadroidImage(this.scene, (i * this.#options.tileWidth) / 2, 0, 'shot'));
         }
         return result;
     }

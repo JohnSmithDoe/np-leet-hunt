@@ -1,5 +1,5 @@
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
+import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+
 import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer } from '../@types/paradroid.types';
 
@@ -28,7 +28,16 @@ export class ParadroidMiddle extends Phaser.GameObjects.Sprite implements NPScen
     static readonly EVENT_CHANGED = 'np-middle-changed';
     #active = { player: false, droid: false };
 
-    constructor(public scene: NPScene, public row: number, x: number, y: number) {
+    constructor(
+        public scene: NPScene,
+        public row: number,
+        x: number,
+        y: number,
+        private config = {
+            width: 64,
+            height: 64,
+        }
+    ) {
         super(scene, x, y, '');
     }
 
@@ -42,7 +51,7 @@ export class ParadroidMiddle extends Phaser.GameObjects.Sprite implements NPScen
     create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(IMAGES.nobody.key);
         this.setOrigin(0);
-        this.setDisplaySize(64, 64);
+        this.setDisplaySize(this.config.width, this.config.height);
         container?.add(this);
         if (!container) this.scene.addToLayer('ui', this);
     }

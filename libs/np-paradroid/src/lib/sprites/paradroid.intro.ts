@@ -18,7 +18,7 @@ export class ParadroidIntro extends NPSceneContainer<ParadroidImage> {
         this.add(imageTest2);
         this.scene.tweens.add({
             targets: [imageTest, imageTest3, imageTest2],
-            y: 400,
+            y: 200,
             ease: 'Power1',
             duration: 2000,
             onComplete: () => {

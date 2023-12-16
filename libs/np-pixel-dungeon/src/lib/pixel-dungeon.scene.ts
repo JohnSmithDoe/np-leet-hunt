@@ -16,6 +16,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     private engine: PixelDungeonEngine;
     constructor() {
         super({ key: PixelDungeonScene.key });
+        this.noUiCam = true;
     }
 
     public setupComponents(): void {

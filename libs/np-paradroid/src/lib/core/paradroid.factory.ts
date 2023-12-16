@@ -36,9 +36,9 @@ export interface TParadroidFactoryOptions {
 
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
     rows: 8,
-    columns: 6, // only use even values
-    tileWidth: 64,
-    tileHeight: 64,
+    columns: 8, // only use even values
+    tileWidth: 48,
+    tileHeight: 48,
     stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
     autoFireRate: 10, // percentage chance 0 - 100
     changerRate: 5, // percentage chance 0 - 100

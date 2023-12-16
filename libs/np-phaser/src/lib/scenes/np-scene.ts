@@ -12,7 +12,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
     #layers = new NPSceneContainer<NPLayer>(this);
     #debugOut: Phaser.GameObjects.Text;
     onlyComponent = true;
-
+    noUiCam = false;
     abstract setupComponents(): void;
 
     #initScene() {
@@ -52,6 +52,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
             gameObject.forEach(gameObj => this.addToLayer(name, gameObj));
         } else {
             this.add.existing(gameObject);
+            if (this.noUiCam) return;
             const uiCam = this.cameras.getCamera('ui-camera');
             if (name === 'ui') {
                 this.cameras.main.ignore(gameObject);
@@ -99,7 +100,7 @@ export abstract class NPScene extends Phaser.Scene implements NPSceneComponentCo
 
     init() {
         this.#debugOut = this.add.text(0, 0, '');
-        this.cameras.addExisting(new NPFullscreenCamera(this, false).setName('ui-camera'));
+        if (!this.noUiCam) this.cameras.addExisting(new NPFullscreenCamera(this, false).setName('ui-camera'));
         if (!this.onlyComponent) {
             this.#initScene();
         }
