@@ -24,7 +24,7 @@ const IMAGES = {
     },
 };
 
-export class Button extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class NPButton extends Phaser.GameObjects.Sprite implements NPGameObject {
     static readonly EVENT_CLICK = 'np-click';
     #disabled = false;
 
@@ -49,7 +49,7 @@ export class Button extends Phaser.GameObjects.Sprite implements NPGameObject {
         this.setOrigin(0);
         this.setDisplaySize(this.config.width, this.config.height);
         container?.add(this);
-        if (!container) this.scene.addToLayer('ui', this);
+        if (!container) this.scene.addExisting(this);
     }
 
     #onClick() {
@@ -57,7 +57,7 @@ export class Button extends Phaser.GameObjects.Sprite implements NPGameObject {
             return;
         }
         this.setTexture(IMAGES.defaultBtn.key);
-        this.emit(Button.EVENT_CLICK, this);
+        this.emit(NPButton.EVENT_CLICK, this);
     }
 
     set disabled(value: boolean) {

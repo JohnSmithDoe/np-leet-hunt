@@ -39,6 +39,10 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameO
         this.scene.load.image(this.#image);
     }
 
+    addToScene(): void {
+        this.scene.addExisting(this);
+    }
+
     public create(): void {
         const length = Phaser.Math.Distance.BetweenPoints(this.start, this.target);
         const angle = Phaser.Math.Angle.BetweenPoints(this.start, this.target);

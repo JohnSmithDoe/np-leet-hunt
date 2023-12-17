@@ -38,20 +38,20 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     create() {
         const container = new Phaser.GameObjects.Container(this, 0, 0, []);
         super.create();
-        this.addToLayer('ui', container);
+        this.addExisting(container);
 
         const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
         recreateBtn.on('pointerup', () => {
             // this.removeFromContainer(this.#paradroidGame);
-            this.removeFromLayer('ui', this.#paradroidGame.container);
+            this.removeExisting(this.#paradroidGame.container);
             const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
             this.#paradroidGame = new ParadroidGame(this);
             this.#paradroidGame.init();
             this.#paradroidGame.create(newcontainer);
-            this.addToLayer('ui', newcontainer);
+            this.addExisting(newcontainer);
             // this.generateStuff();
         });
-        this.addToLayer('ui', recreateBtn);
+        this.addExisting(recreateBtn);
         this.cameras.getCamera('ui-camera').setViewport(0, 0, 100, 100);
         //this.layer('ui').camera.setViewport(0, 0, 100, 100);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);

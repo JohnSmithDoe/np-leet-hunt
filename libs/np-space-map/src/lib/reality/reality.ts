@@ -70,7 +70,7 @@ export class Reality extends Phaser.GameObjects.TileSprite implements NPSceneCom
 
     create(): void {
         this.setTexture(this.#image.key).setSize(this.scene.scale.width, this.scene.scale.height).setOrigin(0);
-        this.scene.addToLayer('fg', this);
+        this.scene.addExisting(this);
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 

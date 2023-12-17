@@ -7,44 +7,44 @@ import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
 export abstract class NPScene extends Phaser.Scene {
-    protected components = new NPGameObjectList<NPGameObject>(this);
+    protected components = new NPGameObjectList<NPGameObject | NPGameObjectList<NPGameObject>>(this);
     #debugOut: Phaser.GameObjects.Text;
     abstract setupComponents(): void;
 
     debugOut(text: string | string[] | number | number[]) {
-        this.#debugOut.setText(`${text}`).setPosition(0, this.scale.height - 50);
-        this.addToLayer('debug', this.#debugOut); // need to readd or it will be rendered by every camera...
+        this.#debugOut.setText(`${text}`).setPosition(0, 0);
+        this.addExisting(this.#debugOut); // need to readd or it will be rendered by every camera...
     }
 
-    addComponent(component: NPGameObject | NPGameObject[]) {
+    addComponent<T extends NPGameObject | NPGameObject[] | NPGameObjectList>(component: T) {
         if (Array.isArray(component)) {
             component.forEach(comp => this.addComponent(comp));
         } else {
             this.components.add(component);
         }
+        return component;
     }
-
-    addToLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
+    removeComponent(component: NPGameObject | NPGameObject[] | NPGameObjectList) {
+        if (Array.isArray(component)) {
+            component.forEach(comp => this.removeComponent(comp));
+        } else {
+            this.components.remove(component);
+        }
+        return component;
+    }
+    addExisting(gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
         if (Array.isArray(gameObject)) {
-            gameObject.forEach(gameObj => this.addToLayer(name, gameObj));
+            gameObject.forEach(gameObj => this.addExisting(gameObj));
         } else {
             this.add.existing(gameObject);
         }
     }
 
-    removeFromLayer(name: TNPLayerKeys, gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
+    removeExisting(gameObject: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]) {
         if (Array.isArray(gameObject)) {
-            gameObject.forEach(gameObj => this.removeFromLayer(name, gameObj));
+            gameObject.forEach(gameObj => this.removeExisting(gameObj));
         } else {
             gameObject.destroy(true);
-        }
-    }
-
-    removeFromContainer(component: NPGameObject | NPGameObject[]) {
-        if (Array.isArray(component)) {
-            component.forEach(comp => this.removeFromContainer(comp));
-        } else {
-            this.components.remove(component);
         }
     }
 
@@ -62,6 +62,11 @@ export abstract class NPScene extends Phaser.Scene {
 
     create() {
         this.components.create();
+        this.components.addToScene();
+        this.fadeIn();
+    }
+
+    private fadeIn() {
         new Observable(sub => {
             this.cameras.cameras.forEach(cam => {
                 cam.fadeIn(1000, 0, 0, 0, (cama: NPFullscreenCamera, percent: number) => {

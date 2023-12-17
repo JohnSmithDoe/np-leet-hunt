@@ -31,7 +31,7 @@ export class ParadroidIntro extends NPGameObjectList<ParadroidImage> {
                     });
             },
         });
-        this.scene.addToLayer('ui', imageTest);
+        this.scene.addExisting(imageTest);
         super.init();
     }
 

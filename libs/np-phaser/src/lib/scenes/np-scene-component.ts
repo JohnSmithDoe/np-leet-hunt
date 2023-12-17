@@ -10,6 +10,7 @@ export interface NPGameObject extends Phaser.GameObjects.GameObject {
     init?(): void;
     preload?(): void;
     create?(): void;
+    addToScene?(): void;
 
     // hmm
     // protected preUpdate?(time: number, delta: number): void;
@@ -21,9 +22,13 @@ export interface NPGameObjectContainer {
     init(): void;
     preload(): void;
     create(): void;
+    addToScene(): void;
 }
 
-export class NPGameObjectList<T extends NPGameObject> extends Phaser.Structs.List<T> implements NPGameObjectContainer {
+export class NPGameObjectList<T extends NPGameObject | NPGameObjectList = NPGameObject>
+    extends Phaser.Structs.List<T>
+    implements NPGameObjectContainer
+{
     scene: NPScene;
 
     constructor(scene: NPScene) {
@@ -51,6 +56,14 @@ export class NPGameObjectList<T extends NPGameObject> extends Phaser.Structs.Lis
         for (const component of this.list) {
             if (component.create) {
                 component.create();
+            }
+        }
+    }
+
+    public addToScene(): void {
+        for (const component of this.list) {
+            if (component.addToScene) {
+                component.addToScene();
             }
         }
     }

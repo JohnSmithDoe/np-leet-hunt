@@ -1,11 +1,14 @@
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
+import MoveToTask from 'phaser3-rex-plugins/plugins/behaviors/moveto/MoveTo';
 import Ship from 'phaser3-rex-plugins/plugins/ship';
 
-export class NPMovableSprite extends Phaser.Physics.Arcade.Image {
+export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGameObject {
     // private controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     private shipBehaviour: Ship;
+    private moveTo: MoveToTask;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
+    constructor(public scene: NPScene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
         super(scene, x, y, texture);
         this.shipBehaviour = new Ship(this, { wrap: false, maxSpeed: 500 });
         this.setName('rocket');
@@ -26,11 +29,19 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image {
         // this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     }
 
+    public create(): void {
+        this.moveTo = new MoveToTask(this, { speed: 1200, rotateToTarget: true });
+    }
+
     preUpdate() {
         // this.controls.update(delta);
         if (!this.shipBehaviour.isUp) {
             this.setAngularVelocity(0);
             this.setVelocity(0);
         }
+    }
+
+    public moveToTarget(target: { x?: number; y?: number }) {
+        this.moveTo.moveTo(target.x, target.y);
     }
 }

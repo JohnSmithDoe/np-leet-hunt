@@ -18,26 +18,22 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
     }
 
     async setupComponents() {
-        this.generateStuff();
+        this.map = this.addComponent(new NPSpaceMap(this));
+
         this.game.events.on(SPACE_EVENTS.ZOOM_IN, () => {
-            this.cameras.main.setZoom(this.cameras.main.zoom + 0.01);
+            this.cameras.main.setZoom(0.5);
         });
         this.game.events.on(SPACE_EVENTS.ZOOM_OUT, () => {
-            this.cameras.main.setZoom(this.cameras.main.zoom - 0.01);
+            this.cameras.main.setZoom(0.05);
         });
     }
 
-    private generateStuff() {
-        this.map = new NPSpaceMap(this);
-        this.map.init();
-        // this.addComponent(this.map);
-        // this.addComponent(new Reality(this, 'reality1'));
-    }
+    // this.addComponent(this.map);
+    // this.addComponent(new Reality(this, 'reality1'));
 
     preload() {
         console.log('Preloading Assets...');
         super.preload();
-        this.map.preload();
         this.load.image('rocket', 'assets/rocket.png');
     }
 
@@ -46,10 +42,13 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
      */
     create() {
         super.create();
-        this.map.create();
-        this.rocket = new NPMovableSprite(this, 5000, 5000, 'rocket').setScale(0.5);
-        this.addToLayer('np', this.rocket);
-        this.map.list.forEach(c => this.add.existing(c));
+        const start = this.map.startingPlanet.getCenter();
+        this.rocket = new NPMovableSprite(this, start.x, start.y, 'rocket').setScale(0.5);
+        this.rocket.create();
+        this.rocket.setDepth(30);
+        this.addExisting(this.rocket);
+        this.map.setRocket(this.rocket);
+        this.cameras.main.startFollow(this.rocket).setZoom(0.5);
     }
 
     update(time: number, delta: number) {

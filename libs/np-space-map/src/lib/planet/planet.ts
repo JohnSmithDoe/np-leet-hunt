@@ -60,6 +60,12 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         // this.stop();
     }
 
+    addToScene(): void {
+        console.log('64:addToScene-planet');
+
+        this.scene.addExisting(this);
+    }
+
     public update(...args: number[]): void {
         super.update(...args);
         // console.log(this.anims.currentFrame.index, this.anims.currentFrame);

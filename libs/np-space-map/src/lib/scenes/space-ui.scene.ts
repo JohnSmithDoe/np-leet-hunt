@@ -31,13 +31,13 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         zoomInTxtBtn.on('pointerup', () => {
             this.game.events.emit(SPACE_EVENTS.ZOOM_IN);
         });
-        this.addToLayer('ui', zoomInTxtBtn);
+        this.addExisting(zoomInTxtBtn);
 
         const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
         zoomOutTxtBtn.on('pointerup', () => {
             this.game.events.emit(SPACE_EVENTS.ZOOM_OUT);
         });
-        this.addToLayer('ui', zoomOutTxtBtn);
+        this.addExisting(zoomOutTxtBtn);
         const bubble = createSpeechBubble(
             this,
             70,
@@ -46,6 +46,6 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             100,
             "“And now you're a boss, too... of this pile of rubble.”"
         );
-        this.addToLayer('np', bubble);
+        this.addExisting(bubble);
     }
 }

@@ -53,7 +53,7 @@ export class ParadroidMiddle extends Phaser.GameObjects.Sprite implements NPGame
         this.setOrigin(0);
         this.setDisplaySize(this.config.width, this.config.height);
         container?.add(this);
-        if (!container) this.scene.addToLayer('ui', this);
+        if (!container) this.scene.addExisting(this);
     }
 
     activate(owner: TParadroidPlayer) {
