@@ -1,7 +1,6 @@
-import { NPSceneComponent } from '@shared/np-phaser';
+import { NPScene } from '@shared/np-phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
 import { TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeonBoard } from '../core/pixel-dungeon-board';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
@@ -10,7 +9,7 @@ import { PixelDungeonMob } from '../sprites/pixel-dungeon.mob';
 import { PixelDungeonJunction } from './parts/pixel-dungeon.junction';
 import { PixelDungeon } from './pixel-dungeon';
 
-export class PixelDungeonLevel implements NPSceneComponent {
+export class PixelDungeonLevel {
     scene: NPScene;
     #map: PixelDungeonMap;
     #board: PixelDungeonBoard;

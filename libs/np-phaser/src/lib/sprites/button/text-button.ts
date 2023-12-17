@@ -1,9 +1,7 @@
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
-
-export class TextButton extends Phaser.GameObjects.Text implements NPSceneComponent {
+export class TextButton extends Phaser.GameObjects.Text implements NPGameObject {
     constructor(
         public scene: NPScene,
         x: number,

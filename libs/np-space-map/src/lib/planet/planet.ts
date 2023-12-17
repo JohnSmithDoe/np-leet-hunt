@@ -1,4 +1,4 @@
-import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
@@ -25,7 +25,7 @@ const IMAGES = {
     // planetSheet: { key: 'planet-sheet', url: 'np-space-map/planets/planet-sheet-1.png', frameConfig },
 };
 
-export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
 
     static getRandom() {
@@ -55,7 +55,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPSceneComponen
         // });
         // console.log(a, 'kdsfjlksadjflksajdflksajdlk');
         // this.scene.add.existing(this);
-        this.scene.addToLayer('np', this);
+        // this.scene.addToLayer('np', this);
         // this.play(this.#image.key);
         // this.stop();
     }

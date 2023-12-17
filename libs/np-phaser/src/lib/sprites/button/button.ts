@@ -1,7 +1,5 @@
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
 
 // const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
 //     frameWidth: 256 * 2,
@@ -26,7 +24,7 @@ const IMAGES = {
     },
 };
 
-export class Button extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+export class Button extends Phaser.GameObjects.Sprite implements NPGameObject {
     static readonly EVENT_CLICK = 'np-click';
     #disabled = false;
 

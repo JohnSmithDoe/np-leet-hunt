@@ -16,15 +16,14 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     private engine: PixelDungeonEngine;
     constructor() {
         super({ key: PixelDungeonScene.key });
-        this.noUiCam = true;
     }
 
     public setupComponents(): void {
         this.engine = new PixelDungeonEngine(this);
-        this.addComponent(this.engine);
     }
 
     preload() {
+        this.engine.preload();
         this.load.scenePlugin({
             key: 'rexboardplugin',
             sceneKey: 'rexBoard',
@@ -35,6 +34,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     }
 
     create() {
+        this.engine.create();
         super.create();
         this.cam = this.cameras.main;
         // this.cam.setRoundPixels(true);

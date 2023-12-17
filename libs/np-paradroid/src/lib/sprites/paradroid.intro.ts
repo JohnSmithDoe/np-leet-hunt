@@ -1,10 +1,10 @@
-import { NPScene, NPSceneContainer } from '@shared/np-phaser';
+import { NPGameObjectList, NPScene } from '@shared/np-phaser';
 
 import { NPFullscreenCamera } from '../../../../np-phaser/src/lib/cameras/np-fullscreen-camera';
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { ParadroidImage } from './paradroid.image';
 
-export class ParadroidIntro extends NPSceneContainer<ParadroidImage> {
+export class ParadroidIntro extends NPGameObjectList<ParadroidImage> {
     constructor(scene: NPScene) {
         super(scene);
     }
@@ -35,8 +35,8 @@ export class ParadroidIntro extends NPSceneContainer<ParadroidImage> {
         super.init();
     }
 
-    create(container?: Phaser.GameObjects.Container) {
-        super.create(container);
+    create() {
+        super.create();
         this.list.forEach(img => {
             const ratio = img.height / img.width;
             img.setDisplaySize(128, 128 * ratio);

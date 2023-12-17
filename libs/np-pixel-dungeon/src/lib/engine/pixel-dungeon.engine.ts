@@ -1,5 +1,4 @@
 // eslint-disable-next-line max-classes-per-file
-import { NPSceneComponent } from '@shared/np-phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
 
@@ -15,7 +14,7 @@ import { HandleActionState } from './states/handle-action.state';
 import { StartGameState } from './states/start-game.state';
 import { States } from './states/states';
 
-export class PixelDungeonEngine extends StateManager implements NPSceneComponent {
+export class PixelDungeonEngine extends StateManager {
     player: PixelDungeonPlayer;
     mobs: PixelDungeonMob[];
     #pathfinder: PixelDungeonPathfinder;

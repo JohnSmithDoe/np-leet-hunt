@@ -1,7 +1,6 @@
+import { NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneComponent, NPSceneContainer } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 import { EFlowFrom, EParadroidShape } from '../@types/paradroid.consts';
 import { TParadroidFx, TParadroidSubTile } from '../@types/paradroid.types';
 import { isCombineShape, isExpandShape } from '../@types/paradroid.utils';
@@ -85,19 +84,19 @@ const shapeToFieldDefinition = (shape: EParadroidShape) => {
     }
 };
 
-export class ParadroidField extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameObject {
     static readonly EVENT_ACTIVATE_NEXT = 'activate_next';
     static readonly EVENT_DEACTIVATE_NEXT = 'deactivate_next';
 
     #subTile: TParadroidSubTile;
-    #paths: NPSceneContainer<ParadroidPath>;
+    #paths: NPGameObjectList<ParadroidPath>;
     #options: { width: number; height?: number };
 
     constructor(public scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
         super(scene, 0, 0, '');
         this.#subTile = subTile;
         this.#options = options;
-        this.#paths = new NPSceneContainer<ParadroidPath>(scene);
+        this.#paths = new NPGameObjectList<ParadroidPath>(scene);
 
         const width = this.#options.width;
         const height = this.#options.height ?? width;
@@ -132,7 +131,8 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
             this.#options.height ?? this.#options.width
         );
         container?.add(this);
-        this.#paths.create(container);
+        this.#paths.create();
+        container?.add(this.#paths.list);
         let g: Phaser.GameObjects.Graphics;
         const size = Math.min(this.#options.width, this.#options.height ?? Number.MAX_SAFE_INTEGER) / 4;
         const center = this.getCenter();
@@ -164,7 +164,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPScene
 
     update(...args) {
         super.update(...args);
-        this.#paths.update(...(args as [number, number]));
+        this.#paths.list.forEach(path => path.update(...args));
     }
 
     get col() {

@@ -1,7 +1,6 @@
-import { NPScene } from '../../scenes/np-scene';
-import { NPSceneComponent } from '../../scenes/np-scene-component';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 
-export class Image extends Phaser.GameObjects.Image implements NPSceneComponent {
+export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
     #frameKey: number;
 

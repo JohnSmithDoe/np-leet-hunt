@@ -1,10 +1,9 @@
 import * as Phaser from 'phaser';
 
 import { NPScene } from '../scenes/np-scene';
-import { NPBaseComponent } from '../scenes/np-scene-component';
 import { isLayer } from '../utilities/np-phaser-utils';
 
-export class NPCamera extends Phaser.Cameras.Scene2D.Camera implements NPBaseComponent {
+export class NPCamera extends Phaser.Cameras.Scene2D.Camera {
     focusObject?: Phaser.GameObjects.GameObject;
     focusLayer?: Phaser.GameObjects.Layer;
     debug = true;

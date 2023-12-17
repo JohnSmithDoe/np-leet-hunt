@@ -3,42 +3,27 @@ import * as Phaser from 'phaser';
 
 import { NPScene } from './np-scene';
 
-export interface NPBaseComponent {
+// Gameobject with init, preload and create
+export interface NPGameObject extends Phaser.GameObjects.GameObject {
     scene: NPScene;
 
     init?(): void;
-}
-
-export interface NPSceneComponent extends NPBaseComponent {
     preload?(): void;
+    create?(): void;
 
-    create?(container?: Phaser.GameObjects.Container): void;
-
-    update?(time: number, delta: number): void;
+    // hmm
+    // protected preUpdate?(time: number, delta: number): void;
 }
 
-export interface NPResizeableSceneComponent extends NPSceneComponent {
-    resize?(gameSize?: Phaser.Structs.Size): void;
-}
+export interface NPGameObjectContainer {
+    scene: NPScene;
 
-export interface NPSceneComponentContainer {
     init(): void;
-
     preload(): void;
-
-    create(container?: Phaser.GameObjects.Container): void;
-
-    update(time: number, delta: number): void;
+    create(): void;
 }
 
-export interface NPSceneComponentResizeableContainer extends NPSceneComponentContainer {
-    resize(gameSize?: Phaser.Structs.Size): void;
-}
-
-export class NPSceneContainer<T extends NPSceneComponent>
-    extends Phaser.Structs.List<T>
-    implements NPSceneComponentContainer
-{
+export class NPGameObjectList<T extends NPGameObject> extends Phaser.Structs.List<T> implements NPGameObjectContainer {
     scene: NPScene;
 
     constructor(scene: NPScene) {
@@ -62,36 +47,10 @@ export class NPSceneContainer<T extends NPSceneComponent>
         }
     }
 
-    create(container?: Phaser.GameObjects.Container): void {
+    create(): void {
         for (const component of this.list) {
             if (component.create) {
-                component.create(container);
-            }
-        }
-    }
-
-    update(time: number, delta: number): void {
-        for (const component of this.list) {
-            if (component.update) {
-                component.update(time, delta);
-            }
-        }
-    }
-}
-
-export class NPResizeableSceneContainer<T extends NPResizeableSceneComponent>
-    extends NPSceneContainer<T>
-    implements NPSceneComponentResizeableContainer
-{
-    create(): void {
-        super.create();
-        this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
-    }
-
-    resize(gameSize?: Phaser.Structs.Size): void {
-        for (const component of this.list) {
-            if (component.resize) {
-                component.resize(gameSize);
+                component.create();
             }
         }
     }

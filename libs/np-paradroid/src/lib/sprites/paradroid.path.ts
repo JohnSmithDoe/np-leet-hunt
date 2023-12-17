@@ -1,17 +1,16 @@
 // noinspection JSSuspiciousNameCombination
 
 import { PI, PIAndAHalf, PIHalf } from '@shared/np-library';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { NPSceneComponent } from '../../../../np-phaser/src/lib/scenes/np-scene-component';
 import { EFlowFrom, EFlowTo, EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPath, TParadroidPlayer } from '../@types/paradroid.types';
 import { ParadroidField } from './paradroid.field';
 
 const SHEET = { key: 'pipes-paths', url: 'np-paradroid/paths.png', frameWidth: 32, frameHeight: 16 };
 
-export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPSceneComponent {
+export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameObject {
     static readonly EVENT_ACTIVATED = 'activated';
     static readonly EVENT_DEACTIVATED = 'deactivated';
     #state: 'inactive' | 'activating' | 'deactivating' | 'active' = 'inactive';

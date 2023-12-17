@@ -26,8 +26,7 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image {
         // this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     }
 
-    public update(delta: number) {
-        super.update(delta);
+    preUpdate() {
         // this.controls.update(delta);
         if (!this.shipBehaviour.isUp) {
             this.setAngularVelocity(0);

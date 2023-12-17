@@ -1,4 +1,4 @@
-import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
@@ -14,7 +14,7 @@ const IMAGES = {
     space8: { key: 'space-8', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-8.jpg' },
 };
 
-export class Space extends Phaser.GameObjects.TileSprite implements NPSceneComponent {
+export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
 
     static getRandom() {
@@ -33,13 +33,16 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPSceneCompo
     }
 
     create(): void {
+        console.log('36:create-');
         this.setTexture(this.#image.key).setSize(this.scene.scale.width, this.scene.scale.height).setOrigin(0);
-        this.scene.addToLayer('bg', this);
+        // this.scene.addToLayer('bg', this);
+        // this only works if the camera is related to this....
+        // two options: own camera      scene handles all the camera related stuff
+        //              soc             control
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
-    update(...args: number[]): void {
-        super.update(...args);
+    preUpdate(): void {
         this.tilePositionX += 0.5;
     }
 

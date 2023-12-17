@@ -1,4 +1,4 @@
-import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { NPRNG } from '../../utilities/piecemeal';
@@ -16,7 +16,7 @@ const IMAGES = {
     },
 };
 
-export class DashedLine extends Phaser.GameObjects.TileSprite implements NPSceneComponent {
+export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
 
     static getRandom() {
@@ -58,7 +58,7 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPScene
         // });
         // console.log(a, 'kdsfjlksadjflksajdflksajdlk');
         // this.scene.add.existing(this);
-        this.scene.addToLayer('np', this);
+        // this.scene.addToLayer('np', this);
         // this.play(this.#image.key);
         // this.stop();
     }

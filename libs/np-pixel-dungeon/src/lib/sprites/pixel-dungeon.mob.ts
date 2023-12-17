@@ -1,5 +1,5 @@
 import { EDirection } from '@shared/np-library';
-import { NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject } from '@shared/np-phaser';
 import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
@@ -32,7 +32,7 @@ const defaultOptions: TPixelDungeonMobOptions = {
     energyGain: 25,
 };
 
-export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPSceneComponent {
+export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObject {
     rexChess: ChessData;
     scene: NPSceneWithBoard;
     options: TPixelDungeonMobOptions;

@@ -1,4 +1,4 @@
-import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 
 import { NPTimer } from '../../utilities/np-timer';
 import { NPRNG } from '../../utilities/piecemeal';
@@ -38,7 +38,7 @@ const defaultOptions: TBinareTimerOptions = {
     ms: true,
 };
 
-export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPSceneComponent {
+export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameObject {
     static EVENT_TIMER_ENDED = 'binary-timer-ended';
     options: TBinareTimerOptions;
 

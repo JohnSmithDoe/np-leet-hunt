@@ -1,4 +1,3 @@
-import { NPSceneComponent } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 
@@ -14,7 +13,7 @@ export interface TPixelDungeonMapOptions {
     width: number;
     height: number;
 }
-export class PixelDungeonMap implements NPSceneComponent {
+export class PixelDungeonMap {
     scene: NPSceneWithBoard;
 
     #map: Phaser.Tilemaps.Tilemap;

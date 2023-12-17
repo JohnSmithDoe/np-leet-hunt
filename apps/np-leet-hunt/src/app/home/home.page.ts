@@ -5,7 +5,9 @@ import { StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { filter } from 'rxjs';
 
-import { SpaceScene } from '../../../../../libs/np-space-map/src/lib/space.scene';
+import { SpaceScene } from '../../../../../libs/np-space-map/src/lib/scenes/space.scene';
+import { SpaceMapScene } from '../../../../../libs/np-space-map/src/lib/scenes/space-map.scene';
+import { SpaceUiScene } from '../../../../../libs/np-space-map/src/lib/scenes/space-ui.scene';
 
 @Component({
     selector: 'np-home',
@@ -18,14 +20,17 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     async ngOnInit(): Promise<void> {
         this.listen(
             this.#stage.initialized$.pipe(filter(isInitialized => isInitialized)).subscribe(() => {
-                this.goToPixeldungeon();
+                this.goToSpace();
             })
         );
         console.log('HomePageComponent', 'ngOnInit');
     }
 
     public goToSpace() {
-        this.#stage.startScene(SpaceScene.key, new SpaceScene());
+        this.#stage.phaser.game.scene.add(SpaceScene.key, new SpaceScene(), true);
+        this.#stage.phaser.game.scene.add(SpaceMapScene.key, new SpaceMapScene(), true);
+        this.#stage.phaser.game.scene.add(SpaceUiScene.key, new SpaceUiScene(), true);
+        // this.#stage.startScene(SpaceScene.key, new SpaceScene());
     }
 
     public goToPixeldungeon() {

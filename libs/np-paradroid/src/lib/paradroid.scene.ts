@@ -5,7 +5,6 @@ import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscro
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { ParadroidGame } from './core/paradroid.game';
-import { ParadroidIntro } from './sprites/paradroid.intro';
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'paradroid-scene';
@@ -17,8 +16,8 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
 
     async setupComponents() {
         this.#paradroidGame = new ParadroidGame(this);
-        this.addComponent(this.#paradroidGame);
-        this.addComponent(new ParadroidIntro(this));
+        // this.addComponent(this.#paradroidGame);
+        // this.addComponent(new ParadroidIntro(this));
     }
 
     init() {
@@ -38,16 +37,15 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
      */
     create() {
         const container = new Phaser.GameObjects.Container(this, 0, 0, []);
-        super.create(container);
+        super.create();
         this.addToLayer('ui', container);
 
         const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
         recreateBtn.on('pointerup', () => {
-            this.removeFromContainer(this.#paradroidGame);
+            // this.removeFromContainer(this.#paradroidGame);
             this.removeFromLayer('ui', this.#paradroidGame.container);
             const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
             this.#paradroidGame = new ParadroidGame(this);
-            this.addComponent(this.#paradroidGame);
             this.#paradroidGame.init();
             this.#paradroidGame.create(newcontainer);
             this.addToLayer('ui', newcontainer);
