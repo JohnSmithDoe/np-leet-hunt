@@ -17,11 +17,11 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         super({ key: SpaceMapScene.key });
     }
 
-    async setupComponents() {
+    setupComponents() {
         this.map = this.addComponent(new NPSpaceMap(this));
 
         this.game.events.on(SPACE_EVENTS.ZOOM_IN, () => {
-            this.cameras.main.setZoom(0.5);
+            this.cameras.main.setZoom(1);
         });
         this.game.events.on(SPACE_EVENTS.ZOOM_OUT, () => {
             this.cameras.main.setZoom(0.05);

@@ -10,9 +10,9 @@ import { NPRNG } from '../../utilities/piecemeal';
 const IMAGES = {
     dashedLineRed: {
         key: 'dashed-line-red',
-        url: 'np-phaser/dashed-line/assets/red-dashed-2896x205.png',
+        url: 'np-phaser/dashed-line/assets/red-dashed-2896x50.png',
         width: 2896,
-        height: 205,
+        height: 50,
     },
 };
 
@@ -49,9 +49,8 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameO
         this.setTexture(this.#image.key)
             .setOrigin(0)
             .setRotation(angle)
-            .setSize(length, 205)
-            .setScale(1, 0.5)
-            .setPosition(this.start.x, this.start.y - 205 / 4);
+            .setSize(length, 50)
+            .setPosition(this.start.x, this.start.y - 50 / 4);
 
         // const a = this.scene.anims.create({
         //     key: this.#image.key,

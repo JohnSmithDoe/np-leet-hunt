@@ -15,7 +15,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #start: Planet;
     #map: Starmap;
     #planets: Planet[] = [];
-    #connections: { from: Planet; to: Planet; line: DashedLine }[] = [];
+    #connections: { from: Planet; to: Planet; line: DashedLine; travelFrom: NPButton; travelTo: NPButton }[] = [];
     #outerSpace: Planet[] = [];
 
     init = () => {
@@ -29,9 +29,9 @@ export class NPSpaceMap extends NPGameObjectList {
             minDistance: 1750,
             outerSpaceDim: 5000,
         });
-        if (this.#debug) this.#debugDraw(this.#map);
         this.#initPlanets();
         this.#initConnections();
+        if (this.#debug) this.#debugDraw(this.#map);
         super.init();
     };
 
@@ -49,9 +49,33 @@ export class NPSpaceMap extends NPGameObjectList {
         this.scene.addExisting(rectMap);
         this.scene.addExisting(rectOuter);
         this.scene.debugOut(`planets ${map.coords.planets.length}`);
+        const g = this.scene.add.graphics({ lineStyle: { width: 6 } });
+        g.setDepth(100);
+        this.#connections.forEach(conn => {
+            g.lineBetween(conn.from.x, conn.from.y, conn.to.x, conn.to.y);
+        });
+        const g2 = this.scene.add.graphics({ lineStyle: { width: 6, color: 0xff0000 } });
+        g2.setDepth(101);
+        this.#connections.forEach(conn => {
+            const angle = Phaser.Math.Angle.BetweenPoints(conn.from, conn.to);
+            const buttonPos = pointOnAngle(conn.from, angle, 300);
+            g2.lineBetween(conn.from.x, conn.from.y, buttonPos.x, buttonPos.y);
+        });
     }
 
     private travelTo(target: { x?: number; y?: number }) {
+        this.#connections.forEach(conn => {
+            conn.line.alpha = 0.2;
+            conn.travelTo.alpha = 0;
+            conn.travelFrom.alpha = 0;
+        });
+        this.rocket.onceMoved(() => {
+            this.#connections.forEach(conn => {
+                conn.line.alpha = 0.8;
+                conn.travelTo.alpha = 1;
+                conn.travelFrom.alpha = 1;
+            });
+        });
         this.rocket.moveToTarget(target);
     }
 
@@ -78,6 +102,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #addPlanet(coords: Phaser.Types.Math.Vector2Like, isOuter: boolean): Planet {
         const type = this.#getPlanetType(isOuter);
         const planet = new Planet(this.scene, type).setPosition(coords.x, coords.y);
+        planet.setOrigin(0.5);
         return this.add(planet) as Planet;
     }
 
@@ -111,23 +136,23 @@ export class NPSpaceMap extends NPGameObjectList {
             const line = new DashedLine(this.scene, 'dashedLineRed', planet, target);
             line.setDepth(2);
             this.add(line);
-            this.#connections.push({ from: planet, to: target.item, line });
             let angle = Phaser.Math.Angle.BetweenPoints(planet, target);
             let buttonPos = pointOnAngle(planet, angle, 300);
-            let btn = new NPButton(this.scene, buttonPos.x, buttonPos.y, { width: size, height: size });
-            btn.on(NPButton.EVENT_CLICK, () => {
+            const btnFrom = new NPButton(this.scene, buttonPos.x, buttonPos.y, { width: size, height: size });
+            btnFrom.on(NPButton.EVENT_CLICK, () => {
                 this.travelTo(target);
             });
-            btn.setDepth(5).setOrigin(0.5);
-            this.add(btn);
+            btnFrom.setDepth(5).setOrigin(0.5);
+            this.add(btnFrom);
             angle = Phaser.Math.Angle.BetweenPoints(target, planet);
             buttonPos = pointOnAngle(target, angle, 300);
-            btn = new NPButton(this.scene, buttonPos.x, buttonPos.y, { width: size, height: size });
-            btn.on(NPButton.EVENT_CLICK, () => {
+            const btnTo = new NPButton(this.scene, buttonPos.x, buttonPos.y, { width: size, height: size });
+            btnTo.on(NPButton.EVENT_CLICK, () => {
                 this.travelTo(planet);
             });
-            btn.setDepth(5).setOrigin(0.5);
-            this.add(btn);
+            btnTo.setDepth(5).setOrigin(0.5);
+            this.add(btnTo);
+            this.#connections.push({ from: planet, to: target.item, line, travelFrom: btnFrom, travelTo: btnTo });
         }
     }
 }

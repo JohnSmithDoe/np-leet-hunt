@@ -45,7 +45,10 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
 
     public create(): void {
         this.setTexture(this.#image.key);
-        if (this.#image.key !== 'planet-sun') this.setDisplaySize(512, 512);
+        this.setOrigin(0.5);
+        if (this.width < 512) {
+            this.setDisplaySize(512, 512);
+        }
         // const a = this.scene.anims.create({
         //     key: this.#image.key,
         //     frames: this.#image.key,

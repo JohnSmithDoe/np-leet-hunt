@@ -44,4 +44,9 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGa
     public moveToTarget(target: { x?: number; y?: number }) {
         this.moveTo.moveTo(target.x, target.y);
     }
+
+    onceMoved(fn: () => void) {
+        this.moveTo.once('complete', () => fn());
+        return this;
+    }
 }

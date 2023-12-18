@@ -46,7 +46,6 @@ export class NPButton extends Phaser.GameObjects.Sprite implements NPGameObject 
 
     create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(IMAGES.defaultBtn.key);
-        this.setOrigin(0);
         this.setDisplaySize(this.config.width, this.config.height);
         container?.add(this);
         if (!container) this.scene.addExisting(this);
