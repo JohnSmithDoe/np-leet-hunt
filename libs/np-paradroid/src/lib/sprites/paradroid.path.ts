@@ -23,7 +23,11 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
     #tileHeight: number;
     #thickness: number;
 
-    constructor(public scene: NPScene, field: ParadroidField, path: TParadroidPath) {
+    constructor(
+        public scene: NPScene,
+        field: ParadroidField,
+        path: TParadroidPath
+    ) {
         super(scene, field.x, field.y, '');
         this.#field = field;
         this.#path = path;

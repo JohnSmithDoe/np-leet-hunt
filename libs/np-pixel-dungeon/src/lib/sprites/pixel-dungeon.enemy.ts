@@ -48,7 +48,7 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
             } else {
                 try {
                     tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
-                } catch (e) {
+                } catch {
                     console.log('no random tile');
                 }
                 if (tile) {

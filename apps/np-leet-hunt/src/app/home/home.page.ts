@@ -3,16 +3,14 @@ import { NPBaseSubscriber } from '@shared/np-library';
 import { ParadroidScene } from '@shared/np-paradroid';
 import { StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
+import { SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
 import { filter } from 'rxjs';
-
-import { SpaceScene } from '../../../../../libs/np-space-map/src/lib/scenes/space.scene';
-import { SpaceMapScene } from '../../../../../libs/np-space-map/src/lib/scenes/space-map.scene';
-import { SpaceUiScene } from '../../../../../libs/np-space-map/src/lib/scenes/space-ui.scene';
 
 @Component({
     selector: 'np-home',
     templateUrl: 'home.page.html',
     styleUrls: ['home.page.scss'],
+    standalone: false,
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     #stage = inject(StageService);

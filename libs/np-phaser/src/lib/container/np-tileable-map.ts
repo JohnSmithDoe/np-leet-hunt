@@ -1,6 +1,3 @@
-/* eslint-disable no-magic-numbers */
-// eslint-disable-next-line max-classes-per-file
-
 import { NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
 
 import { NPMovableSprite } from '../sprites/np-movable-sprite';

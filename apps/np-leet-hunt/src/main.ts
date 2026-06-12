@@ -1,5 +1,5 @@
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { platformBrowser } from '@angular/platform-browser';
 import { nyanConsole } from '@shared/np-library';
 
 import { AppModule } from './app/app.module';
@@ -9,6 +9,6 @@ if (environment.production) {
     enableProdMode();
 }
 nyanConsole('Welcome to Leet-Hunt :)');
-platformBrowserDynamic()
+platformBrowser()
     .bootstrapModule(AppModule)
     .catch(err => console.log(err));

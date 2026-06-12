@@ -92,7 +92,11 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
     #paths: NPGameObjectList<ParadroidPath>;
     #options: { width: number; height?: number };
 
-    constructor(public scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
+    constructor(
+        public scene: NPScene,
+        subTile: TParadroidSubTile,
+        options: { width: number; height?: number }
+    ) {
         super(scene, 0, 0, '');
         this.#subTile = subTile;
         this.#options = options;

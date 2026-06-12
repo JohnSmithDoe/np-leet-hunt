@@ -41,7 +41,10 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
     #vision: MobVision;
     #activity: MobAction;
 
-    constructor(public engine: PixelDungeonEngine, options?: TPixelDungeonMobOptions) {
+    constructor(
+        public engine: PixelDungeonEngine,
+        options?: TPixelDungeonMobOptions
+    ) {
         const mobOptions = Object.assign({}, defaultOptions, options ?? {});
         super(engine.scene, 0, 0, mobOptions);
         this.options = mobOptions;

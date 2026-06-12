@@ -33,7 +33,10 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
     #isRunning = false;
     #done = false;
 
-    constructor(mob: PixelDungeonMob, public target: PixelDungeonMob) {
+    constructor(
+        mob: PixelDungeonMob,
+        public target: PixelDungeonMob
+    ) {
         super(mob);
     }
 
@@ -63,7 +66,10 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
 }
 
 export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeonAction {
-    constructor(mob: PixelDungeonMob, public tile: TileXYType) {
+    constructor(
+        mob: PixelDungeonMob,
+        public tile: TileXYType
+    ) {
         super(mob);
     }
 
@@ -122,7 +128,6 @@ export class HandleActionState extends PixelDungeonState {
     }
 
     next = () => {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             // gain energy until one or more mobs can act
             while (!this.#mobs?.length) {

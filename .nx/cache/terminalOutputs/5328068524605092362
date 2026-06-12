@@ -1,0 +1,37 @@
+  [2m[33mconsole.warn[39m[22m
+[33m    this.npStage.ngOnDestroy();[39m
+[2m[22m
+[2m    [0m [90m 27 |[39m [90m     */[39m[22m
+[2m     [90m 28 |[39m     ngOnDestroy()[33m:[39m [36mvoid[39m {[22m
+[2m    [31m[1m>[22m[2m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'this.npStage.ngOnDestroy();'[39m)[33m;[39m[22m
+[2m     [90m    |[39m                 [31m[1m^[22m[2m[39m[22m
+[2m     [90m 30 |[39m     }[22m
+[2m     [90m 31 |[39m }[22m
+[2m     [90m 32 |[39m[0m[22m
+[2m[22m
+[2m      [2mat AppComponent.ngOnDestroy ([22m[2msrc/app/app.component.ts[2m:29:17)[22m[2m[22m
+[2m      [2mat executeOnDestroys ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:4887:20)[22m[2m[22m
+[2m      [2mat cleanUpView ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:4765:5)[22m[2m[22m
+[2m      [2mat destroyViewTree ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:4732:9)[22m[2m[22m
+[2m      [2mat destroyLView ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:4754:3)[22m[2m[22m
+[2m      [2mat ViewRef.destroy ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:6162:5)[22m[2m[22m
+[2m      [2mat ComponentRef2.destroy ([22m[2m../../node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs[2m:8937:19)[22m[2m[22m
+[2m      [2mat ComponentFixture.destroy ([22m[2m../../node_modules/@angular/core/fesm2022/testing.mjs[2m:284:25)[22m[2m[22m
+[2m      [2mat [22m[2m../../node_modules/@angular/core/fesm2022/testing.mjs[2m:1511:17[22m[2m[22m
+[2m          at Array.forEach (<anonymous>)[22m
+[2m      [2mat _TestBedImpl.destroyActiveFixtures ([22m[2m../../node_modules/@angular/core/fesm2022/testing.mjs[2m:1509:26)[22m[2m[22m
+[2m      [2mat _TestBedImpl.resetTestingModule ([22m[2m../../node_modules/@angular/core/fesm2022/testing.mjs[2m:1362:12)[22m[2m[22m
+[2m      [2mat [22m[2m../../node_modules/@angular/core/fesm2022/testing.mjs[2m:2469:15[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../node_modules/zone.js/bundles/zone.umd.js[2m:407:168)[22m[2m[22m
+[2m      [2mat _ProxyZoneSpec.onInvoke ([22m[2m../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:1079:43)[22m[2m[22m
+[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../node_modules/zone.js/bundles/zone.umd.js[2m:407:56)[22m[2m[22m
+[2m      [2mat _ZoneImpl.run ([22m[2m../../node_modules/zone.js/bundles/zone.umd.js[2m:162:47)[22m[2m[22m
+[2m      [2mat Object.wrappedFunc ([22m[2m../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:407:38)[22m[2m[22m
+
+/Users/mpstaerk/Projects/devops/np-leet-hunt/node_modules/@ionic/core/dist/esm/ion-split-pane.entry.js:89
+        const mediaList = window.matchMedia(mediaQuery);
+                                 ^
+
+[TypeError: window.matchMedia is not a function]
+
+Node.js v22.22.3

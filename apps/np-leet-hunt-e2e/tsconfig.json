@@ -3,17 +3,14 @@
     "compilerOptions": {
         "sourceMap": false,
         "outDir": "../../dist/out-tsc",
+        "module": "commonjs",
+        "moduleResolution": "node10",
         "allowJs": true,
-        "types": ["cypress", "node"],
+        "types": ["node"],
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src/**/*.ts", "src/**/*.js"],
-    "angularCompilerOptions": {
-        "strictInjectionParameters": true,
-        "strictInputAccessModifiers": true,
-        "strictTemplates": true
-    }
+    "include": ["src/**/*.ts", "src/**/*.js", "playwright.config.ts"]
 }

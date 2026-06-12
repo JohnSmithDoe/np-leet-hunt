@@ -19,7 +19,10 @@ export class Reality extends Phaser.GameObjects.TileSprite implements NPSceneCom
         this.renderTexture.draw(this.light, x, y);
     }
 
-    constructor(public scene: NPScene, type: keyof typeof IMAGES) {
+    constructor(
+        public scene: NPScene,
+        type: keyof typeof IMAGES
+    ) {
         super(scene, 0, 0, scene.scale.width, scene.scale.height, '');
         this.#image = IMAGES[type];
         this.setName(type);

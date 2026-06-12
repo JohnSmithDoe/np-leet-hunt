@@ -1,0 +1,10 @@
+
+Linting "np-paradroid"...
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-paradroid/src/lib/paradroid.scene.ts[24m[0m
+[0m  [2m17:5[22m  [33mwarning[39m  Promise-returning method provided where a void return was expected by extended/implemented type 'NPScene'  [2m@typescript-eslint/no-misused-promises[22m[0m
+[0m[0m
+[0m[33m[1m✖ 1 problem (0 errors, 1 warning)[22m[39m[0m
+[0m[33m[1m[22m[39m[0m
+✖ 1 problem (0 errors, 1 warning)
+

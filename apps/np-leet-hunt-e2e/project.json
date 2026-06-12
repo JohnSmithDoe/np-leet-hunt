@@ -5,22 +5,10 @@
     "projectType": "application",
     "targets": {
         "e2e": {
-            "executor": "@nrwl/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": ["{workspaceRoot}/dist/.playwright/apps/np-leet-hunt-e2e"],
             "options": {
-                "cypressConfig": "apps/np-leet-hunt-e2e/cypress.json",
-                "devServerTarget": "np-leet-hunt:serve:development"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "np-leet-hunt:serve:production"
-                }
-            }
-        },
-        "lint": {
-            "executor": "@nrwl/linter:eslint",
-            "outputs": ["{options.outputFile}"],
-            "options": {
-                "lintFilePatterns": ["apps/np-leet-hunt-e2e/**/*.{js,ts}"]
+                "config": "apps/np-leet-hunt-e2e/playwright.config.ts"
             }
         }
     },

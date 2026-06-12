@@ -56,7 +56,12 @@ export const CLpcSheetConfigs: Record<TLpcSheetKeys, { url: string }> = {
 export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements NPGameObject {
     #options: TPixelDungeonLPCSpriteOptions;
 
-    constructor(public scene: NPScene, x: number, y: number, options: TPixelDungeonLPCSpriteOptions) {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        options: TPixelDungeonLPCSpriteOptions
+    ) {
         super(scene, x, y, '');
         this.#options = options;
     }

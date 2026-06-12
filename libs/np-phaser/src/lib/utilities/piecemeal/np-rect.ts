@@ -221,14 +221,14 @@ export class NPRect implements Iterable<NPVec2> {
             this.top >= other.bottom
                 ? this.top - other.bottom
                 : this.bottom <= other.top
-                ? other.top - this.bottom
-                : -1;
+                  ? other.top - this.bottom
+                  : -1;
         const horizontal =
             this.left >= other.right
                 ? this.left - other.right
                 : this.right <= other.left
-                ? other.left - this.right
-                : -1;
+                  ? other.left - this.right
+                  : -1;
 
         if (vertical === -1 && horizontal === -1) return -1;
         if (vertical === -1) return horizontal;

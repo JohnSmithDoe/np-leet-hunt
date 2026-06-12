@@ -115,7 +115,8 @@ Run `nx affected:test` to execute the unit tests affected by a change.
 
 ## Running end-to-end tests
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+Run `nx e2e np-leet-hunt-e2e` to execute the end-to-end tests via [Playwright](https://playwright.dev).
+The first run requires `npx playwright install chromium` to download the browser.
 
 Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
 

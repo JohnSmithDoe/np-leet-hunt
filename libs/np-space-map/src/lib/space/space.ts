@@ -22,7 +22,10 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject
         return NPRNG.item(types);
     }
 
-    constructor(public scene: NPScene, type: keyof typeof IMAGES) {
+    constructor(
+        public scene: NPScene,
+        type: keyof typeof IMAGES
+    ) {
         super(scene, 0, 0, scene.scale.width, scene.scale.height, '');
         this.#image = IMAGES[type];
         this.setName(type);

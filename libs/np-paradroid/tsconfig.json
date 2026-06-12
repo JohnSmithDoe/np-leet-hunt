@@ -1,11 +1,10 @@
 {
     "extends": "../../tsconfig.base.json",
-  "exclude": [
-    "jest.config.ts"
-  ],
-  "compilerOptions": {
-    "target": "es2020",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "exclude": [
+        "jest.config.ts"
+    ],
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
     }
 }

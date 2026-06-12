@@ -28,7 +28,12 @@ export class NPButton extends Phaser.GameObjects.Sprite implements NPGameObject 
     static readonly EVENT_CLICK = 'np-click';
     #disabled = false;
 
-    constructor(public scene: NPScene, x: number, y: number, private config = { width: 64, height: 64 }) {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        private config = { width: 64, height: 64 }
+    ) {
         super(scene, x, y, '');
         this.setInteractive({ useHandCursor: true });
         this.on('pointerover', () => this.#updateTexture(true, false))

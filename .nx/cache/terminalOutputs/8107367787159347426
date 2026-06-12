@@ -1,0 +1,27 @@
+
+Linting "np-space-map"...
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-space-map/src/lib/planet/planet.ts[24m[0m
+[0m  [2m36:5[22m  [31merror[39m  Member constructor should be declared before all public static method definitions  [2m@typescript-eslint/member-ordering[22m[0m
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-space-map/src/lib/reality/reality.ts[24m[0m
+[0m  [2m10:5[22m  [31merror[39m  Member sphere should be declared before all #private instance field definitions         [2m@typescript-eslint/member-ordering[22m[0m
+[0m  [2m11:5[22m  [31merror[39m  Member light should be declared before all #private instance field definitions          [2m@typescript-eslint/member-ordering[22m[0m
+[0m  [2m12:5[22m  [31merror[39m  Member renderTexture should be declared before all #private instance field definitions  [2m@typescript-eslint/member-ordering[22m[0m
+[0m  [2m22:5[22m  [31merror[39m  Member constructor should be declared before all public instance method definitions     [2m@typescript-eslint/member-ordering[22m[0m
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-space-map/src/lib/scenes/space-ui.scene.ts[24m[0m
+[0m  [2m12:5[22m  [31merror[39m  '#space' is defined but never used  [2mno-unused-private-class-members[22m[0m
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-space-map/src/lib/space/np-space-map.ts[24m[0m
+[0m  [2m38:5[22m  [31merror[39m  Member startingPlanet should be declared before all public instance method definitions  [2m@typescript-eslint/member-ordering[22m[0m
+[0m  [2m66:5[22m  [31merror[39m  Member travelTo should be declared before all #private instance method definitions      [2m@typescript-eslint/member-ordering[22m[0m
+[0m  [2m82:5[22m  [31merror[39m  Member setRocket should be declared before all #private instance method definitions     [2m@typescript-eslint/member-ordering[22m[0m
+[0m[0m
+[0m[4m/Users/mpstaerk/Projects/devops/np-leet-hunt/libs/np-space-map/src/lib/space/space.ts[24m[0m
+[0m  [2m25:5[22m  [31merror[39m  Member constructor should be declared before all public static method definitions  [2m@typescript-eslint/member-ordering[22m[0m
+[0m[0m
+[0m[31m[1m✖ 10 problems (10 errors, 0 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m
+✖ 10 problems (10 errors, 0 warnings)
+

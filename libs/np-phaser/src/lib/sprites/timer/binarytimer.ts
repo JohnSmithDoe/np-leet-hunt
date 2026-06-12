@@ -49,7 +49,12 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
     #frenzyMode: boolean = false;
     #timer = new NPTimer();
 
-    constructor(public scene: NPScene, x: number, y: number, options?: TBinareTimerOptions) {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        options?: TBinareTimerOptions
+    ) {
         super(scene, { x, y });
         this.options = options ? Object.assign(defaultOptions, options) : defaultOptions;
         let digits: number = 0;

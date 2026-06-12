@@ -37,9 +37,11 @@
                 </ion-item-divider>
                 <ion-list>
                     <!-- TODO - Hook up reverse pipe so we don't call function in template -->
-                    <div *ngFor="let action of actionsHistoryRef.reverse()">
-                        <ion-item><p><i>{{action}}</i></p></ion-item>
-                    </div>
+                    @for (action of actionsHistoryRef.reverse(); track $index) {
+                        <div>
+                            <ion-item><p><i>{{action}}</i></p></ion-item>
+                        </div>
+                    }
                 </ion-list>
 
             </ion-content>

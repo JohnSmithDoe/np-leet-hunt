@@ -1,0 +1,92 @@
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m np-leet-hunt [39m[27m[0m [2mapps/np-leet-hunt/src/app/home/[22m[1mhome.page.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    [1m[31mJest encountered an unexpected token[39m[22m
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see [4mhttps://jestjs.io/docs/ecmascript-modules[24m for how to enable it.
+     • If you are trying to use TypeScript, see [4mhttps://jestjs.io/docs/getting-started#using-typescript[24m
+     • To have some of your "node_modules" files transformed, you can specify a custom [1m"transformIgnorePatterns"[22m in your config.
+     • If you need a custom transformation, specify a [1m"transform"[22m option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the [1m"moduleNameMapper"[22m config option.
+
+    You'll find more details and examples of these config options in the docs:
+    [36mhttps://jestjs.io/docs/configuration[39m
+    For information about custom transformations, see:
+    [36mhttps://jestjs.io/docs/code-transformation[39m
+
+    [1m[31mDetails:[39m[22m
+
+    /Users/mpstaerk/Projects/devops/np-leet-hunt/node_modules/@ionic/core/components/index.js:4
+    export{L as LogLevel,g as getAssetPath,r as render,s as setAssetPath,a as setNonce,b as setPlatformOptions}from"./p-CHqRYvYm.js";export{c as createAnimation}from"./p-CmR5uXej.js";export{a as LIFECYCLE_DID_ENTER,c as LIFECYCLE_DID_LEAVE,L as LIFECYCLE_WILL_ENTER,b as LIFECYCLE_WILL_LEAVE,d as LIFECYCLE_WILL_UNLOAD,g as getIonPageElement}from"./p-CtukzcyX.js";export{iosTransitionAnimation}from"./p-C1aScSTo.js";export{mdTransitionAnimation}from"./p-DIE4pXMl.js";export{g as getTimeGivenProgression}from"./p-hHmYLOfE.js";export{createGesture}from"./p-Cl0B-RWe.js";export{g as getPlatforms,i as initialize,a as isPlatform}from"./p-DOFCbuQR.js";export{c as componentOnReady}from"./p-Baq1XyAy.js";export{I as IonicSafeString,g as getMode,s as setupConfig}from"./p-k_E4tX5Z.js";export{o as openURL}from"./p-DiVJyqlX.js";export{m as menuController}from"./p-BnqQlm7c.js";export{b as actionSheetController,a as alertController,l as loadingController,m as modalController,p as pickerController,c as popoverController,t as toastController}from"./p-W9CZ2mWX.js";const e=e=>{const{swiper:o,extendParams:s}=e,t={effect:void 0,direction:"horizontal",initialSlide:0,loop:!1,parallax:!1,slidesPerView:1,spaceBetween:0,speed:300,slidesPerColumn:1,slidesPerColumnFill:"column",slidesPerGroup:1,centeredSlides:!1,slidesOffsetBefore:0,slidesOffsetAfter:0,touchEventsTarget:"container",freeMode:!1,freeModeMomentum:!0,freeModeMomentumRatio:1,freeModeMomentumBounce:!0,freeModeMomentumBounceRatio:1,freeModeMomentumVelocityRatio:1,freeModeSticky:!1,freeModeMinimumVelocity:.02,autoHeight:!1,setWrapperSize:!1,zoom:{maxRatio:3,minRatio:1,toggle:!1},touchRatio:1,touchAngle:45,simulateTouch:!0,touchStartPreventDefault:!1,shortSwipes:!0,longSwipes:!0,longSwipesRatio:.5,longSwipesMs:300,followFinger:!0,threshold:0,touchMoveStopPropagation:!0,touchReleaseOnEdges:!1,iOSEdgeSwipeDetection:!1,iOSEdgeSwipeThreshold:20,resistance:!0,resistanceRatio:.85,watchSlidesProgress:!1,watchSlidesVisibility:!1,preventClicks:!0,preventClicksPropagation:!0,slideToClickedSlide:!1,loopAdditionalSlides:0,noSwiping:!0,runCallbacksOnInit:!0,coverflowEffect:{rotate:50,stretch:0,depth:100,modifier:1,slideShadows:!0},flipEffect:{slideShadows:!0,limitRotation:!0},cubeEffect:{slideShadows:!0,shadow:!0,shadowOffset:20,shadowScale:.94},fadeEffect:{crossFade:!1},a11y:{prevSlideMessage:"Previous slide",nextSlideMessage:"Next slide",firstSlideMessage:"This is the first slide",lastSlideMessage:"This is the last slide"}};o.pagination&&(t.pagination={type:"bullets",clickable:!1,hideOnClick:!1}),o.scrollbar&&(t.scrollbar={hide:!0}),s(t)};export{e as IonicSlides}
+    ^^^^^^
+
+    SyntaxError: Unexpected token 'export'
+
+    [0m [90m 1 |[39m [36mimport[39m { [33mComponentFixture[39m[33m,[39m [33mTestBed[39m[33m,[39m waitForAsync } [36mfrom[39m [32m'@angular/core/testing'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mIonicModule[39m } [36mfrom[39m [32m'@ionic/angular'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 3 |[39m
+     [90m 4 |[39m [36mimport[39m { [33mHomePageComponent[39m } [36mfrom[39m [32m'./home.page'[39m[33m;[39m
+     [90m 5 |[39m[0m
+
+      [2mat ModuleExecutor.compile ([22m../../node_modules/jest-runtime/build/index.js[2m:2104:44)[22m
+      [2mat Object.<anonymous> ([22m../../node_modules/@ionic/angular/fesm2022/ionic-angular-common.mjs[2m:7:169)[22m
+      [2mat Object.<anonymous> ([22m../../node_modules/@ionic/angular/fesm2022/ionic-angular.mjs[2m:4:23)[22m
+      [2mat Object.<anonymous> ([22m[0m[36msrc/app/home/home.page.spec.ts[39m[0m[2m:2:1)[22m
+
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [0m[7m[37m np-leet-hunt [39m[27m[0m [2mapps/np-leet-hunt/src/app/[22m[1mapp.component.spec.ts[22m
+  [1m● [22mTest suite failed to run
+
+    [1m[31mJest encountered an unexpected token[39m[22m
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see [4mhttps://jestjs.io/docs/ecmascript-modules[24m for how to enable it.
+     • If you are trying to use TypeScript, see [4mhttps://jestjs.io/docs/getting-started#using-typescript[24m
+     • To have some of your "node_modules" files transformed, you can specify a custom [1m"transformIgnorePatterns"[22m in your config.
+     • If you need a custom transformation, specify a [1m"transform"[22m option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the [1m"moduleNameMapper"[22m config option.
+
+    You'll find more details and examples of these config options in the docs:
+    [36mhttps://jestjs.io/docs/configuration[39m
+    For information about custom transformations, see:
+    [36mhttps://jestjs.io/docs/code-transformation[39m
+
+    [1m[31mDetails:[39m[22m
+
+    /Users/mpstaerk/Projects/devops/np-leet-hunt/node_modules/@ionic/core/components/index.js:4
+    export{L as LogLevel,g as getAssetPath,r as render,s as setAssetPath,a as setNonce,b as setPlatformOptions}from"./p-CHqRYvYm.js";export{c as createAnimation}from"./p-CmR5uXej.js";export{a as LIFECYCLE_DID_ENTER,c as LIFECYCLE_DID_LEAVE,L as LIFECYCLE_WILL_ENTER,b as LIFECYCLE_WILL_LEAVE,d as LIFECYCLE_WILL_UNLOAD,g as getIonPageElement}from"./p-CtukzcyX.js";export{iosTransitionAnimation}from"./p-C1aScSTo.js";export{mdTransitionAnimation}from"./p-DIE4pXMl.js";export{g as getTimeGivenProgression}from"./p-hHmYLOfE.js";export{createGesture}from"./p-Cl0B-RWe.js";export{g as getPlatforms,i as initialize,a as isPlatform}from"./p-DOFCbuQR.js";export{c as componentOnReady}from"./p-Baq1XyAy.js";export{I as IonicSafeString,g as getMode,s as setupConfig}from"./p-k_E4tX5Z.js";export{o as openURL}from"./p-DiVJyqlX.js";export{m as menuController}from"./p-BnqQlm7c.js";export{b as actionSheetController,a as alertController,l as loadingController,m as modalController,p as pickerController,c as popoverController,t as toastController}from"./p-W9CZ2mWX.js";const e=e=>{const{swiper:o,extendParams:s}=e,t={effect:void 0,direction:"horizontal",initialSlide:0,loop:!1,parallax:!1,slidesPerView:1,spaceBetween:0,speed:300,slidesPerColumn:1,slidesPerColumnFill:"column",slidesPerGroup:1,centeredSlides:!1,slidesOffsetBefore:0,slidesOffsetAfter:0,touchEventsTarget:"container",freeMode:!1,freeModeMomentum:!0,freeModeMomentumRatio:1,freeModeMomentumBounce:!0,freeModeMomentumBounceRatio:1,freeModeMomentumVelocityRatio:1,freeModeSticky:!1,freeModeMinimumVelocity:.02,autoHeight:!1,setWrapperSize:!1,zoom:{maxRatio:3,minRatio:1,toggle:!1},touchRatio:1,touchAngle:45,simulateTouch:!0,touchStartPreventDefault:!1,shortSwipes:!0,longSwipes:!0,longSwipesRatio:.5,longSwipesMs:300,followFinger:!0,threshold:0,touchMoveStopPropagation:!0,touchReleaseOnEdges:!1,iOSEdgeSwipeDetection:!1,iOSEdgeSwipeThreshold:20,resistance:!0,resistanceRatio:.85,watchSlidesProgress:!1,watchSlidesVisibility:!1,preventClicks:!0,preventClicksPropagation:!0,slideToClickedSlide:!1,loopAdditionalSlides:0,noSwiping:!0,runCallbacksOnInit:!0,coverflowEffect:{rotate:50,stretch:0,depth:100,modifier:1,slideShadows:!0},flipEffect:{slideShadows:!0,limitRotation:!0},cubeEffect:{slideShadows:!0,shadow:!0,shadowOffset:20,shadowScale:.94},fadeEffect:{crossFade:!1},a11y:{prevSlideMessage:"Previous slide",nextSlideMessage:"Next slide",firstSlideMessage:"This is the first slide",lastSlideMessage:"This is the last slide"}};o.pagination&&(t.pagination={type:"bullets",clickable:!1,hideOnClick:!1}),o.scrollbar&&(t.scrollbar={hide:!0}),s(t)};export{e as IonicSlides}
+    ^^^^^^
+
+    SyntaxError: Unexpected token 'export'
+
+    [0m [90m 1 |[39m [36mimport[39m { [33mComponent[39m[33m,[39m inject[33m,[39m [33mOnDestroy[39m } [36mfrom[39m [32m'@angular/core'[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mModalController[39m } [36mfrom[39m [32m'@ionic/angular'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 3 |[39m [36mimport[39m { [33mStageService[39m } [36mfrom[39m [32m'@shared/np-phaser'[39m[33m;[39m
+     [90m 4 |[39m
+     [90m 5 |[39m [33m@[39m[33mComponent[39m({[0m
+
+      [2mat ModuleExecutor.compile ([22m../../node_modules/jest-runtime/build/index.js[2m:2104:44)[22m
+      [2mat Object.<anonymous> ([22m../../node_modules/@ionic/angular/fesm2022/ionic-angular-common.mjs[2m:7:169)[22m
+      [2mat Object.<anonymous> ([22m../../node_modules/@ionic/angular/fesm2022/ionic-angular.mjs[2m:4:23)[22m
+      [2mat Object.<anonymous> ([22msrc/app/app.component.ts[2m:2:1)[22m
+      [2mat Object.<anonymous> ([22m[0m[36msrc/app/app.component.spec.ts[39m[0m[2m:4:1)[22m
+
+[1mTest Suites: [22m[1m[31m2 failed[39m[22m, 2 total
+[1mTests:       [22m0 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        2.718 s
+[2mRan all test suites[22m[2m.[22m

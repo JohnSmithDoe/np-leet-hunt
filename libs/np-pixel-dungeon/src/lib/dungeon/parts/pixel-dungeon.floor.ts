@@ -4,7 +4,11 @@ import { PixelDungeon } from '../pixel-dungeon';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonFloor extends PixelDungeonTile {
-    constructor(tile: TDungeonTile, dungeon: PixelDungeon, private isRoomFloor: boolean) {
+    constructor(
+        tile: TDungeonTile,
+        dungeon: PixelDungeon,
+        private isRoomFloor: boolean
+    ) {
         super(tile, dungeon);
     }
 

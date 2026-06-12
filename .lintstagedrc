@@ -1,5 +1,0 @@
-{
-  "lint-staged": {
-    "*": ["eslint --fix", "git add"]
-  }
-}

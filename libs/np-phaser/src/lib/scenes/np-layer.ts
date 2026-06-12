@@ -9,7 +9,11 @@ import { NPSceneComponent } from './np-scene-component';
 export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponent {
     camera?: NPCamera;
 
-    constructor(public scene: NPScene, public readonly name: TNPLayerKeys, makeMain: boolean) {
+    constructor(
+        public scene: NPScene,
+        public readonly name: TNPLayerKeys,
+        makeMain: boolean
+    ) {
         super(scene, []);
         this.camera = new NPFullscreenCamera(scene, makeMain).setName(name + '-camera');
         this.camera.debug = makeMain;

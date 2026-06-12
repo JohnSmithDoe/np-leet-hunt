@@ -81,7 +81,7 @@ export class PixelDungeonFactory {
             // hmm: why is that important for alignment
         }
         this.#options = options;
-        this.#options.roomTries ??= options.width * options.height ?? options.width;
+        this.#options.roomTries ??= options.width * options.height;
 
         this.#rng = new NPRng(this.#options.seed ?? `${Date.now()}#PixelDungeon`);
         this.#bounds = new NPRect(0, 0, options.width, options.height);

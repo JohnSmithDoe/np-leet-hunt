@@ -21,8 +21,11 @@ export class StageComponent implements AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         if (this.stageContainer) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            this.listen(this.#npStage.initStage(this.stageContainer.nativeElement).subscribe(isReady => (this.isReady = isReady)));
+            this.listen(
+                this.#npStage
+                    .initStage(this.stageContainer.nativeElement)
+                    .subscribe(isReady => (this.isReady = isReady))
+            );
         }
     }
 

@@ -1,0 +1,39 @@
+
+[7m[1m[36m NX [39m[22m[27m  Ensuring Playwright is installed.
+
+use --skipInstall to skip installation.
+
+
+[2mRunning [22m1[2m test using [22m1[2m worker[22m
+
+[1A[2K[1/1] [chromium] › apps/np-leet-hunt-e2e/src/app.spec.ts:3:5 › boots the game and shows the Phaser stage
+[1A[2K[31m  1) [chromium] › apps/np-leet-hunt-e2e/src/app.spec.ts:3:5 › boots the game and shows the Phaser stage [39m
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('np-stage canvas')
+    Expected: visible
+    Received: hidden
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+    [2m  - waiting for locator('np-stage canvas')[22m
+    [2m    63 × locator resolved to <canvas width="0" height="0"></canvas>[22m
+    [2m       - unexpected value "hidden"[22m
+
+
+    [0m [90m  6 |[39m     [36mawait[39m expect(page[33m.[39mlocator([32m'ion-title'[39m[33m,[39m { hasText[33m:[39m [32m'Home'[39m }))[33m.[39mtoBeVisible()[33m;[39m
+     [90m  7 |[39m     [90m// Phaser attaches its canvas inside the <np-stage> container once the game is up[39m
+    [31m[1m>[22m[39m[90m  8 |[39m     [36mawait[39m expect(page[33m.[39mlocator([32m'np-stage canvas'[39m))[33m.[39mtoBeVisible({ timeout[33m:[39m [35m30000[39m })[33m;[39m
+     [90m    |[39m                                                   [31m[1m^[22m[39m
+     [90m  9 |[39m })[33m;[39m
+     [90m 10 |[39m[0m
+    [2m    at /Users/mpstaerk/Projects/devops/np-leet-hunt/apps/np-leet-hunt-e2e/src/app.spec.ts:8:51[22m
+
+[2m    Error Context: dist/.playwright/apps/np-leet-hunt-e2e/test-output/app-boots-the-game-and-shows-the-Phaser-stage-chromium/error-context.md[22m
+
+
+[1A[2K[31m  1 failed[39m
+[31m    [chromium] › apps/np-leet-hunt-e2e/src/app.spec.ts:3:5 › boots the game and shows the Phaser stage [39m

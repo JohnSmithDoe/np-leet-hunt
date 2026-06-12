@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
 import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
 

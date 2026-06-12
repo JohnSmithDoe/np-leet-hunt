@@ -1,5 +1,5 @@
 // Tile index mapping to make the code more readable
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 type NPTileIndex = number;
 
 interface NPWeightedTileIndex {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable no-magic-numbers */
 import * as Phaser from 'phaser';
 
 import { OnSceneCreate, OnScenePreload } from '../types/np-phaser';

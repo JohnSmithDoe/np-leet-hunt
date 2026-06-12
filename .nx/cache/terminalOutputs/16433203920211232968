@@ -1,0 +1,10 @@
+
+[7m[1m[36m NX [39m[22m[27m  Ensuring Playwright is installed.
+
+use --skipInstall to skip installation.
+
+
+[2mRunning [22m1[2m test using [22m1[2m worker[22m
+
+[1A[2K[1/1] [chromium] › apps/np-leet-hunt-e2e/src/app.spec.ts:3:5 › boots the game and shows the Phaser stage
+[1A[2K[32m  1 passed[39m[2m (2.5s)[22m

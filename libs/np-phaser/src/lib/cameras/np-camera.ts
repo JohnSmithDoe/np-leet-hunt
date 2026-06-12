@@ -9,7 +9,14 @@ export class NPCamera extends Phaser.Cameras.Scene2D.Camera {
     debug = true;
     #makeMain = false;
 
-    constructor(public scene: NPScene, x: number, y: number, width: number, height: number, makeMain: boolean) {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        makeMain: boolean
+    ) {
         super(x, y, width, height);
         this.#makeMain = makeMain;
     }

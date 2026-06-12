@@ -8,7 +8,12 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGa
     private shipBehaviour: Ship;
     private moveTo: MoveToTask;
 
-    constructor(public scene: NPScene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
+    constructor(
+        public scene: NPScene,
+        x: number,
+        y: number,
+        texture: string | Phaser.Textures.Texture
+    ) {
         super(scene, x, y, texture);
         this.shipBehaviour = new Ship(this, { wrap: false, maxSpeed: 500 });
         this.setName('rocket');

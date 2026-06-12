@@ -1,20 +1,15 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
+import { AppModule } from './app.module';
 
-describe('AppComponent', () => {
-    beforeEach(waitForAsync(() => {
-        void TestBed.configureTestingModule({
-            declarations: [AppComponent],
-            schemas: [CUSTOM_ELEMENTS_SCHEMA],
+describe('AppComponent smoke test', () => {
+    it('compiles the app module and creates the root component', async () => {
+        await TestBed.configureTestingModule({
+            imports: [AppModule],
         }).compileComponents();
-    }));
 
-    it('should create the app', () => {
         const fixture = TestBed.createComponent(AppComponent);
-        const app = fixture.debugElement.componentInstance;
-        expect(app).toBeTruthy();
+        expect(fixture.componentInstance).toBeTruthy();
     });
-    // TODO: add more tests!
 });
