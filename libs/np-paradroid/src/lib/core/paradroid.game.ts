@@ -44,12 +44,12 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#engine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
             this.#middle(row).deactivate(owner)
         );
-        // this.add(this.#fields);
+        this.add(this.#fields);
 
         this.#buttons = this.#generateButtons(this.#engine);
-        // this.add(this.#buttons);
+        this.add(this.#buttons);
         this.#shots = this.#generateShots();
-        // this.add(this.#shots);
+        this.add(this.#shots);
 
         this.#timer = new BinaryTimer(
             this.scene,
@@ -63,7 +63,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.add(this.#timer);
 
         this.#middleCol = this.#generateMiddleRow();
-        // this.add(this.#middleCol);
+        this.add(this.#middleCol);
 
         this.#droidFields = this.#generateFields(EParadroidOwner.Droid);
         this.#droidEngine = new ParadroidEngine(this.#droidFields.list);
@@ -74,12 +74,12 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#droidEngine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
             this.#middle(row).deactivate(owner)
         );
-        // this.add(this.#droidFields);
+        this.add(this.#droidFields);
 
         this.#droidButtons = this.#generateButtons(this.#droidEngine);
-        // this.add(this.#droidButtons);
+        this.add(this.#droidButtons);
         this.#droidShots = this.#generateShots();
-        // this.add(this.#droidShots);
+        this.add(this.#droidShots);
 
         super.init();
     }
@@ -88,28 +88,28 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         let x = 0;
         let y = 100;
         const buttons = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#buttons.create();
+        this.#buttons.create(buttons);
         x += this.#options.tileWidth;
         const fields = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#fields.create();
+        this.#fields.create(fields);
         x += this.#factory.columns * this.#options.tileWidth;
         const middle = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#middleCol.create();
+        this.#middleCol.create(middle);
         x += this.#options.tileWidth;
         x += this.#factory.columns * this.#options.tileWidth;
         const droid = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#droidFields.create();
+        this.#droidFields.create(droid);
         droid.setScale(-1, 1);
         const buttons2 = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#droidButtons.create();
+        this.#droidButtons.create(buttons2);
         x = this.#options.tileWidth;
         y = 100 - this.#options.tileHeight / 2;
         const shots = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#shots.create();
+        this.#shots.create(shots);
         this.#shots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));
         x = this.#options.tileWidth * (this.#options.columns * 2 + 2); // +2 player buttons and middle row
         const droidshots = new Phaser.GameObjects.Container(this.scene, x, y, []);
-        this.#droidShots.create();
+        this.#droidShots.create(droidshots);
 
         droidshots.setScale(-1, 1);
         this.#droidShots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));

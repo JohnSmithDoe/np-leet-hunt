@@ -16,8 +16,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
 
     async setupComponents() {
         this.#paradroidGame = new ParadroidGame(this);
-        //this.addComponent(this.#paradroidGame);
-        //this.addComponent(new ParadroidIntro(this));
+        this.addComponent(this.#paradroidGame);
+        // TODO: ParadroidIntro still depends on the removed layer cameras ('ui-camera') — rework before re-enabling
+        // this.addComponent(new ParadroidIntro(this));
     }
 
     init() {
@@ -37,23 +38,21 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
      */
     create() {
         const container = new Phaser.GameObjects.Container(this, 0, 0, []);
-        super.create();
+        super.create(container);
         this.addExisting(container);
 
         const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
         recreateBtn.on('pointerup', () => {
-            // this.removeFromContainer(this.#paradroidGame);
+            this.removeComponent(this.#paradroidGame);
             this.removeExisting(this.#paradroidGame.container);
             const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
             this.#paradroidGame = new ParadroidGame(this);
+            this.addComponent(this.#paradroidGame);
             this.#paradroidGame.init();
             this.#paradroidGame.create(newcontainer);
             this.addExisting(newcontainer);
-            // this.generateStuff();
         });
         this.addExisting(recreateBtn);
-        this.cameras.getCamera('ui-camera').setViewport(0, 0, 100, 100);
-        //this.layer('ui').camera.setViewport(0, 0, 100, 100);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         this.resize();
     }
@@ -61,6 +60,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     update(time: number, delta: number) {
         this.iter += 0.01;
         super.update(time, delta);
+        this.#paradroidGame.update(time, delta);
     }
 
     /**

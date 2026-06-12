@@ -8,11 +8,9 @@ export interface NPGameObject extends Phaser.GameObjects.GameObject {
 
     init?(): void;
     preload?(): void;
-    create?(): void;
+    create?(container?: Phaser.GameObjects.Container): void;
     addToScene?(): void;
-
-    // hmm
-    // protected preUpdate?(time: number, delta: number): void;
+    // update(...args) is already part of Phaser.GameObjects.GameObject
 }
 
 export interface NPGameObjectContainer {
@@ -51,10 +49,18 @@ export class NPGameObjectList<T extends NPGameObject | NPGameObjectList = NPGame
         }
     }
 
-    create(): void {
+    create(container?: Phaser.GameObjects.Container): void {
         for (const component of this.list) {
             if (component.create) {
-                component.create();
+                component.create(container);
+            }
+        }
+    }
+
+    update(...args: unknown[]): void {
+        for (const component of this.list) {
+            if (component.update) {
+                component.update(...args);
             }
         }
     }

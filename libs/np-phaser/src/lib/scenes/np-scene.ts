@@ -60,8 +60,8 @@ export abstract class NPScene extends Phaser.Scene {
         this.components.preload();
     }
 
-    create() {
-        this.components.create();
+    create(container?: Phaser.GameObjects.Container) {
+        this.components.create(container);
         this.components.addToScene();
         this.fadeIn();
     }
