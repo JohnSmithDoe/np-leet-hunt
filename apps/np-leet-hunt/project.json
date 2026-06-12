@@ -7,7 +7,9 @@
     "targets": {
         "build": {
             "executor": "@angular/build:application",
-            "outputs": ["{workspaceRoot}/dist/apps/np-leet-hunt"],
+            "outputs": [
+                "{workspaceRoot}/dist/apps/np-leet-hunt"
+            ],
             "options": {
                 "outputPath": {
                     "base": "dist/apps/np-leet-hunt",
@@ -15,7 +17,9 @@
                 },
                 "index": "apps/np-leet-hunt/src/index.html",
                 "browser": "apps/np-leet-hunt/src/main.ts",
-                "polyfills": ["apps/np-leet-hunt/src/polyfills.ts"],
+                "polyfills": [
+                    "apps/np-leet-hunt/src/polyfills.ts"
+                ],
                 "tsConfig": "apps/np-leet-hunt/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
                 "assets": [
@@ -46,9 +50,15 @@
                         "output": "./np-pixel-dungeon"
                     }
                 ],
-                "styles": ["apps/np-leet-hunt/src/global.scss"],
+                "styles": [
+                    "apps/np-leet-hunt/src/global.scss"
+                ],
                 "scripts": [],
-                "allowedCommonJsDependencies": ["phaser", "poisson-disk-sampling", "eventemitter3"]
+                "allowedCommonJsDependencies": [
+                    "phaser",
+                    "poisson-disk-sampling",
+                    "eventemitter3"
+                ]
             },
             "configurations": {
                 "production": {
@@ -102,18 +112,25 @@
             "executor": "@nx/eslint:lint"
         },
         "test": {
-            "executor": "@nx/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/apps/np-leet-hunt"],
+            "executor": "@nx/vitest:test",
+            "outputs": [
+                "{options.reportsDirectory}"
+            ],
             "options": {
-                "jestConfig": "apps/np-leet-hunt/jest.config.ts",
-                "passWithNoTests": true
+                "configFile": "apps/np-leet-hunt/vitest.config.ts",
+                "reportsDirectory": "../../coverage/apps/np-leet-hunt"
             }
         },
         "stylelint": {
             "executor": "nx-stylelint:lint",
-            "outputs": ["{options.outputFile}"],
+            "outputs": [
+                "{options.outputFile}"
+            ],
             "options": {
-                "lintFilePatterns": ["apps/np-leet-hunt/**/*.css", "apps/np-leet-hunt/**/*.scss"]
+                "lintFilePatterns": [
+                    "apps/np-leet-hunt/**/*.css",
+                    "apps/np-leet-hunt/**/*.scss"
+                ]
             }
         }
     },

@@ -22,161 +22,1051 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": ".prettierrc.json",
-        "hash": "18397330178547032736"
-      },
-      {
-        "file": "nx.json",
-        "hash": "6641884636893195686"
-      },
-      {
-        "file": "LICENSE",
-        "hash": "12476272592599247422"
-      },
-      {
-        "file": ".gitignore",
-        "hash": "5892797846150372604"
-      },
-      {
-        "file": "apps/old/stateMachine.ts",
-        "hash": "2751848674839170183"
-      },
-      {
-        "file": "AI.md",
-        "hash": "10646350156856167631"
-      },
-      {
-        "file": "tsconfig.json",
-        "hash": "7113714237164333523"
-      },
-      {
-        "file": "CLAUDE.md",
-        "hash": "17015562460231757431"
-      },
-      {
-        "file": "TODO.md",
-        "hash": "5747291445638025884"
-      },
-      {
-        "file": "ionic.config.json",
-        "hash": "431870115605592484"
-      },
-      {
-        "file": "README.md",
-        "hash": "16892956110125061546"
-      },
-      {
-        "file": ".husky/pre-commit",
-        "hash": "12711826071653017367"
-      },
-      {
         "file": ".github/workflows/gh-page.yml",
         "hash": "4701531548594789920"
       },
       {
-        "file": "apps/old/old.md",
-        "hash": "8294319530852921631"
-      },
-      {
-        "file": "tools/jest/empty-module.js",
-        "hash": "3429130306414473014"
-      },
-      {
-        "file": "package.json",
-        "hash": "14430480370153228042"
+        "file": "CLAUDE.md",
+        "hash": "3239190154668295401"
       },
       {
         "file": ".prettierignore",
         "hash": "822789216646354860"
       },
       {
-        "file": "package-lock.json",
-        "hash": "16556970733090179625"
+        "file": "tools/tsconfig.tools.json",
+        "hash": "14822921385246232288"
       },
       {
-        "file": "pull_request_template.md",
-        "hash": "15034318482760000911"
+        "file": "ionic.config.json",
+        "hash": "431870115605592484"
+      },
+      {
+        "file": ".prettierrc.json",
+        "hash": "18397330178547032736"
+      },
+      {
+        "file": "apps/old/old.md",
+        "hash": "8294319530852921631"
+      },
+      {
+        "file": "tools/generators/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "5892797846150372604"
       },
       {
         "file": "eslint.config.mjs",
-        "hash": "7598525381535927381"
-      },
-      {
-        "file": ".stylelintrc.json",
-        "hash": "7877396125471624169"
-      },
-      {
-        "file": "tools/tsconfig.tools.json",
-        "hash": "14822921385246232288"
+        "hash": "7471663256006944138"
       },
       {
         "file": "tsconfig.base.json",
         "hash": "2931888546127481254"
       },
       {
-        "file": "jest.config.ts",
-        "hash": "9610879865243759153"
+        "file": ".stylelintrc.json",
+        "hash": "7877396125471624169"
+      },
+      {
+        "file": "TODO.md",
+        "hash": "5747291445638025884"
+      },
+      {
+        "file": "package.json",
+        "hash": "16668818779829095731"
+      },
+      {
+        "file": "README.md",
+        "hash": "714705666671702195"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "7113714237164333523"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "12476272592599247422"
+      },
+      {
+        "file": "pull_request_template.md",
+        "hash": "15034318482760000911"
+      },
+      {
+        "file": "AI.md",
+        "hash": "10646350156856167631"
+      },
+      {
+        "file": "apps/old/stateMachine.ts",
+        "hash": "2751848674839170183"
+      },
+      {
+        "file": "nx.json",
+        "hash": "14202609732688171282"
+      },
+      {
+        "file": ".husky/pre-commit",
+        "hash": "12711826071653017367"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "13980804326023015496"
       },
       {
         "file": ".stylelintignore",
         "hash": "2752117144567040554"
-      },
-      {
-        "file": "tools/generators/.gitkeep",
-        "hash": "3244421341483603138"
       }
     ],
     "projectFileMap": {
-      "np-library": [
+      "np-pixel-dungeon": [
         {
-          "file": "libs/np-library/README.md",
-          "hash": "620604075166986513"
+          "file": "libs/np-pixel-dungeon/README.md",
+          "hash": "3159619394776828164"
         },
         {
-          "file": "libs/np-library/jest.config.ts",
-          "hash": "16529320303381775188"
+          "file": "libs/np-pixel-dungeon/project.json",
+          "hash": "3536046173779342029"
         },
         {
-          "file": "libs/np-library/project.json",
-          "hash": "7451638561644139073"
+          "file": "libs/np-pixel-dungeon/src/assets/Download19233.png",
+          "hash": "11792210115199008382"
         },
         {
-          "file": "libs/np-library/src/index.ts",
-          "hash": "12760563048620774176",
+          "file": "libs/np-pixel-dungeon/src/assets/Download96156.png",
+          "hash": "16728196616095532374"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/PixelDungeon.tsj",
+          "hash": "17056833634707661273"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/PixelDungeon2.tsj",
+          "hash": "6725256230354166338"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/buch-dungeon-tileset-extruded.png",
+          "hash": "2781714879519458650"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/grid-ps1.png",
+          "hash": "3713572796413691137"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/sheet-credits.txt",
+          "hash": "3569177335364580968"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/tiles_sewers-extruded.png",
+          "hash": "2613689805502595214"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/assets/tiles_sewers.png",
+          "hash": "17520738168055214087"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/index.ts",
+          "hash": "6663851545717354992"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/@types/pixel-dungeon.types.ts",
+          "hash": "17162226918565827934",
           "deps": [
+            "npm:phaser3-rex-plugins",
             "np-phaser"
           ]
         },
         {
-          "file": "libs/np-library/src/lib/base/np-base-subscriber.ts",
-          "hash": "15180002850282889426",
+          "file": "libs/np-pixel-dungeon/src/lib/core/pixel-dungeon-board.ts",
+          "hash": "17813755742496015941",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/core/pixel-dungeon.pathfinder.ts",
+          "hash": "9834281304360286245",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.floor.ts",
+          "hash": "4615119263904420748"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.hallway.ts",
+          "hash": "9120660460295838668"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.junction.ts",
+          "hash": "89262813207819412",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.room.ts",
+          "hash": "5039939653789089770"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.tile.ts",
+          "hash": "9461278064247403955",
+          "deps": [
+            "npm:phaser3-rex-plugins",
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.wall.ts",
+          "hash": "3708179915261765237",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.factory.ts",
+          "hash": "17649238039027891973",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.level.ts",
+          "hash": "4355755606420422324",
+          "deps": [
+            "np-phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.ts",
+          "hash": "10633624318327870645",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/pixel-dungeon.engine.ts",
+          "hash": "10717214615297227811",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/pixel-dungeon.state.ts",
+          "hash": "11384251998857073259",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/states/end-game.state.ts",
+          "hash": "3137199144138571532"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/states/handle-action.state.ts",
+          "hash": "15113948923807038445",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/states/start-game.state.ts",
+          "hash": "2855413049621383763"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/engine/states/states.ts",
+          "hash": "4751043855415441089"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-floorlayer.ts",
+          "hash": "3173517414234506485"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-objectlayer.ts",
+          "hash": "352215406126344918"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-tilelayer.ts",
+          "hash": "1604061372203903968",
+          "deps": [
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-walllayer.ts",
+          "hash": "9239840486040380771"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/pixel-dungeon-tileset.ts",
+          "hash": "10802963168721606126"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/map/pixel-dungeon.map.ts",
+          "hash": "14378031723220434599",
+          "deps": [
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/pixel-dungeon.scene.ts",
+          "hash": "7191705017067135910",
+          "deps": [
+            "np-phaser",
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.enemy.ts",
+          "hash": "16643348832222573142",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.info-text.ts",
+          "hash": "17501307589865695758",
+          "deps": [
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.lpc-sprite.ts",
+          "hash": "4105813470155972646",
+          "deps": [
+            "np-library",
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.mob.ts",
+          "hash": "17376016748669734150",
+          "deps": [
+            "np-library",
+            "np-phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.player.ts",
+          "hash": "9895625379456072980",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-action.ts",
+          "hash": "9207233935767131923"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-movement.ts",
+          "hash": "9390924098338260626",
+          "deps": [
+            "np-library",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-vision.ts",
+          "hash": "5278451818262749079",
+          "deps": [
+            "np-library",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/src/test-setup.ts",
+          "hash": "12378993641344970544",
+          "deps": [
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "libs/np-pixel-dungeon/tsconfig.json",
+          "hash": "7300995600241782706"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/tsconfig.lib.json",
+          "hash": "4413055883885191999"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/tsconfig.spec.json",
+          "hash": "4339966301730907136"
+        },
+        {
+          "file": "libs/np-pixel-dungeon/vitest.config.ts",
+          "hash": "15252856270549238651",
+          "deps": [
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
+          ]
+        }
+      ],
+      "np-phaser": [
+        {
+          "file": "libs/np-phaser/README.md",
+          "hash": "2139524801562364621"
+        },
+        {
+          "file": "libs/np-phaser/project.json",
+          "hash": "2729823951314219511"
+        },
+        {
+          "file": "libs/np-phaser/src/index.ts",
+          "hash": "12818538933337421582"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.html",
+          "hash": "5417822923695276795"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.scss",
+          "hash": "12817976078284506876"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.ts",
+          "hash": "13748609904435861398",
           "deps": [
             "npm:@angular/core",
             "npm:rxjs"
           ]
         },
         {
-          "file": "libs/np-library/src/lib/np-utils.ts",
-          "hash": "17058656383248168090"
-        },
-        {
-          "file": "libs/np-library/src/test-setup.ts",
-          "hash": "2674404341416425809",
+          "file": "libs/np-phaser/src/lib/cameras/np-camera.ts",
+          "hash": "13004341073898551302",
           "deps": [
-            "npm:jest-preset-angular"
+            "npm:phaser"
           ]
         },
         {
-          "file": "libs/np-library/tsconfig.json",
-          "hash": "8691975328940748188"
+          "file": "libs/np-phaser/src/lib/cameras/np-fullscreen-camera.ts",
+          "hash": "10708721278526493519",
+          "deps": [
+            "npm:phaser"
+          ]
         },
         {
-          "file": "libs/np-library/tsconfig.lib.json",
-          "hash": "5052282837103943017"
+          "file": "libs/np-phaser/src/lib/container/np-tileable-map.ts",
+          "hash": "17817108427177517175"
         },
         {
-          "file": "libs/np-library/tsconfig.spec.json",
-          "hash": "5806763716851569392"
+          "file": "libs/np-phaser/src/lib/factories/graphics.factory.ts",
+          "hash": "16478800358091573202",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/phaser.module.ts",
+          "hash": "7308222342859504099",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/phaser.spec.ts",
+          "hash": "8137077815701249999",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/scenes/np-layer.ts",
+          "hash": "78499458325182501",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/scenes/np-scene-component.ts",
+          "hash": "3739229336494265936",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/scenes/np-scene.ts",
+          "hash": "17789724633567065115",
+          "deps": [
+            "npm:phaser",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/scenes/world.scene.ts",
+          "hash": "12709124677120431603",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/service/phaser.service.ts",
+          "hash": "12285464461153371660",
+          "deps": [
+            "npm:@angular/core",
+            "npm:phaser",
+            "npm:phaser3-rex-plugins",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/service/stage.service.ts",
+          "hash": "6473333032045243934",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/NpButton.ts",
+          "hash": "3585291442022245350",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/Button.png",
+          "hash": "17134547171532776933"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/button.xcf",
+          "hash": "756879018134742447"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/button1.png",
+          "hash": "10739441147631284668"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/button2.png",
+          "hash": "11030218569346714994"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/button3.png",
+          "hash": "7377167000833126001"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/button4.png",
+          "hash": "343370548524873755"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/assets/licence.md",
+          "hash": "17299405525205125602"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/button/text-button.ts",
+          "hash": "94637742112492946",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/cute-robot/assets/Foozle_File_License.txt",
+          "hash": "12842366712482443258"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/dashed-line/assets/red-dashed-2896x50.png",
+          "hash": "1179742028029148100"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/dashed-line/dashed-line.ts",
+          "hash": "16657976224261511955",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/image/image.ts",
+          "hash": "2658630487670265160"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/np-movable-sprite.ts",
+          "hash": "16691129254154590844",
+          "deps": [
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/sprites/timer/binarytimer.ts",
+          "hash": "12553656171172285151"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/types/np-phaser.d.ts",
+          "hash": "13620773534565243114"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/np-phaser-utils.ts",
+          "hash": "12504096926295256966",
+          "deps": [
+            "npm:phaser",
+            "npm:poisson-disk-sampling"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/np-timer.ts",
+          "hash": "17547045812458621190"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/piecemeal/index.ts",
+          "hash": "4640931485162247842"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-direction.ts",
+          "hash": "8291630309249630490"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-rect.ts",
+          "hash": "2431137397536818357",
+          "deps": [
+            "np-library"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-rng.ts",
+          "hash": "12403581837293752554",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-vec2.ts",
+          "hash": "18402830241758361457"
+        },
+        {
+          "file": "libs/np-phaser/src/lib/utilities/scroll-manager.ts",
+          "hash": "2889537607556530347",
+          "deps": [
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/src/test-setup.ts",
+          "hash": "12378993641344970544",
+          "deps": [
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "libs/np-phaser/tsconfig.json",
+          "hash": "7300995600241782706"
+        },
+        {
+          "file": "libs/np-phaser/tsconfig.lib.json",
+          "hash": "15354244627631299287"
+        },
+        {
+          "file": "libs/np-phaser/tsconfig.spec.json",
+          "hash": "4339966301730907136"
+        },
+        {
+          "file": "libs/np-phaser/vitest.config.ts",
+          "hash": "9102620335230726963",
+          "deps": [
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
+          ]
+        }
+      ],
+      "np-paradroid": [
+        {
+          "file": "libs/np-paradroid/README.md",
+          "hash": "8183675748904597289"
+        },
+        {
+          "file": "libs/np-paradroid/project.json",
+          "hash": "11145627580086197277"
+        },
+        {
+          "file": "libs/np-paradroid/src/assets/female_pack.png",
+          "hash": "4487387433873179421"
+        },
+        {
+          "file": "libs/np-paradroid/src/assets/paradroid.png",
+          "hash": "10796316711400491824"
+        },
+        {
+          "file": "libs/np-paradroid/src/assets/paths.png",
+          "hash": "12396907127404847095"
+        },
+        {
+          "file": "libs/np-paradroid/src/assets/pngwing.com.png",
+          "hash": "3545803522564723574"
+        },
+        {
+          "file": "libs/np-paradroid/src/index.ts",
+          "hash": "9107961875403392148"
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/@types/paradroid.consts.ts",
+          "hash": "777231174913415093"
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/@types/paradroid.types.ts",
+          "hash": "39406446478886949"
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/@types/paradroid.utils.ts",
+          "hash": "10868939804754856785"
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/core/paradroid.engine.ts",
+          "hash": "8690325843495139542"
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/core/paradroid.factory.ts",
+          "hash": "15876714484245014708",
+          "deps": [
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/core/paradroid.game.ts",
+          "hash": "3004206380059887343",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/paradroid.scene.ts",
+          "hash": "3787283388174052329",
+          "deps": [
+            "np-phaser",
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.button.ts",
+          "hash": "2162023495540749586",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.field.ts",
+          "hash": "4716116722013290529",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.image.ts",
+          "hash": "13170519784042990547",
+          "deps": [
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.intro.ts",
+          "hash": "15369852541678297577",
+          "deps": [
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.middle.ts",
+          "hash": "2883980027661752622",
+          "deps": [
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/lib/sprites/paradroid.path.ts",
+          "hash": "6870992444624703128",
+          "deps": [
+            "np-library",
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/src/test-setup.ts",
+          "hash": "12378993641344970544",
+          "deps": [
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "libs/np-paradroid/tsconfig.json",
+          "hash": "7300995600241782706"
+        },
+        {
+          "file": "libs/np-paradroid/tsconfig.lib.json",
+          "hash": "11021578636840030416"
+        },
+        {
+          "file": "libs/np-paradroid/tsconfig.spec.json",
+          "hash": "4339966301730907136"
+        },
+        {
+          "file": "libs/np-paradroid/vitest.config.ts",
+          "hash": "16417699694884630805",
+          "deps": [
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
+          ]
+        }
+      ],
+      "np-space-map": [
+        {
+          "file": "libs/np-space-map/README.md",
+          "hash": "5197079874508375980"
+        },
+        {
+          "file": "libs/np-space-map/project.json",
+          "hash": "2753101173094183473"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/attribution.md",
+          "hash": "18294130561370350203"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/blue-planet.png",
+          "hash": "14159792630112459017"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/blue.png",
+          "hash": "11072996669245094177"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/brown-planet.png",
+          "hash": "14499876031972134174"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/eyes.png",
+          "hash": "6684367759342647650"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/galaxy.png",
+          "hash": "15430966036822853753"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/gas-giant.png",
+          "hash": "14287530891176379648"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/green.png",
+          "hash": "14115296355541822496"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/nebula.png",
+          "hash": "771687487161131512"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/origin.txt",
+          "hash": "6333951189556375116"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet01.png",
+          "hash": "17957016843040755529"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet02.png",
+          "hash": "17825617871057270381"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet03.png",
+          "hash": "14350209687864470152"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet04.png",
+          "hash": "2338234474312983266"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet05.png",
+          "hash": "9867146475257892888"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet06.png",
+          "hash": "667831662004658399"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet07.png",
+          "hash": "2137253311568298423"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/planet08.png",
+          "hash": "8311220808831106184"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/purple-planet.png",
+          "hash": "12863052096933231349"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/red.png",
+          "hash": "13044590676966751490"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/stars.png",
+          "hash": "7723010275562044006"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/sun.png",
+          "hash": "3733208235168923921"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/white.png",
+          "hash": "384643132634935549"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/planets/yellow.png",
+          "hash": "2828168266705984139"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-1.jpg",
+          "hash": "14666246545552862598"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-2.jpg",
+          "hash": "17126143058296675435"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-3.jpg",
+          "hash": "4245744616369680482"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-4.jpg",
+          "hash": "10652085028393719933"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-5.jpg",
+          "hash": "1726672896364742466"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-6.jpg",
+          "hash": "11573035002137775071"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-7.jpg",
+          "hash": "10101936186449266186"
+        },
+        {
+          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-8.jpg",
+          "hash": "1196292662295461070"
+        },
+        {
+          "file": "libs/np-space-map/src/index.ts",
+          "hash": "17433625833472730385"
+        },
+        {
+          "file": "libs/np-space-map/src/lib/planet/planet.ts",
+          "hash": "13405390817400267829",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/reality/reality.ts",
+          "hash": "6403569367385818214",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/scenes/space-map.scene.ts",
+          "hash": "7007358286311542090",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/scenes/space-ui.scene.ts",
+          "hash": "12045869162793207419",
+          "deps": [
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/scenes/space.scene.ts",
+          "hash": "2640786001186567748",
+          "deps": [
+            "np-phaser",
+            "npm:phaser",
+            "npm:phaser3-rex-plugins"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/space.events.ts",
+          "hash": "12129105489552968103"
+        },
+        {
+          "file": "libs/np-space-map/src/lib/space/np-space-map.ts",
+          "hash": "14205125756984361239",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/space/space.ts",
+          "hash": "8291374833843591563",
+          "deps": [
+            "np-phaser",
+            "npm:phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/lib/space/starmap.factory.ts",
+          "hash": "14455495629217652322",
+          "deps": [
+            "npm:phaser",
+            "np-phaser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/src/test-setup.ts",
+          "hash": "12378993641344970544",
+          "deps": [
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "libs/np-space-map/tsconfig.json",
+          "hash": "7300995600241782706"
+        },
+        {
+          "file": "libs/np-space-map/tsconfig.lib.json",
+          "hash": "11021578636840030416"
+        },
+        {
+          "file": "libs/np-space-map/tsconfig.spec.json",
+          "hash": "4339966301730907136"
+        },
+        {
+          "file": "libs/np-space-map/vitest.config.ts",
+          "hash": "8781736259759529356",
+          "deps": [
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
+          ]
         }
       ],
       "np-leet-hunt": [
@@ -540,10 +1430,6 @@
           "hash": "9838812746653505068"
         },
         {
-          "file": "apps/np-leet-hunt/jest.config.ts",
-          "hash": "11951387762154540909"
-        },
-        {
           "file": "apps/np-leet-hunt/package-lock.json",
           "hash": "6057020897178772968"
         },
@@ -557,7 +1443,7 @@
         },
         {
           "file": "apps/np-leet-hunt/project.json",
-          "hash": "9166381907305206149"
+          "hash": "14865676709824713079"
         },
         {
           "file": "apps/np-leet-hunt/src/@model/events.ts",
@@ -592,7 +1478,7 @@
         },
         {
           "file": "apps/np-leet-hunt/src/app/app.component.ts",
-          "hash": "1387383088805927326",
+          "hash": "6543717477097405700",
           "deps": [
             "npm:@angular/core",
             "npm:@ionic/angular",
@@ -620,7 +1506,7 @@
         },
         {
           "file": "apps/np-leet-hunt/src/app/home/home.page.ts",
-          "hash": "16536243275122625976",
+          "hash": "10120172788155826874",
           "deps": [
             "npm:@angular/core",
             "np-library",
@@ -728,9 +1614,12 @@
         },
         {
           "file": "apps/np-leet-hunt/src/test-setup.ts",
-          "hash": "13880882188168968760",
+          "hash": "3613385035642295500",
           "deps": [
-            "npm:jest-preset-angular"
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
           ]
         },
         {
@@ -751,667 +1640,20 @@
         },
         {
           "file": "apps/np-leet-hunt/tsconfig.json",
-          "hash": "323173928014310254"
+          "hash": "12335250603604330253"
         },
         {
           "file": "apps/np-leet-hunt/tsconfig.spec.json",
-          "hash": "14482282507099759972"
-        }
-      ],
-      "np-space-map": [
-        {
-          "file": "libs/np-space-map/README.md",
-          "hash": "5197079874508375980"
+          "hash": "4339966301730907136"
         },
         {
-          "file": "libs/np-space-map/jest.config.ts",
-          "hash": "1153665101578047045"
-        },
-        {
-          "file": "libs/np-space-map/project.json",
-          "hash": "17218470457439314565"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/attribution.md",
-          "hash": "18294130561370350203"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/blue-planet.png",
-          "hash": "14159792630112459017"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/blue.png",
-          "hash": "11072996669245094177"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/brown-planet.png",
-          "hash": "14499876031972134174"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/eyes.png",
-          "hash": "6684367759342647650"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/galaxy.png",
-          "hash": "15430966036822853753"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/gas-giant.png",
-          "hash": "14287530891176379648"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/green.png",
-          "hash": "14115296355541822496"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/nebula.png",
-          "hash": "771687487161131512"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/origin.txt",
-          "hash": "6333951189556375116"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet01.png",
-          "hash": "17957016843040755529"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet02.png",
-          "hash": "17825617871057270381"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet03.png",
-          "hash": "14350209687864470152"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet04.png",
-          "hash": "2338234474312983266"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet05.png",
-          "hash": "9867146475257892888"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet06.png",
-          "hash": "667831662004658399"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet07.png",
-          "hash": "2137253311568298423"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/planet08.png",
-          "hash": "8311220808831106184"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/purple-planet.png",
-          "hash": "12863052096933231349"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/red.png",
-          "hash": "13044590676966751490"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/stars.png",
-          "hash": "7723010275562044006"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/sun.png",
-          "hash": "3733208235168923921"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/white.png",
-          "hash": "384643132634935549"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/planets/yellow.png",
-          "hash": "2828168266705984139"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-1.jpg",
-          "hash": "14666246545552862598"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-2.jpg",
-          "hash": "17126143058296675435"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-3.jpg",
-          "hash": "4245744616369680482"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-4.jpg",
-          "hash": "10652085028393719933"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-5.jpg",
-          "hash": "1726672896364742466"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-6.jpg",
-          "hash": "11573035002137775071"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-7.jpg",
-          "hash": "10101936186449266186"
-        },
-        {
-          "file": "libs/np-space-map/src/assets/space/tileable-classic-nebula-space-patterns-8.jpg",
-          "hash": "1196292662295461070"
-        },
-        {
-          "file": "libs/np-space-map/src/index.ts",
-          "hash": "17433625833472730385"
-        },
-        {
-          "file": "libs/np-space-map/src/lib/planet/planet.ts",
-          "hash": "13405390817400267829",
+          "file": "apps/np-leet-hunt/vitest.config.ts",
+          "hash": "9006987347329906548",
           "deps": [
-            "np-phaser",
-            "npm:phaser"
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
           ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/reality/reality.ts",
-          "hash": "6403569367385818214",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/scenes/space-map.scene.ts",
-          "hash": "7007358286311542090",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/scenes/space-ui.scene.ts",
-          "hash": "12045869162793207419",
-          "deps": [
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/scenes/space.scene.ts",
-          "hash": "2640786001186567748",
-          "deps": [
-            "np-phaser",
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/space.events.ts",
-          "hash": "12129105489552968103"
-        },
-        {
-          "file": "libs/np-space-map/src/lib/space/np-space-map.ts",
-          "hash": "14205125756984361239",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/space/space.ts",
-          "hash": "8291374833843591563",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/lib/space/starmap.factory.ts",
-          "hash": "14455495629217652322",
-          "deps": [
-            "npm:phaser",
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/np-space-map/tsconfig.json",
-          "hash": "8691975328940748188"
-        },
-        {
-          "file": "libs/np-space-map/tsconfig.lib.json",
-          "hash": "5052282837103943017"
-        },
-        {
-          "file": "libs/np-space-map/tsconfig.spec.json",
-          "hash": "5806763716851569392"
-        }
-      ],
-      "np-paradroid": [
-        {
-          "file": "libs/np-paradroid/README.md",
-          "hash": "8183675748904597289"
-        },
-        {
-          "file": "libs/np-paradroid/jest.config.ts",
-          "hash": "7996613361697715501"
-        },
-        {
-          "file": "libs/np-paradroid/project.json",
-          "hash": "7046638304146783137"
-        },
-        {
-          "file": "libs/np-paradroid/src/assets/female_pack.png",
-          "hash": "4487387433873179421"
-        },
-        {
-          "file": "libs/np-paradroid/src/assets/paradroid.png",
-          "hash": "10796316711400491824"
-        },
-        {
-          "file": "libs/np-paradroid/src/assets/paths.png",
-          "hash": "12396907127404847095"
-        },
-        {
-          "file": "libs/np-paradroid/src/assets/pngwing.com.png",
-          "hash": "3545803522564723574"
-        },
-        {
-          "file": "libs/np-paradroid/src/index.ts",
-          "hash": "9107961875403392148"
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/@types/paradroid.consts.ts",
-          "hash": "777231174913415093"
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/@types/paradroid.types.ts",
-          "hash": "39406446478886949"
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/@types/paradroid.utils.ts",
-          "hash": "10868939804754856785"
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/core/paradroid.engine.ts",
-          "hash": "8690325843495139542"
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/core/paradroid.factory.ts",
-          "hash": "15876714484245014708",
-          "deps": [
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/core/paradroid.game.ts",
-          "hash": "3004206380059887343",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/paradroid.scene.ts",
-          "hash": "14073621819076103948",
-          "deps": [
-            "np-phaser",
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.button.ts",
-          "hash": "2162023495540749586",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.field.ts",
-          "hash": "4716116722013290529",
-          "deps": [
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.image.ts",
-          "hash": "13170519784042990547",
-          "deps": [
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.intro.ts",
-          "hash": "15369852541678297577",
-          "deps": [
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.middle.ts",
-          "hash": "2883980027661752622",
-          "deps": [
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/lib/sprites/paradroid.path.ts",
-          "hash": "6870992444624703128",
-          "deps": [
-            "np-library",
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/np-paradroid/tsconfig.json",
-          "hash": "8691975328940748188"
-        },
-        {
-          "file": "libs/np-paradroid/tsconfig.lib.json",
-          "hash": "5052282837103943017"
-        },
-        {
-          "file": "libs/np-paradroid/tsconfig.spec.json",
-          "hash": "5806763716851569392"
-        }
-      ],
-      "np-pixel-dungeon": [
-        {
-          "file": "libs/np-pixel-dungeon/README.md",
-          "hash": "3159619394776828164"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/jest.config.ts",
-          "hash": "16380556381229374831"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/project.json",
-          "hash": "13182035119178551624"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/Download19233.png",
-          "hash": "11792210115199008382"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/Download96156.png",
-          "hash": "16728196616095532374"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/PixelDungeon.tsj",
-          "hash": "17056833634707661273"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/PixelDungeon2.tsj",
-          "hash": "6725256230354166338"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/buch-dungeon-tileset-extruded.png",
-          "hash": "2781714879519458650"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/grid-ps1.png",
-          "hash": "3713572796413691137"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/sheet-credits.txt",
-          "hash": "3569177335364580968"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/tiles_sewers-extruded.png",
-          "hash": "2613689805502595214"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/assets/tiles_sewers.png",
-          "hash": "17520738168055214087"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/index.ts",
-          "hash": "6663851545717354992"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/@types/pixel-dungeon.types.ts",
-          "hash": "17162226918565827934",
-          "deps": [
-            "npm:phaser3-rex-plugins",
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/core/pixel-dungeon-board.ts",
-          "hash": "17813755742496015941",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/core/pixel-dungeon.pathfinder.ts",
-          "hash": "9834281304360286245",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.floor.ts",
-          "hash": "4615119263904420748"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.hallway.ts",
-          "hash": "9120660460295838668"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.junction.ts",
-          "hash": "89262813207819412",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.room.ts",
-          "hash": "5039939653789089770"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.tile.ts",
-          "hash": "9461278064247403955",
-          "deps": [
-            "npm:phaser3-rex-plugins",
-            "np-phaser"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/parts/pixel-dungeon.wall.ts",
-          "hash": "3708179915261765237",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.factory.ts",
-          "hash": "17649238039027891973",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.level.ts",
-          "hash": "4355755606420422324",
-          "deps": [
-            "np-phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/dungeon/pixel-dungeon.ts",
-          "hash": "10633624318327870645",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/pixel-dungeon.engine.ts",
-          "hash": "10717214615297227811",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/pixel-dungeon.state.ts",
-          "hash": "11384251998857073259",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/states/end-game.state.ts",
-          "hash": "3137199144138571532"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/states/handle-action.state.ts",
-          "hash": "15113948923807038445",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/states/start-game.state.ts",
-          "hash": "2855413049621383763"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/engine/states/states.ts",
-          "hash": "4751043855415441089"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-floorlayer.ts",
-          "hash": "3173517414234506485"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-objectlayer.ts",
-          "hash": "352215406126344918"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-tilelayer.ts",
-          "hash": "1604061372203903968",
-          "deps": [
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/layer/pixel-dungeon-walllayer.ts",
-          "hash": "9239840486040380771"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/pixel-dungeon-tileset.ts",
-          "hash": "10802963168721606126"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/map/pixel-dungeon.map.ts",
-          "hash": "14378031723220434599",
-          "deps": [
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/pixel-dungeon.scene.ts",
-          "hash": "7191705017067135910",
-          "deps": [
-            "np-phaser",
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.enemy.ts",
-          "hash": "16643348832222573142",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.info-text.ts",
-          "hash": "17501307589865695758",
-          "deps": [
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.lpc-sprite.ts",
-          "hash": "4105813470155972646",
-          "deps": [
-            "np-library",
-            "np-phaser",
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.mob.ts",
-          "hash": "17376016748669734150",
-          "deps": [
-            "np-library",
-            "np-phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/pixel-dungeon.player.ts",
-          "hash": "9895625379456072980",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-action.ts",
-          "hash": "9207233935767131923"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-movement.ts",
-          "hash": "9390924098338260626",
-          "deps": [
-            "np-library",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/lib/sprites/traits/mob-vision.ts",
-          "hash": "5278451818262749079",
-          "deps": [
-            "np-library",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/np-pixel-dungeon/tsconfig.json",
-          "hash": "8691975328940748188"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/tsconfig.lib.json",
-          "hash": "908508589486302851"
-        },
-        {
-          "file": "libs/np-pixel-dungeon/tsconfig.spec.json",
-          "hash": "5806763716851569392"
         }
       ],
       "np-leet-hunt-e2e": [
@@ -1440,269 +1682,67 @@
           "hash": "6320355172760017729"
         }
       ],
-      "np-phaser": [
+      "np-library": [
         {
-          "file": "libs/np-phaser/README.md",
-          "hash": "2139524801562364621"
+          "file": "libs/np-library/README.md",
+          "hash": "620604075166986513"
         },
         {
-          "file": "libs/np-phaser/jest.config.ts",
-          "hash": "15896660268689494450"
+          "file": "libs/np-library/project.json",
+          "hash": "15688537819962612671"
         },
         {
-          "file": "libs/np-phaser/project.json",
-          "hash": "1701601713591290772"
+          "file": "libs/np-library/src/index.ts",
+          "hash": "12760563048620774176",
+          "deps": [
+            "np-phaser"
+          ]
         },
         {
-          "file": "libs/np-phaser/src/index.ts",
-          "hash": "12818538933337421582"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.html",
-          "hash": "5417822923695276795"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.scss",
-          "hash": "5001810527387853120"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/basics/stage/stage.component.ts",
-          "hash": "2716674533767845166",
+          "file": "libs/np-library/src/lib/base/np-base-subscriber.ts",
+          "hash": "15180002850282889426",
           "deps": [
             "npm:@angular/core",
             "npm:rxjs"
           ]
         },
         {
-          "file": "libs/np-phaser/src/lib/cameras/np-camera.ts",
-          "hash": "13004341073898551302",
-          "deps": [
-            "npm:phaser"
-          ]
+          "file": "libs/np-library/src/lib/np-utils.ts",
+          "hash": "17058656383248168090"
         },
         {
-          "file": "libs/np-phaser/src/lib/cameras/np-fullscreen-camera.ts",
-          "hash": "10708721278526493519",
+          "file": "libs/np-library/src/test-setup.ts",
+          "hash": "12378993641344970544",
           "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/container/np-tileable-map.ts",
-          "hash": "17817108427177517175"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/factories/graphics.factory.ts",
-          "hash": "16478800358091573202",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/phaser.module.ts",
-          "hash": "7308222342859504099",
-          "deps": [
-            "npm:@angular/common",
-            "npm:@angular/core"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/phaser.spec.ts",
-          "hash": "8137077815701249999",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/scenes/np-layer.ts",
-          "hash": "78499458325182501",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/scenes/np-scene-component.ts",
-          "hash": "3739229336494265936",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/scenes/np-scene.ts",
-          "hash": "17789724633567065115",
-          "deps": [
-            "npm:phaser",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/scenes/world.scene.ts",
-          "hash": "12709124677120431603",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/service/phaser.service.ts",
-          "hash": "12285464461153371660",
-          "deps": [
+            "npm:@analogjs/vitest-angular",
+            "npm:vitest-canvas-mock",
             "npm:@angular/core",
-            "npm:phaser",
-            "npm:phaser3-rex-plugins",
-            "npm:rxjs"
+            "npm:@angular/platform-browser"
           ]
         },
         {
-          "file": "libs/np-phaser/src/lib/service/stage.service.ts",
-          "hash": "6473333032045243934",
+          "file": "libs/np-library/tsconfig.json",
+          "hash": "7300995600241782706"
+        },
+        {
+          "file": "libs/np-library/tsconfig.lib.json",
+          "hash": "11021578636840030416"
+        },
+        {
+          "file": "libs/np-library/tsconfig.spec.json",
+          "hash": "4339966301730907136"
+        },
+        {
+          "file": "libs/np-library/vitest.config.ts",
+          "hash": "11507680994779976336",
           "deps": [
-            "npm:@angular/core",
-            "npm:rxjs"
+            "npm:@analogjs/vite-plugin-angular",
+            "npm:@nx/vite",
+            "npm:vite"
           ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/NpButton.ts",
-          "hash": "3585291442022245350",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/Button.png",
-          "hash": "17134547171532776933"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/button.xcf",
-          "hash": "756879018134742447"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/button1.png",
-          "hash": "10739441147631284668"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/button2.png",
-          "hash": "11030218569346714994"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/button3.png",
-          "hash": "7377167000833126001"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/button4.png",
-          "hash": "343370548524873755"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/assets/licence.md",
-          "hash": "17299405525205125602"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/button/text-button.ts",
-          "hash": "94637742112492946",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/cute-robot/assets/Foozle_File_License.txt",
-          "hash": "12842366712482443258"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/dashed-line/assets/red-dashed-2896x50.png",
-          "hash": "1179742028029148100"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/dashed-line/dashed-line.ts",
-          "hash": "16657976224261511955",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/image/image.ts",
-          "hash": "2658630487670265160"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/np-movable-sprite.ts",
-          "hash": "16691129254154590844",
-          "deps": [
-            "npm:phaser",
-            "npm:phaser3-rex-plugins"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/sprites/timer/binarytimer.ts",
-          "hash": "12553656171172285151"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/types/np-phaser.d.ts",
-          "hash": "13620773534565243114"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/np-phaser-utils.ts",
-          "hash": "12504096926295256966",
-          "deps": [
-            "npm:phaser",
-            "npm:poisson-disk-sampling"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/np-timer.ts",
-          "hash": "17547045812458621190"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/piecemeal/index.ts",
-          "hash": "4640931485162247842"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-direction.ts",
-          "hash": "8291630309249630490"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-rect.ts",
-          "hash": "2431137397536818357",
-          "deps": [
-            "np-library"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-rng.ts",
-          "hash": "12403581837293752554",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/piecemeal/np-vec2.ts",
-          "hash": "18402830241758361457"
-        },
-        {
-          "file": "libs/np-phaser/src/lib/utilities/scroll-manager.ts",
-          "hash": "2889537607556530347",
-          "deps": [
-            "npm:phaser"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/src/test-setup.ts",
-          "hash": "2674404341416425809",
-          "deps": [
-            "npm:jest-preset-angular"
-          ]
-        },
-        {
-          "file": "libs/np-phaser/tsconfig.json",
-          "hash": "8691975328940748188"
-        },
-        {
-          "file": "libs/np-phaser/tsconfig.lib.json",
-          "hash": "15354244627631299287"
-        },
-        {
-          "file": "libs/np-phaser/tsconfig.spec.json",
-          "hash": "3281153670465995925"
         }
       ]
     }
   },
-  "externalNodesHash": "3345578187582830366"
+  "externalNodesHash": "510544075587274482"
 }

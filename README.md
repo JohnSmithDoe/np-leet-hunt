@@ -109,7 +109,7 @@ the `--prod` flag for a production build.
 
 ## Running unit tests
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+Run `nx test my-app` to execute the unit tests via [Vitest](https://vitest.dev).
 
 Run `nx affected:test` to execute the unit tests affected by a change.
 

@@ -224,11 +224,11 @@
       "apps/np-leet-hunt/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
+    "targets.test.options.configFile": [
       "apps/np-leet-hunt/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.passWithNoTests": [
+    "targets.test.options.reportsDirectory": [
       "apps/np-leet-hunt/project.json",
       "nx/core/project-json"
     ],
@@ -424,27 +424,11 @@
       "libs/np-library/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.configurations": [
+    "targets.test.options.configFile": [
       "libs/np-library/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
-      "libs/np-library/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.options.passWithNoTests": [
-      "libs/np-library/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci": [
-      "libs/np-library/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.ci": [
-      "libs/np-library/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.codeCoverage": [
+    "targets.test.options.reportsDirectory": [
       "libs/np-library/project.json",
       "nx/core/project-json"
     ],
@@ -530,27 +514,11 @@
       "libs/np-paradroid/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.configurations": [
+    "targets.test.options.configFile": [
       "libs/np-paradroid/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
-      "libs/np-paradroid/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.options.passWithNoTests": [
-      "libs/np-paradroid/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci": [
-      "libs/np-paradroid/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.ci": [
-      "libs/np-paradroid/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.codeCoverage": [
+    "targets.test.options.reportsDirectory": [
       "libs/np-paradroid/project.json",
       "nx/core/project-json"
     ],
@@ -636,11 +604,11 @@
       "libs/np-phaser/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
+    "targets.test.options.configFile": [
       "libs/np-phaser/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.passWithNoTests": [
+    "targets.test.options.reportsDirectory": [
       "libs/np-phaser/project.json",
       "nx/core/project-json"
     ],
@@ -726,27 +694,11 @@
       "libs/np-pixel-dungeon/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.configurations": [
+    "targets.test.options.configFile": [
       "libs/np-pixel-dungeon/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
-      "libs/np-pixel-dungeon/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.options.passWithNoTests": [
-      "libs/np-pixel-dungeon/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci": [
-      "libs/np-pixel-dungeon/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.ci": [
-      "libs/np-pixel-dungeon/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.codeCoverage": [
+    "targets.test.options.reportsDirectory": [
       "libs/np-pixel-dungeon/project.json",
       "nx/core/project-json"
     ],
@@ -832,27 +784,11 @@
       "libs/np-space-map/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.configurations": [
+    "targets.test.options.configFile": [
       "libs/np-space-map/project.json",
       "nx/core/project-json"
     ],
-    "targets.test.options.jestConfig": [
-      "libs/np-space-map/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.options.passWithNoTests": [
-      "libs/np-space-map/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci": [
-      "libs/np-space-map/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.ci": [
-      "libs/np-space-map/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.test.configurations.ci.codeCoverage": [
+    "targets.test.options.reportsDirectory": [
       "libs/np-space-map/project.json",
       "nx/core/project-json"
     ],

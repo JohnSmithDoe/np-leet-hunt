@@ -6,19 +6,13 @@
     "prefix": "np-afterwork",
     "targets": {
         "test": {
-            "executor": "@nx/jest:jest",
+            "executor": "@nx/vitest:test",
             "outputs": [
-                "{workspaceRoot}/coverage/{projectRoot}"
+                "{options.reportsDirectory}"
             ],
             "options": {
-                "jestConfig": "libs/np-pixel-dungeon/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "configFile": "libs/np-pixel-dungeon/vitest.config.ts",
+                "reportsDirectory": "../../coverage/libs/np-pixel-dungeon"
             }
         },
         "lint": {

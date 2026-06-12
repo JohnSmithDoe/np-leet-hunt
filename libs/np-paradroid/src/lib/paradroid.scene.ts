@@ -16,8 +16,8 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
 
     async setupComponents() {
         this.#paradroidGame = new ParadroidGame(this);
-        // this.addComponent(this.#paradroidGame);
-        // this.addComponent(new ParadroidIntro(this));
+        //this.addComponent(this.#paradroidGame);
+        //this.addComponent(new ParadroidIntro(this));
     }
 
     init() {

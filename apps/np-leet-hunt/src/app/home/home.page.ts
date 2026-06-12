@@ -8,8 +8,8 @@ import { filter } from 'rxjs';
 
 @Component({
     selector: 'np-home',
-    templateUrl: 'home.page.html',
-    styleUrls: ['home.page.scss'],
+    templateUrl: './home.page.html',
+    styleUrls: ['./home.page.scss'],
     standalone: false,
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {

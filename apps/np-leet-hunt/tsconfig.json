@@ -1,7 +1,7 @@
 {
     "extends": "../../tsconfig.base.json",
     "exclude": [
-        "jest.config.ts"
+        "vitest.config.ts"
     ],
     "compilerOptions": {}
 }
