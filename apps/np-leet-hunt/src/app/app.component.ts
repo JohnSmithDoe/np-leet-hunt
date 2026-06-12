@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
     IonApp,
@@ -21,6 +21,7 @@ import { StageService } from '@shared/np-phaser';
     selector: 'np-app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         IonApp,
         IonSplitPane,

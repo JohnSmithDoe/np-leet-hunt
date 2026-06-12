@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    inject,
+    OnDestroy,
+    ViewChild,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { StageService } from '../../service/stage.service';
@@ -7,6 +15,7 @@ import { StageService } from '../../service/stage.service';
     selector: 'np-stage',
     templateUrl: './stage.component.html',
     styleUrls: ['./stage.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StageComponent implements AfterViewInit, OnDestroy {
     #npStage = inject(StageService);

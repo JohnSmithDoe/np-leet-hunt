@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import {
     IonButton,
     IonButtons,
@@ -22,6 +22,7 @@ import { filter } from 'rxjs';
     selector: 'np-home',
     templateUrl: './home.page.html',
     styleUrls: ['./home.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         IonHeader,
         IonToolbar,

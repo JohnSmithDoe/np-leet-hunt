@@ -17,9 +17,6 @@
                 },
                 "index": "apps/np-leet-hunt/src/index.html",
                 "browser": "apps/np-leet-hunt/src/main.ts",
-                "polyfills": [
-                    "apps/np-leet-hunt/src/polyfills.ts"
-                ],
                 "tsConfig": "apps/np-leet-hunt/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
                 "assets": [

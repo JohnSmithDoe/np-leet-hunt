@@ -1,4 +1,4 @@
-import { inject, Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as Phaser from 'phaser';
 import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
 import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
@@ -9,7 +9,6 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class PhaserService {
-    #ngZone = inject(NgZone);
     // * We need the Phaser.Game to live inside our own class because extending Phaser.Game would require a super call
     #game: Phaser.Game;
     get game(): Phaser.Game {
@@ -41,17 +40,12 @@ export class PhaserService {
      */
     init(parent: string | HTMLElement = 'np-np-phaser-main') {
         console.warn('np-phaser init');
-        /**
-         * * Phaser by default runs at 60 FPS, and each frame that triggers change detection in Angular which causes
-         * * Performance to go out the door.  NgZone's runOutsideAngular will prevent Phaser from automatically hitting change detection
-         * * https://angular.io/guide/zone
-         */
-        this.#ngZone.runOutsideAngular(() => {
-            if (!this.#game) {
-                this.createGame(parent);
-                this.#initialized.next(true);
-            }
-        });
+        // The app runs zoneless, so Phaser's 60 FPS loop cannot trigger Angular change
+        // detection — no NgZone.runOutsideAngular needed around game creation anymore.
+        if (!this.#game) {
+            this.createGame(parent);
+            this.#initialized.next(true);
+        }
         return this.initialized$;
     }
 
