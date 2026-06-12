@@ -5,7 +5,9 @@ import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
 import StateManagerPlugin from 'phaser3-rex-plugins/plugins/statemanager-plugin';
 import { BehaviorSubject } from 'rxjs';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class PhaserService {
     #ngZone = inject(NgZone);
     // * We need the Phaser.Game to live inside our own class because extending Phaser.Game would require a super call

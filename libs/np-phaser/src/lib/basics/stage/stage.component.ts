@@ -5,7 +5,6 @@ import { StageService } from '../../service/stage.service';
 
 @Component({
     selector: 'np-stage',
-    standalone: true,
     templateUrl: './stage.component.html',
     styleUrls: ['./stage.component.scss'],
 })

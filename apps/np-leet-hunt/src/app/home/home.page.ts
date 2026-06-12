@@ -1,19 +1,46 @@
 import { Component, inject, OnInit } from '@angular/core';
+import {
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonMenuButton,
+    IonTitle,
+    IonToolbar,
+} from '@ionic/angular/standalone';
 import { NPBaseSubscriber } from '@shared/np-library';
 import { ParadroidScene } from '@shared/np-paradroid';
-import { StageService } from '@shared/np-phaser';
+import { StageComponent, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
+import { addIcons } from 'ionicons';
+import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
 
 @Component({
     selector: 'np-home',
     templateUrl: './home.page.html',
     styleUrls: ['./home.page.scss'],
-    standalone: false,
+    imports: [
+        IonHeader,
+        IonToolbar,
+        IonButtons,
+        IonMenuButton,
+        IonButton,
+        IonIcon,
+        IonTitle,
+        IonContent,
+        StageComponent,
+    ],
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     #stage = inject(StageService);
+
+    constructor() {
+        super();
+        addIcons({ heart });
+    }
 
     async ngOnInit(): Promise<void> {
         this.listen(

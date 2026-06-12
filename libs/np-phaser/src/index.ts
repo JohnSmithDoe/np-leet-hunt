@@ -1,4 +1,3 @@
-export * from './lib/phaser.module';
 export * from './lib/service/stage.service';
 export * from './lib/service/phaser.service';
 export * from './lib/scenes/world.scene';

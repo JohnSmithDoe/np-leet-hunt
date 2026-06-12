@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
-import { AppModule } from './app.module';
+import { appConfig } from './app.config';
 
 describe('AppComponent smoke test', () => {
-    it('compiles the app module and creates the root component', async () => {
+    it('creates the root component with the real bootstrap providers', async () => {
         await TestBed.configureTestingModule({
-            imports: [AppModule],
+            imports: [AppComponent],
+            providers: appConfig.providers,
         }).compileComponents();
 
         const fixture = TestBed.createComponent(AppComponent);

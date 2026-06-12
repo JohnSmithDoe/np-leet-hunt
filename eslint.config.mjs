@@ -88,8 +88,6 @@ export default tseslint.config(
             "@typescript-eslint/no-redundant-type-constituents": "off",
             // WIP game code keeps placeholder #private fields around
             "no-unused-private-class-members": "off",
-            // the app deliberately stays NgModule-based for now
-            "@angular-eslint/prefer-standalone": "off",
             "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
             "dot-notation": "off",
             "@typescript-eslint/dot-notation": "error",
