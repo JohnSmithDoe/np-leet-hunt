@@ -13,12 +13,10 @@ import { NPBaseSubscriber } from '@shared/np-library';
 import { ParadroidScene } from '@shared/np-paradroid';
 import { StageComponent, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
-import { SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
+import { PlanetInfoComponent, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
 import { addIcons } from 'ionicons';
 import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
-
-import { PlanetInfoComponent } from '../planet-info/planet-info.component';
 
 @Component({
     selector: 'np-home',

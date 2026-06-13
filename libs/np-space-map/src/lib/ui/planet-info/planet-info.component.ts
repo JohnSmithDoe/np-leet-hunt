@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NPBaseSubscriber } from '@shared/np-library';
 import { StageService } from '@shared/np-phaser';
-import { PlanetInfo, SPACE_EVENTS } from '@shared/np-space-map';
 import type * as Phaser from 'phaser';
 import { filter } from 'rxjs';
+
+import { PlanetInfo } from '../../planet/planet-info';
+import { SPACE_EVENTS } from '../../space.events';
 
 /**
  * HTML overlay that shows the selected planet's survey readout (GDD §6: text-heavy surfaces live in

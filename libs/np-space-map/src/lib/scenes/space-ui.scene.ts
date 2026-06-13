@@ -11,7 +11,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     static key = 'space-ui-scene';
     #bar!: Phaser.GameObjects.Graphics;
     #jumps!: Phaser.GameObjects.Text;
-    #snapback!: Phaser.GameObjects.Text;
+    #banner!: Phaser.GameObjects.Text;
     #fraction = 0;
 
     constructor() {
@@ -33,7 +33,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
         this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');
-        this.#snapback = this.add
+        this.#banner = this.add
             .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
             .setOrigin(0.5)
             .setScrollFactor(0)
@@ -48,7 +48,10 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
             this.#fraction = 1;
             this.#drawBar();
-            this.#snapback.setText('REALITY SNAPPED BACK');
+            this.#banner.setColor('#ff8a8a').setText('REALITY SNAPPED BACK');
+        });
+        this.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => {
+            this.#banner.setColor('#8affc8').setText('JUMPED OUT — SECTOR LEFT');
         });
     }
 

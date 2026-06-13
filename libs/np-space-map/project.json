@@ -4,12 +4,11 @@
     "projectType": "library",
     "sourceRoot": "libs/np-space-map/src",
     "prefix": "np-afterwork",
+    "tags": [],
     "targets": {
         "test": {
             "executor": "@nx/vitest:test",
-            "outputs": [
-                "{options.reportsDirectory}"
-            ],
+            "outputs": ["{options.reportsDirectory}"],
             "options": {
                 "configFile": "libs/np-space-map/vitest.config.ts",
                 "reportsDirectory": "../../coverage/libs/np-space-map"
@@ -17,7 +16,13 @@
         },
         "lint": {
             "executor": "@nx/eslint:lint"
+        },
+        "stylelint": {
+            "executor": "nx-stylelint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["libs/np-space-map/**/*.css", "libs/np-space-map/**/*.scss"]
+            }
         }
-    },
-    "tags": []
+    }
 }

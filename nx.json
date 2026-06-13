@@ -3,10 +3,7 @@
     "defaultBase": "master",
     "defaultProject": "np-leet-hunt",
     "namedInputs": {
-        "default": [
-            "{projectRoot}/**/*",
-            "sharedGlobals"
-        ],
+        "default": ["{projectRoot}/**/*", "sharedGlobals"],
         "sharedGlobals": [
             "{workspaceRoot}/.stylelintrc.json",
             "{workspaceRoot}/tsconfig.base.json",
@@ -17,45 +14,33 @@
             "!{projectRoot}/eslint.config.mjs",
             "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
             "!{projectRoot}/tsconfig.spec.json",
-            "!{projectRoot}/vitest.config.[jt]s"
+            "!{projectRoot}/vitest.config.[jt]s",
+            "!{projectRoot}/.stylelintrc(.(json|yml|yaml|js))?"
         ]
     },
     "targetDefaults": {
         "build": {
-            "dependsOn": [
-                "^build"
-            ],
-            "inputs": [
-                "production",
-                "^production"
-            ],
+            "dependsOn": ["^build"],
+            "inputs": ["production", "^production"],
             "cache": true
         },
         "lint": {
-            "inputs": [
-                "default",
-                "{workspaceRoot}/eslint.config.mjs"
-            ],
+            "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"],
             "cache": true
         },
         "test": {
-            "inputs": [
-                "default",
-                "^production"
-            ],
+            "inputs": ["default", "^production"],
             "cache": true
         },
         "e2e": {
-            "inputs": [
-                "default",
-                "^production"
-            ],
+            "inputs": ["default", "^production"],
             "cache": true
         },
         "stylelint": {
             "inputs": [
                 "default",
-                "{workspaceRoot}/.stylelintrc.json"
+                "{workspaceRoot}/.stylelintrc.json",
+                "{workspaceRoot}/.stylelintrc(.(json|yml|yaml|js))?"
             ],
             "cache": true
         }

@@ -126,6 +126,15 @@ welcome (pillar 1).
    Front catches the ship → snap-back ending: rescued members are home safe, the rest are lost
    in this telling. Ship destroyed → run over.
 
+**Two ways out.** The sector's rim is dotted with *boundary suns* — out-of-the-way exit gates.
+Jumping to any surviving sun **bails** the sector at once: you escape the Hush but leave
+empty-handed (no rescue, no rim loot). The **guardian** is the *rewarding* exit — beat its
+set-piece to free a family member and advance properly. A run is then a constant pull between
+bailing early (safe, poor) and pushing for the guardian while the grey closes (rich, risky).
+The suns ring the map's edge and the Hush burns its near-side ones first, so the set of open
+exits shrinks the longer you linger. *(Prototype status: bail-suns are in — any rim sun ends the
+sector with no reward; the guardian gate is deferred, §7/§8.)*
+
 **The time rule.** The front advances **only on jumps**. Inside the games — dungeons and
 duels — the Hush has no purchase: play holds him off, so no front progress. Pressure there is
 local instead (dungeon hazards, the duel countdown). All run-level pressure lives in one
@@ -196,8 +205,10 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
   events, loot, and routes cease to exist.
 - **Rare pushback.** *Distortion batteries* (rare loot/event rewards) push the front back one
   node — the distortion is what keeps the adventure alive, and it can be fed.
-- **The guardian gates the exit.** Beating the sector's game-master opens the gate; lingering
-  afterwards is allowed but the front keeps advancing per jump.
+- **Exits at the rim.** Boundary suns ring the sector edge as bail-exits (leave now, no reward);
+  the **guardian gates the *rewarding* exit** — beating its set-piece opens the gate, frees the
+  captive, and advances. Lingering afterwards is allowed but the front keeps advancing per jump,
+  burning the near-side rim suns first and thinning the available bail-exits.
 
 ### Crew abilities (one per rescued family member)
 
@@ -432,6 +443,11 @@ Goal: the skeleton every later phase hangs on.
   nature — the front-runner now) · sulking after a fight (guilt/reunion payoff) · hiding in the
   garage (tidy, lighter) · slipped the beam by accident (max whimsy, tractor swap gag). Decide
   before writing the intro sequence.
+- **Exit model — bail-suns vs. the guardian gate.** Prototype now: *any* rim sun is an ungated,
+  no-reward exit (a speed-run bail). Canonical intent: rim suns stay no-reward bail-exits and the
+  guardian becomes the rewarding exit (rescue + advance). Confirm/tune when the duel and run-state
+  machine land — does bailing still bank partial rescues? is there a cost to bail, or is "leave
+  poor" cost enough?
 - Sibling duel-assist verb (freeze countdown vs. re-roll row vs. something better) — tune in
   playtesting once duels are staged.
 - True ending: does *remembering* the Hush unmake him or redeem him — is the grey hollow

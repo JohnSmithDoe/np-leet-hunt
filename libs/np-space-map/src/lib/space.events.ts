@@ -11,6 +11,8 @@ export enum SPACE_EVENTS {
     PLANET_SWALLOWED = 'npPlanetSwallowed',
     /** The front caught the ship — reality snapped back (run-end stub). Payload: `{ jumps }`. */
     REALITY_SNAPBACK = 'npRealitySnapback',
+    /** Reached a rim sun and bailed the sector (no reward; run-end stub). Payload: `{ jumps }`. */
+    SECTOR_EXIT = 'npSectorExit',
 }
 
 export interface FrontAdvancedPayload {

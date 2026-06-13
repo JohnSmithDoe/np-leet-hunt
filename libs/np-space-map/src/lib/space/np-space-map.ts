@@ -226,6 +226,13 @@ export class NPSpaceMap extends NPGameObjectList {
     #onArrived(target: Planet) {
         this.#current = target;
         this.#traveling = false;
+
+        // Reaching a rim sun bails the sector (no reward; run-end stub) — takes precedence over snapback.
+        if (target.outer) {
+            this.#onSectorExit();
+            return;
+        }
+
         this.#liveLines().forEach(line => line.setAlpha(LINE_ALPHA));
         this.#refreshStates();
 
@@ -250,6 +257,15 @@ export class NPSpaceMap extends NPGameObjectList {
         this.scene.cameras.main.flash(600, 200, 200, 220);
         this.scene.game.events.emit(SPACE_EVENTS.REALITY_SNAPBACK, { jumps: this.#jumps });
         // TODO(Leet-27): hand off to the run state machine for the snap-back ending screen.
+    }
+
+    #onSectorExit() {
+        this.#frozen = true;
+        this.#deselect();
+        this.#here.setVisible(false);
+        this.scene.cameras.main.flash(600, 120, 220, 180); // calm green-cyan, distinct from the red snapback
+        this.scene.game.events.emit(SPACE_EVENTS.SECTOR_EXIT, { jumps: this.#jumps });
+        // TODO(Leet-27): hand off to the run state machine — bailing leaves the sector with no rescue.
     }
 
     #refreshStates() {
