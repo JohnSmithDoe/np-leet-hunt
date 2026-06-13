@@ -1,16 +1,14 @@
-import { PixelDungeon } from '../pixel-dungeon';
 import { PixelDungeonJunction } from './pixel-dungeon.junction';
 import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonRoom {
-    junctions: PixelDungeonJunction[];
+    junctions: PixelDungeonJunction[] = [];
 
     #tiles: PixelDungeonTile[] = [];
-    #dungeon: PixelDungeon;
-    #topLeft: PixelDungeonTile;
-    #bottomLeft: PixelDungeonTile;
-    #topRight: PixelDungeonTile;
-    #bottomRight: PixelDungeonTile;
+    #topLeft?: PixelDungeonTile;
+    #bottomLeft?: PixelDungeonTile;
+    #topRight?: PixelDungeonTile;
+    #bottomRight?: PixelDungeonTile;
     #region: number;
 
     *[Symbol.iterator](): Iterator<PixelDungeonTile> {
@@ -31,31 +29,35 @@ export class PixelDungeonRoom {
     }
 
     topLeft() {
-        return (this.#topLeft ??= this.#tiles.reduce((tile, curr) => {
+        // a room always contains at least one tile
+        return (this.#topLeft ??= this.#tiles.reduce<PixelDungeonTile | null>((tile, curr) => {
             tile ??= curr;
             return tile.x <= curr.x && tile.y <= curr.y ? tile : curr;
-        }, null));
+        }, null)!);
     }
 
     topRight() {
-        return (this.#topRight ??= this.#tiles.reduce((tile, curr) => {
+        // a room always contains at least one tile
+        return (this.#topRight ??= this.#tiles.reduce<PixelDungeonTile | null>((tile, curr) => {
             tile ??= curr;
             return tile.x >= curr.x && tile.y <= curr.y ? tile : curr;
-        }, null));
+        }, null)!);
     }
 
     bottomRight() {
-        return (this.#bottomRight ??= this.#tiles.reduce((tile, curr) => {
+        // a room always contains at least one tile
+        return (this.#bottomRight ??= this.#tiles.reduce<PixelDungeonTile | null>((tile, curr) => {
             tile ??= curr;
             return tile.x >= curr.x && tile.y >= curr.y ? tile : curr;
-        }, null));
+        }, null)!);
     }
 
     bottomLeft() {
-        return (this.#bottomLeft ??= this.#tiles.reduce((tile, curr) => {
+        // a room always contains at least one tile
+        return (this.#bottomLeft ??= this.#tiles.reduce<PixelDungeonTile | null>((tile, curr) => {
             tile ??= curr;
             return tile.x <= curr.x && tile.y >= curr.y ? tile : curr;
-        }, null));
+        }, null)!);
     }
     get tiles() {
         return this.#tiles;

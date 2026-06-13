@@ -8,7 +8,7 @@ export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 
 export abstract class NPScene extends Phaser.Scene {
     protected components = new NPGameObjectList<NPGameObject | NPGameObjectList<NPGameObject>>(this);
-    #debugOut: Phaser.GameObjects.Text;
+    #debugOut!: Phaser.GameObjects.Text;
     abstract setupComponents(): void;
 
     debugOut(text: string | string[] | number | number[]) {

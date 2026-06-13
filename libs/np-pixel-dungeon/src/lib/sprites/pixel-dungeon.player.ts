@@ -39,7 +39,7 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
 };
 
 export class PixelDungeonPlayer extends PixelDungeonMob {
-    options: TPixelDungeonPlayerOptions;
+    options!: TPixelDungeonPlayerOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonPlayerOptions) {
         super(engine, Object.assign({}, defaultOptions, options ?? {}));

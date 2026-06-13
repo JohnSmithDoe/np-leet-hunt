@@ -4,8 +4,8 @@ import { OnSceneCreate, OnScenePreload } from '../types/np-phaser';
 import { ScrollManager } from '../utilities/scroll-manager';
 
 export class WorldScene extends Phaser.Scene implements OnScenePreload, OnSceneCreate {
-    private backgroundImage: Phaser.GameObjects.Image; // * Reference for the background image
-    private scrollManager: ScrollManager; // * Custom np utility for handling scroll
+    private backgroundImage?: Phaser.GameObjects.Image; // * Reference for the background image
+    private scrollManager!: ScrollManager; // * Custom np utility for handling scroll
 
     constructor() {
         super({ key: 'preloader' });

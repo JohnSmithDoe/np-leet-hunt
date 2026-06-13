@@ -9,7 +9,7 @@ export class TextButton extends Phaser.GameObjects.Text implements NPGameObject 
         text: string | string[],
         style?: Phaser.Types.GameObjects.Text.TextStyle
     ) {
-        super(scene, x, y, text, style);
+        super(scene, x, y, text, style ?? {});
 
         this.setInteractive({ useHandCursor: true });
         this.on('pointerover', () => this.enterButtonHoverState())

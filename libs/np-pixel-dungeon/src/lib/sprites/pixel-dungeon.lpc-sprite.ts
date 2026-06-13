@@ -97,9 +97,17 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
         // 235 236 237 238 239 240 241 242 243 244 245 246 247
         // 248 ... 260
 
-        this.on(Phaser.Animations.Events.ANIMATION_COMPLETE, (a, b, c, d) => {
-            console.log(`Playing: ${d}`);
-        });
+        this.on(
+            Phaser.Animations.Events.ANIMATION_COMPLETE,
+            (
+                _anim: Phaser.Animations.Animation,
+                _frame: Phaser.Animations.AnimationFrame,
+                _gameObject: Phaser.GameObjects.GameObject,
+                frameKey: string
+            ) => {
+                console.log(`Playing: ${frameKey}`);
+            }
+        );
     }
 
     play(key: TLpcAnimationKey): this {
@@ -160,17 +168,16 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
     }
 
     #createAnimations() {
-        const animations = NPLpcConfig[this.#options.lpcType].animations;
-        for (const key in animations) {
-            if (animations.hasOwnProperty(key)) {
-                const animation = animations[key];
-                this.anims.create({
-                    key,
-                    frames: this.anims.generateFrameNumbers(this.#options.key, { ...animation }),
-                    frameRate: animation.frameRate ?? 12,
-                    repeat: animation.repeat ?? -1,
-                });
-            }
+        const animations = NPLpcConfig[this.#options.lpcType ?? 'standard'].animations;
+        for (const key of Object.keys(animations) as TLpcAnimationKey[]) {
+            const animation = animations[key];
+            if (!animation) continue;
+            this.anims.create({
+                key,
+                frames: this.anims.generateFrameNumbers(this.#options.key, { ...animation }),
+                frameRate: animation.frameRate ?? 12,
+                repeat: animation.repeat ?? -1,
+            });
         }
     }
 }

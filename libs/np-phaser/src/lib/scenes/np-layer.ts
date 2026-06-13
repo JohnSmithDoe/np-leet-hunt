@@ -3,10 +3,10 @@ import * as Phaser from 'phaser';
 import { NPCamera } from '../cameras/np-camera';
 import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPScene, TNPLayerKeys } from './np-scene';
-import { NPSceneComponent } from './np-scene-component';
 
+// NPLayer is not an NPGameObject: Phaser.GameObjects.Layer does not extend GameObject.
 //https://github.com/photonstorm/phaser/issues/6675
-export class NPLayer extends Phaser.GameObjects.Layer implements NPSceneComponent {
+export class NPLayer extends Phaser.GameObjects.Layer {
     camera?: NPCamera;
 
     constructor(

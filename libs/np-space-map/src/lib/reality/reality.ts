@@ -1,17 +1,17 @@
-import { NPScene, NPSceneComponent } from '@shared/np-phaser';
+import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 const IMAGES = {
     reality1: { key: 'reality-1', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-1.jpg' },
 };
 
-export class Reality extends Phaser.GameObjects.TileSprite implements NPSceneComponent {
+export class Reality extends Phaser.GameObjects.TileSprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
     private sphere: Phaser.GameObjects.Graphics;
-    private light: Phaser.GameObjects.Arc;
-    private renderTexture: Phaser.GameObjects.RenderTexture;
+    private light!: Phaser.GameObjects.Arc;
+    private renderTexture!: Phaser.GameObjects.RenderTexture;
 
-    handlePointerMove(pointer) {
+    handlePointerMove(pointer: Phaser.Input.Pointer) {
         const x = pointer.x;
         const y = pointer.y;
 

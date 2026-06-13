@@ -6,7 +6,7 @@ import Ship from 'phaser3-rex-plugins/plugins/ship';
 export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGameObject {
     // private controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     private shipBehaviour: Ship;
-    private moveTo: MoveToTask;
+    private moveTo!: MoveToTask;
 
     constructor(
         public scene: NPScene,
@@ -46,7 +46,7 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGa
         }
     }
 
-    public moveToTarget(target: { x?: number; y?: number }) {
+    public moveToTarget(target: Phaser.Types.Math.Vector2Like) {
         this.moveTo.moveTo(target.x, target.y);
     }
 

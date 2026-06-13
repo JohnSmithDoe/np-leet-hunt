@@ -9,7 +9,7 @@ import { Space } from '../space/space';
 export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-ui-scene';
     iter = 0;
-    #space: Space;
+    #space!: Space;
 
     constructor() {
         super({ key: SpaceUiScene.key });

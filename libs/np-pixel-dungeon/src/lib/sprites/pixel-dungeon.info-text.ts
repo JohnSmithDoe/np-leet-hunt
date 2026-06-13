@@ -27,7 +27,8 @@ export class PixelDungeonInfoText extends Phaser.GameObjects.Text {
             fontSize: 10,
             color: CMobInfoColors[type],
         };
-        const worldXY = engine.level.tileToWorldXY(tile);
+        // mob tiles always lie within the tilemap bounds
+        const worldXY = engine.level.tileToWorldXY(tile)!;
         super(engine.scene, worldXY.x + 8, worldXY.y, text, style);
         this.setOrigin(0.5);
         this.scene.tweens.add({

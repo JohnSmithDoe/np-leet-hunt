@@ -136,7 +136,6 @@ export class ParadroidFactory {
             this.#tileGrid[i] = [];
             for (let j = 0; j < this.rows; j++) {
                 this.#accessGrid[i][j] = i === 0 ? EParadroidAccess.hasPath : EParadroidAccess.unset;
-                this.#tileGrid[i][j] = undefined;
             }
         }
     }
@@ -195,10 +194,16 @@ export class ParadroidFactory {
         const nextAccessCol = this.#accessGrid[tile.col + 1];
         const rows = getRowCount(tile);
         for (let i = 0, j = rows; i < j; i++) {
-            tile.subTiles.push(this.#generateSubTile(tile, tile.incoming[getRowKeyByIndex(i)], i, 0));
-            tile.subTiles.push(this.#generateSubTile(tile, tile.outgoing[getRowKeyByIndex(i)], i, 1));
-            accessCol[tile.row + i] = tile.incoming[getRowKeyByIndex(i)].access;
-            nextAccessCol[tile.row + i] = tile.outgoing[getRowKeyByIndex(i)].access;
+            const rowKey = getRowKeyByIndex(i);
+            const incoming = tile.incoming[rowKey];
+            const outgoing = tile.outgoing[rowKey];
+            if (!incoming || !outgoing) {
+                throw new Error(`No sub tile definition for row '${rowKey}' of tile type '${type}'`);
+            }
+            tile.subTiles.push(this.#generateSubTile(tile, incoming, i, 0));
+            tile.subTiles.push(this.#generateSubTile(tile, outgoing, i, 1));
+            accessCol[tile.row + i] = incoming.access;
+            nextAccessCol[tile.row + i] = outgoing.access;
         }
         return tile;
     }
@@ -250,7 +255,8 @@ export class ParadroidFactory {
     }
 
     get #tileHeight() {
-        return this.#options.tileHeight;
+        // invariant: every factory is created with options containing a tileHeight (see defaultFactoryOptions)
+        return this.#options.tileHeight!;
     }
 
     get #tileSet() {
@@ -263,7 +269,7 @@ export class ParadroidFactory {
     }
 
     #getNextSubTile(subTile: TParadroidSubTile, flow: EFlowTo) {
-        let result: TParadroidSubTile;
+        let result: TParadroidSubTile | null = null;
         if (flow === EFlowTo.Top) {
             result = this.#getSubTile(subTile.col, subTile.row - 1);
         } else if (flow === EFlowTo.Bottom) {
@@ -283,7 +289,8 @@ export class ParadroidFactory {
             if (result) {
                 for (let i: number = 0, j: number = rows; i < j; i++) {
                     const nextAccess = col[row + i];
-                    const rowAccessByIndex = info.incoming[getRowKeyByIndex(i)].access;
+                    // i < getRowCount(info) guarantees the row key exists on info.incoming
+                    const rowAccessByIndex = info.incoming[getRowKeyByIndex(i)]!.access;
                     result &&= nextAccess === EParadroidAccess.unset || nextAccess === rowAccessByIndex;
                 }
             }

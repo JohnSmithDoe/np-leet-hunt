@@ -14,10 +14,10 @@ import { StartGameState } from './states/start-game.state';
 import { States } from './states/states';
 
 export class PixelDungeonEngine extends StateManager {
-    player: PixelDungeonPlayer;
-    mobs: PixelDungeonMob[];
-    #pathfinder: PixelDungeonPathfinder;
-    #level: PixelDungeonLevel;
+    player!: PixelDungeonPlayer;
+    mobs!: PixelDungeonMob[];
+    #pathfinder!: PixelDungeonPathfinder;
+    #level!: PixelDungeonLevel;
 
     constructor(public scene: NPSceneWithBoard) {
         super({ scene, eventEmitter: false });

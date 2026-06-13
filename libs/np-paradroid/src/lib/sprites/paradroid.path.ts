@@ -18,7 +18,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
     #field: ParadroidField;
     #path: TParadroidPath;
 
-    #fullWidth: number;
+    #fullWidth!: number;
     #tileWidth: number;
     #tileHeight: number;
     #thickness: number;
@@ -52,7 +52,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
         container?.add(this);
     }
 
-    update(...args) {
+    update(...args: unknown[]) {
         super.update(...args);
         switch (this.#state) {
             case 'activating':

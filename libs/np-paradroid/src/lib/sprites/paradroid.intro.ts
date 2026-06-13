@@ -24,7 +24,7 @@ export class ParadroidIntro extends NPGameObjectList<ParadroidImage> {
             onComplete: () => {
                 this.scene.cameras
                     .getCamera('ui-camera')
-                    .shake(1200, 0.02, undefined, (_: NPFullscreenCamera, percent: number) => {
+                    ?.shake(1200, 0.02, undefined, (_: NPFullscreenCamera, percent: number) => {
                         if (percent === 1) {
                             this.list.forEach(img => img.destroy());
                         }

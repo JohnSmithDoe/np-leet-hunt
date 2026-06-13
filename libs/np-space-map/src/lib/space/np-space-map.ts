@@ -10,10 +10,10 @@ import { Planet } from '../planet/planet';
 import { Starmap, StarmapFactory } from './starmap.factory';
 
 export class NPSpaceMap extends NPGameObjectList {
-    private rocket: NPMovableSprite;
+    private rocket!: NPMovableSprite;
     #debug = false;
-    #start: Planet;
-    #map: Starmap;
+    #start!: Planet;
+    #map!: Starmap;
     #planets: Planet[] = [];
     #connections: { from: Planet; to: Planet; line: DashedLine; travelFrom: NPButton; travelTo: NPButton }[] = [];
     #outerSpace: Planet[] = [];
@@ -39,7 +39,7 @@ export class NPSpaceMap extends NPGameObjectList {
         return this.#start;
     }
     #debugDraw(map: Starmap) {
-        const rectInner = createRectangle(this.scene, map.inner);
+        const rectInner = createRectangle(this.scene, map.inner!);
         const rectMap = createRectangle(this.scene, new Phaser.Geom.Rectangle(0, 0, map.width, map.height));
         const rectOuter = createRectangle(
             this.scene,
@@ -63,7 +63,7 @@ export class NPSpaceMap extends NPGameObjectList {
         });
     }
 
-    private travelTo(target: { x?: number; y?: number }) {
+    private travelTo(target: Phaser.Types.Math.Vector2Like) {
         this.#connections.forEach(conn => {
             conn.line.alpha = 0.2;
             conn.travelTo.alpha = 0;
@@ -84,7 +84,7 @@ export class NPSpaceMap extends NPGameObjectList {
     }
 
     #initPlanets() {
-        let topLeft: Planet;
+        let topLeft: Planet | undefined;
         for (const coords of this.#map.coords.planets) {
             const planet = this.#addPlanet(coords, false).setDepth(3);
             this.#planets.push(planet);
@@ -92,7 +92,7 @@ export class NPSpaceMap extends NPGameObjectList {
                 topLeft = planet;
             }
         }
-        this.#start = topLeft;
+        this.#start = topLeft!;
         for (const coords of this.#map.coords.outerSpace) {
             const outerPlanet = this.#addPlanet(coords, true).setDepth(3).setScale(6);
             this.#outerSpace.push(outerPlanet);

@@ -7,20 +7,20 @@ import { PixelDungeonMob } from '../pixel-dungeon.mob';
 export const equalTile = (tile: TileXYType, other: TileXYType) => tile.x === other.x && tile.y === other.y;
 
 export class MobVision extends FieldOfView<PixelDungeonMob> {
-    #currentView: TileXYType[];
+    #currentView: TileXYType[] = [];
     constructor(private mob: PixelDungeonMob) {
+        // preTestCallback / costCallback are typed as required by the plugin but are
+        // optional at runtime; omit them (use the plugin defaults) and cast the config.
+        // preTestCallback: a => this.mob.engine.preTestCallback(a, this.options.visionRange),
+        // costCallback: a => this.engine.costs(a),
         super(mob, {
-            // preTestCallback: a => this.mob.engine.preTestCallback(a, this.options.visionRange),
-            // costCallback: a => this.engine.costs(a),
-            preTestCallback: undefined,
-            costCallback: undefined,
             coneMode: 'angle',
             cone: mob.options.fovConeAngle,
             occupiedTest: false,
             blockerTest: true,
             perspective: false, // true crashs
-        });
-        this.faceDirection = mob.options.startingDirection;
+        } as FieldOfView.IConfig);
+        this.faceDirection = mob.options.startingDirection!;
         this.updateVision();
     }
 
@@ -39,6 +39,6 @@ export class MobVision extends FieldOfView<PixelDungeonMob> {
         return mapRexPluginDirection(this.face);
     }
     set faceDirection(direction: EDirection) {
-        super.setFace(mapToRexPluginDirection(direction));
+        super.setFace(mapToRexPluginDirection(direction)!);
     }
 }

@@ -52,7 +52,7 @@ export class NPRng {
      */
     spliceOne<T>(array: T[]): T {
         const idx = this.inRange(array.length - 1);
-        return array.splice(idx, 1).pop();
+        return array.splice(idx, 1).pop()!;
     }
 
     /**

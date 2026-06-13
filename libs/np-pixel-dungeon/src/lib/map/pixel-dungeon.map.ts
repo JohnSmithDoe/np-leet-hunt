@@ -16,14 +16,14 @@ export interface TPixelDungeonMapOptions {
 export class PixelDungeonMap {
     scene: NPSceneWithBoard;
 
-    #map: Phaser.Tilemaps.Tilemap;
+    #map!: Phaser.Tilemaps.Tilemap;
     #tileset: PixelDungeonTileset;
     #options: TPixelDungeonMapOptions;
 
-    #floor: PixelDungeonFloorLayer;
-    #walls: PixelDungeonTilelayer;
-    #objects: PixelDungeonTilelayer;
-    #stitches: PixelDungeonTilelayer;
+    #floor!: PixelDungeonFloorLayer;
+    #walls!: PixelDungeonTilelayer;
+    #objects!: PixelDungeonTilelayer;
+    #stitches!: PixelDungeonTilelayer;
 
     constructor(engine: PixelDungeonEngine, options: TPixelDungeonMapOptions, type: TNPTilesetKey) {
         this.scene = engine.scene;

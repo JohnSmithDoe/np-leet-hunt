@@ -23,7 +23,7 @@ const defaultOptions: TPixelDungeonEnemyOptions = {
 };
 
 export class PixelDungeonEnemy extends PixelDungeonMob {
-    options: TPixelDungeonEnemyOptions;
+    options!: TPixelDungeonEnemyOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonEnemyOptions) {
         // options.energyGain = (Math.trunc(Math.random() * 5) + 1) * 10;
@@ -38,7 +38,7 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
     #aiAction() {
         const activity = this.activity;
         if (!activity.hasNextAction && activity.canAct()) {
-            let tile: TileXYType;
+            let tile: TileXYType | null = null;
             const neighbours = this.engine.level.getNeighborChess(this.tile);
             const playerAsNeigbour = (neighbours && Array.isArray(neighbours) ? neighbours : [neighbours]).find(
                 n => n === this.engine.player

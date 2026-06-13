@@ -12,7 +12,7 @@ export class PixelDungeonTilelayer {
     constructor(name: string, scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap, tileset: PixelDungeonTileset) {
         this.#map = map;
         this.#tileset = tileset;
-        this.#tilelayer = this.#map.createBlankLayer(name, tileset.tileset);
+        this.#tilelayer = this.#map.createBlankLayer(name, tileset.tileset)!;
         this.#tilelayer.setScale(1);
     }
 

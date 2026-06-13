@@ -7,7 +7,7 @@ import { PixelDungeonMap } from '../../map/pixel-dungeon.map';
 import { PixelDungeon } from '../pixel-dungeon';
 
 export abstract class PixelDungeonTile {
-    rexChess: ChessData;
+    rexChess!: ChessData; // injected by the rex board plugin via board.addChess
     #dungeon: PixelDungeon;
     #tile: TDungeonTile;
 

@@ -22,7 +22,10 @@ interface TBinareTimerOptions {
     ms?: boolean;
 }
 
-const defaultOptions: TBinareTimerOptions = {
+type TBinaryTimerConfig = Required<Omit<TBinareTimerOptions, 'startTime' | 'endTime'>> &
+    Pick<TBinareTimerOptions, 'startTime' | 'endTime'>;
+
+const defaultOptions: TBinaryTimerConfig = {
     timerWidth: 250,
     timerHeight: 50,
     textFill: '#4dd3f6',
@@ -40,12 +43,12 @@ const defaultOptions: TBinareTimerOptions = {
 
 export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameObject {
     static EVENT_TIMER_ENDED = 'binary-timer-ended';
-    options: TBinareTimerOptions;
+    options: TBinaryTimerConfig;
 
-    #startTime: number;
+    #startTime = 0;
     #barWidth: number;
     #barHeight: number;
-    #text: Phaser.GameObjects.Text;
+    #text!: Phaser.GameObjects.Text;
     #frenzyMode: boolean = false;
     #timer = new NPTimer();
 

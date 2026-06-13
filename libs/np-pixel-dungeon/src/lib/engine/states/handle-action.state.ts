@@ -68,7 +68,7 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
 export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeonAction {
     constructor(
         mob: PixelDungeonMob,
-        public tile: TileXYType
+        public tile: TileXYType | undefined
     ) {
         super(mob);
     }
@@ -118,7 +118,7 @@ export class WaitForInputAction extends PixelDungeonBaseAction implements PixelD
 // 4. Start over
 export class HandleActionState extends PixelDungeonState {
     name = States.HandleAction;
-    #mobs: PixelDungeonMob[];
+    #mobs: PixelDungeonMob[] = [];
     #actions: PixelDungeonAction[] = [];
     #waitForInputAction: WaitForInputAction;
 
@@ -143,7 +143,8 @@ export class HandleActionState extends PixelDungeonState {
             }
             // get the action of the first one and if animated wait for it to end
             while (this.#mobs.length) {
-                const mob = this.#mobs.shift();
+                // the while condition guarantees a non-empty list
+                const mob = this.#mobs.shift()!;
 
                 const action = mob.action ?? this.#waitForInputAction;
                 const done = action.perform();

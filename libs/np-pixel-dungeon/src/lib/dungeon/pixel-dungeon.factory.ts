@@ -51,14 +51,14 @@ const defaultDungeon: TDungeonOptions = {
 };
 
 export class PixelDungeonFactory {
-    #rng: NPRng;
+    #rng!: NPRng;
 
-    #options: TDungeonOptions;
-    #dungeon: TDungeonTile[][];
+    #options!: TDungeonOptions;
+    #dungeon!: TDungeonTile[][];
 
     /// The index of the current region being carved.
     #currentRegion = 0;
-    #bounds: NPRect;
+    #bounds!: NPRect;
     #rooms: NPRect[] = [];
 
     generate(options?: TDungeonOptions) {
@@ -74,7 +74,7 @@ export class PixelDungeonFactory {
         return this.#dungeon;
     }
 
-    #initializeDungeon(options: TDungeonOptions) {
+    #initializeDungeon(options?: TDungeonOptions) {
         options = Object.assign({}, defaultDungeon, options ?? {});
         if (options.width % 2 === 0 || options.height % 2 === 0) {
             throw new Error('The options must be odd-sized');
@@ -108,8 +108,10 @@ export class PixelDungeonFactory {
         /// Places rooms randomly inside the grid
         let roomArea = 0;
         let roomAreaPercentage = 0;
+        // roomTries and roomArea are always set in #initializeDungeon
+        let roomTries = this.#options.roomTries!;
         // try to create rooms until roomTries runs out or the requested room area is covered
-        while (--this.#options.roomTries > 0 && roomAreaPercentage < this.#options.roomArea) {
+        while (--roomTries > 0 && roomAreaPercentage < this.#options.roomArea!) {
             const room = this.#createRoom();
             if (!room) continue;
             this.#rooms.push(room);
@@ -150,7 +152,7 @@ export class PixelDungeonFactory {
         // Keep track of which regions have been merged. This maps an original
         // region index to the one it has been merged to.
         // all regions are not connected at the beginning
-        const merged = {};
+        const merged: Record<number, number> = {};
         const openRegions = new Set<number>();
         for (let i = 1; i <= this.#currentRegion; i++) {
             merged[i] = i;
@@ -164,7 +166,7 @@ export class PixelDungeonFactory {
 
             // Merge the connected regions. We'll pick one region (arbitrarily) and
             // map all other regions to its index.
-            let dest;
+            let dest: number | undefined;
             const sources: number[] = [];
             const mergedRegions = [];
             for (const region of connectorRegions[connector.hashCode()]) {
@@ -182,7 +184,7 @@ export class PixelDungeonFactory {
             // some of the ones we're merging now.
             for (let i = 0; i <= this.#currentRegion; i++) {
                 if (sources.includes(merged[i])) {
-                    merged[i] = dest;
+                    merged[i] = dest!;
                 }
             }
 
@@ -205,7 +207,7 @@ export class PixelDungeonFactory {
                 // dungeon isn't singly-connected.
                 // this can lead to adjacent connections...
                 // add max extra connections to prevent tooo much -> probably distribute a bit
-                if (this.#rng.oneIn(this.#options.extraConnectorChance)) {
+                if (this.#rng.oneIn(this.#options.extraConnectorChance!)) {
                     // check if cardinal neighbours are already added
                     const neighbours = CardinalDirections.map(dir => directionToPos(dir).add(other));
                     const isAdjacent = neighbours.reduce(
@@ -283,7 +285,8 @@ export class PixelDungeonFactory {
 
         cells.push(start);
         while (cells.length) {
-            const cell = cells.pop();
+            // the while condition guarantees a non-empty list
+            const cell = cells.pop()!;
 
             // See which adjacent cells are open.
             const possibleCells = CardinalDirections.filter(dir => this.#canCarve(cell, dir));
@@ -295,7 +298,7 @@ export class PixelDungeonFactory {
                 if (
                     lastDir &&
                     possibleCells.includes(lastDir) &&
-                    this.#rng.percentageHit(this.#options.straightenPercentage)
+                    this.#rng.percentageHit(this.#options.straightenPercentage!)
                 ) {
                     dir = lastDir;
                 } else {
@@ -324,7 +327,7 @@ export class PixelDungeonFactory {
         // - It avoids creating rooms that are too rectangular: too tall and
         //   narrow or too wide and flat.
         // TODO: This isn't very flexible or tunable. Do something better here. min max room size
-        const size = this.#rng.inRange(1, 3 + this.#options.roomExtraSize) * 2 + 1;
+        const size = this.#rng.inRange(1, 3 + this.#options.roomExtraSize!) * 2 + 1;
         // const size = 3;
         const rectangularity = this.#rng.inRange(0, 1 + Math.trunc(size / 2)) * 2;
         let width = size;

@@ -7,7 +7,7 @@ export class NPTileableMap extends NPGameObjectList<NPGameObject> {
     // bgLayer: Phaser.GameObjects.Container;
     // mapLayer: Phaser.GameObjects.Container;
 
-    private ship: NPMovableSprite;
+    private ship!: NPMovableSprite;
 
     constructor(scene: NPScene) {
         super(scene);

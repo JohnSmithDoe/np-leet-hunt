@@ -2,7 +2,7 @@ import { NPGameObject, NPScene } from '@shared/np-phaser';
 
 export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
-    #frameKey: number;
+    #frameKey?: number;
 
     constructor(
         public scene: NPScene,

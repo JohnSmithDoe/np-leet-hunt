@@ -54,6 +54,9 @@ export interface NPTilesetMappingNew {
 
 export type TNPTilesetKey = 'shattered';
 type NPTilesetConfig = Phaser.Types.Tilemaps.TilemapConfig & {
+    key: string;
+    tileWidth: number;
+    tileHeight: number;
     tileSetImage: string;
     tileSetMargin: number;
     tileSetSpacing: number;
@@ -131,8 +134,8 @@ const TILESETS: Record<TNPTilesetKey, NPTilesetConfig> = {
 };
 
 export class PixelDungeonTileset {
-    #map: Phaser.Tilemaps.Tilemap;
-    #tileset: Phaser.Tilemaps.Tileset;
+    #map!: Phaser.Tilemaps.Tilemap;
+    #tileset!: Phaser.Tilemaps.Tileset;
     #config: NPTilesetConfig;
 
     constructor(type: TNPTilesetKey) {
@@ -148,7 +151,7 @@ export class PixelDungeonTileset {
             this.#config.tileHeight,
             this.#config.tileSetMargin,
             this.#config.tileSetSpacing
-        );
+        )!;
     }
 
     get tileset() {

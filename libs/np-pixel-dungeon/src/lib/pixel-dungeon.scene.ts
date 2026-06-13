@@ -8,12 +8,12 @@ import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
 
 export class PixelDungeonScene extends NPScene implements OnScenePreload, OnSceneCreate, NPSceneWithBoard {
     static readonly key = 'pixel-dungeon-scene';
-    rexBoard: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
+    rexBoard!: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
-    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    cam: Phaser.Cameras.Scene2D.Camera;
-    private cameraDrag: boolean;
-    private engine: PixelDungeonEngine;
+    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    cam!: Phaser.Cameras.Scene2D.Camera;
+    private cameraDrag = false;
+    private engine!: PixelDungeonEngine;
     constructor() {
         super({ key: PixelDungeonScene.key });
     }
@@ -60,7 +60,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             }
         });
 
-        this.input.on('pointermove', pointer => {
+        this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (pointer.isDown) {
                 camera.scrollX = cameraDragStartX + (pointer.downX - pointer.x) / camera.zoom;
                 camera.scrollY = cameraDragStartY + (pointer.downY - pointer.y) / camera.zoom;
@@ -68,20 +68,28 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             }
         });
 
-        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY) => {
-            // Get the current world point under pointer.
-            const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
-            const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
-            camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 10);
+        this.input.on(
+            'wheel',
+            (
+                pointer: Phaser.Input.Pointer,
+                gameObjects: Phaser.GameObjects.GameObject[],
+                deltaX: number,
+                deltaY: number
+            ) => {
+                // Get the current world point under pointer.
+                const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+                const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
+                camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 10);
 
-            // Update camera matrix, so `getWorldPoint` returns zoom-adjusted coordinates.
-            const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
-            // Scroll the camera to keep the pointer under the same world point.
-            camera.scrollX -= newWorldPoint.x - worldPoint.x;
-            camera.scrollY -= newWorldPoint.y - worldPoint.y; //TODO not working
-            this.cam.scrollX = this.engine.player.x - this.cam.width * 0.5;
-            this.cam.scrollY = this.engine.player.y - this.cam.height * 0.5;
-        });
+                // Update camera matrix, so `getWorldPoint` returns zoom-adjusted coordinates.
+                const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+                // Scroll the camera to keep the pointer under the same world point.
+                camera.scrollX -= newWorldPoint.x - worldPoint.x;
+                camera.scrollY -= newWorldPoint.y - worldPoint.y; //TODO not working
+                this.cam.scrollX = this.engine.player.x - this.cam.width * 0.5;
+                this.cam.scrollY = this.engine.player.y - this.cam.height * 0.5;
+            }
+        );
 
         // moveTo.moveToRandomNeighbor();
 
@@ -108,7 +116,8 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         // this.cam.setViewport(0, 0, this.scale.width, this.scale.height);
 
         this.cam.setZoom(5);
-        this.cursors = this.input.keyboard.createCursorKeys();
+        // keyboard input is enabled by default in the game config
+        this.cursors = this.input.keyboard!.createCursorKeys();
         this.engine.startUP();
         this.engine.startUpdate();
     }

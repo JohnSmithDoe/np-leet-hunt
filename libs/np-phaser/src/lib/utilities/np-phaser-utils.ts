@@ -40,7 +40,7 @@ export const poissonDiscSampler = (
         .map(p => new Phaser.Geom.Point(p[0], p[1]));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const distributePointsInRectangle = (n, w, h) => {
+const distributePointsInRectangle = (n: number, w: number, h: number) => {
     const points: { x: number; y: number }[] = [];
 
     // Calculate the minimum distance between points
@@ -51,8 +51,8 @@ const distributePointsInRectangle = (n, w, h) => {
 
     for (let i = 0; i < n; i++) {
         // Generate random positions for each point, while ensuring they are at least minDistance apart
-        let x;
-        let y;
+        let x: number;
+        let y: number;
         let allSpaced = false;
         let count = 0;
         do {
@@ -76,7 +76,7 @@ const distributePointsInRectangle = (n, w, h) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const distributePointsInRectangle2 = (n, w, h) => {
+const distributePointsInRectangle2 = (n: number, w: number, h: number) => {
     const points: { x: number; y: number }[] = [];
 
     // Calculate the number of rows and columns in the grid

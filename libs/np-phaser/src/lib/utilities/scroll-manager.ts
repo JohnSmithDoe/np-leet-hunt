@@ -19,8 +19,8 @@ export class ScrollManager {
     private scrollUp = false;
     private scrollDown = false;
     private scene: Phaser.Scene;
-    private backgroundImage: Phaser.GameObjects.Components.ComputedSize;
-    private panningTarget: PanningTarget;
+    private backgroundImage!: Phaser.GameObjects.Components.ComputedSize;
+    private panningTarget?: PanningTarget;
 
     constructor(scene: Phaser.Scene) {
         console.log('scroll-manager.ts', 'Constructor for ScrollManager');

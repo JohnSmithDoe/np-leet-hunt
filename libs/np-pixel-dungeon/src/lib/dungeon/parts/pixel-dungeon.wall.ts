@@ -45,6 +45,8 @@ export class PixelDungeonWall extends PixelDungeonTile {
         }
 
         if (wallToN || wallToS) return 'WALL_VERT';
+        // unreachable: the tile to the south is neither junction, floor nor empty here, so it is a wall
+        throw new Error(`no tile index for wall at ${this.x},${this.y}`);
     }
 
     #needStitching() {

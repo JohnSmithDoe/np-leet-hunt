@@ -26,10 +26,10 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
     #junctions: PixelDungeonJunction[] = [];
     #halls: PixelDungeonHallway[] = [];
     #rooms: PixelDungeonRoom[] = [];
-    // additional tile lists
-    #allTiles: PixelDungeonTile[];
-    #hallTiles: PixelDungeonTile[];
-    #roomTiles: PixelDungeonTile[];
+    // additional tile lists (populated in #mapDungeon, called from the constructor)
+    #allTiles!: PixelDungeonTile[];
+    #hallTiles!: PixelDungeonTile[];
+    #roomTiles!: PixelDungeonTile[];
 
     *[Symbol.iterator](): Iterator<TDungeonTile> {
         for (const tileRow of this.#dungeon) {
@@ -173,8 +173,9 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
         // collect cardinal regions of the wall
         CardinalDirections.forEach(dir => {
             const next = pos.add(directionToPos(dir));
-            const region = this.#tile(next).region;
-            if (region !== 0) regions.add(region);
+            const neighbour = this.#tile(next);
+            if (!neighbour) return;
+            if (neighbour.region !== 0) regions.add(neighbour.region);
         });
         return regions;
     }

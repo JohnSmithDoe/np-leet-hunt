@@ -12,8 +12,8 @@ export class StageService {
     #phaser = inject(PhaserService);
     #initialized = new BehaviorSubject(false);
     initialized$ = this.#initialized.asObservable();
-    #current: NPScene;
-    #currentKey: string;
+    #current: NPScene | null = null;
+    #currentKey = '';
 
     public get phaser(): PhaserService {
         return this.#phaser;
@@ -24,8 +24,9 @@ export class StageService {
         if (key === this.#currentKey) return;
         this.phaser.game.scene.dump();
         if (this.#current) {
+            const current = this.#current;
             new Observable(sub => {
-                this.#current.cameras.cameras.forEach(cam => {
+                current.cameras.cameras.forEach(cam => {
                     cam.fade(1000, 0, 0, 0, false, (cama: NPFullscreenCamera, percent: number) => {
                         if (percent === 1) {
                             sub.next(true);

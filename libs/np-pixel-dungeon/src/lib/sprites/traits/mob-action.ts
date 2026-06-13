@@ -5,12 +5,12 @@ const FULL_ENERGY = 100;
 
 export class MobAction {
     #energy = 0;
-    #nextAction: PixelDungeonAction | null;
+    #nextAction: PixelDungeonAction | null = null;
 
     constructor(private mob: PixelDungeonMob) {}
     gainEnergy() {
         //console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
-        return (this.#energy += this.mob.options.energyGain) >= FULL_ENERGY;
+        return (this.#energy += this.mob.options.energyGain!) >= FULL_ENERGY;
     }
 
     canAct() {
@@ -20,7 +20,7 @@ export class MobAction {
         return !this.#nextAction && this.canAct();
     }
 
-    setNextAction(action: PixelDungeonAction) {
+    setNextAction(action: PixelDungeonAction | null) {
         this.#nextAction = action;
     }
 

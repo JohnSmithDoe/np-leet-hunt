@@ -3,8 +3,8 @@ import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateMa
 import { PixelDungeonEngine } from './pixel-dungeon.engine';
 
 export abstract class PixelDungeonState implements StateManager.IState {
-    name: string;
-    protected engine: PixelDungeonEngine;
+    abstract name: string;
+    protected engine!: PixelDungeonEngine;
 
     enter(engine: PixelDungeonEngine) {
         this.engine = engine;

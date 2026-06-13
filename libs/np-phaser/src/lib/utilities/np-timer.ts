@@ -1,5 +1,5 @@
 export class NPTimer {
-    #timer: number;
+    #timer?: number;
 
     waitFor(time: number): boolean {
         if (!this.#timer) {

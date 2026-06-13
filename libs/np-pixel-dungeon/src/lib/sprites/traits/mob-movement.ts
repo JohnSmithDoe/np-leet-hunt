@@ -8,7 +8,7 @@ import { EMobInfoType } from '../pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../pixel-dungeon.mob';
 
 export class MobMovement extends MoveTo<PixelDungeonMob> {
-    moveToTask: MoveToTask & {
+    moveToTask!: MoveToTask & {
         targetX: number;
         targetY: number;
     };
@@ -40,7 +40,7 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
         this.once('occupy', () => fn());
         return this;
     }
-    update(time, delta) {
+    update(time: number, delta: number) {
         // Do the move first and then check if completed
         // Parent checks complete and then moves
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -71,7 +71,7 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
     }
 
     nextMove() {
-        return this.#pathToMove.shift();
+        return this.#pathToMove?.shift();
     }
     canMoveToTile(tile: TileXYType) {
         return this.canMoveTo(tile.x, tile.y);

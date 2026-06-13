@@ -33,13 +33,13 @@ const defaultOptions: TPixelDungeonMobOptions = {
 };
 
 export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObject {
-    rexChess: ChessData;
-    scene: NPSceneWithBoard;
+    rexChess!: ChessData;
+    scene!: NPSceneWithBoard;
     options: TPixelDungeonMobOptions;
 
-    #movement: MobMovement;
-    #vision: MobVision;
-    #activity: MobAction;
+    #movement!: MobMovement;
+    #vision!: MobVision;
+    #activity!: MobAction;
 
     constructor(
         public engine: PixelDungeonEngine,

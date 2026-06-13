@@ -9,7 +9,7 @@ import { ParadroidGame } from './core/paradroid.game';
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'paradroid-scene';
     iter = 0;
-    #paradroidGame: ParadroidGame;
+    #paradroidGame!: ParadroidGame;
     constructor() {
         super({ key: ParadroidScene.key });
     }

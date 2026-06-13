@@ -10,7 +10,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class PhaserService {
     // * We need the Phaser.Game to live inside our own class because extending Phaser.Game would require a super call
-    #game: Phaser.Game;
+    #game!: Phaser.Game;
     get game(): Phaser.Game {
         return this.#game;
     }

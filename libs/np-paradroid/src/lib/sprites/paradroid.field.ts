@@ -166,7 +166,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
         }
     }
 
-    update(...args) {
+    update(...args: unknown[]) {
         super.update(...args);
         this.#paths.list.forEach(path => path.update(...args));
     }

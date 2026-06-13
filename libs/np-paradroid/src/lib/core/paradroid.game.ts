@@ -13,21 +13,21 @@ import { defaultFactoryOptions, ParadroidFactory, TParadroidFactoryOptions } fro
 
 export class ParadroidGame extends NPGameObjectList<NPGameObject> {
     readonly #options: TParadroidFactoryOptions;
-    #factory: ParadroidFactory;
+    #factory!: ParadroidFactory;
 
-    #droidFields: NPGameObjectList<ParadroidField>;
-    #droidEngine: ParadroidEngine;
-    #droidButtons: NPGameObjectList<ParadroidButton>;
-    #droidShots: NPGameObjectList<ParadroidImage>;
+    #droidFields!: NPGameObjectList<ParadroidField>;
+    #droidEngine!: ParadroidEngine;
+    #droidButtons!: NPGameObjectList<ParadroidButton>;
+    #droidShots!: NPGameObjectList<ParadroidImage>;
 
-    #middleCol: NPGameObjectList<ParadroidMiddle>;
+    #middleCol!: NPGameObjectList<ParadroidMiddle>;
 
-    #fields: NPGameObjectList<ParadroidField>;
-    #engine: ParadroidEngine;
-    #buttons: NPGameObjectList<ParadroidButton>;
-    #shots: NPGameObjectList<ParadroidImage>;
-    #timer: BinaryTimer;
-    container: Phaser.GameObjects.Container;
+    #fields!: NPGameObjectList<ParadroidField>;
+    #engine!: ParadroidEngine;
+    #buttons!: NPGameObjectList<ParadroidButton>;
+    #shots!: NPGameObjectList<ParadroidImage>;
+    #timer!: BinaryTimer;
+    container!: Phaser.GameObjects.Container;
 
     constructor(scene: NPScene, options?: TParadroidFactoryOptions) {
         super(scene);
@@ -39,10 +39,10 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#fields = this.#generateFields(EParadroidOwner.Player);
         this.#engine = new ParadroidEngine(this.#fields.list);
         this.#engine.on(ParadroidEngine.EVENT_ACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middle(row).activate(owner)
+            this.#middle(row)!.activate(owner)
         );
         this.#engine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middle(row).deactivate(owner)
+            this.#middle(row)!.deactivate(owner)
         );
         this.add(this.#fields);
 
@@ -54,7 +54,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#timer = new BinaryTimer(
             this.scene,
             -125 + this.#options.tileWidth / 2,
-            this.#factory.rows * this.#options.tileHeight + this.#options.tileHeight / 4,
+            this.#factory.rows * this.#options.tileHeight! + this.#options.tileHeight! / 4,
             {
                 startTime: 30e3,
                 min: false,
@@ -69,10 +69,10 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#droidEngine = new ParadroidEngine(this.#droidFields.list);
 
         this.#droidEngine.on(ParadroidEngine.EVENT_ACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middle(row).activate(owner)
+            this.#middle(row)!.activate(owner)
         );
         this.#droidEngine.on(ParadroidEngine.EVENT_DEACTIVATE_MIDDLE, (row: number, owner: TParadroidPlayer) =>
-            this.#middle(row).deactivate(owner)
+            this.#middle(row)!.deactivate(owner)
         );
         this.add(this.#droidFields);
 
@@ -103,16 +103,18 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         const buttons2 = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidButtons.create(buttons2);
         x = this.#options.tileWidth;
-        y = 100 - this.#options.tileHeight / 2;
+        y = 100 - this.#options.tileHeight! / 2;
         const shots = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#shots.create(shots);
-        this.#shots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));
+        this.#shots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight! / 4));
         x = this.#options.tileWidth * (this.#options.columns * 2 + 2); // +2 player buttons and middle row
         const droidshots = new Phaser.GameObjects.Container(this.scene, x, y, []);
         this.#droidShots.create(droidshots);
 
         droidshots.setScale(-1, 1);
-        this.#droidShots.list.forEach(s => s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight / 4));
+        this.#droidShots.list.forEach(s =>
+            s.setDisplaySize(this.#options.tileWidth / 4, this.#options.tileHeight! / 4)
+        );
 
         this.#timer.create(middle);
         container?.add(buttons);
@@ -122,7 +124,8 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         container?.add(buttons2);
         container?.add(shots);
         container?.add(droidshots);
-        this.container = container;
+        // invariant: ParadroidScene always passes a container to create()
+        this.container = container!;
     }
 
     #generateFields(owner: EParadroidOwner) {
@@ -146,7 +149,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         for (const field of firstRow) {
             const paradroidButton = new ParadroidButton(this.scene, field, {
                 width: this.#options.tileWidth,
-                height: this.#options.tileHeight,
+                height: this.#options.tileHeight!,
             });
             paradroidButton.on(ParadroidButton.EVENT_CLICK, () => this.#onClick(engine === this.#engine));
             result.add(paradroidButton);
@@ -159,14 +162,14 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         const firstRow = this.#engine.grid[0];
         const total = new ParadroidMiddle(this.scene, -1, 0, -this.#options.tileWidth, {
             width: this.#options.tileWidth,
-            height: this.#options.tileHeight,
+            height: this.#options.tileHeight!,
         });
         result.add(total);
 
         for (const field of firstRow) {
             const middle = new ParadroidMiddle(this.scene, field.row, 0, field.y, {
                 width: this.#options.tileWidth,
-                height: this.#options.tileHeight,
+                height: this.#options.tileHeight!,
             });
             middle.on(ParadroidMiddle.EVENT_CHANGED, () => this.#updateMiddleTotal());
             result.add(middle);
@@ -198,14 +201,15 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
             },
             { none: 0, player: 0, droid: 0 }
         );
+        // invariant: the total middle with row -1 is always added in #generateMiddleRow
         if (all.droid === 0 && all.player === 0) {
-            this.#middle(-1).owner = 'middle';
+            this.#middle(-1)!.owner = 'middle';
         } else if (all.droid === all.player) {
-            this.#middle(-1).owner = 'middle-both';
+            this.#middle(-1)!.owner = 'middle-both';
         } else if (all.droid > all.player) {
-            this.#middle(-1).owner = 'middle-droid';
+            this.#middle(-1)!.owner = 'middle-droid';
         } else if (all.droid < all.player) {
-            this.#middle(-1).owner = 'middle-player';
+            this.#middle(-1)!.owner = 'middle-player';
         }
         console.log(all);
     }
@@ -220,7 +224,8 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
 
     #onClick(isPlayer: boolean) {
         const { list } = isPlayer ? this.#shots : this.#droidShots;
-        list.pop().destroy();
+        // invariant: buttons are disabled once the list is empty, so no further clicks can arrive
+        list.pop()!.destroy();
         if (!list.length) {
             const buttons = isPlayer ? this.#buttons : this.#droidButtons;
             buttons.list.forEach(b => (b.disabled = true));

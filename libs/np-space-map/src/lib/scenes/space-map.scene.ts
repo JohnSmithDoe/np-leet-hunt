@@ -10,8 +10,8 @@ import { NPSpaceMap } from '../space/np-space-map';
 export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-map-scene';
     iter = 0;
-    private rocket: NPMovableSprite;
-    private map: NPSpaceMap;
+    private rocket!: NPMovableSprite;
+    private map!: NPSpaceMap;
 
     constructor() {
         super({ key: SpaceMapScene.key });

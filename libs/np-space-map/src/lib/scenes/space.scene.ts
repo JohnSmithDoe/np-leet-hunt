@@ -8,7 +8,7 @@ import { Space } from '../space/space';
 export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-scene';
     iter = 0;
-    #space: Space;
+    #space!: Space;
 
     constructor() {
         super({ key: SpaceScene.key });

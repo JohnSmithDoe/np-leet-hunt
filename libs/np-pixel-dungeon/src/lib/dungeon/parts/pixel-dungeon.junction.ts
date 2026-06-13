@@ -10,9 +10,9 @@ import { PixelDungeonTile } from './pixel-dungeon.tile';
 export class PixelDungeonJunction extends PixelDungeonTile {
     regions: Set<number>;
 
-    #map: PixelDungeonMap;
+    #map!: PixelDungeonMap;
     #open = false;
-    private vertical: boolean;
+    private vertical!: boolean;
 
     constructor(tile: TDungeonTile, dungeon: PixelDungeon) {
         super(tile, dungeon);

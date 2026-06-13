@@ -1,125 +1,96 @@
-# Mobile Game Template - Ionic & Phaser Monorepo
+# np-leet-hunt
 
-This is a template project for all you aspiring video game developers out there! Want to use your web application skills
-for creating an awesome video game?
+A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 21 / Ionic 8** shell app (standalone components, zoneless, OnPush) hosting a **Phaser 3** game, packaged for iOS/Android via **Capacitor 8**.
 
-This repository will give you a great starting point!
+- The full game design doc lives in [`game-design.md`](./game-design.md).
+- The active issue backlog is [`BACKLOG.md`](./BACKLOG.md) (`Leet-<n>` numbering).
+- Working notes for contributors (incl. AI agents) are in [`CLAUDE.md`](./CLAUDE.md).
 
-# Instructions
+**Version constraints to respect:**
+- **Phaser stays on 3.x** — Phaser 4 is a ground-up rewrite incompatible with the game code and `phaser3-rex-plugins`.
+- **Angular tracks the newest version Nx supports** (Nx's peer range usually lags one major behind Angular's latest).
 
-1. Clone the repository using 'Use template' (and don't forget to give us a Star / Follow on Github, please!)
-2. Select which framework from 'apps/' folder you are going to use and remove the others if necessary.
-3. Search + Replace all instances of 'example-app-"frameworkName"-e2e' with your app name (important to do this first)
-4. Search + Replace all instances of 'example-app-"frameworkName"' with your app name
-5. Change the folder names for example-app-frameworkName and example-app-frameworkName-e2e to what you named for steps
-   #1 and #2
-6. Search + Replace all instances of 'openforge-ionic-monorepo-example' with your project name
-7. Search + Replace 'company-name' with your company name. This is the NX project scope that allows you to import
-   libraries using @company-name
+## Architecture
 
-That's it for the renaming!  Now to test...
+The npm scope is `np-afterwork`; libraries are imported via the `@shared/*` path aliases in `tsconfig.base.json`. The dependency graph is layered — the app sits on the game modes, the game modes sit on the Phaser bridge, and everything bottoms out in the framework-agnostic utilities:
 
-```npm install```
+```
+apps/np-leet-hunt  (Ionic shell)
+        │
+        ├── @shared/np-space-map      (overworld)
+        ├── @shared/np-paradroid      (circuit mini-game)
+        └── @shared/np-pixel-dungeon  (roguelike)
+                    │
+                @shared/np-phaser     (Angular↔Phaser bridge + game framework)
+                    │
+                @shared/np-library    (framework-agnostic utilities)
+```
 
-```npx nx run np-leet-hunt:serve``` (where np-leet-hunt is the name you replaced with above)
+- **`apps/np-leet-hunt`** — the Ionic shell. `HomePageComponent` waits for `StageService.initialized$`, then adds and starts game-mode scenes. (`apps/old/` is scrap, not part of the build.)
 
-You should now load your example app!
+Each library has its own README with how it works, its main components, and a grounded "what can be improved" list:
 
-# Checking Licenses
+| Library | What it is | Key components | Notable gaps (see its README) |
+|---|---|---|---|
+| [`np-library`](./libs/np-library/README.md) | Framework-agnostic TypeScript utilities; the bottom of the dependency graph. | `NPBaseSubscriber` (RxJS cleanup), math helpers (`clamp`, `array2D`, radian constants). | Re-exports `piecemeal` *from* `np-phaser`, inverting the dependency direction; no tests. |
+| [`np-phaser`](./libs/np-phaser/README.md) | The Angular↔Phaser bridge and shared game framework everything builds on. | `PhaserService` (owns `Phaser.Game`), `StageService` (scene lifecycle), `NPScene` (component model), `StageComponent`, shared sprites/cameras, and the `piecemeal` geometry/RNG toolkit (`NPVec2`, `NPRect`, `NPRng`, `EDirection`). | Thin public barrel forces deep imports; fragile fade plumbing; heavy rex-plugin coupling; near-zero tests. |
+| [`np-space-map`](./libs/np-space-map/README.md) | The star-map / overworld, run as **three concurrent scenes** (background, map, UI) with independent cameras instead of Phaser layers. | `SpaceScene` / `SpaceMapScene` / `SpaceUiScene`, `NPSpaceMap`, `StarmapFactory` (Poisson-disc generation), `Planet`. | Cross-scene API is only two zoom events; hardcoded config; possible outer-space sampling offset. |
+| [`np-paradroid`](./libs/np-paradroid/README.md) | A Paradroid-style "Influence Device" duel — capture a procedurally-generated circuit by activating flow paths toward the contested middle. | `ParadroidScene`, `ParadroidFactory` (seeded generation), `ParadroidEngine`, `ParadroidField`/`Path` state machines. | Magic numbers; stringly-typed path state; dead `ParadroidIntro`; no tests. |
+| [`np-pixel-dungeon`](./libs/np-pixel-dungeon/README.md) | A turn-based roguelike: room-and-maze dungeon generation, energy-gated turns, pathfinding, FOV, LPC-spritesheet mobs. | `PixelDungeonScene`, `PixelDungeonEngine` (rex state machine), `PixelDungeonFactory`, tilemap layers, mob traits (movement/action/vision). | FOV `perspective` mode disabled (*"true crashs"*) so no true line-of-sight occlusion; placeholder enemy AI; `EndGameState` is a stub; no tests. |
 
-To run the license checker, use
-`npx license-checker --summary` or vanilla `npx license-checker`
+**Asset convention:** each library keeps its assets under its own source tree; the app's `project.json` build target copies them to output folders named after the lib (`./np-phaser`, `./np-space-map`, …), so in-game `load` calls reference paths like `np-space-map/...`.
 
-# Important - Utilizing this Repo
+### Cross-cutting observations
 
-Most of the commands to generate projects/capabilities/apps are default to NX, Ionic, or Angular (in that order), so we
-will NOT include their specific instructions since as the packages update so will the documentation.
+Themes that recur across the game libraries and are worth treating as a shared backlog:
 
-With that said, there are some special things to keep in mind...
+- **No unit tests in any game library.** The pure, deterministic pieces — `StarmapFactory`, the Paradroid factory, the dungeon generator, and the `piecemeal` geometry/RNG toolkit — are the cheapest, highest-value places to start.
+- **Debug `console.log` noise** is left in across all of the game modes and `np-phaser`; gate it behind a debug flag or remove it.
+- **Dead / commented-out code** lingers (`np-phaser`'s `WorldScene`/`NPTileableMap`, Paradroid's `ParadroidIntro`, space-map's `Reality` and unused scroller).
+- **Hardcoded magic numbers and config** (fade/scroll durations, starmap dimensions, zoom levels, path speeds, room sizing) should move into named constants or options.
+- **Thin public surfaces** mean consumers reach into `src/lib/...` by deep path; widening the barrels would make the available toolkit discoverable.
 
-## Generating a Project - Additional Step
+## Getting started
 
-After any project is created by NX, we MUST add StyleLint
+```bash
+npm install
+npm start                       # serve np-leet-hunt at http://localhost:4200
+npx nx serve np-leet-hunt       # same, explicit
+```
 
-nx g nx-stylelint:configuration --project <projectName>
+### Common commands
 
-## Generate an application
+```bash
+npx nx build np-leet-hunt                  # production build → dist/apps/np-leet-hunt
+npx nx test <project>                      # Vitest (np-leet-hunt, np-library, np-phaser, np-paradroid, np-pixel-dungeon, np-space-map)
+npx nx test <project> -- <path>            # single test file
+npx nx test <project> -- -t "<pattern>"    # single test by name
+npx nx lint <project>                      # ESLint (flat config, eslint.config.mjs)
+npx nx stylelint <project>                 # Stylelint (scss)
+npx nx e2e np-leet-hunt-e2e                # Playwright e2e (first run: npx playwright install chromium)
+npx nx affected:test                       # affected only; defaultBase is 'master'
+npx nx graph                               # view the project dependency graph
+```
 
-The normal NX command to generate an app is `nx g @nrwl/react:app my-app` ; however, there are some special steps to
-generate an Ionic App. These are defined well
-in [Eric Jeker's post here](https://medium.com/@eric.jeker/how-to-integrate-ionic-in-nrwl-nx-3493fcb7e85e)
+When generating a new project with Nx, also add Stylelint: `nx g nx-stylelint:configuration --project <projectName>`.
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+## Mobile (Capacitor)
 
-## Adding Capacitor to your application
+A production build must exist before syncing to a native platform:
 
-We are using Capacitor to run the project in mobile. We configured Capacitor to be able to run in monorepos, so if you
-want to add capacitor into your application follow this steps:
+```bash
+npx nx build np-leet-hunt
+npm run sync:app:angular        # cap copy + sync
+npm run ios:app:angular         # open the iOS project
+npm run android:app:angular     # open the Android project
+```
 
-1. Make sure you have run `nx build your-app-name` (Where `your-app-name` will be the name of your application).
-2. Make sure your application has the `package.json` created, if not create one at the root of you application
-   folder `apps/your-application-folder` and add the folowing
-   properties: `"name": your-app-name`, `"version": "0.0.0"`, `"licence: "MIT""`, `"private: true"`, `"dependencies: {}"`, `"devDependencies": {}` (
-   where `your-app-name` will be replaced with your currently application name).
-3. Go to `apps/your-app-name` and run `npm install @capacitor/cli --save-dev`, then run `npm install @capacitor/core`.
-4. Nowe it's time to initialize Capacitor. Go to `apps/your-app-name` and run `npx cap init`.
-5. In the project root folder, search for the `ionic.config.json` file and add `your-app-name` as a new project in
-   the `projects` array. You can copy&paste the example one and just replace all instances.
+## Checking licenses
 
-## Adding a Capacitor Platform to your application
-
-1. At the root of your project, run `ionic capacitor add platform --project=your-app-name` (Where `platform` could
-   be `ios` | `android`) (Where `your-project-name` will be the project name you set into the `ionic.config.json` file).
-
-## Running your application with Capacitor
-
-1. Run `nx build your-app-name` (Where `your-app-name` will be the name of your application).
-2. Run `cd apps/your-app-name && npx cap copy`.
-3. Run `cd apps/your-app-name && npx cap sync`.
-4. Run `cd apps/your-app-name && npx cap open platform`. (Where `platform` could be `ios` | `android`)
-
-# NX Original Instructions
+```bash
+npx license-checker --summary   # or vanilla: npx license-checker
+```
 
 ## Further help
 
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-## Generate a library
-
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported
-from `@openforge-ionic-monorepo-example/mylib`.
-
-## Development server
-
-Run `npx nx run np-leet-hunt:serve` for a dev server. Navigate to http://localhost:4200/. The app will automatically
-reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use
-the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `nx test my-app` to execute the unit tests via [Vitest](https://vitest.dev).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `nx e2e np-leet-hunt-e2e` to execute the end-to-end tests via [Playwright](https://playwright.dev).
-The first run requires `npx playwright install chromium` to download the browser.
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
+Visit the [Nx documentation](https://nx.dev) to learn more about generators, the task runner, and the dependency graph.
