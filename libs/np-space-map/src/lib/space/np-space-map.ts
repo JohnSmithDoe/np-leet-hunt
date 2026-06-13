@@ -34,6 +34,10 @@ const LINE_PREVIEW_ALPHA = 1;
 const LINE_TRAVEL_ALPHA = 0.18;
 const PREVIEW_TINT = 0x88ccff;
 
+// Camera: drag to pan, wheel to zoom. The only automatic move is a gentle ease to a selected planet.
+const SELECT_PAN_MS = 450; // ease-to-selected-planet duration
+const DRAG_THRESHOLD = 6; // screen px of movement before a press counts as a drag, not a tap
+
 export class NPSpaceMap extends NPGameObjectList {
     #map!: Starmap;
     #start!: Planet;
@@ -52,6 +56,10 @@ export class NPSpaceMap extends NPGameObjectList {
     #traveling = false;
     #frozen = false;
     #jumps = 0;
+
+    #dragging = false;
+    #dragMoved = 0;
+    #lastDrag?: { x: number; y: number };
 
     init = () => {
         this.#map = StarmapFactory.create({
@@ -86,10 +94,7 @@ export class NPSpaceMap extends NPGameObjectList {
     create(container?: Phaser.GameObjects.Container) {
         super.create(container);
         this.#planets.forEach(planet => planet.on('pointerup', () => this.#onPlanetTap(planet)));
-        // Tapping empty space (nothing interactive under the pointer) clears the selection.
-        this.scene.input.on(Phaser.Input.Events.POINTER_DOWN, (_pointer: Phaser.Input.Pointer, over: unknown[]) => {
-            if (!over.length) this.#deselect();
-        });
+        this.#setupCameraDrag();
 
         this.#here = this.scene.add.circle(0, 0, 1, 0x66ccff, 0).setStrokeStyle(12, 0x66ccff, 0.9).setDepth(25);
         this.scene.tweens.add({
@@ -117,8 +122,36 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#emitFront();
     }
 
+    // Drag-to-pan the map when idle, with a movement threshold so a small wobble still reads as a tap.
+    #setupCameraDrag() {
+        const cam = this.scene.cameras.main;
+        this.scene.input.on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+            this.#dragging = false;
+            this.#dragMoved = 0;
+            this.#lastDrag = { x: pointer.x, y: pointer.y };
+        });
+        this.scene.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
+            if (!pointer.isDown || this.#frozen || !this.#lastDrag) return;
+            const dx = pointer.x - this.#lastDrag.x;
+            const dy = pointer.y - this.#lastDrag.y;
+            this.#lastDrag = { x: pointer.x, y: pointer.y };
+            this.#dragMoved += Math.hypot(dx, dy);
+            if (this.#dragMoved < DRAG_THRESHOLD) return;
+            this.#dragging = true;
+            cam.panEffect.reset(); // a drag cancels any in-flight ease-to-selected-planet
+            cam.scrollX -= dx / cam.zoom;
+            cam.scrollY -= dy / cam.zoom;
+        });
+        this.scene.input.on(Phaser.Input.Events.POINTER_UP, (_pointer: Phaser.Input.Pointer, over: unknown[]) => {
+            // A genuine click on empty space clears the selection; a drag (or a click on a planet) does not.
+            if (!this.#dragging && !over.length) this.#deselect();
+            this.#dragging = false;
+            this.#lastDrag = undefined;
+        });
+    }
+
     #onPlanetTap(planet: Planet) {
-        if (this.#frozen || this.#traveling || !this.#rocket) return;
+        if (this.#frozen || this.#traveling || this.#dragging || !this.#rocket) return;
         // Any live planet can be selected for inspection; a second tap on a reachable, already-selected
         // one commits the jump (GDD §6 two-tap).
         if (this.#selected === planet && this.#reachable().includes(planet)) {
@@ -141,6 +174,8 @@ export class NPSpaceMap extends NPGameObjectList {
         if (this.#reachable().includes(planet)) {
             this.#lineBetween(this.#current, planet)?.setAlpha(LINE_PREVIEW_ALPHA);
         }
+        // Ease the camera to the selected planet so an off-screen pick is brought into view.
+        this.scene.cameras.main.pan(planet.x, planet.y, SELECT_PAN_MS, 'Sine.easeInOut');
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_SELECTED, planet.info);
     }
 

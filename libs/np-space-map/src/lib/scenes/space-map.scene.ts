@@ -9,6 +9,7 @@ import { NPSpaceMap } from '../space/np-space-map';
 const INITIAL_ZOOM = 0.09;
 const MIN_ZOOM = 0.05;
 const MAX_ZOOM = 1;
+const ZOOM_STEP = 0.02; // per wheel notch — fine-grained so zoom creeps, not jumps
 
 export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-map-scene';
@@ -37,10 +38,11 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.addExisting(this.#rocket);
         this.#map.setRocket(this.#rocket);
 
-        this.cameras.main.startFollow(this.#rocket).setZoom(INITIAL_ZOOM);
+        // Centre on the start once; NPSpaceMap drives follow (only while travelling), ease-to-select, and drag.
+        this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
         this.input.on('wheel', (_pointer: unknown, _over: unknown, _dx: number, dy: number) => {
             const cam = this.cameras.main;
-            cam.setZoom(Phaser.Math.Clamp(cam.zoom * (dy > 0 ? 0.9 : 1.1), MIN_ZOOM, MAX_ZOOM));
+            cam.setZoom(Phaser.Math.Clamp(cam.zoom * (dy > 0 ? 1 - ZOOM_STEP : 1 + ZOOM_STEP), MIN_ZOOM, MAX_ZOOM));
         });
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }

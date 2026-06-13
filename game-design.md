@@ -47,7 +47,7 @@ conflict gets resolved here first:
 
 **Premise.** An ordinary house, an ordinary family: the kid, their sibling, mom and dad,
 grandma and grandpa. One evening, reality around the house gets distorted — and in a distorted
-reality, UFOs with tractor beams are suddenly possible. A collection ship beams up the whole
+reality, UFOs with tractor beams are suddenly possible. A silent grey ship beams up the whole
 family (and, briefly, a very confused farm tractor). When the kid gets back, the house is
 silent — and the garage is a space hangar now, bigger on the inside. A ship is waiting.
 
@@ -57,13 +57,26 @@ mechanical start difference (robo-pet temperament — specified in §4);
 world and story are otherwise identical. *Why the kid wasn't taken is deliberately still open —
 see §8 Open questions.*
 
-**The antagonist — the Toymaker.** A lonely, immortal collector and game-master with no family
-of his own. He doesn't hate the kid — he envies them. The family are now prized pieces of his
-collection, and — bound by his own nature — he only releases what is **won from him in his
-games**. This is the diegetic frame for everything the player does: dungeons are his playrooms,
-the circuit duel is his signature parlor game, the five sector guardians are his game-masters.
-*(Reference DNA: Doctor Who's Celestial Toymaker. The Weeping-Angel "lonely assassin" flavor
-stays in the toolbox for his servants — statue enemies that only move unseen.)*
+**The antagonist — the Hush.** A grey, quiet figure you forget the instant you look away. He
+doesn't collect, gloat, or hate — he *tidies*: where the Hush passes, color, play, time, and
+memory drain back to grey ordinary. He **is** the normality closing in (the timer — below).
+The distorted reality is a bright wound in the grey, and **play is what keeps the wound open** —
+the one thing the Hush cannot normalize. That is the loophole the whole game turns on: to take
+something as vivid and beloved as a family, he couldn't simply grey them out — he had to step
+into the realm of play and **wager** them. By play's own rules, what is wagered can be won back.
+So every dungeon, duel, and guardian fight is the kid forcing the Hush onto the one ground where
+he's beatable. Dungeons are pockets where play still rules and the grey only seeps in at the
+edges; the circuit duel is the kid's takeover verb; the five guardians are play-champions the
+Hush has greyed and bound to hold the gates.
+*(Reference DNA: Momo's Men in Grey — stolen time, drab efficiency — crossed with Doctor Who's
+The Silence — forgotten the moment you look away. The Weeping-Angel "only-moves-unseen" flavor
+stays in the toolbox for his servants.)*
+
+**The forgetting.** The world forgets the Hush the instant it looks away — which is why no one
+has ever stopped him, and why every run is a fresh *telling*. The robo-pet is the one memory
+immune to it (it alone remembers the other tellings — §4): the kid hunts a foe nobody else can
+hold in mind. *(This also offers a strong answer to why the kid wasn't taken — overlooked
+because he was mid-play, hiding or imagining, and so invisible to the grey. Parked in §8.)*
 
 **The five captives.** Mom, dad, grandma, grandpa, and the sibling — one held behind each of
 the five sector guardians. Each rescued member joins the ship as crew with a gameplay role
@@ -71,25 +84,28 @@ the five sector guardians. Each rescued member joins the ship as crew with a gam
 routes, dad boosts the ship, the sibling assists in duels. The rescue order the map allows
 shapes the run.
 
-**Reality fights back (the timer).** Reality does not like being distorted and pulls itself
-back to normal. On the star map this reads as a closing *normality front* (spatial timer —
-mechanics in §4). When reality fully snaps back, the distortion's infrastructure — hangar,
-UFOs, sectors — stops existing, and the run ends: whoever was rescued is home and safe;
-whoever wasn't is lost *in this telling*. Each new run is a new telling.
+**The Hush closes in (the timer).** He doesn't chase — he arrives, greying the map behind the
+ship one layer at a time (the *normality front* — mechanics in §4). Where he's passed, the
+distortion's color and possibility are gone: events, routes, and loot, normalized away. When he
+reaches the ship, the distortion's whole infrastructure — hangar, UFOs, sectors — was never
+there, and the run ends: whoever was won back is home and safe; whoever wasn't is lost *in this
+telling*. By the next telling the Hush has forgotten the kid too, and it begins again.
 
 **Endings.**
-- **Partial rescue** — reality snaps back first: a bittersweet epilogue with the rescued
+- **Partial rescue** — the Hush reaches the ship first: a bittersweet epilogue with the won-back
   members home; empty chairs for the rest.
-- **Full rescue** — all five rescued before the snap-back: the path to the Toymaker himself
-  opens. The bonus/true final fight, with the whole family aboard (their combined help is the
-  mechanical payoff — §4).
-- **True ending** — beat the Toymaker at his own game. He is lonely, not evil; whether the
-  ending allows him empathy (an invitation, a toy left behind?) is a writing decision, parked
-  in §8.
+- **Full rescue** — all five won back before the grey arrives: the way to the Hush himself opens.
+  The bonus/true final fight, with the whole family aboard (their combined help is the mechanical
+  payoff — §4).
+- **True ending** — beat the Hush at the one game he can't rig. The hook ties to the forgetting:
+  he can only be reached by being *remembered* — named, given a face. Whether that unmakes him or
+  redeems a thing that starved on being forgotten is a writing decision, parked in §8.
 
-**Flavor guideline — lean on Doctor Who.** The game references Doctor Who wherever it fits:
-bigger-on-the-inside spaces, don't-blink statues, timey-wimey event flavor, the tractor-beam
-gag. Pop-culture mashups beyond that are welcome (pillar 1), but Doctor Who is the house style.
+**Flavor guideline — Momo's grey meets Doctor Who's Silence.** The house style is stolen-time
+drabness (Momo's Men in Grey) crossed with forget-when-unseen dread (the Silence), kept inside
+the wider Doctor Who palette the game already loves: bigger-on-the-inside spaces, don't-blink
+statues, timey-wimey event flavor, the tractor-beam gag. Pop-culture mashups beyond that are
+welcome (pillar 1).
 
 ## 3. Core gameplay
 
@@ -102,24 +118,24 @@ gag. Pop-culture mashups beyond that are welcome (pillar 1), but Doctor Who is t
 3. **En-route events** — a jump can be intercepted (visualized: an enemy ship flies toward
    yours): a choice-tree event, a ship fight, or a boarding opportunity.
 4. **Planet arrival** — the planet's event fires: gain / lose / shop / or one of the
-   Toymaker's games — a planet dungeon or a duel.
+   games — a planet dungeon or a duel.
 5. **Sector guardian** — at the sector exit, a game-master stages a set-piece (guardian lair →
    staged duel). Win → family member freed, joins the crew (ability unlocks, §4) → exit gate →
    next, larger and meaner sector.
-6. **Run end** — all five rescued before the front arrives → the Toymaker fight (true final).
+6. **Run end** — all five rescued before the Hush arrives → the Hush fight (true final).
    Front catches the ship → snap-back ending: rescued members are home safe, the rest are lost
    in this telling. Ship destroyed → run over.
 
-**The time rule.** The front advances **only on jumps**. Inside the Toymaker's games —
-dungeons and duels — time belongs to *him*: no front progress. Pressure inside the games is
+**The time rule.** The front advances **only on jumps**. Inside the games — dungeons and
+duels — the Hush has no purchase: play holds him off, so no front progress. Pressure there is
 local instead (dungeon hazards, the duel countdown). All run-level pressure lives in one
 readable place: the map.
 
 **The duel (`np-paradroid`) is the takeover verb.** Whenever the kid takes something over,
-it's a circuit duel — the Toymaker's signature game:
+it's a circuit duel — play turned into a weapon:
 - Boarding a ship → duel for the bridge.
 - Hacking a dungeon door, turret, droid, or locked chest → mini-duel (small grid, short timer).
-- Guardian and Toymaker fights → staged multi-round duels.
+- Guardian and Hush fights → staged multi-round duels.
 Scale knobs: grid columns/rows, countdown, fx-tile mix, opposing AI strength.
 
 **Dungeons (`np-pixel-dungeon`), scaled by type.**
@@ -137,7 +153,7 @@ Scale knobs: grid columns/rows, countdown, fx-tile mix, opposing AI strength.
 - **Front reaches the ship** → snap-back ending (partial rescue stands).
 
 **Mode handoff.** `hangar → starmap ⇄ (event | dungeon | duel) → guardian → next sector → … →
-Toymaker → ending` — matching the existing architecture: the map scenes persist, game modes are
+the Hush → ending` — matching the existing architecture: the map scenes persist, game modes are
 pushed on top and return a result.
 
 ## 4. Systems
@@ -150,9 +166,10 @@ Three meters, one currency, deliberately no fuel (the front already owns travel 
   events, shops, dad, and grandpa. Hull 0 = run over.
 - **Heart** — the kid's health inside dungeons. Restored by grandma after dungeons, items, and
   rest events. Heart 0 = downed → robo-pet drags the kid out (§3 fail states).
-- **Marbles** — the currency. The Toymaker's distorted world runs on game tokens; the kid
-  collects marbles in a world that has lost its marbles. Earned from events, dungeons, won
-  duels; spent on shops, upgrades (grandpa), bribes, and duel stakes.
+- **Marbles** — the currency. The distorted world runs on play, and play's tokens are marbles;
+  the kid gathers them in a world the Hush is draining — a world steadily losing its marbles.
+  Earned from events, dungeons, won duels; spent on shops, upgrades (grandpa), bribes, and duel
+  stakes.
 
 ### The robo-pet
 
@@ -193,7 +210,7 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
 - **Dad — the engineer.** Passive hull regeneration per jump and a damage bonus in ship fights.
 - **The sibling — the duel partner.** One assist per duel (e.g. freeze the countdown briefly or
   re-roll a grid row — exact verb tuned in playtesting).
-- **Whole-family bonus (Toymaker fight).** With all five aboard, all abilities are active and
+- **Whole-family bonus (the Hush fight).** With all five aboard, all abilities are active and
   the family interferes in the final staged duel on the kid's behalf — the mechanical payoff of
   the true-ending route.
 
@@ -202,7 +219,7 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
 - **Shape.** Intro → question → three answers → optional follow-up (depth ≤ 2). Answers are
   internally tagged good/neutral/bad (AI.md trees) — the player never sees the labels, only
   consequences.
-- **Outcomes.** Touch resources (Hull/Heart/Marbles), grant items, spawn one of the Toymaker's
+- **Outcomes.** Touch resources (Hull/Heart/Marbles), grant items, spawn one of the
   games (dungeon/duel/fight), open routes, or set story flags.
 - **Gated answers.** Crew aboard, pet class, and items unlock extra answer options ("Mom reads
   the star chart…") — systems feeding pillar 2.
@@ -223,11 +240,12 @@ duel grid size, fx-tile mix, countdown, and AI · guardian set-piece complexity.
 
 ## 5. Content plan
 
-### The five sectors — classic space, increasingly toy-seasoned
+### The five sectors — classic space, increasingly greyed
 
-Classic space biomes carry the run; the Toymaker's presence intrudes more with every sector
-(the *distortion gradient*): sector 1 has a garden gnome floating where no gnome should be;
-sector 5 is more toy than cosmos. The tone curves from familiar to uncanny to old-and-sad.
+Classic space biomes carry the run, but the Hush's drain deepens the closer you get to his core
+(the *grey gradient*): sector 1 is the most vivid and barely touched — a garden gnome floating
+where no gnome should be — while by sector 5 the color is nearly gone, play has all but died, and
+the grey is everywhere. The tone curves from familiar to uncanny to old-and-sad.
 
 1. **Home Reach** — green worlds and a suburban nebula; the space right behind the garage.
    Familiar things made strange. Tutorial energy, small map.
@@ -236,19 +254,22 @@ sector 5 is more toy than cosmos. The tone curves from familiar to uncanny to ol
 3. **Ember Belt** — asteroid fields, lava worlds, forge-light. The loud, dangerous middle.
 4. **Veiled Nebula** — deep nebula, half-lit, eerie; pop-culture ghosts drift here (the AI.md
    carnival and whale events live in this pool).
-5. **The Workshop Dark** — the oldest space: wind-up planets running down, gears gone quiet,
-   the Toymaker's workshop beyond the last gate. The melancholy floor of the game.
+5. **The Long Quiet** — the greyest, oldest space: clocks run down, color all but gone, planets
+   the Hush has nearly finished tidying away. His own still, grey quarter — where the world's
+   stolen time is hoarded and the most-prized captive is kept — lies beyond the last gate. The
+   melancholy floor of the game.
 
 ### Captive placement
 
 Mom, dad, grandma, grandpa shuffle across sectors 1–4 each run (crew-ability build variety);
-**the sibling is always the Toymaker's most prized piece, held in sector 5** — your duel
+**the sibling is always the Hush's most prized piece, held in sector 5** — your duel
 partner arrives right before the final duel. Reunion scenes are written order-agnostic.
 
 ### The five game-masters (guardians)
 
-The Toymaker's lieutenants; each lair is one of his playrooms intruding into the biome, and
-each fight is a staged multi-round duel with a lair gimmick:
+Play-champions the Hush has greyed and bound to hold the gates; each lair is a pocket where
+their game still rules, and each fight is a staged multi-round duel with a lair gimmick. Beating
+one frees the captive — and, for a moment, the champion too:
 
 1. **The Gnome King** (Home Reach) — a garden-gnome general; hide-and-seek rules in his lair.
 2. **The Porcelain Matron** (Frozen Drift) — queen of the Angel statues; her court only moves
@@ -257,8 +278,8 @@ each fight is a staged multi-round duel with a lair gimmick:
    house always wins, until you steal the dice.
 4. **The High Scorer** (Veiled Nebula) — a ghost champion haunting a derelict arcade; beat his
    high score, win his stage.
-5. **The Unwound** (Workshop Dark) — a run-down clockwork knight, the Toymaker's *first* toy.
-   The saddest fight in the game; his winding key is the gate key.
+5. **The Unwound** (The Long Quiet) — a run-down clockwork knight, the first thing the Hush ever
+   stopped. The saddest fight in the game; his winding key is the gate key.
 
 ### Dungeon objectives ("house rules" card on entry)
 
@@ -272,10 +293,10 @@ playroom, shifting exit).
 
 ### Enemy roster
 
-- **Map — the Collection Fleet.** His drones are a core enemy behavior, not just fights:
-  thief drones **tractor-steal an item or marble stash and flee**; chase and board to reclaim
-  it (plus their cargo). Every boarding is a small mirror of the abduction. Escort fighters
-  protect them in later sectors.
+- **Map — the Grey Fleet.** The Hush's wardens are a core enemy behavior, not just fights:
+  thief drones **tractor-steal an item or marble stash and flee** to feed it to the grey; chase
+  and board to reclaim it (plus their cargo). Every boarding is a small mirror of the abduction.
+  Escort fighters protect them in later sectors.
 - **Dungeons.** Wind-up soldiers (slow, relentless) · Angel statues (move only when unseen —
   drives the FoV system) · dice mimics (chests that gamble) · porcelain dolls · arcade ghosts ·
   **stray droids** — duel-able in place: win to absorb their class (§4 pet growth inside
@@ -308,23 +329,25 @@ playroom, shifting exit).
 - Tap a connected planet → jump preview (front advance, visible risks) → tap again to commit.
   Fire-and-forget; no manual flying.
 - **Distorted space is colorful; normal space is a desaturated, ordinary night sky.** The
-  normality front is a creeping wall of mundane sky eating the color behind you — the timer is
-  visible poetry, no clock widget needed. Swallowed nodes turn into boring stars.
+  normality front is the Hush himself — a creeping wall of mundane grey sky eating the color
+  behind you — so the timer is visible poetry, no clock widget needed. Swallowed nodes turn into
+  boring stars.
 
 ### Art direction — an intentional collage
 
-Mixed styles are diegetic: the Toymaker glues his world together from different toy boxes.
-Rules: one consistent style *within* each mode (painted space on the map, pixel art in
-dungeons, clean tiles in duels); collage *between* modes is a feature. Toy intrusions follow
-the distortion gradient (§5). Normality always reads as desaturation. Existing assets stay
-valid.
+Mixed styles are diegetic: the distortion lets every toy box, era, and genre collide (pillar 1)
+— and the Hush is its opposite, a grey that flattens all of it to the same drab. Color and clash
+read as alive; grey uniformity is the Hush winning. Rules: one consistent style *within* each
+mode (painted space on the map, pixel art in dungeons, clean tiles in duels); collage *between*
+modes is a feature. The grey gradient (§5) reads as rising desaturation and stillness; normality
+always reads as drained color. Existing assets stay valid.
 
 ### Audio — ambient space score
 
 Atmospheric synth space music with a distinct mood per sector: warm and homely (Home Reach) →
 still and glassy (Frozen Drift) → driving (Ember Belt) → eerie and veiled (Veiled Nebula) →
-sparse, slow, clockwork-textured (Workshop Dark). Stingers for events, intercepts, and duel
-starts; whimsical toy SFX for the Toymaker's intrusions.
+sparse, slow, clockwork-textured (The Long Quiet). Stingers for events, intercepts, and duel
+starts; a signature greying SFX — color and sound draining out — for the Hush's intrusions.
 
 ### Controls — one-finger playable everywhere
 
@@ -377,11 +400,11 @@ Goal: the skeleton every later phase hangs on.
 
 ### Phase 4 — The Family Run
 
-- Five sectors with the difficulty knobs (§4) and the distortion gradient (§5).
+- Five sectors with the difficulty knobs (§4) and the grey gradient (§5).
 - The five guardians (staged duels + lair gimmicks); captive shuffle, sibling in sector 5.
 - Crew abilities per rescued member; whole-family bonus.
-- Boarding + ship dungeons (bridge or surrender); Collection Fleet thief drones.
-- Hangar with sibling choice; all three endings incl. the Toymaker fight.
+- Boarding + ship dungeons (bridge or surrender); Grey Fleet thief drones.
+- Hangar with sibling choice; all three endings incl. the Hush fight.
 - *Exit: a complete run from garage to true ending.*
 
 ### Phase 5 — The Telling
@@ -404,18 +427,23 @@ Goal: the skeleton every later phase hangs on.
   difficulty — consider how failure tells story rather than just punishing (§4).
 - All four pillars were kept; if event writing (pillar 2) and mode variety (pillar 3) compete
   for production time, that priority call is still open (§7).
-- **Why was the kid left behind?** Deliberately open. Candidates: sulking after a fight
-  (guilt/reunion payoff) · hiding in the garage (tidy, lighter) · deliberately left by the
-  collector ("not a complete piece" — personal sting) · slipped the beam by accident
-  (max whimsy, tractor swap gag). Decide before writing the intro sequence.
+- **Why was the kid left behind?** Deliberately open. Candidates: invisible to the grey — mid-play,
+  hiding or imagining, so the Hush never saw him (ties the hero's origin to the antagonist's
+  nature — the front-runner now) · sulking after a fight (guilt/reunion payoff) · hiding in the
+  garage (tidy, lighter) · slipped the beam by accident (max whimsy, tractor swap gag). Decide
+  before writing the intro sequence.
 - Sibling duel-assist verb (freeze countdown vs. re-roll row vs. something better) — tune in
   playtesting once duels are staged.
-- Does the true ending offer the Toymaker empathy (he's lonely, not evil)? Writing decision.
+- True ending: does *remembering* the Hush unmake him or redeem him — is the grey hollow
+  (entropy, no self) or a thing that starved on being forgotten? Writing decision.
 - Ship destroyed: do already-rescued family members still count as saved in that ending, or is
   losing the ship losing everything? (Ending logic, decide with §4 difficulty tuning.)
 - Front tuning for §4: nodes per jump, can it ever be slowed or pushed back (rare items/events?),
   what exactly happens on the map when a node is swallowed.
-- Distortion-gradient tuning (how much toy per sector) and guardian lair gimmick details —
-  refine when sectors get built (§5/§7).
+- Grey-gradient tuning (how drained per sector) and guardian lair gimmick details — refine when
+  sectors get built (§5/§7).
+- §5 content reframe under the Hush: do the guardians and dungeon enemies stay as varied
+  play-champions (gnome king, porcelain court, arcade ghost…), or get re-skinned greyer and more
+  forgotten the deeper you go? Decide in a dedicated §5 content round — not silently rewritten here.
 - Optional audio flourish (post-v1): a subtle stem layered into the ambient score per rescued
   family member — audible reunion progress without changing the ambient direction.
