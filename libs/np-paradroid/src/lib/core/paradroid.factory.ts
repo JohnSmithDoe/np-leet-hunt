@@ -3,7 +3,6 @@ import {
     CParadroidModes,
     CParadroidShapeInfo,
     CParadroidTileInfo,
-    EFlowFrom,
     EFlowTo,
     EParadroidAccess,
     EParadroidDifficulty,
@@ -76,27 +75,30 @@ export class ParadroidFactory {
         // different one. Generation is reproducible per seed yet varied on retry.
         do {
             this.#initialize();
-            for (let col: number = 0, j: number = Math.trunc(this.columns / 2); col < j; col++) {
-                const tileSet = this.#adjustTileSetForColumn(col);
-                this.#generateCol(col, tileSet);
-            }
+            this.#generateColumns();
             isValid = this.#validateGrid();
-            tryouts++;
-            if (tryouts > 100) throw new Error('Could not generate grid');
+            if (++tryouts > 100) throw new Error('Could not generate grid');
         } while (!isValid);
 
         this.#initializePaths();
         return this.#tileGrid;
     }
 
-    #validateGrid(minCount?: number) {
+    /// Fills the left half column by column; #generateTile mirrors each tile
+    /// into the right half, so we only iterate to the midpoint.
+    #generateColumns() {
+        const midpoint = Math.trunc(this.columns / 2);
+        for (let col = 0; col < midpoint; col++) {
+            this.#generateCol(col, this.#adjustTileSetForColumn(col));
+        }
+    }
+
+    /// A board is winnable when at least half of the final column carries a
+    /// flow that reaches the right edge.
+    #validateGrid() {
         const lastCol = this.#tileGrid[this.#tileGrid.length - 1];
-        return (
-            lastCol.reduce(
-                (count, current) => (current.paths.find(p => p.to === EFlowTo.Right) ? count + 1 : count),
-                0
-            ) >= (minCount ?? lastCol.length / 2)
-        );
+        const rightBoundFlows = lastCol.filter(subTile => subTile.paths.some(p => p.to === EFlowTo.Right)).length;
+        return rightBoundFlows >= lastCol.length / 2;
     }
 
     #adjustTileSetForColumn(col: number) {
@@ -147,44 +149,28 @@ export class ParadroidFactory {
     }
 
     #initializePaths() {
-        // set all next first
-        for (const path of this.#paths) {
-            const nextSubTile = this.#getNextSubTile(path.subTile, path.to);
-            path.next = this.#paths.filter(p => p.subTile === nextSubTile && isNextFlow(path.to, p.from));
-        }
-        // set all other attributes afterward
-        for (const path of this.#paths) {
-            path.prev = this.#paths.filter(p => p.next.find(p2 => p2 === path));
-            this.#adjustPathFx(path);
-        }
-        // stats -> analyse the grid
-        const stats: Record<number, { start: TParadroidPath; ends: TParadroidPath[] }> = {};
-        const startPaths = this.#paths.filter(p => p.subTile.col === 0 && p.from === EFlowFrom.Left);
-        startPaths.forEach(start => {
-            const ends = this.#ends(start);
-            stats[start.subTile.row] = { start, ends };
-        });
-        // console.log(stats);
-        const statsr: Record<number, { end: TParadroidPath; starts: TParadroidPath[] }> = {};
-        const endPaths = this.#paths.filter(p => p.subTile.col === this.columns - 1 && p.to === EFlowTo.Right);
-        endPaths.forEach(end => {
-            const starts = this.#starts(end);
-            statsr[end.subTile.row] = { end, starts };
-        });
-        console.log(statsr);
+        // next must be wired for every path before prev (prev is derived from it)
+        // and before fx (fx walks downstream via next).
+        this.#paths.forEach(path => this.#linkNext(path));
+        this.#paths.forEach(path => this.#linkPrev(path));
+        this.#paths.forEach(path => this.#adjustPathFx(path));
     }
 
-    #generateCol(col: number, aTypeSet: EParadroidTileType[]): TParadroidTile[] {
-        let currentrow: number;
-        let tile: TParadroidTile;
-        const result: TParadroidTile[] = [];
-        currentrow = 0;
-        while (currentrow < this.rows) {
-            tile = this.#generateTile(aTypeSet, col, currentrow);
-            currentrow += getRowCount(tile);
-            result.push(tile);
+    #linkNext(path: TParadroidPath) {
+        const nextSubTile = this.#getNextSubTile(path.subTile, path.to);
+        path.next = this.#paths.filter(p => p.subTile === nextSubTile && isNextFlow(path.to, p.from));
+    }
+
+    #linkPrev(path: TParadroidPath) {
+        path.prev = this.#paths.filter(p => p.next.includes(path));
+    }
+
+    // #generateTile writes each tile into #tileGrid, so we only walk the rows.
+    #generateCol(col: number, aTypeSet: EParadroidTileType[]) {
+        let row = 0;
+        while (row < this.rows) {
+            row += getRowCount(this.#generateTile(aTypeSet, col, row));
         }
-        return result;
     }
 
     #generateTile(aTileTypeSet: EParadroidTileType[], col: number, row: number): TParadroidTile {
@@ -305,35 +291,4 @@ export class ParadroidFactory {
         const suitableTypes = aTileSet.filter(tileType => isFitting(CParadroidTileInfo[tileType]));
         return this.#rng.item(suitableTypes);
     };
-
-    #last(path: TParadroidPath): TParadroidPath[] {
-        const lasts = path.next
-            .map(next => this.#last(next))
-            .reduce((all, current) => {
-                all.push(...current);
-                return all;
-            }, []);
-        return path.next.length ? lasts : [path];
-    }
-    #first(path: TParadroidPath): TParadroidPath[] {
-        const firsts = path.prev
-            .map(prev => this.#first(prev))
-            .reduce((all, current) => {
-                all.push(...current);
-                return all;
-            }, []);
-        return path.prev.length ? firsts : [path];
-    }
-
-    #starts(end: TParadroidPath) {
-        return this.#first(end).filter(
-            (p, idx, arr) => p.from === EFlowFrom.Left && arr.findIndex(p2 => p2.subTile.row === p.subTile.row) === idx
-        );
-    }
-
-    #ends(start: TParadroidPath) {
-        return this.#last(start).filter(
-            (p, idx, arr) => p.to === EFlowTo.Right && arr.findIndex(p2 => p2.subTile.row === p.subTile.row) === idx
-        );
-    }
 }

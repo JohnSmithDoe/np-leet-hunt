@@ -161,16 +161,6 @@ export class NPRect implements Iterable<NPVec2> {
         return this.size.area;
     }
 
-    //  const Rect.posAndSize(this.pos, this.size);
-
-    // Rect.leftTopRightBottom(int left, int top, int right, int bottom)
-    //     : pos = Vec(left, top),
-    //       size = Vec(right - left, bottom - top);
-
-    // Rect(int x, int y, int width, int height)
-    //     : pos = Vec(x, y),
-    //       size = Vec(width, height);
-
     toString() {
         return `(${this.pos.toString()})-(${this.size.toString()})`;
     }
@@ -210,8 +200,6 @@ export class NPRect implements Iterable<NPVec2> {
         const y = clamp(pos.y, this.top, this.bottom);
         return new NPVec2(x, y);
     }
-
-    // get iterator => RectIterator(this);
 
     /// Returns the distance between this Rect and [other]. This is minimum
     /// length that a corridor would have to be to go from one Rect to the other.

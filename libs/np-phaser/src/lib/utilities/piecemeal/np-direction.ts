@@ -10,7 +10,8 @@ export enum EDirection {
     NW = 'northwest',
 }
 
-/// The eight cardinal and intercardinal directions.
+/// The eight cardinal and intercardinal directions, in clockwise order. This
+/// ordering is load-bearing: every rotation below is a step around this cycle.
 export const AllDirections = [
     EDirection.N,
     EDirection.NE,
@@ -29,181 +30,51 @@ export const CardinalDirections = [EDirection.N, EDirection.E, EDirection.S, EDi
 /// southwest and southeast.
 export const IntercardinalDirections = [EDirection.NE, EDirection.SE, EDirection.SW, EDirection.NW];
 
-export const rotateLeft45 = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return EDirection.NONE;
-        case EDirection.N:
-            return EDirection.NW;
-        case EDirection.NE:
-            return EDirection.N;
-        case EDirection.E:
-            return EDirection.NE;
-        case EDirection.SE:
-            return EDirection.E;
-        case EDirection.S:
-            return EDirection.SE;
-        case EDirection.SW:
-            return EDirection.S;
-        case EDirection.W:
-            return EDirection.SW;
-        case EDirection.NW:
-            return EDirection.W;
-    }
-};
-export const rotateRight45 = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return EDirection.NONE;
-        case EDirection.N:
-            return EDirection.NE;
-        case EDirection.NE:
-            return EDirection.E;
-        case EDirection.E:
-            return EDirection.SE;
-        case EDirection.SE:
-            return EDirection.S;
-        case EDirection.S:
-            return EDirection.SW;
-        case EDirection.SW:
-            return EDirection.W;
-        case EDirection.W:
-            return EDirection.NW;
-        case EDirection.NW:
-            return EDirection.N;
-    }
-};
-export const rotateLeft90 = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return EDirection.NONE;
-        case EDirection.N:
-            return EDirection.W;
-        case EDirection.NE:
-            return EDirection.NW;
-        case EDirection.E:
-            return EDirection.N;
-        case EDirection.SE:
-            return EDirection.NE;
-        case EDirection.S:
-            return EDirection.E;
-        case EDirection.SW:
-            return EDirection.SE;
-        case EDirection.W:
-            return EDirection.S;
-        case EDirection.NW:
-            return EDirection.SW;
-    }
-};
-export const rotateRight90 = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return EDirection.NONE;
-        case EDirection.N:
-            return EDirection.E;
-        case EDirection.NE:
-            return EDirection.SE;
-        case EDirection.E:
-            return EDirection.S;
-        case EDirection.SE:
-            return EDirection.SW;
-        case EDirection.S:
-            return EDirection.W;
-        case EDirection.SW:
-            return EDirection.NW;
-        case EDirection.W:
-            return EDirection.N;
-        case EDirection.NW:
-            return EDirection.NE;
-    }
-};
-export const rotate180 = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return EDirection.NONE;
-        case EDirection.N:
-            return EDirection.S;
-        case EDirection.NE:
-            return EDirection.SW;
-        case EDirection.E:
-            return EDirection.W;
-        case EDirection.SE:
-            return EDirection.NW;
-        case EDirection.S:
-            return EDirection.N;
-        case EDirection.SW:
-            return EDirection.NE;
-        case EDirection.W:
-            return EDirection.E;
-        case EDirection.NW:
-            return EDirection.SE;
-    }
+/// Steps `steps` eighths clockwise around the compass (negative = anticlockwise).
+/// NONE has no angle, so it never rotates.
+const rotate =
+    (steps: number) =>
+    (dir: EDirection): EDirection => {
+        if (dir === EDirection.NONE) return EDirection.NONE;
+        const turned = (AllDirections.indexOf(dir) + steps) % AllDirections.length;
+        return AllDirections[(turned + AllDirections.length) % AllDirections.length];
+    };
+
+export const rotateLeft45 = rotate(-1);
+export const rotateRight45 = rotate(1);
+export const rotateLeft90 = rotate(-2);
+export const rotateRight90 = rotate(2);
+export const rotate180 = rotate(4);
+
+const DirectionLabels: Record<EDirection, string> = {
+    [EDirection.NONE]: 'NONE',
+    [EDirection.N]: 'N',
+    [EDirection.NE]: 'NE',
+    [EDirection.E]: 'E',
+    [EDirection.SE]: 'SE',
+    [EDirection.S]: 'S',
+    [EDirection.SW]: 'SW',
+    [EDirection.W]: 'W',
+    [EDirection.NW]: 'NW',
 };
 
-export const directionToString = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return 'NONE';
-        case EDirection.N:
-            return 'N';
-        case EDirection.NE:
-            return 'NE';
-        case EDirection.E:
-            return 'E';
-        case EDirection.SE:
-            return 'SE';
-        case EDirection.S:
-            return 'S';
-        case EDirection.SW:
-            return 'SW';
-        case EDirection.W:
-            return 'W';
-        case EDirection.NW:
-            return 'NW';
-    }
-};
+export const directionToString = (dir: EDirection) => DirectionLabels[dir];
 
-export const mapRexPluginDirection = (dir: number): EDirection => {
-    switch (dir) {
-        case 0:
-            return EDirection.E;
-        case 1:
-            return EDirection.S;
-        case 2:
-            return EDirection.W;
-        case 3:
-            return EDirection.N;
-        case 4:
-            return EDirection.SE;
-        case 5:
-            return EDirection.SW;
-        case 6:
-            return EDirection.NW;
-        case 7:
-            return EDirection.NE;
-        default:
-            return EDirection.NONE;
-    }
-};
+/// The rex movement plugin enumerates directions by index; this is that order.
+const RexDirections = [
+    EDirection.E,
+    EDirection.S,
+    EDirection.W,
+    EDirection.N,
+    EDirection.SE,
+    EDirection.SW,
+    EDirection.NW,
+    EDirection.NE,
+];
+
+export const mapRexPluginDirection = (dir: number): EDirection => RexDirections[dir] ?? EDirection.NONE;
+
 export const mapToRexPluginDirection = (dir: EDirection): number | undefined => {
-    switch (dir) {
-        case EDirection.E:
-            return 0;
-        case EDirection.S:
-            return 1;
-        case EDirection.W:
-            return 2;
-        case EDirection.N:
-            return 3;
-        case EDirection.SE:
-            return 4;
-        case EDirection.SW:
-            return 5;
-        case EDirection.NW:
-            return 6;
-        case EDirection.NE:
-            return 7;
-        default:
-            return undefined;
-    }
+    const code = RexDirections.indexOf(dir);
+    return code === -1 ? undefined : code;
 };

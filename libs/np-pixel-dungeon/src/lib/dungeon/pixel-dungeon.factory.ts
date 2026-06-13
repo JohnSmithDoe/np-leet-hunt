@@ -67,7 +67,6 @@ export class PixelDungeonFactory {
         this.#addRooms();
         this.#addHallways();
         this.#addJunctions();
-        // return this.#dungeon;
         this.#removeDeadEnds();
         this.#removeFullWalls();
         this.#addEmptyFrame();
@@ -397,48 +396,6 @@ export class PixelDungeonFactory {
 
     #getRegion(pos: NPVec2) {
         return this.#dungeon[pos.y][pos.x].region;
-    }
-
-    // not yet
-
-    #carveRoundRoom(room: NPRect) {
-        const centerX = room.center.x;
-        const centerY = room.center.y;
-        const circleRadius = room.circleRadius;
-        console.log(centerX, centerY, circleRadius);
-        for (const pos of room) {
-            this.#carve(pos, ETileType.floor);
-        }
-        // Draw the maximum pixel circle in the grid
-        this.#fillCircle(centerX, centerY, circleRadius);
-    }
-
-    #fillCircle(centerX: number, centerY: number, radius: number, type = ETileType.room): void {
-        let x = radius;
-        let y = 0;
-        let decisionOver2 = 1 - x; // Decision criterion divided by 2 evaluated at x=r, y=0
-
-        while (y <= x) {
-            // Draw horizontal lines in the octants where y is incremented
-            for (let i = centerX - x; i <= centerX + x; i++) {
-                this.#carve(new NPVec2(i, centerY - y), type); // Octant 1
-                this.#carve(new NPVec2(i, centerY + y), type); // Octant 8
-            }
-
-            // Draw horizontal lines in the octants where x is incremented
-            for (let i = centerX - y; i <= centerX + y; i++) {
-                this.#carve(new NPVec2(i, centerY - x), type); // Octant 2
-                this.#carve(new NPVec2(i, centerY + x), type); // Octant 7
-            }
-
-            y++;
-            if (decisionOver2 <= 0) {
-                decisionOver2 += 2 * y + 1; // Change in decision criterion for y -> y+1
-            } else {
-                x--;
-                decisionOver2 += 2 * (y - x) + 1; // Change for y -> y+1, x -> x-1
-            }
-        }
     }
 
     #addEmptyFrame() {

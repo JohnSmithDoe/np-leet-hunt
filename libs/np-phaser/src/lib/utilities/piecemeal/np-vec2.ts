@@ -1,27 +1,22 @@
 import { AllDirections, CardinalDirections, EDirection, IntercardinalDirections } from './np-direction';
 
-export const directionToPos = (dir: EDirection) => {
-    switch (dir) {
-        case EDirection.NONE:
-            return new NPVec2(0, 0);
-        case EDirection.N:
-            return new NPVec2(0, -1);
-        case EDirection.NE:
-            return new NPVec2(1, -1);
-        case EDirection.E:
-            return new NPVec2(1, 0);
-        case EDirection.SE:
-            return new NPVec2(1, 1);
-        case EDirection.S:
-            return new NPVec2(0, 1);
-        case EDirection.SW:
-            return new NPVec2(-1, 1);
-        case EDirection.W:
-            return new NPVec2(-1, 0);
-        case EDirection.NW:
-            return new NPVec2(-1, -1);
-    }
+const DirectionOffsets: Record<EDirection, [number, number]> = {
+    [EDirection.NONE]: [0, 0],
+    [EDirection.N]: [0, -1],
+    [EDirection.NE]: [1, -1],
+    [EDirection.E]: [1, 0],
+    [EDirection.SE]: [1, 1],
+    [EDirection.S]: [0, 1],
+    [EDirection.SW]: [-1, 1],
+    [EDirection.W]: [-1, 0],
+    [EDirection.NW]: [-1, -1],
 };
+
+export const directionToPos = (dir: EDirection) => new NPVec2(...DirectionOffsets[dir]);
+
+/// The squared magnitude an operand contributes to a comparison: a vector's own
+/// lengthSquared, or a scalar interpreted as a length.
+const magnitudeSquared = (value: NPVec2 | number) => (typeof value === 'number' ? value * value : value.lengthSquared);
 
 export class NPVec2 {
     static readonly zero = new NPVec2(0, 0);
@@ -173,37 +168,30 @@ export class NPVec2 {
 
     /// Returns `true` if the magnitude of this vector is greater than [other].
     grt(value: NPVec2 | number) {
-        return typeof value === 'number'
-            ? this.lengthSquared > value * value
-            : this.lengthSquared > value.lengthSquared;
+        return this.lengthSquared > magnitudeSquared(value);
     }
 
     /// Returns `true` if the magnitude of this vector is greater than or equal
     /// to [other].
     grtEq(value: NPVec2 | number) {
-        return typeof value === 'number'
-            ? this.lengthSquared >= value * value
-            : this.lengthSquared >= value.lengthSquared;
+        return this.lengthSquared >= magnitudeSquared(value);
     }
 
     /// Returns `true` if the magnitude of this vector is less than [other].
     isSmaller(value: NPVec2 | number) {
-        return typeof value === 'number'
-            ? this.lengthSquared < value * value
-            : this.lengthSquared < value.lengthSquared;
+        return this.lengthSquared < magnitudeSquared(value);
     }
 
     /// Returns `true` if the magnitude of this vector is less than or equal to
     /// [other].
     isSmallerOrEqual(value: NPVec2 | number) {
-        return typeof value === 'number'
-            ? this.lengthSquared <= value * value
-            : this.lengthSquared <= value.lengthSquared;
+        return this.lengthSquared <= magnitudeSquared(value);
     }
 
+    /// Compares coordinates against another vector, or magnitude against a scalar.
     equals(value: NPVec2 | number) {
         return typeof value === 'number'
-            ? this.lengthSquared === value * value
+            ? this.lengthSquared === magnitudeSquared(value)
             : this.x === value.x && this.y === value.y;
     }
 

@@ -30,14 +30,13 @@ export class NPRng {
     }
 
     /// Rounds [value] to a nearby integer, randomly rounding up or down based
-    /// on the fractional value.
+    /// on the fractional part: the chance of rounding up equals that fraction.
     ///
-    /// For example, `round(3.2)` has a 20% chance of returning 3, and an 80%
-    /// chance of returning 4.
+    /// For example, `round(3.2)` has a 20% chance of returning 4 and an 80%
+    /// chance of returning 3.
     round(value: number) {
-        let result = Math.floor(value);
-        if (value - result > 1.0) result++;
-        return result;
+        const floor = Math.floor(value);
+        return this.#rng.frac() < value - floor ? floor + 1 : floor;
     }
 
     /**

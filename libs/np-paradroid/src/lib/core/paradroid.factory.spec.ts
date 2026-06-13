@@ -14,12 +14,6 @@ const fingerprint = (grid: TParadroidSubTile[][]) =>
         .join('\n');
 
 describe('ParadroidFactory', () => {
-    beforeAll(() => {
-        // the factory logs grid stats on every generation; keep test output clean
-        vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    });
-    afterAll(() => vi.restoreAllMocks());
-
     const build = (seed = 'paradroid-test') => new ParadroidFactory({ ...defaultFactoryOptions, seed });
 
     it('fills a columns x rows grid of sub-tiles', () => {
