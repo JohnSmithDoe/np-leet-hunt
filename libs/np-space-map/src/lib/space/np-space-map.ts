@@ -5,11 +5,12 @@ import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/da
 import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
 import { getClosest } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
 import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
+import { resolvePlanetEvent } from '../events/event.pool';
 import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
 import { NormalityFront } from '../reality/normality-front';
 import { Reality } from '../reality/reality';
-import { SPACE_EVENTS } from '../space.events';
+import { EventResolvedPayload, SPACE_EVENTS } from '../space.events';
 import { Starmap, StarmapFactory } from './starmap.factory';
 
 interface Connection {
@@ -58,6 +59,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #selected?: Planet;
     #traveling = false;
     #frozen = false;
+    #inEvent = false; // a planet-arrival event dialog is open; map input is locked until it resolves
     #jumps = 0;
 
     #dragging = false;
@@ -118,6 +120,9 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#refreshStates();
         // Let every scene register its listeners first, then publish the starting front state to the HUD.
         this.scene.time.delayedCall(0, () => this.#emitFront());
+
+        // The event dialog (HTML overlay) resolves an arrival event and hands the outcome back here.
+        this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
     }
 
     public setRocket(rocket: NPMovableSprite) {
@@ -140,7 +145,7 @@ export class NPSpaceMap extends NPGameObjectList {
             this.#lastDrag = { x: pointer.x, y: pointer.y };
         });
         this.scene.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
-            if (!pointer.isDown || this.#frozen || !this.#lastDrag) return;
+            if (!pointer.isDown || this.#frozen || this.#inEvent || !this.#lastDrag) return;
             const dx = pointer.x - this.#lastDrag.x;
             const dy = pointer.y - this.#lastDrag.y;
             this.#lastDrag = { x: pointer.x, y: pointer.y };
@@ -160,7 +165,7 @@ export class NPSpaceMap extends NPGameObjectList {
     }
 
     #onPlanetTap(planet: Planet) {
-        if (this.#frozen || this.#traveling || this.#dragging || !this.#rocket) return;
+        if (this.#frozen || this.#traveling || this.#inEvent || this.#dragging || !this.#rocket) return;
         // Any live planet can be selected for inspection; a second tap on a reachable, already-selected
         // one commits the jump (GDD §6 two-tap).
         if (this.#selected === planet && this.#reachable().includes(planet)) {
@@ -239,8 +244,23 @@ export class NPSpaceMap extends NPGameObjectList {
         // The front advanced at launch; if it overtook the ship's destination, reality snaps back on arrival.
         if (!this.#front.contains(this.#current)) {
             this.#onSnapback();
+            return;
         }
+
+        // Landed safely → the planet's event fires (event-system.md §6). Lock map input until it resolves.
+        this.#inEvent = true;
+        const event = resolvePlanetEvent(target.info.name);
+        this.scene.game.events.emit(SPACE_EVENTS.PLANET_ARRIVED, { event, planet: target.name });
     }
+
+    #onEventResolved = (payload: EventResolvedPayload) => {
+        // TODO(event-system.md §8): apply effects to run-state (Hull/Heart/Marbles/items/flags), the
+        // front, and the map. Until the run state machine (Leet-27) exists, just log them.
+        if (payload.effects.length) {
+            console.log('[event]', payload.id, payload.path.join(' › '), payload.effects);
+        }
+        this.#inEvent = false;
+    };
 
     #swallow(planet: Planet, duration = 800) {
         planet.setMapState('swallowed');

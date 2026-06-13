@@ -4,12 +4,11 @@
     "projectType": "library",
     "sourceRoot": "libs/np-paradroid/src",
     "prefix": "np-afterwork",
+    "tags": [],
     "targets": {
         "test": {
             "executor": "@nx/vitest:test",
-            "outputs": [
-                "{options.reportsDirectory}"
-            ],
+            "outputs": ["{options.reportsDirectory}"],
             "options": {
                 "configFile": "libs/np-paradroid/vitest.config.ts",
                 "reportsDirectory": "../../coverage/libs/np-paradroid"
@@ -17,7 +16,13 @@
         },
         "lint": {
             "executor": "@nx/eslint:lint"
+        },
+        "stylelint": {
+            "executor": "nx-stylelint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["libs/np-paradroid/**/*.css", "libs/np-paradroid/**/*.scss"]
+            }
         }
-    },
-    "tags": []
+    }
 }

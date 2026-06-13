@@ -227,9 +227,10 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
 
 ### Events
 
-- **Shape.** Intro → question → three answers → optional follow-up (depth ≤ 2). Answers are
+- **Shape.** Intro → question → exactly three answers; each answer either resolves to an outcome
+  or branches to a follow-up question (usually one level, deeper where a tree earns it). Answers are
   internally tagged good/neutral/bad (AI.md trees) — the player never sees the labels, only
-  consequences.
+  consequences. Full data model, pools, arrival flow, and dialog UI: **`event-system.md`**.
 - **Outcomes.** Touch resources (Hull/Heart/Marbles), grant items, spawn one of the
   games (dungeon/duel/fight), open routes, or set story flags.
 - **Gated answers.** Crew aboard, pet class, and items unlock extra answer options ("Mom reads

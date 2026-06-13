@@ -4,12 +4,11 @@
     "projectType": "library",
     "sourceRoot": "libs/np-pixel-dungeon/src",
     "prefix": "np-afterwork",
+    "tags": [],
     "targets": {
         "test": {
             "executor": "@nx/vitest:test",
-            "outputs": [
-                "{options.reportsDirectory}"
-            ],
+            "outputs": ["{options.reportsDirectory}"],
             "options": {
                 "configFile": "libs/np-pixel-dungeon/vitest.config.ts",
                 "reportsDirectory": "../../coverage/libs/np-pixel-dungeon"
@@ -17,7 +16,13 @@
         },
         "lint": {
             "executor": "@nx/eslint:lint"
+        },
+        "stylelint": {
+            "executor": "nx-stylelint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["libs/np-pixel-dungeon/**/*.css", "libs/np-pixel-dungeon/**/*.scss"]
+            }
         }
-    },
-    "tags": []
+    }
 }

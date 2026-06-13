@@ -13,7 +13,13 @@ import { NPBaseSubscriber } from '@shared/np-library';
 import { ParadroidScene } from '@shared/np-paradroid';
 import { StageComponent, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
-import { PlanetInfoComponent, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
+import {
+    EventDialogComponent,
+    PlanetInfoComponent,
+    SpaceMapScene,
+    SpaceScene,
+    SpaceUiScene,
+} from '@shared/np-space-map';
 import { addIcons } from 'ionicons';
 import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
@@ -34,6 +40,7 @@ import { filter } from 'rxjs';
         IonContent,
         StageComponent,
         PlanetInfoComponent,
+        EventDialogComponent,
     ],
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {
