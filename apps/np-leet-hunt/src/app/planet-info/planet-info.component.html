@@ -1,0 +1,38 @@
+@if (info(); as planet) {
+    <aside class="planet-card">
+        <header class="planet-card-head">
+            <span class="planet-card-eyebrow">Planetary survey</span>
+            <h2 class="planet-card-name">{{ planet.name }}</h2>
+            <span class="planet-card-class">{{ planet.classification }}</span>
+        </header>
+
+        <dl class="planet-card-stats">
+            <div class="planet-card-row">
+                <dt>Atmosphere</dt>
+                <dd>{{ planet.atmosphere }}</dd>
+            </div>
+            <div class="planet-card-row">
+                <dt>Temperature</dt>
+                <dd>{{ planet.temperature }}</dd>
+            </div>
+            <div class="planet-card-row">
+                <dt>Gravity</dt>
+                <dd>{{ planet.gravity }}</dd>
+            </div>
+            <div class="planet-card-row">
+                <dt>Population</dt>
+                <dd>{{ planet.population }}</dd>
+            </div>
+            <div class="planet-card-row">
+                <dt>Hazard</dt>
+                <dd>{{ planet.hazard }}</dd>
+            </div>
+            <div class="planet-card-row">
+                <dt>Resource</dt>
+                <dd>{{ planet.resource }}</dd>
+            </div>
+        </dl>
+
+        <p class="planet-card-desc">{{ planet.description }}</p>
+    </aside>
+}

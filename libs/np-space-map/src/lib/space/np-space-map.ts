@@ -4,7 +4,9 @@ import * as Phaser from 'phaser';
 import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/dashed-line';
 import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
 import { getClosest } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
+import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { Planet } from '../planet/planet';
+import { generatePlanetInfo } from '../planet/planet-info';
 import { NormalityFront } from '../reality/normality-front';
 import { Reality } from '../reality/reality';
 import { SPACE_EVENTS } from '../space.events';
@@ -46,7 +48,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #rocket?: NPMovableSprite;
     #here!: Phaser.GameObjects.Arc;
 
-    #preview?: Planet;
+    #selected?: Planet;
     #traveling = false;
     #frozen = false;
     #jumps = 0;
@@ -84,6 +86,10 @@ export class NPSpaceMap extends NPGameObjectList {
     create(container?: Phaser.GameObjects.Container) {
         super.create(container);
         this.#planets.forEach(planet => planet.on('pointerup', () => this.#onPlanetTap(planet)));
+        // Tapping empty space (nothing interactive under the pointer) clears the selection.
+        this.scene.input.on(Phaser.Input.Events.POINTER_DOWN, (_pointer: Phaser.Input.Pointer, over: unknown[]) => {
+            if (!over.length) this.#deselect();
+        });
 
         this.#here = this.scene.add.circle(0, 0, 1, 0x66ccff, 0).setStrokeStyle(12, 0x66ccff, 0.9).setDepth(25);
         this.scene.tweens.add({
@@ -113,16 +119,13 @@ export class NPSpaceMap extends NPGameObjectList {
 
     #onPlanetTap(planet: Planet) {
         if (this.#frozen || this.#traveling || !this.#rocket) return;
-        if (planet === this.#current || !this.#reachable().includes(planet)) {
-            this.#clearPreview();
+        // Any live planet can be selected for inspection; a second tap on a reachable, already-selected
+        // one commits the jump (GDD §6 two-tap).
+        if (this.#selected === planet && this.#reachable().includes(planet)) {
+            this.#commitJump(planet);
             return;
         }
-        // First tap previews the jump; a second tap on the same target commits it (GDD §6).
-        if (this.#preview === planet) {
-            this.#commitJump(planet);
-        } else {
-            this.#setPreview(planet);
-        }
+        this.#select(planet);
     }
 
     /** Adjacent nodes that are still distorted (swallowed neighbours drop out of reach). */
@@ -130,22 +133,32 @@ export class NPSpaceMap extends NPGameObjectList {
         return (this.#adjacency.get(this.#current) ?? []).filter(neighbour => neighbour.alive);
     }
 
-    #setPreview(target: Planet) {
-        this.#clearPreview();
-        this.#preview = target;
-        target.setTint(PREVIEW_TINT);
-        this.#lineBetween(this.#current, target)?.setAlpha(LINE_PREVIEW_ALPHA);
+    #select(planet: Planet) {
+        this.#restoreSelectedVisuals();
+        this.#selected = planet;
+        planet.setTint(PREVIEW_TINT);
+        // Highlight the route only when it's an actual jump target.
+        if (this.#reachable().includes(planet)) {
+            this.#lineBetween(this.#current, planet)?.setAlpha(LINE_PREVIEW_ALPHA);
+        }
+        this.scene.game.events.emit(SPACE_EVENTS.PLANET_SELECTED, planet.info);
     }
 
-    #clearPreview() {
-        if (!this.#preview) return;
-        if (this.#preview.alive) this.#preview.clearTint();
-        this.#lineBetween(this.#current, this.#preview)?.setAlpha(LINE_ALPHA);
-        this.#preview = undefined;
+    #deselect() {
+        if (!this.#selected) return;
+        this.#restoreSelectedVisuals();
+        this.#selected = undefined;
+        this.scene.game.events.emit(SPACE_EVENTS.PLANET_DESELECTED);
+    }
+
+    #restoreSelectedVisuals() {
+        if (!this.#selected) return;
+        if (this.#selected.alive) this.#selected.clearTint();
+        this.#lineBetween(this.#current, this.#selected)?.setAlpha(LINE_ALPHA);
     }
 
     #commitJump(target: Planet) {
-        this.#clearPreview();
+        this.#deselect();
         this.#traveling = true;
         this.#here.setVisible(false);
         this.#liveLines().forEach(line => line.setAlpha(LINE_TRAVEL_ALPHA));
@@ -185,7 +198,7 @@ export class NPSpaceMap extends NPGameObjectList {
 
     #onSnapback() {
         this.#frozen = true;
-        this.#clearPreview();
+        this.#deselect();
         this.#here.setVisible(false);
         this.scene.cameras.main.flash(600, 200, 200, 220);
         this.scene.game.events.emit(SPACE_EVENTS.REALITY_SNAPBACK, { jumps: this.#jumps });
@@ -203,6 +216,11 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#here.setVisible(this.#current.alive);
         if (this.#current.alive) {
             this.#here.setPosition(this.#current.x, this.#current.y).setRadius(this.#current.displayWidth * 0.62);
+        }
+        // If the selected planet just fell to the front, drop the selection (its visuals are now the swallow look).
+        if (this.#selected && !this.#selected.alive) {
+            this.#selected = undefined;
+            this.scene.game.events.emit(SPACE_EVENTS.PLANET_DESELECTED);
         }
     }
 
@@ -226,13 +244,16 @@ export class NPSpaceMap extends NPGameObjectList {
 
     #initPlanets() {
         let topLeft: Planet | undefined;
-        for (const coords of this.#map.coords.planets) {
-            const planet = this.#addPlanet(coords, false).setDepth(3);
+        this.#map.coords.planets.forEach((coords, index) => {
+            // Seed the readout by index so a planet reports the same stats every time it's reselected.
+            const planet = this.#addPlanet(coords, false)
+                .setDepth(3)
+                .setInfo(generatePlanetInfo(new NPRng(`planet-${index}`)));
             this.#planets.push(planet);
             if (!topLeft || (topLeft.x > coords.x && topLeft.y > coords.y)) {
                 topLeft = planet;
             }
-        }
+        });
         this.#start = topLeft!;
         for (const coords of this.#map.coords.outerSpace) {
             this.#outerSpace.push(this.#addPlanet(coords, true).setDepth(3).setScale(6));

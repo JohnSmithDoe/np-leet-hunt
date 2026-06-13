@@ -28,7 +28,7 @@ export class PixelDungeonLevel {
                 width: this.#dungeon.width,
                 height: this.#dungeon.height,
             },
-            'shattered'
+            'space'
         );
         this.#board = new PixelDungeonBoard(engine, {
             width: this.#dungeon.width,

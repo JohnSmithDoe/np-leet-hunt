@@ -1,4 +1,8 @@
 export enum SPACE_EVENTS {
+    /** A planet was selected (tapped). Payload: the planet's `PlanetInfo`. */
+    PLANET_SELECTED = 'npPlanetSelected',
+    /** Selection cleared (tapped empty space, the current node, or committed a jump). No payload. */
+    PLANET_DESELECTED = 'npPlanetDeselected',
     /** A jump was committed; the ship has begun travelling. Payload: `{ to: string }`. */
     JUMP_COMMITTED = 'npJumpCommitted',
     /** The normality front advanced after a jump. Payload: `{ closedFraction, radius, jumps }`. */

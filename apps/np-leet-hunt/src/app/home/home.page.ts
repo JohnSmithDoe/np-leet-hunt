@@ -18,6 +18,8 @@ import { addIcons } from 'ionicons';
 import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
 
+import { PlanetInfoComponent } from '../planet-info/planet-info.component';
+
 @Component({
     selector: 'np-home',
     templateUrl: './home.page.html',
@@ -33,6 +35,7 @@ import { filter } from 'rxjs';
         IonTitle,
         IonContent,
         StageComponent,
+        PlanetInfoComponent,
     ],
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {

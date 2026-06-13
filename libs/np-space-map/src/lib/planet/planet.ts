@@ -2,6 +2,7 @@ import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
+import { PlanetInfo } from './planet-info';
 
 const IMAGES = {
     planet1: { key: 'planet-1', url: 'np-space-map/planets/planet01.png' },
@@ -37,6 +38,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     #alive = true;
     #pulse?: Phaser.Tweens.Tween;
     #state: PlanetMapState = 'dim';
+    #info!: PlanetInfo;
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
@@ -59,6 +61,16 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
 
     get mapState(): PlanetMapState {
         return this.#state;
+    }
+
+    /** This planet's survey readout, shown in the info overlay on selection. */
+    get info(): PlanetInfo {
+        return this.#info;
+    }
+
+    setInfo(info: PlanetInfo): this {
+        this.#info = info;
+        return this;
     }
 
     preload(): void {
@@ -101,7 +113,8 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
                 });
                 break;
             case 'dim':
-                this.clearTint().setAlpha(0.5).disableInteractive();
+                // Still clickable so the player can inspect any live planet, just not a jump target.
+                this.clearTint().setAlpha(0.5).setInteractive({ useHandCursor: true });
                 break;
             case 'swallowed':
                 this.#alive = false;
