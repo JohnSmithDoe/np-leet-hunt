@@ -5,7 +5,7 @@
     "scripts": {
         "start": "nx serve",
         "build": "nx build --base-href ./",
-        "test": "nx test",
+        "test": "nx run-many -t test --no-tui",
         "e2e": "nx e2e np-leet-hunt-e2e",
         "prepare": "husky",
         "serve:app:angular": "nx serve np-leet-hunt",

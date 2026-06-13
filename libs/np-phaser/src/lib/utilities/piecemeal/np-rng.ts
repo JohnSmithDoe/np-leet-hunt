@@ -69,8 +69,11 @@ export class NPRng {
         return this.inRange(100) <= percent;
     }
 
+    /// Rewinds the generator to its initial seeded state, so it replays the same
+    /// sequence from the start. (Re-sowing the seed restarts the sequence; it does
+    /// not produce new values — for fresh values, keep drawing or use a new seed.)
     reset() {
-        this.#rng.sow([`${Date.now()}`]);
+        this.#rng.sow([this.#seed]);
     }
 }
 

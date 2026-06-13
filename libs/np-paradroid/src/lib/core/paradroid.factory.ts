@@ -31,7 +31,9 @@ export interface TParadroidFactoryOptions {
     autoFireRate: number;
     tileSet: EParadroidTileType[];
     owner: TParadroidPlayer;
-    seed: string;
+    /// Optional. Provide one for reproducible generation (tests, debugging).
+    /// Omit it to get a fresh layout each time the factory is built.
+    seed?: string;
 }
 
 export const defaultFactoryOptions: TParadroidFactoryOptions = {
@@ -44,7 +46,7 @@ export const defaultFactoryOptions: TParadroidFactoryOptions = {
     changerRate: 5, // percentage chance 0 - 100
     tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
     owner: EParadroidOwner.Player,
-    seed: new Date().toISOString(),
+    // seed intentionally omitted: each factory gets a fresh layout (see constructor).
 };
 
 const hasCombineShapeOnPath = (path: TParadroidPath): boolean =>
@@ -60,13 +62,18 @@ export class ParadroidFactory {
 
     constructor(options: TParadroidFactoryOptions) {
         this.#options = options;
-        this.#rng = new NPRng(options.seed);
+        // An explicit seed makes generation reproducible; without one we pick a
+        // fresh seed per factory so e.g. "Re-Create" yields a new layout.
+        this.#rng = new NPRng(options.seed ?? new Date().toISOString());
     }
 
     generateGrid(owner: EParadroidOwner = EParadroidOwner.Player) {
         this.#options.owner = owner;
         let isValid = false;
         let tryouts = 0;
+        // Each attempt keeps drawing from the seeded RNG (we deliberately do NOT
+        // rewind it between attempts), so an invalid layout is followed by a
+        // different one. Generation is reproducible per seed yet varied on retry.
         do {
             this.#initialize();
             for (let col: number = 0, j: number = Math.trunc(this.columns / 2); col < j; col++) {
@@ -127,7 +134,6 @@ export class ParadroidFactory {
      * @return
      */
     #initialize() {
-        this.#rng.reset();
         this.#accessGrid = [];
         this.#tileGrid = [];
         this.#paths = [];
