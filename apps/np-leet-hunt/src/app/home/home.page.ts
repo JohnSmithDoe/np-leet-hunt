@@ -53,17 +53,18 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     }
 
     public goToSpace() {
-        this.#stage.phaser.game.scene.add(SpaceScene.key, new SpaceScene(), true);
-        this.#stage.phaser.game.scene.add(SpaceMapScene.key, new SpaceMapScene(), true);
-        this.#stage.phaser.game.scene.add(SpaceUiScene.key, new SpaceUiScene(), true);
-        // this.#stage.startScene(SpaceScene.key, new SpaceScene());
+        this.#stage.startScene(
+            { key: SpaceScene.key, scene: new SpaceScene(), persistent: true },
+            { key: SpaceMapScene.key, scene: new SpaceMapScene(), persistent: true },
+            { key: SpaceUiScene.key, scene: new SpaceUiScene(), persistent: true }
+        );
     }
 
     public goToPixeldungeon() {
-        this.#stage.startScene(PixelDungeonScene.key, new PixelDungeonScene());
+        this.#stage.startScene({ key: PixelDungeonScene.key, scene: new PixelDungeonScene() });
     }
 
     public goToParadroid() {
-        this.#stage.startScene(ParadroidScene.key, new ParadroidScene());
+        this.#stage.startScene({ key: ParadroidScene.key, scene: new ParadroidScene() });
     }
 }
