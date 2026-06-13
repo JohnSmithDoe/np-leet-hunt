@@ -3,10 +3,6 @@ import * as Phaser from 'phaser';
 
 import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 
-// const frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig = {
-//     frameWidth: 256 * 2,
-//     frameHeight: 256 * 2,
-// };
 const IMAGES = {
     planet1: { key: 'planet-1', url: 'np-space-map/planets/planet01.png' },
     planet2: { key: 'planet-2', url: 'np-space-map/planets/planet02.png' },
@@ -22,11 +18,25 @@ const IMAGES = {
     planetGalaxy: { key: 'planet-galaxy', url: 'np-space-map/planets/galaxy.png' },
     planetGasGiant: { key: 'planet-gas-giant', url: 'np-space-map/planets/gas-giant.png' },
     planetPurple: { key: 'planet-purple', url: 'np-space-map/planets/purple-planet.png' },
-    // planetSheet: { key: 'planet-sheet', url: 'np-space-map/planets/planet-sheet-1.png', frameConfig },
 };
+
+/**
+ * A node's role on the map this turn, which drives its look and whether it can be jumped to:
+ * - `current`   — where the ship is now (marked by the "here" ring)
+ * - `reachable` — an adjacent, still-distorted node the player can jump to (pulses, hand cursor)
+ * - `dim`       — a live node that isn't adjacent right now
+ * - `swallowed` — normalised by the front: a colourless, shrunken "boring star", no longer travelable
+ */
+export type PlanetMapState = 'current' | 'reachable' | 'dim' | 'swallowed';
+
+const SWALLOWED_TINT = 0x6b7280;
 
 export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
+    #baseScale = 1;
+    #alive = true;
+    #pulse?: Phaser.Tweens.Tween;
+    #state: PlanetMapState = 'dim';
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
@@ -42,6 +52,15 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         this.setName(type);
     }
 
+    /** A node is alive until the normality front swallows it. */
+    get alive(): boolean {
+        return this.#alive;
+    }
+
+    get mapState(): PlanetMapState {
+        return this.#state;
+    }
+
     preload(): void {
         this.scene.load.image(this.#image);
     }
@@ -52,32 +71,58 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         if (this.width < 512) {
             this.setDisplaySize(512, 512);
         }
-        // const a = this.scene.anims.create({
-        //     key: this.#image.key,
-        //     frames: this.#image.key,
-        //     frameRate: 1,
-        //     repeat: -1,
-        //     yoyo: true,
-        // });
-        // console.log(a, 'kdsfjlksadjflksajdflksajdlk');
-        // this.scene.add.existing(this);
-        // this.scene.addToLayer('np', this);
-        // this.play(this.#image.key);
-        // this.stop();
+        this.#baseScale = this.scaleX;
     }
 
     addToScene(): void {
-        console.log('64:addToScene-planet');
-
         this.scene.addExisting(this);
+    }
+
+    /** Apply a map role: updates tint, alpha, scale, the idle pulse, and travel interactivity. */
+    setMapState(state: PlanetMapState): this {
+        this.#state = state;
+        this.#pulse?.stop();
+        this.#pulse = undefined;
+        this.setScale(this.#baseScale);
+
+        switch (state) {
+            case 'current':
+                this.clearTint().setAlpha(1).setInteractive({ useHandCursor: true });
+                break;
+            case 'reachable':
+                this.clearTint().setAlpha(1).setInteractive({ useHandCursor: true });
+                this.#pulse = this.scene.tweens.add({
+                    targets: this,
+                    scale: this.#baseScale * 1.08,
+                    duration: 700,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut',
+                });
+                break;
+            case 'dim':
+                this.clearTint().setAlpha(0.5).disableInteractive();
+                break;
+            case 'swallowed':
+                this.#alive = false;
+                this.disableInteractive();
+                this.setTint(SWALLOWED_TINT);
+                this.scene.tweens.add({
+                    targets: this,
+                    alpha: 0.3,
+                    scale: this.#baseScale * 0.3,
+                    duration: 800,
+                    ease: 'Sine.easeIn',
+                });
+                break;
+        }
+        return this;
     }
 
     public update(...args: number[]): void {
         super.update(...args);
-        // console.log(this.anims.currentFrame.index, this.anims.currentFrame);
-
-        // console.log(this.anims.currentAnim.duration, this.frame.sourceIndex);
-
-        this.angle += 0.1;
+        if (this.#alive) {
+            this.angle += 0.05;
+        }
     }
 }

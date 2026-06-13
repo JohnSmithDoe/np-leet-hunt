@@ -1,90 +1,75 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-const IMAGES = {
-    reality1: { key: 'reality-1', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-1.jpg' },
-};
+import { FrontPoint } from './normality-front';
 
-export class Reality extends Phaser.GameObjects.TileSprite implements NPGameObject {
-    readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
-    private sphere: Phaser.GameObjects.Graphics;
-    private light!: Phaser.GameObjects.Arc;
-    private renderTexture!: Phaser.GameObjects.RenderTexture;
+// The mask circle is drawn once at this radius then scaled to size — scaling a geometry-mask graphic
+// is cheaper than redrawing it every collapse.
+const BASE_RADIUS = 1000;
 
-    handlePointerMove(pointer: Phaser.Input.Pointer) {
-        const x = pointer.x;
-        const y = pointer.y;
+// Mundane, colour-drained sky. A flat fill rather than a tiled texture: the veil has to span the
+// whole world, and a TileSprite that large would allocate a multi-gigabyte backing canvas.
+const VEIL_COLOUR = 0x2c303b;
+const VEIL_ALPHA = 0.64;
 
-        this.renderTexture.clear();
-        this.renderTexture.draw(this.light, x, y);
-    }
+/**
+ * Renders the normality front as a radial collapse: a veil of colourless sky covering everything
+ * outside a circular bubble of still-distorted space. The bubble is punched out with an inverted
+ * geometry mask, so collapsing the front is just shrinking that circle. The veil sits above the
+ * planets/routes so they desaturate as it passes over them, but below the ship and HUD.
+ */
+export class Reality extends Phaser.GameObjects.Rectangle implements NPGameObject {
+    #mask!: Phaser.Display.Masks.GeometryMask;
+    #circle!: Phaser.GameObjects.Graphics;
+    readonly #center: FrontPoint;
+    #radius: number;
 
     constructor(
         public scene: NPScene,
-        type: keyof typeof IMAGES
+        center: FrontPoint,
+        radius: number
     ) {
-        super(scene, 0, 0, scene.scale.width, scene.scale.height, '');
-        this.#image = IMAGES[type];
-        this.setName(type);
-        const graphics = new Phaser.GameObjects.Graphics(this.scene);
-        graphics.fillStyle(0xff00ff, 0.5);
-        graphics.lineStyle(50, 0xff00ff);
-        graphics.fillCircle(0, 0, 500);
-        // graphics.beginPath();
-        // graphics.arc(0, 0, 200, Phaser.Math.DegToRad(0), Phaser.Math.DegToRad(360), false, 0.01);
-        // graphics.strokePath();
-        // graphics.closePath();
-        graphics.setPosition(1e3, 500);
-        this.sphere = graphics;
-        // this.scene.add.existing(graphics);
-        const mask = new Phaser.Display.Masks.GeometryMask(this.scene, graphics);
-        mask.invertAlpha = true;
-        this.setBlendMode(Phaser.BlendModes.LUMINOSITY);
-
-        this.setMask(mask);
-
-        this.alpha = 0.25;
-        // const rt = this.scene.make.renderTexture(
-        //     {
-        //         width: this.scene.scale.width,
-        //         height: this.scene.scale.height,
-        //     },
-        //     false
-        // );
-        // this.light = this.scene.add.circle(0, 0, 1130, 0x000000, 1);
-        // this.light.visible = false;
-        // this.renderTexture = rt;
-        // // this.scene.input.on(Phaser.Input.Events.POINTER_MOVE, this.handlePointerMove, this);
-        // const maskImage = this.scene.make.image({
-        //     x: 0,
-        //     y: 0,
-        //     key: rt.texture.key,
-        //     add: false,
-        // });
-
-        // const mask = new Phaser.Display.Masks.BitmapMask(this.scene, maskImage);
-        // mask.invertAlpha = true;
-        // this.setMask(mask);
-    }
-
-    preload(): void {
-        this.scene.load.image(this.#image);
+        // Span the whole bubble plus a margin so the veil always fills the view outside it.
+        super(
+            scene,
+            center.x,
+            center.y,
+            (radius + BASE_RADIUS) * 2,
+            (radius + BASE_RADIUS) * 2,
+            VEIL_COLOUR,
+            VEIL_ALPHA
+        );
+        this.#center = center;
+        this.#radius = radius;
+        this.setName('reality');
     }
 
     create(): void {
-        this.setTexture(this.#image.key).setSize(this.scene.scale.width, this.scene.scale.height).setOrigin(0);
+        this.setDepth(10); // above planets (3) and routes (2), below the "here" ring (25) and ship (30)
+
+        this.#circle = this.scene.add.graphics();
+        this.#circle.fillStyle(0xffffff, 1).fillCircle(0, 0, BASE_RADIUS);
+        this.#circle.setPosition(this.#center.x, this.#center.y).setVisible(false);
+        this.#circle.setScale(this.#radius / BASE_RADIUS);
+
+        this.#mask = this.#circle.createGeometryMask();
+        this.#mask.invertAlpha = true; // veil shows OUTSIDE the circle; inside stays distorted/colourful
+        this.setMask(this.#mask);
+    }
+
+    addToScene(): void {
         this.scene.addExisting(this);
-        this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
-    update(...args: number[]): void {
-        super.update(...args);
-        this.sphere.scale = this.sphere.scale - 0.001;
-        // this.tilePositionX -= 0.5;
-    }
-
-    resize(gameSize?: Phaser.Structs.Size): void {
-        const { width, height } = gameSize || this.scene.scale;
-        this.setSize(width, height);
+    /** Collapse (or, with pushback, re-grow) the distortion bubble to `radius`, tweened over `duration` ms. */
+    collapseTo(radius: number, duration = 800): void {
+        this.#radius = radius;
+        this.scene.tweens.add({
+            targets: this.#circle,
+            scaleX: radius / BASE_RADIUS,
+            scaleY: radius / BASE_RADIUS,
+            duration,
+            ease: 'Sine.easeInOut',
+        });
     }
 }

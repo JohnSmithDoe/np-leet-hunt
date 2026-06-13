@@ -1,51 +1,66 @@
 import { NPScene } from '@shared/np-phaser';
+import * as Phaser from 'phaser';
 
-import { createSpeechBubble } from '../../../../np-phaser/src/lib/factories/graphics.factory';
-import { TextButton } from '../../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
-import { SPACE_EVENTS } from '../space.events';
-import { Space } from '../space/space';
+import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
 
+const BAR = { x: 60, y: 64, w: 520, h: 34 };
+
+/** Fixed map HUD: how far reality has closed in, and how many jumps it took. */
 export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-ui-scene';
-    iter = 0;
-    #space!: Space;
+    #bar!: Phaser.GameObjects.Graphics;
+    #jumps!: Phaser.GameObjects.Text;
+    #snapback!: Phaser.GameObjects.Text;
+    #fraction = 0;
 
     constructor() {
         super({ key: SpaceUiScene.key });
     }
 
     setupComponents() {
-        console.log('dont do it???????');
-        // this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-        // this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        // this.cameras.main.startFollow(this.rocket).setZoom(0.035);
+        // HUD is built in create(): it needs no preloaded assets, only text + graphics.
     }
 
-    /**
-     * * Phaser will only call create after all assets in Preload have been loaded
-     */
     create() {
         super.create();
-        const zoomInTxtBtn = new TextButton(this, 500, 10, 'Zoom In');
-        zoomInTxtBtn.on('pointerup', () => {
-            this.game.events.emit(SPACE_EVENTS.ZOOM_IN);
-        });
-        this.addExisting(zoomInTxtBtn);
+        const text = (x: number, y: number, value: string, size: number, color: string) =>
+            this.add
+                .text(x, y, value, { fontFamily: 'sans-serif', fontSize: `${size}px`, color })
+                .setScrollFactor(0)
+                .setDepth(100);
 
-        const zoomOutTxtBtn = new TextButton(this, 700, 10, 'Zoom Out');
-        zoomOutTxtBtn.on('pointerup', () => {
-            this.game.events.emit(SPACE_EVENTS.ZOOM_OUT);
+        text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
+        this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
+        this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');
+        this.#snapback = this.add
+            .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(101);
+        this.#drawBar();
+
+        this.game.events.on(SPACE_EVENTS.FRONT_ADVANCED, (payload: FrontAdvancedPayload) => {
+            this.#fraction = payload.closedFraction;
+            this.#jumps.setText(`JUMPS  ${payload.jumps}`);
+            this.#drawBar();
         });
-        this.addExisting(zoomOutTxtBtn);
-        const bubble = createSpeechBubble(
-            this,
-            70,
-            400,
-            250,
-            100,
-            "“And now you're a boss, too... of this pile of rubble.”"
-        );
-        this.addExisting(bubble);
+        this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
+            this.#fraction = 1;
+            this.#drawBar();
+            this.#snapback.setText('REALITY SNAPPED BACK');
+        });
+    }
+
+    #drawBar() {
+        const f = Phaser.Math.Clamp(this.#fraction, 0, 1);
+        const fill = f < 0.5 ? 0x6fcf97 : f < 0.8 ? 0xf2c94c : 0xeb5757; // green → amber → red as it closes
+        this.#bar.clear();
+        this.#bar.fillStyle(0x10131c, 0.85).fillRoundedRect(BAR.x, BAR.y, BAR.w, BAR.h, 8);
+        const fillWidth = (BAR.w - 6) * f;
+        if (fillWidth > 1) {
+            this.#bar.fillStyle(fill, 1).fillRect(BAR.x + 3, BAR.y + 3, fillWidth, BAR.h - 6);
+        }
+        this.#bar.lineStyle(2, 0x3a4255, 1).strokeRoundedRect(BAR.x, BAR.y, BAR.w, BAR.h, 8);
     }
 }

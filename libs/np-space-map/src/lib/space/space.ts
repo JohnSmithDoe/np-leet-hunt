@@ -36,12 +36,7 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject
     }
 
     create(): void {
-        console.log('36:create-');
         this.setTexture(this.#image.key).setSize(this.scene.scale.width, this.scene.scale.height).setOrigin(0);
-        // this.scene.addToLayer('bg', this);
-        // this only works if the camera is related to this....
-        // two options: own camera      scene handles all the camera related stuff
-        //              soc             control
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
