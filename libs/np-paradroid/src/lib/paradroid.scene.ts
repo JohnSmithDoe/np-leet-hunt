@@ -51,6 +51,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
             this.#paradroidGame.init();
             this.#paradroidGame.create(newcontainer);
             this.addExisting(newcontainer);
+            this.resize();
         });
         this.addExisting(recreateBtn);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
@@ -64,13 +65,30 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     }
 
     /**
-     * * When the screen is resized, we
+     * * When the screen is resized, match the camera viewport to the new size and
+     * * re-fit the board so the whole thing stays visible on any device.
      *
      * @param gameSize
      */
     resize(gameSize?: Phaser.Structs.Size): void {
-        // this.cameras.cameras.forEach(cam => console.log(cam.renderList));
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
+        this.#fitBoardToViewport(width, height);
+    }
+
+    /**
+     * The board is laid out at a fixed pixel size (48px tiles, anchored near the
+     * top-left) and would overflow narrow / mobile viewports. Zoom the main camera
+     * so the board's bounds fit the viewport (with a little breathing room) and
+     * centre the camera on it. Scaling down for now — proper responsive layout TODO.
+     */
+    #fitBoardToViewport(width: number, height: number): void {
+        const board = this.#paradroidGame?.container;
+        if (!board || width === 0 || height === 0) return;
+        const bounds = board.getBounds();
+        if (bounds.width === 0 || bounds.height === 0) return;
+        const margin = 1.1; // ~10% padding around the board
+        const zoom = Math.min(width / (bounds.width * margin), height / (bounds.height * margin));
+        this.cameras.main.setZoom(zoom).centerOn(bounds.centerX, bounds.centerY);
     }
 }
