@@ -22,11 +22,15 @@ interface Connection {
 const MAP_SIZE = 15000;
 const MIN_PLANET_DISTANCE = 1750;
 
-// Normality-front tuning. The front always takes ~DESIRED_JUMPS to collapse, whatever the map size,
-// and keeps a central safe core so the very middle never normalises.
+// Normality-front tuning. The front sweeps in as a diagonal line from the left (the Hush greying the
+// map one layer at a time); it always takes ~DESIRED_JUMPS to cross, whatever the map size, and stops
+// short of the far edge so a sliver of distorted space (the safe core) never normalises.
 const FRONT_MARGIN = 600;
 const DESIRED_JUMPS = 10;
-const MIN_RADIUS_FACTOR = 0.15;
+const SAFE_FRACTION = 0.15; // far-side fraction of the sweep that stays distorted
+// Sweep axis: points toward still-distorted space (down-and-right), so the grey closes in from the
+// upper-left as a tilted line. The front line itself is perpendicular to this.
+const FRONT_AXIS = { x: Math.cos(Phaser.Math.DegToRad(25)), y: Math.sin(Phaser.Math.DegToRad(25)) };
 
 // Route alphas: the resting look, the previewed jump, and the dimmed-down look while travelling.
 const LINE_ALPHA = 0.7;
@@ -42,8 +46,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #map!: Starmap;
     #start!: Planet;
     #current!: Planet;
-    #planets: Planet[] = [];
-    #outerSpace: Planet[] = [];
+    #planets: Planet[] = []; // inner travel-graph planets + outer bonus suns (distinguished by Planet.outer)
     #connections: Connection[] = [];
     #adjacency = new Map<Planet, Planet[]>();
 
@@ -72,16 +75,22 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#initPlanets();
         this.#initConnections();
 
-        const center = { x: this.#map.width / 2, y: this.#map.height / 2 };
-        const initialRadius = NormalityFront.enclosingRadius(center, this.#planets, FRONT_MARGIN);
-        const minRadius = initialRadius * MIN_RADIUS_FACTOR;
+        const origin = { x: 0, y: 0 };
+        const bounds = NormalityFront.enclosingBounds(origin, FRONT_AXIS, this.#planets, FRONT_MARGIN);
+        const span = bounds.max - bounds.min;
+        const initialPosition = bounds.min;
+        const maxPosition = bounds.min + span * (1 - SAFE_FRACTION);
         this.#front = new NormalityFront({
-            center,
-            initialRadius,
-            minRadius,
-            step: (initialRadius - minRadius) / DESIRED_JUMPS,
+            origin,
+            axis: FRONT_AXIS,
+            initialPosition,
+            maxPosition,
+            step: (maxPosition - initialPosition) / DESIRED_JUMPS,
         });
-        this.#reality = this.add(new Reality(this.scene, center, initialRadius)) as Reality;
+        // The front normalises the axis; reuse it so the renderer's sweep scale matches the geometry.
+        this.#reality = this.add(
+            new Reality(this.scene, this.#front.origin, this.#front.axis, initialPosition)
+        ) as Reality;
 
         this.#current = this.#start;
         super.init();
@@ -115,9 +124,9 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#rocket = rocket;
     }
 
-    /** Distortion-battery pushback (§4): grow the bubble back. TODO(Leet-29): wire to event/loot rewards. */
+    /** Distortion-battery pushback (§4): push the front back out. TODO(Leet-29): wire to event/loot rewards. */
     public pushFront(amount?: number) {
-        this.#reality.collapseTo(this.#front.pushFront(amount), 600);
+        this.#reality.sweepTo(this.#front.pushFront(amount), 600);
         this.#refreshStates();
         this.#emitFront();
     }
@@ -195,9 +204,21 @@ export class NPSpaceMap extends NPGameObjectList {
     #commitJump(target: Planet) {
         this.#deselect();
         this.#traveling = true;
+        this.#jumps += 1;
         this.#here.setVisible(false);
         this.#liveLines().forEach(line => line.setAlpha(LINE_TRAVEL_ALPHA));
         this.scene.game.events.emit(SPACE_EVENTS.JUMP_COMMITTED, { to: target.name });
+
+        // The front advances only on jumps (GDD §3). Sweep it — and grey out what falls behind — in
+        // lockstep with the rocket, so reality visibly closes in *as* the kid flies, not after landing.
+        const flightMs = this.#rocket!.travelDurationTo({ x: target.x, y: target.y });
+        this.#reality.sweepTo(this.#front.advance(), flightMs);
+        this.#front
+            .swallowed(this.#planets)
+            .filter(planet => planet.alive)
+            .forEach(planet => this.#swallow(planet, flightMs));
+        this.#emitFront();
+
         this.#rocket!.onceMoved(() => this.#onArrived(target));
         this.#rocket!.moveToTarget({ x: target.x, y: target.y });
     }
@@ -205,29 +226,20 @@ export class NPSpaceMap extends NPGameObjectList {
     #onArrived(target: Planet) {
         this.#current = target;
         this.#traveling = false;
-        this.#jumps += 1;
         this.#liveLines().forEach(line => line.setAlpha(LINE_ALPHA));
-
-        // The front advances only on jumps (GDD §3): collapse the bubble, then normalise what fell behind.
-        this.#reality.collapseTo(this.#front.advance(), 800);
-        this.#front
-            .swallowed(this.#planets)
-            .filter(planet => planet.alive)
-            .forEach(planet => this.#swallow(planet));
-
         this.#refreshStates();
-        this.#emitFront();
 
+        // The front advanced at launch; if it overtook the ship's destination, reality snaps back on arrival.
         if (!this.#front.contains(this.#current)) {
             this.#onSnapback();
         }
     }
 
-    #swallow(planet: Planet) {
+    #swallow(planet: Planet, duration = 800) {
         planet.setMapState('swallowed');
         this.#connections
             .filter(conn => conn.from === planet || conn.to === planet)
-            .forEach(conn => this.scene.tweens.add({ targets: conn.line, alpha: 0, duration: 800 }));
+            .forEach(conn => this.scene.tweens.add({ targets: conn.line, alpha: 0, duration }));
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_SWALLOWED, { planet: planet.name });
     }
 
@@ -262,7 +274,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #emitFront() {
         this.scene.game.events.emit(SPACE_EVENTS.FRONT_ADVANCED, {
             closedFraction: this.#front.closedFraction,
-            radius: this.#front.radius,
+            position: this.#front.position,
             jumps: this.#jumps,
         });
     }
@@ -290,13 +302,20 @@ export class NPSpaceMap extends NPGameObjectList {
             }
         });
         this.#start = topLeft!;
-        for (const coords of this.#map.coords.outerSpace) {
-            this.#outerSpace.push(this.#addPlanet(coords, true).setDepth(3).setScale(6));
-        }
+        // Outer suns join the same node list as navigable bonus detours — sized + flagged via #addPlanet.
+        this.#map.coords.outerSpace.forEach((coords, index) => {
+            this.#planets.push(
+                this.#addPlanet(coords, true)
+                    .setDepth(3)
+                    .setInfo(generatePlanetInfo(new NPRng(`outer-${index}`), true))
+            );
+        });
     }
 
     #addPlanet(coords: Phaser.Types.Math.Vector2Like, isOuter: boolean): Planet {
-        const planet = new Planet(this.scene, this.#getPlanetType(isOuter)).setPosition(coords.x, coords.y);
+        const planet = new Planet(this.scene, this.#getPlanetType(isOuter))
+            .setPosition(coords.x, coords.y)
+            .setOuter(isOuter);
         planet.setOrigin(0.5);
         return this.add(planet) as Planet;
     }
@@ -310,11 +329,18 @@ export class NPSpaceMap extends NPGameObjectList {
         return type;
     }
 
-    // Only the inner planets form the travel graph; the outer-space suns are decorative backdrop.
+    // Inner planets form the main graph (each linked to its 3 nearest inner planets); each outer sun
+    // spurs off its single nearest inner planet — an out-of-the-way bonus detour.
     #initConnections() {
-        for (const planet of this.#planets) {
-            for (const target of getClosest(planet, this.#planets, 3)) {
+        const inner = this.#planets.filter(planet => !planet.outer);
+        for (const planet of inner) {
+            for (const target of getClosest(planet, inner, 3)) {
                 this.#connect(planet, target.item);
+            }
+        }
+        for (const sun of this.#planets.filter(planet => planet.outer)) {
+            for (const target of getClosest(sun, inner, 1)) {
+                this.#connect(sun, target.item);
             }
         }
     }

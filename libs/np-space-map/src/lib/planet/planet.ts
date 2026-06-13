@@ -31,6 +31,8 @@ const IMAGES = {
 export type PlanetMapState = 'current' | 'reachable' | 'dim' | 'swallowed';
 
 const SWALLOWED_TINT = 0x6b7280;
+const INNER_DISPLAY = 512; // base size for a normal planet (small textures scale up to this)
+const OUTER_DISPLAY = 1100; // out-of-the-way bonus suns read noticeably bigger
 
 export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
@@ -39,6 +41,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     #pulse?: Phaser.Tweens.Tween;
     #state: PlanetMapState = 'dim';
     #info!: PlanetInfo;
+    #outer = false;
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
@@ -73,6 +76,16 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         return this;
     }
 
+    /** Out-of-the-way bonus sun off the main route (vs. an inner travel-graph planet). */
+    get outer(): boolean {
+        return this.#outer;
+    }
+
+    setOuter(value = true): this {
+        this.#outer = value;
+        return this;
+    }
+
     preload(): void {
         this.scene.load.image(this.#image);
     }
@@ -80,8 +93,11 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     public create(): void {
         this.setTexture(this.#image.key);
         this.setOrigin(0.5);
-        if (this.width < 512) {
-            this.setDisplaySize(512, 512);
+        // Outer (bonus) suns read bigger; inner planets just scale small textures up to a base size.
+        if (this.#outer) {
+            this.setDisplaySize(OUTER_DISPLAY, OUTER_DISPLAY);
+        } else if (this.width < INNER_DISPLAY) {
+            this.setDisplaySize(INNER_DISPLAY, INNER_DISPLAY);
         }
         this.#baseScale = this.scaleX;
     }

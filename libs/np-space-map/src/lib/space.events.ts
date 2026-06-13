@@ -5,7 +5,7 @@ export enum SPACE_EVENTS {
     PLANET_DESELECTED = 'npPlanetDeselected',
     /** A jump was committed; the ship has begun travelling. Payload: `{ to: string }`. */
     JUMP_COMMITTED = 'npJumpCommitted',
-    /** The normality front advanced after a jump. Payload: `{ closedFraction, radius, jumps }`. */
+    /** The normality front advanced after a jump. Payload: `{ closedFraction, position, jumps }`. */
     FRONT_ADVANCED = 'npFrontAdvanced',
     /** A node fell behind the front and was normalised. Payload: `{ planet: string }`. */
     PLANET_SWALLOWED = 'npPlanetSwallowed',
@@ -15,6 +15,7 @@ export enum SPACE_EVENTS {
 
 export interface FrontAdvancedPayload {
     closedFraction: number;
-    radius: number;
+    /** How far the front has swept along its axis from the origin. */
+    position: number;
     jumps: number;
 }

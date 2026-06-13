@@ -3,73 +3,68 @@ import * as Phaser from 'phaser';
 
 import { FrontPoint } from './normality-front';
 
-// The mask circle is drawn once at this radius then scaled to size — scaling a geometry-mask graphic
-// is cheaper than redrawing it every collapse.
-const BASE_RADIUS = 1000;
+// The veil is a single rectangle big enough to overhang the whole world from any front position; it's
+// a flat fill rather than a tiled texture because a TileSprite this large would allocate a multi-
+// gigabyte backing canvas, whereas a Shape is just vector geometry.
+const VEIL_SIZE = 80000;
 
-// Mundane, colour-drained sky. A flat fill rather than a tiled texture: the veil has to span the
-// whole world, and a TileSprite that large would allocate a multi-gigabyte backing canvas.
+// Mundane, colour-drained sky.
 const VEIL_COLOUR = 0x2c303b;
 const VEIL_ALPHA = 0.64;
 
 /**
- * Renders the normality front as a radial collapse: a veil of colourless sky covering everything
- * outside a circular bubble of still-distorted space. The bubble is punched out with an inverted
- * geometry mask, so collapsing the front is just shrinking that circle. The veil sits above the
- * planets/routes so they desaturate as it passes over them, but below the ship and HUD.
+ * Renders the normality front as a diagonal sweep: a veil of colourless sky covering everything behind
+ * the front line, which slides in from one side of the map. The veil is one big rectangle, rotated to
+ * the front angle and pinned by its leading edge to the line — so advancing the front is just sliding
+ * that rectangle along the sweep axis. It sits above the planets/routes so they desaturate as it passes
+ * over them, but below the ship and HUD.
  */
 export class Reality extends Phaser.GameObjects.Rectangle implements NPGameObject {
-    #mask!: Phaser.Display.Masks.GeometryMask;
-    #circle!: Phaser.GameObjects.Graphics;
-    readonly #center: FrontPoint;
-    #radius: number;
+    readonly #origin: FrontPoint;
+    readonly #axis: FrontPoint;
+    readonly #angle: number;
 
     constructor(
         public scene: NPScene,
-        center: FrontPoint,
-        radius: number
+        origin: FrontPoint,
+        axis: FrontPoint,
+        position: number
     ) {
-        // Span the whole bubble plus a margin so the veil always fills the view outside it.
-        super(
-            scene,
-            center.x,
-            center.y,
-            (radius + BASE_RADIUS) * 2,
-            (radius + BASE_RADIUS) * 2,
-            VEIL_COLOUR,
-            VEIL_ALPHA
-        );
-        this.#center = center;
-        this.#radius = radius;
+        const front = pointAt(origin, axis, position);
+        super(scene, front.x, front.y, VEIL_SIZE, VEIL_SIZE, VEIL_COLOUR, VEIL_ALPHA);
+        this.#origin = origin;
+        this.#axis = axis;
+        this.#angle = Math.atan2(axis.y, axis.x);
         this.setName('reality');
     }
 
     create(): void {
+        // Origin on the right-edge midpoint, rotated to the sweep angle: the rectangle's leading edge
+        // becomes the front line and its body fills the greyed side behind it.
+        this.setOrigin(1, 0.5);
+        this.setRotation(this.#angle);
         this.setDepth(10); // above planets (3) and routes (2), below the "here" ring (25) and ship (30)
-
-        this.#circle = this.scene.add.graphics();
-        this.#circle.fillStyle(0xffffff, 1).fillCircle(0, 0, BASE_RADIUS);
-        this.#circle.setPosition(this.#center.x, this.#center.y).setVisible(false);
-        this.#circle.setScale(this.#radius / BASE_RADIUS);
-
-        this.#mask = this.#circle.createGeometryMask();
-        this.#mask.invertAlpha = true; // veil shows OUTSIDE the circle; inside stays distorted/colourful
-        this.setMask(this.#mask);
     }
 
     addToScene(): void {
         this.scene.addExisting(this);
     }
 
-    /** Collapse (or, with pushback, re-grow) the distortion bubble to `radius`, tweened over `duration` ms. */
-    collapseTo(radius: number, duration = 800): void {
-        this.#radius = radius;
+    /** Sweep the front line to `position` along the axis (or, with pushback, back out), tweened over `duration` ms. */
+    sweepTo(position: number, duration = 800): void {
+        const front = pointAt(this.#origin, this.#axis, position);
         this.scene.tweens.add({
-            targets: this.#circle,
-            scaleX: radius / BASE_RADIUS,
-            scaleY: radius / BASE_RADIUS,
+            targets: this,
+            x: front.x,
+            y: front.y,
             duration,
             ease: 'Sine.easeInOut',
         });
     }
 }
+
+// World-space point on the front line at the given sweep position.
+const pointAt = (origin: FrontPoint, axis: FrontPoint, position: number): FrontPoint => ({
+    x: origin.x + axis.x * position,
+    y: origin.y + axis.y * position,
+});

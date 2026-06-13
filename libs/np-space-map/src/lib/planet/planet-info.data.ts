@@ -73,4 +73,29 @@ export const PLANET_INFO_DATA = {
         'The shadows fall the wrong way at noon.',
         'Said to be lovely, if you can ignore the ticking.',
     ],
+    // Out-of-the-way bonus suns: richer rewards, riskier flavor, off the main lanes.
+    outerClassifications: [
+        'Rogue Star',
+        'Derelict Waystation',
+        'Cosmic Anomaly',
+        'Wandering Comet',
+        'Forgotten Beacon',
+        'Hidden Cache',
+    ],
+    outerResources: [
+        'Marble motherlode',
+        'Pristine salvage',
+        'Ancient relic',
+        'Distortion battery',
+        'Cached fuel cells',
+        'A locked vault',
+    ],
+    outerDescriptions: [
+        'Far off the lane — but the long way round pays.',
+        'Nothing official has logged this place in years.',
+        'Out past the routes, where the Toymaker rarely looks.',
+        'A speck the star-charts forgot. Good.',
+        'Quiet, distant, and suspiciously well-stocked.',
+        'Worth the detour, if the Hush doesn’t reach it first.',
+    ],
 } as const;

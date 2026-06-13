@@ -50,6 +50,12 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGa
         this.moveTo.moveTo(target.x, target.y);
     }
 
+    /** Estimated flight time (ms) from the current position to `target` at the move speed — lets callers sync other tweens to a move. */
+    public travelDurationTo(target: Phaser.Types.Math.Vector2Like): number {
+        const distance = Phaser.Math.Distance.Between(this.x, this.y, target.x, target.y);
+        return this.moveTo.speed > 0 ? (distance / this.moveTo.speed) * 1000 : 0;
+    }
+
     onceMoved(fn: () => void) {
         this.moveTo.once('complete', () => fn());
         return this;
