@@ -1,0 +1,120 @@
+:host {
+    position: absolute;
+    inset: 0;
+    z-index: 30; // above the planet-info survey card (z-index 20)
+    pointer-events: none;
+}
+
+.event-backdrop {
+    pointer-events: auto; // a full-screen catcher: the map can't be touched while an event is open
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgb(4 6 12 / 0.55);
+    backdrop-filter: blur(0.1875rem);
+    animation: event-backdrop-in 180ms ease-out;
+}
+
+.event-card {
+    width: min(34rem, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 1.75rem;
+    color: #dce6ff;
+    font-family: system-ui, "Segoe UI", sans-serif;
+    background: linear-gradient(160deg, rgb(20 28 46 / 0.92), rgb(10 14 26 / 0.96));
+    border: 0.0625rem solid rgb(102 204 255 / 0.35);
+    border-radius: 1rem;
+    box-shadow:
+        0 1rem 3rem rgb(0 0 0 / 0.55),
+        inset 0 0 0 0.0625rem rgb(255 255 255 / 0.04);
+    animation: event-card-in 220ms ease-out;
+}
+
+.event-intro {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: rgb(220 230 255 / 0.78);
+}
+
+.event-prompt {
+    margin: 0 0 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #f2f6ff;
+}
+
+.event-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.event-answer {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    text-align: left;
+    color: #e8eeff;
+    cursor: pointer;
+    background: rgb(102 204 255 / 0.08);
+    border: 0.0625rem solid rgb(102 204 255 / 0.3);
+    border-radius: 0.625rem;
+    transition:
+        background 140ms ease,
+        border-color 140ms ease,
+        transform 140ms ease;
+
+    &:hover:not(:disabled) {
+        background: rgb(102 204 255 / 0.18);
+        border-color: rgb(102 204 255 / 0.6);
+        transform: translateY(-0.0625rem);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+}
+
+.event-result {
+    margin: 0 0 1.25rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: #e8eeff;
+}
+
+.event-continue {
+    text-align: center;
+    font-weight: 600;
+}
+
+@keyframes event-backdrop-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes event-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.75rem) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

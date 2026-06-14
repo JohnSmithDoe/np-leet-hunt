@@ -1,0 +1,22 @@
+@if (event(); as ev) {
+    <div class="event-backdrop">
+        <section class="event-card">
+            @if (question(); as q) {
+                @if (atRoot()) {
+                    <p class="event-intro">{{ ev.intro }}</p>
+                }
+                <h2 class="event-prompt">{{ q.prompt }}</h2>
+                <div class="event-answers">
+                    @for (answer of displayAnswers(); track answer.choice) {
+                        <button type="button" class="event-answer" [disabled]="!!answer.gate" (click)="choose(answer)">
+                            {{ answer.choice }}
+                        </button>
+                    }
+                </div>
+            } @else if (outcome(); as o) {
+                <p class="event-result">{{ o.resultText }}</p>
+                <button type="button" class="event-answer event-continue" (click)="acknowledge()">Continue</button>
+            }
+        </section>
+    </div>
+}

@@ -11,6 +11,8 @@ export enum SPACE_EVENTS {
     PLANET_ARRIVED = 'npPlanetArrived',
     /** A planet event was resolved by the player. Payload: `EventResolvedPayload`. */
     EVENT_RESOLVED = 'npEventResolved',
+    /** Run resources changed (event effects, etc.). Payload: `ResourcesPayload`. */
+    RESOURCES_CHANGED = 'npResourcesChanged',
     /** The normality front advanced after a jump. Payload: `{ closedFraction, position, jumps }`. */
     FRONT_ADVANCED = 'npFrontAdvanced',
     /** A node fell behind the front and was normalised. Payload: `{ planet: string }`. */
@@ -41,4 +43,11 @@ export interface EventResolvedPayload {
     path: Tone[];
     /** The chosen outcome's effects, for the map / run-state to apply. */
     effects: Effect[];
+}
+
+/** The run's resource meters (event-system.md §8). A stub until the run state machine (Leet-27). */
+export interface ResourcesPayload {
+    hull: number;
+    heart: number;
+    marbles: number;
 }

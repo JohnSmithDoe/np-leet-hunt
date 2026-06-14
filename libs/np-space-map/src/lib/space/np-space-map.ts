@@ -5,6 +5,7 @@ import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/da
 import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
 import { getClosest } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
 import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
+import { Effect } from '../events/event.model';
 import { resolvePlanetEvent } from '../events/event.pool';
 import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
@@ -66,6 +67,11 @@ export class NPSpaceMap extends NPGameObjectList {
     #dragMoved = 0;
     #lastDrag?: { x: number; y: number };
 
+    // Minimal run-state stub until the run state machine (Leet-27) owns it (event-system.md §8).
+    #resources = { hull: 10, heart: 10, marbles: 0 };
+    #flags = new Set<string>();
+    #items: string[] = [];
+
     init = () => {
         this.#map = StarmapFactory.create({
             planets: 12,
@@ -118,8 +124,11 @@ export class NPSpaceMap extends NPGameObjectList {
         });
 
         this.#refreshStates();
-        // Let every scene register its listeners first, then publish the starting front state to the HUD.
-        this.scene.time.delayedCall(0, () => this.#emitFront());
+        // Let every scene register its listeners first, then publish the starting front + resource state.
+        this.scene.time.delayedCall(0, () => {
+            this.#emitFront();
+            this.#emitResources();
+        });
 
         // The event dialog (HTML overlay) resolves an arrival event and hands the outcome back here.
         this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
@@ -254,13 +263,66 @@ export class NPSpaceMap extends NPGameObjectList {
     }
 
     #onEventResolved = (payload: EventResolvedPayload) => {
-        // TODO(event-system.md §8): apply effects to run-state (Hull/Heart/Marbles/items/flags), the
-        // front, and the map. Until the run state machine (Leet-27) exists, just log them.
-        if (payload.effects.length) {
-            console.log('[event]', payload.id, payload.path.join(' › '), payload.effects);
-        }
+        this.#applyEffects(payload.effects);
         this.#inEvent = false;
     };
+
+    /**
+     * Apply an outcome's effects (event-system.md §8). Resources and the normality front are wired for
+     * real; flags/items land in the run-state stub; openRoute/spawnGame are logged hand-offs until the
+     * hidden-route infra and the mode contract (Leet-29) exist.
+     */
+    #applyEffects(effects: Effect[]) {
+        let frontSteps = 0;
+        for (const effect of effects) {
+            switch (effect.kind) {
+                case 'resource':
+                    this.#resources.hull = Math.max(0, this.#resources.hull + (effect.hull ?? 0));
+                    this.#resources.heart = Math.max(0, this.#resources.heart + (effect.heart ?? 0));
+                    this.#resources.marbles = Math.max(0, this.#resources.marbles + (effect.marbles ?? 0));
+                    break;
+                case 'front':
+                    frontSteps += effect.advance;
+                    break;
+                case 'flag':
+                    this.#flags.add(effect.set);
+                    break;
+                case 'item':
+                    if (effect.grant) this.#items.push(effect.grant);
+                    if (effect.take) this.#items = this.#items.filter(item => item !== effect.take);
+                    break;
+                case 'openRoute':
+                case 'spawnGame':
+                    console.log('[event] effect deferred:', effect); // TODO(event-system.md §8)
+                    break;
+            }
+        }
+        this.#emitResources();
+        if (frontSteps !== 0) this.#applyFrontShift(frontSteps);
+    }
+
+    // An event can shove the front forward (a bad outcome) or push it back (a distortion battery, §4).
+    #applyFrontShift(steps: number) {
+        if (steps > 0) {
+            let position = this.#front.position;
+            for (let i = 0; i < steps; i++) position = this.#front.advance();
+            this.#reality.sweepTo(position, 600);
+            this.#front
+                .swallowed(this.#planets)
+                .filter(planet => planet.alive)
+                .forEach(planet => this.#swallow(planet, 600));
+        } else {
+            this.#reality.sweepTo(this.#front.pushFront(-steps), 600);
+        }
+        this.#refreshStates();
+        this.#emitFront();
+        // A forward shove can overrun the ship's node — same snapback as arriving behind the front.
+        if (!this.#front.contains(this.#current)) this.#onSnapback();
+    }
+
+    #emitResources() {
+        this.scene.game.events.emit(SPACE_EVENTS.RESOURCES_CHANGED, { ...this.#resources });
+    }
 
     #swallow(planet: Planet, duration = 800) {
         planet.setMapState('swallowed');

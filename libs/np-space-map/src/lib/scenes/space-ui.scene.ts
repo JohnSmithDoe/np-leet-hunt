@@ -2,7 +2,7 @@ import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
-import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
+import { FrontAdvancedPayload, ResourcesPayload, SPACE_EVENTS } from '../space.events';
 
 const BAR = { x: 60, y: 64, w: 520, h: 34 };
 
@@ -11,6 +11,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     static key = 'space-ui-scene';
     #bar!: Phaser.GameObjects.Graphics;
     #jumps!: Phaser.GameObjects.Text;
+    #stats!: Phaser.GameObjects.Text;
     #banner!: Phaser.GameObjects.Text;
     #fraction = 0;
 
@@ -33,6 +34,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
         this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');
+        this.#stats = text(BAR.x, BAR.y + BAR.h + 36, 'HULL 10   HEART 10   MARBLES 0', 20, '#9fb0d0');
         this.#banner = this.add
             .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
             .setOrigin(0.5)
@@ -44,6 +46,9 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#fraction = payload.closedFraction;
             this.#jumps.setText(`JUMPS  ${payload.jumps}`);
             this.#drawBar();
+        });
+        this.game.events.on(SPACE_EVENTS.RESOURCES_CHANGED, (r: ResourcesPayload) => {
+            this.#stats.setText(`HULL ${r.hull}   HEART ${r.heart}   MARBLES ${r.marbles}`);
         });
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
             this.#fraction = 1;
