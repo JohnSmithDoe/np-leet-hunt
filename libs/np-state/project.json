@@ -1,0 +1,23 @@
+{
+    "name": "np-state",
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/np-state/src",
+    "prefix": "np-afterwork",
+    "targets": {
+        "test": {
+            "executor": "@nx/vitest:test",
+            "outputs": [
+                "{options.reportsDirectory}"
+            ],
+            "options": {
+                "configFile": "libs/np-state/vitest.config.ts",
+                "reportsDirectory": "../../coverage/libs/np-state"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        }
+    },
+    "tags": []
+}

@@ -20,6 +20,7 @@ import {
     SpaceScene,
     SpaceUiScene,
 } from '@shared/np-space-map';
+import { GameStateService } from '@shared/np-state';
 import { addIcons } from 'ionicons';
 import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
@@ -45,6 +46,7 @@ import { filter } from 'rxjs';
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     #stage = inject(StageService);
+    #gameState = inject(GameStateService);
 
     constructor() {
         super();
@@ -61,9 +63,11 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     }
 
     public goToSpace() {
+        // The app is the composition root: inject the run-state store and hand it (typed `GameState`)
+        // into the map scene, which threads it down to NPSpaceMap. StageService stays domain-free.
         this.#stage.startScene(
             { key: SpaceScene.key, scene: new SpaceScene(), persistent: true },
-            { key: SpaceMapScene.key, scene: new SpaceMapScene(), persistent: true },
+            { key: SpaceMapScene.key, scene: new SpaceMapScene(this.#gameState.run), persistent: true },
             { key: SpaceUiScene.key, scene: new SpaceUiScene(), persistent: true }
         );
     }

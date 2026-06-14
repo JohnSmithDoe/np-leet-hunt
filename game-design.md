@@ -46,24 +46,39 @@ conflict gets resolved here first:
 ## 2. Story & world
 
 **Premise.** An ordinary house, an ordinary family: the kid, their sibling, mom and dad,
-grandma and grandpa. One evening, reality around the house gets distorted — and in a distorted
-reality, UFOs with tractor beams are suddenly possible. A silent grey ship beams up the whole
-family (and, briefly, a very confused farm tractor). When the kid gets back, the house is
-silent — and the garage is a space hangar now, bigger on the inside. A ship is waiting.
+grandma and grandpa. One evening a **grey veil** washes over the house — not a storm but a
+*tide* of pure ordinariness that drains color, play, time, and memory as it rolls. Everything it
+touches goes quiet and grey; and as the tide pulls back out it **drags the family with it**,
+their greyed shapes dwindling away into the dark. The kid should have gone too — but the kid was
+mid-play, and **play is the one thing the grey can't take** (the *gift of play*, like the gift of
+gab). The kid and the robo-pet are left in a greyed-silent house, the last color in the world.
+
+Where the grey meets that stubborn play it doesn't flatten — it **refracts**. The garage warps
+into a hangar (bigger on the inside); the toy ship on the shelf is suddenly a real one; and a
+bright channel of **distorted, everything-is-possible space** tears open along the exact heading
+the tide took the family. The kid guns the ship up that channel after them — the channel is the
+star map, and the hunt is on. The distortion isn't a second thing that happened to the house: it
+is **play bending the grey**, and it lasts exactly as long as the kid can hold it.
+
+**Why the kid was spared.** The gift of play — concretely, the kid was mid-play when the grey
+came, beneath its notice and immune to its drain. This is the spine of the premise, not a
+mystery: play is what the grey can't normalize, so the one player in the house is the one
+survivor. *(Formerly a §8 open question; now canon — what stays open is only how much of that
+night gets dramatized through unlockable story pieces, §4.)*
 
 **The protagonist.** Brother or sister — chosen at run start. The unchosen sibling becomes the
 fifth captive, so the family roster is always five. The choice is identity plus a small
-mechanical start difference (robo-pet temperament — specified in §4);
-world and story are otherwise identical. *Why the kid wasn't taken is deliberately still open —
-see §8 Open questions.*
+mechanical start difference (robo-pet temperament — specified in §4); world and story are
+otherwise identical.
 
 **The antagonist — the Hush.** A grey, quiet figure you forget the instant you look away. He
 doesn't collect, gloat, or hate — he *tidies*: where the Hush passes, color, play, time, and
 memory drain back to grey ordinary. He **is** the normality closing in (the timer — below).
 The distorted reality is a bright wound in the grey, and **play is what keeps the wound open** —
-the one thing the Hush cannot normalize. That is the loophole the whole game turns on: to take
-something as vivid and beloved as a family, he couldn't simply grey them out — he had to step
-into the realm of play and **wager** them. By play's own rules, what is wagered can be won back.
+the one thing the Hush cannot normalize. That is the loophole the whole game turns on: something
+as vivid and beloved as a family can't be cleanly greyed in an instant — caught between the tide
+and the kid's refusing play, the family are left as **stakes on the table**. By play's own rule,
+*what the grey takes through play can be won back through play.*
 So every dungeon, duel, and guardian fight is the kid forcing the Hush onto the one ground where
 he's beatable. Dungeons are pockets where play still rules and the grey only seeps in at the
 edges; the circuit duel is the kid's takeover verb; the five guardians are play-champions the
@@ -74,22 +89,32 @@ stays in the toolbox for his servants.)*
 
 **The forgetting.** The world forgets the Hush the instant it looks away — which is why no one
 has ever stopped him, and why every run is a fresh *telling*. The robo-pet is the one memory
-immune to it (it alone remembers the other tellings — §4): the kid hunts a foe nobody else can
-hold in mind. *(This also offers a strong answer to why the kid wasn't taken — overlooked
-because he was mid-play, hiding or imagining, and so invisible to the grey. Parked in §8.)*
+immune to it: it alone remembers the other tellings (§4) **and keeps the bearing the family were
+taken on**, holding the thread the world itself would drop. The kid hunts a foe nobody else can
+hold in mind, guided by the one companion who can.
 
-**The five captives.** Mom, dad, grandma, grandpa, and the sibling — one held behind each of
-the five sector guardians. Each rescued member joins the ship as crew with a gameplay role
-(abilities specified in §4): grandpa tinkers upgrades, grandma heals after dungeons, mom opens
-routes, dad boosts the ship, the sibling assists in duels. The rescue order the map allows
-shapes the run.
+**The five captives.** Mom, dad, grandma, grandpa, and the sibling — swept out on the grey tide
+and scattered down the channel, one held behind each of the five sector guardians. They aren't
+gone: the grey hadn't finished them when play tore the channel open, so their not-yet-faded color
+leaves **faint markers** along the route — the trail the kid follows, the robo-pet reads. Each
+rescued member joins the ship as crew with a gameplay role (abilities specified in §4): grandpa
+tinkers upgrades, grandma heals after dungeons, mom opens routes, dad boosts the ship, the
+sibling assists in duels. The rescue order the map allows shapes the run.
 
-**The Hush closes in (the timer).** He doesn't chase — he arrives, greying the map behind the
-ship one layer at a time (the *normality front* — mechanics in §4). Where he's passed, the
-distortion's color and possibility are gone: events, routes, and loot, normalized away. When he
-reaches the ship, the distortion's whole infrastructure — hangar, UFOs, sectors — was never
-there, and the run ends: whoever was won back is home and safe; whoever wasn't is lost *in this
-telling*. By the next telling the Hush has forgotten the kid too, and it begins again.
+**The hunt — up the grey toward its source.** The channel runs *downstream of the tide*: deeper
+means greyer, older, sadder, and closer to the Hush's own still quarter, where the most-prized
+captive is kept (§5). You sail toward the source of the grey to win the family out of it — while
+the channel collapses behind you, the same grey closing back in.
+
+**The Hush closes in (the timer — one clock, made personal).** He doesn't chase; he *seeps* —
+greying the channel behind the ship one layer at a time (the *normality front* — mechanics in
+§4). There is no separate countdown: **the front is the grey reaching the kid himself.** The gift
+of play bought a buffer, not immunity — a head start up the channel, not safety. Where the front
+has passed, the distortion's color and possibility are gone: events, routes, and loot, normalized
+away. When it reaches the ship, the distortion's whole infrastructure — hangar, channel,
+sectors — was never there, and the run ends: whoever was won back is home and safe; whoever
+wasn't is lost *in this telling*. By the next telling the Hush has forgotten the kid too, and it
+begins again.
 
 **Endings.**
 - **Partial rescue** — the Hush reaches the ship first: a bittersweet epilogue with the won-back
@@ -104,7 +129,7 @@ telling*. By the next telling the Hush has forgotten the kid too, and it begins 
 **Flavor guideline — Momo's grey meets Doctor Who's Silence.** The house style is stolen-time
 drabness (Momo's Men in Grey) crossed with forget-when-unseen dread (the Silence), kept inside
 the wider Doctor Who palette the game already loves: bigger-on-the-inside spaces, don't-blink
-statues, timey-wimey event flavor, the tractor-beam gag. Pop-culture mashups beyond that are
+statues, timey-wimey event flavor, the grey-tide and tractor-steal gags. Pop-culture mashups beyond that are
 welcome (pillar 1).
 
 ## 3. Core gameplay
@@ -112,7 +137,7 @@ welcome (pillar 1).
 **The run loop.**
 
 1. **Hangar** — pick sibling, ship, and loadout (meta-unlocks apply, §4). Launch into sector 1.
-2. **Star map** (`np-space-map`) — a sector is a route graph of planets. Travel is
+2. **Star map** (`np-space-map`) — a sector is a stretch of the channel: a route graph of planets. Travel is
    fire-and-forget: click an adjacent planet to jump; no manual flying. Each jump advances the
    **normality front**, which swallows map nodes behind you — visited or not.
 3. **En-route events** — a jump can be intercepted (visualized: an enemy ship flies toward
@@ -182,7 +207,8 @@ Three meters, one currency, deliberately no fuel (the front already owns travel 
 
 ### The robo-pet
 
-The kid's companion and the run's emotional anchor — found in the hangar in the first run.
+The kid's companion and the run's emotional anchor — the toy that weathered the grey beside the
+kid, woken into its real form in the hangar on the first run.
 
 - **Duel avatar.** The pet is what jacks into circuits; every duel is played "through" it.
 - **Class absorption (run-scoped).** Beating a stronger droid in a duel offers its class for
@@ -198,6 +224,9 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
   (offensive duel perks, braver scouting). Same world, different feel.
 
 ### The normality front
+
+*Framing (§2): the front is the channel collapsing behind the ship — the grey reaching the kid
+himself. The mechanics:*
 
 - **Per-sector.** Each sector is its own map; the front starts fresh at the sector entry and
   advances a tunable number of node-layers per jump. Sectors grow, so the margin shrinks.
@@ -240,9 +269,9 @@ The kid's companion and the run's emotional anchor — found in the hangar in th
 
 - **Carried power:** the robo-pet's base evolution only — small, capped.
 - **Unlocks, not power:** new ships/loadouts in the hangar, new events entering the pool, and
-  **story pieces** — fragments revealing the night of the abduction (including, eventually, why
-  the kid was left behind — the §8 question can stay open in-fiction and be answered across
-  runs).
+  **story pieces** — fragments revealing the night the grey came (the core reason the kid was
+  spared — the gift of play — is canon in §2; its texture and the family's last moments unspool
+  across runs).
 - Skill stays king; a fresh player with game knowledge can win run one.
 
 ### Difficulty knobs (per sector, rising)
@@ -307,7 +336,7 @@ playroom, shifting exit).
 
 - **Map — the Grey Fleet.** The Hush's wardens are a core enemy behavior, not just fights:
   thief drones **tractor-steal an item or marble stash and flee** to feed it to the grey; chase
-  and board to reclaim it (plus their cargo). Every boarding is a small mirror of the abduction.
+  and board to reclaim it (plus their cargo). Every boarding is a small mirror of the taking.
   Escort fighters protect them in later sectors.
 - **Dungeons.** Wind-up soldiers (slow, relentless) · Angel statues (move only when unseen —
   drives the FoV system) · dice mimics (chests that gamble) · porcelain dolls · arcade ghosts ·
@@ -336,14 +365,18 @@ playroom, shifting exit).
   three answers, gated answers shown with their requirement — "Mom reads the star chart…"),
   shops, and the dungeon "house rules" card. HTML does text best; Phaser does space best.
 
-### Map UX — the front is where the color drains
+### Map UX — a bright channel closing behind you
 
 - Tap a connected planet → jump preview (front advance, visible risks) → tap again to commit.
   Fire-and-forget; no manual flying.
-- **Distorted space is colorful; normal space is a desaturated, ordinary night sky.** The
-  normality front is the Hush himself — a creeping wall of mundane grey sky eating the color
-  behind you — so the timer is visible poetry, no clock widget needed. Swallowed nodes turn into
-  boring stars.
+- **The map is the channel.** Distorted space is colorful — the bright wound play tore into the
+  grey; everything outside it is desaturated, ordinary night sky. The normality front is the Hush
+  himself, the channel **collapsing behind the ship** — a creeping wall of mundane grey eating the
+  color, the grey reaching the kid (§2). So the timer is visible poetry, no clock widget needed:
+  swallowed nodes turn into boring stars.
+- **The family trail.** The captives' not-yet-faded color leaves faint motes strung ahead down the
+  channel, brightest toward the next family member (the robo-pet reads them). They point the hunt
+  without a quest marker — warm where the front is cold, and they wink out as the grey gains.
 
 ### Art direction — an intentional collage
 
@@ -439,11 +472,9 @@ Goal: the skeleton every later phase hangs on.
   difficulty — consider how failure tells story rather than just punishing (§4).
 - All four pillars were kept; if event writing (pillar 2) and mode variety (pillar 3) compete
   for production time, that priority call is still open (§7).
-- **Why was the kid left behind?** Deliberately open. Candidates: invisible to the grey — mid-play,
-  hiding or imagining, so the Hush never saw him (ties the hero's origin to the antagonist's
-  nature — the front-runner now) · sulking after a fight (guilt/reunion payoff) · hiding in the
-  garage (tidy, lighter) · slipped the beam by accident (max whimsy, tractor swap gag). Decide
-  before writing the intro sequence.
+- **Why was the kid left behind? — RESOLVED (§2):** the gift of play — the kid was mid-play when
+  the grey came, beneath its notice and immune to its drain. What remains open is only how much of
+  that night is dramatized through story-piece unlocks (§4).
 - **Exit model — bail-suns vs. the guardian gate.** Prototype now: *any* rim sun is an ungated,
   no-reward exit (a speed-run bail). Canonical intent: rim suns stay no-reward bail-exits and the
   guardian becomes the rewarding exit (rescue + advance). Confirm/tune when the duel and run-state

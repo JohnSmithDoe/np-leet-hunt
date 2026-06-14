@@ -1,4 +1,5 @@
-import { NPGameObjectList } from '@shared/np-phaser';
+import { NPGameObjectList, NPScene } from '@shared/np-phaser';
+import type { GameState } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/dashed-line';
@@ -67,10 +68,15 @@ export class NPSpaceMap extends NPGameObjectList {
     #dragMoved = 0;
     #lastDrag?: { x: number; y: number };
 
-    // Minimal run-state stub until the run state machine (Leet-27) owns it (event-system.md §8).
-    #resources = { hull: 10, heart: 10, marbles: 0 };
-    #flags = new Set<string>();
-    #items: string[] = [];
+    // The run-state store (Leet-27), injected from the app (the composition root) and shared with the
+    // HUD and other modes. The map mutates it through the GameState interface; np-space-map never sees
+    // the Angular facade or a global singleton.
+    #state: GameState;
+
+    constructor(scene: NPScene, state: GameState) {
+        super(scene);
+        this.#state = state;
+    }
 
     init = () => {
         this.#map = StarmapFactory.create({
@@ -277,19 +283,17 @@ export class NPSpaceMap extends NPGameObjectList {
         for (const effect of effects) {
             switch (effect.kind) {
                 case 'resource':
-                    this.#resources.hull = Math.max(0, this.#resources.hull + (effect.hull ?? 0));
-                    this.#resources.heart = Math.max(0, this.#resources.heart + (effect.heart ?? 0));
-                    this.#resources.marbles = Math.max(0, this.#resources.marbles + (effect.marbles ?? 0));
+                    this.#state.adjustResources({ hull: effect.hull, heart: effect.heart, marbles: effect.marbles });
                     break;
                 case 'front':
                     frontSteps += effect.advance;
                     break;
                 case 'flag':
-                    this.#flags.add(effect.set);
+                    this.#state.setFlag(effect.set);
                     break;
                 case 'item':
-                    if (effect.grant) this.#items.push(effect.grant);
-                    if (effect.take) this.#items = this.#items.filter(item => item !== effect.take);
+                    if (effect.grant) this.#state.grantItem(effect.grant);
+                    if (effect.take) this.#state.takeItem(effect.take);
                     break;
                 case 'openRoute':
                 case 'spawnGame':
@@ -321,7 +325,7 @@ export class NPSpaceMap extends NPGameObjectList {
     }
 
     #emitResources() {
-        this.scene.game.events.emit(SPACE_EVENTS.RESOURCES_CHANGED, { ...this.#resources });
+        this.scene.game.events.emit(SPACE_EVENTS.RESOURCES_CHANGED, { ...this.#state.resources });
     }
 
     #swallow(planet: Planet, duration = 800) {

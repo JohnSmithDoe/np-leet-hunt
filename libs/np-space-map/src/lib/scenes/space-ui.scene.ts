@@ -1,8 +1,9 @@
 import { NPScene } from '@shared/np-phaser';
+import type { Resources } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
-import { FrontAdvancedPayload, ResourcesPayload, SPACE_EVENTS } from '../space.events';
+import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
 
 const BAR = { x: 60, y: 64, w: 520, h: 34 };
 
@@ -47,7 +48,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#jumps.setText(`JUMPS  ${payload.jumps}`);
             this.#drawBar();
         });
-        this.game.events.on(SPACE_EVENTS.RESOURCES_CHANGED, (r: ResourcesPayload) => {
+        this.game.events.on(SPACE_EVENTS.RESOURCES_CHANGED, (r: Resources) => {
             this.#stats.setText(`HULL ${r.hull}   HEART ${r.heart}   MARBLES ${r.marbles}`);
         });
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {

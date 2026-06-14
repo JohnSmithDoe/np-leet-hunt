@@ -5,11 +5,10 @@
  * the spec.
  */
 
+import type { CrewMember, SectorId } from '@shared/np-state';
+
 // TODO(Leet-29): replace this placeholder with the real ModeLaunch from the mode-result contract.
 export type ModeLaunch = unknown;
-
-export type SectorId = 'home-reach' | 'frozen-drift' | 'ember-belt' | 'veiled-nebula' | 'long-quiet';
-export type CrewMember = 'mom' | 'dad' | 'grandma' | 'grandpa' | 'sibling';
 
 /** Internal balance tag, never rendered (spec §4). Order of a question's answers is always good|neutral|bad. */
 export type Tone = 'good' | 'neutral' | 'bad';
