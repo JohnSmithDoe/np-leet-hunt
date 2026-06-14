@@ -10,20 +10,14 @@ import {
     IonToolbar,
 } from '@ionic/angular/standalone';
 import { NPBaseSubscriber } from '@shared/np-library';
-import { ParadroidScene } from '@shared/np-paradroid';
 import { StageComponent, StageService } from '@shared/np-phaser';
-import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
-import {
-    EventDialogComponent,
-    PlanetInfoComponent,
-    SpaceMapScene,
-    SpaceScene,
-    SpaceUiScene,
-} from '@shared/np-space-map';
-import { GameStateService } from '@shared/np-state';
+import { EventDialogComponent, PlanetInfoComponent } from '@shared/np-space-map';
+import { GameStateService, RunPhase } from '@shared/np-state';
 import { addIcons } from 'ionicons';
 import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
+
+import { RunConductorService } from '../run/run-conductor.service';
 
 @Component({
     selector: 'np-home',
@@ -46,37 +40,39 @@ import { filter } from 'rxjs';
 })
 export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     #stage = inject(StageService);
-    #gameState = inject(GameStateService);
+    #game = inject(GameStateService);
+    #conductor = inject(RunConductorService);
 
     constructor() {
         super();
         addIcons({ heart });
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.listen(
             this.#stage.initialized$.pipe(filter(isInitialized => isInitialized)).subscribe(() => {
-                this.goToSpace();
+                // Composition root: start a run (hangar → sector), then let the conductor render each
+                // phase. The conductor builds scenes with the injected run store, so StageService stays
+                // domain-free and the FSM is the single source of truth for the active mode.
+                this.#game.startNewRun();
+                this.#conductor.start();
             })
         );
-        console.log('HomePageComponent', 'ngOnInit');
     }
 
-    public goToSpace() {
-        // The app is the composition root: inject the run-state store and hand it (typed `GameState`)
-        // into the map scene, which threads it down to NPSpaceMap. StageService stays domain-free.
-        this.#stage.startScene(
-            { key: SpaceScene.key, scene: new SpaceScene(), persistent: true },
-            { key: SpaceMapScene.key, scene: new SpaceMapScene(this.#gameState.run), persistent: true },
-            { key: SpaceUiScene.key, scene: new SpaceUiScene(), persistent: true }
-        );
+    // Debug toolbar: each button is a run-phase *intent* — the conductor turns the phase into a scene
+    // swap. Illegal transitions (e.g. duel → dungeon directly) are ignored; bounce via the map first.
+    public toSpace(): void {
+        this.#toPhase('sector');
+    }
+    public toParadroid(): void {
+        this.#toPhase('duel');
+    }
+    public toPixeldungeon(): void {
+        this.#toPhase('dungeon');
     }
 
-    public goToPixeldungeon() {
-        this.#stage.startScene({ key: PixelDungeonScene.key, scene: new PixelDungeonScene() });
-    }
-
-    public goToParadroid() {
-        this.#stage.startScene({ key: ParadroidScene.key, scene: new ParadroidScene() });
+    #toPhase(phase: RunPhase): void {
+        if (this.#game.fsm.can(phase)) this.#game.fsm.to(phase);
     }
 }

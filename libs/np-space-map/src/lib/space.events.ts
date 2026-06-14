@@ -11,8 +11,6 @@ export enum SPACE_EVENTS {
     PLANET_ARRIVED = 'npPlanetArrived',
     /** A planet event was resolved by the player. Payload: `EventResolvedPayload`. */
     EVENT_RESOLVED = 'npEventResolved',
-    /** Run resources changed (event effects, etc.). Payload: `Resources` (`@shared/np-state`). */
-    RESOURCES_CHANGED = 'npResourcesChanged',
     /** The normality front advanced after a jump. Payload: `{ closedFraction, position, jumps }`. */
     FRONT_ADVANCED = 'npFrontAdvanced',
     /** A node fell behind the front and was normalised. Payload: `{ planet: string }`. */

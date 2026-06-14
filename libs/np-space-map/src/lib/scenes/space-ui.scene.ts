@@ -1,6 +1,7 @@
 import { NPScene } from '@shared/np-phaser';
-import type { Resources } from '@shared/np-state';
+import type { GameState } from '@shared/np-state';
 import * as Phaser from 'phaser';
+import { Subscription } from 'rxjs';
 
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
 import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
@@ -15,9 +16,12 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     #stats!: Phaser.GameObjects.Text;
     #banner!: Phaser.GameObjects.Text;
     #fraction = 0;
+    #state: GameState;
+    #stateSub?: Subscription;
 
-    constructor() {
+    constructor(state: GameState) {
         super({ key: SpaceUiScene.key });
+        this.#state = state;
     }
 
     setupComponents() {
@@ -48,9 +52,12 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#jumps.setText(`JUMPS  ${payload.jumps}`);
             this.#drawBar();
         });
-        this.game.events.on(SPACE_EVENTS.RESOURCES_CHANGED, (r: Resources) => {
-            this.#stats.setText(`HULL ${r.hull}   HEART ${r.heart}   MARBLES ${r.marbles}`);
+        // Read the run store directly: its BehaviorSubject replays the current resources on subscribe
+        // and pushes every change, so the HUD needs no RESOURCES_CHANGED event bus.
+        this.#stateSub = this.#state.changes$.subscribe(({ resources }) => {
+            this.#stats.setText(`HULL ${resources.hull}   HEART ${resources.heart}   MARBLES ${resources.marbles}`);
         });
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.#stateSub?.unsubscribe());
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
             this.#fraction = 1;
             this.#drawBar();

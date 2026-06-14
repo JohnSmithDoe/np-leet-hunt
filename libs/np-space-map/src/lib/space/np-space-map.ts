@@ -130,10 +130,10 @@ export class NPSpaceMap extends NPGameObjectList {
         });
 
         this.#refreshStates();
-        // Let every scene register its listeners first, then publish the starting front + resource state.
+        // Let every scene register its FRONT_ADVANCED listener first, then publish the starting front.
+        // (Resources need no kick: the HUD reads the run store's BehaviorSubject, which replays on subscribe.)
         this.scene.time.delayedCall(0, () => {
             this.#emitFront();
-            this.#emitResources();
         });
 
         // The event dialog (HTML overlay) resolves an arrival event and hands the outcome back here.
@@ -301,7 +301,6 @@ export class NPSpaceMap extends NPGameObjectList {
                     break;
             }
         }
-        this.#emitResources();
         if (frontSteps !== 0) this.#applyFrontShift(frontSteps);
     }
 
@@ -322,10 +321,6 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#emitFront();
         // A forward shove can overrun the ship's node — same snapback as arriving behind the front.
         if (!this.#front.contains(this.#current)) this.#onSnapback();
-    }
-
-    #emitResources() {
-        this.scene.game.events.emit(SPACE_EVENTS.RESOURCES_CHANGED, { ...this.#state.resources });
     }
 
     #swallow(planet: Planet, duration = 800) {

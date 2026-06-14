@@ -34,9 +34,14 @@ export class PixelDungeonMap {
     preload(): void {
         // shamelessly stole from shattered-pixel-dungeon
         this.scene.load.image(this.tileset.key, this.tileset.imageUrl);
+        // the semantic role -> tile-index mapping lives in PixelDungeon.tsj (single source of truth)
+        PixelDungeonTileset.preloadDefinition(this.scene);
     }
 
     create() {
+        // parse the loaded tileset definition into the mapping before any tile is placed
+        PixelDungeonTileset.applyDefinition(this.scene);
+
         // Creating a blank tilemap with dimensions matching the dungeon
         const mapData = new Phaser.Tilemaps.MapData({
             tileWidth: this.tileset.tileWidth,
