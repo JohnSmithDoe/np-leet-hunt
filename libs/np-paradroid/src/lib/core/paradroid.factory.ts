@@ -24,7 +24,7 @@ export interface TParadroidFactoryOptions {
     rows: number;
     columns: number;
     tileWidth: number;
-    tileHeight?: number;
+    tileHeight: number;
     stretchFactor: number;
     changerRate: number;
     autoFireRate: number;
@@ -35,18 +35,30 @@ export interface TParadroidFactoryOptions {
     seed?: string;
 }
 
-export const defaultFactoryOptions: TParadroidFactoryOptions = {
-    rows: 8,
-    columns: 8, // only use even values
-    tileWidth: 48,
-    tileHeight: 48,
-    stretchFactor: 0, // put in # of straight tiles after each rnd tile to stretch out the level design
-    autoFireRate: 10, // percentage chance 0 - 100
-    changerRate: 5, // percentage chance 0 - 100
-    tileSet: CParadroidModes[EParadroidDifficulty.Brutal].tileSet,
-    owner: EParadroidOwner.Player,
-    // seed intentionally omitted: each factory gets a fresh layout (see constructor).
+/// Build factory options for a difficulty, sourcing the tileSet and the fx rates
+/// (changerRate / autoFireRate) from its mode in CParadroidModes. Pass `overrides`
+/// to tweak individual fields, e.g. a fixed `seed` for reproducible generation.
+export const factoryOptionsForDifficulty = (
+    difficulty: EParadroidDifficulty,
+    overrides: Partial<TParadroidFactoryOptions> = {}
+): TParadroidFactoryOptions => {
+    const mode = CParadroidModes[difficulty];
+    return {
+        rows: 8,
+        columns: 8, // only use even values
+        tileWidth: 48,
+        tileHeight: 48,
+        stretchFactor: 0, // # of straight tiles after each rnd tile to stretch out the level design
+        tileSet: mode.tileSet,
+        changerRate: mode.changerRate, // percentage chance 0 - 100; <= 0 disables
+        autoFireRate: mode.autoFireRate, // percentage chance 0 - 100; <= 0 disables
+        owner: EParadroidOwner.Player,
+        // seed intentionally omitted: each factory gets a fresh layout (see constructor).
+        ...overrides,
+    };
 };
+
+export const defaultFactoryOptions: TParadroidFactoryOptions = factoryOptionsForDifficulty(EParadroidDifficulty.Brutal);
 
 const hasCombineShapeOnPath = (path: TParadroidPath): boolean =>
     isCombineShape(path.subTile.shape) ||
@@ -247,8 +259,7 @@ export class ParadroidFactory {
     }
 
     get #tileHeight() {
-        // invariant: every factory is created with options containing a tileHeight (see defaultFactoryOptions)
-        return this.#options.tileHeight!;
+        return this.#options.tileHeight;
     }
 
     get #tileSet() {

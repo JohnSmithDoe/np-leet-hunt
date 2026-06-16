@@ -1,6 +1,5 @@
 import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import MouseWheelScroller from 'phaser3-rex-plugins/plugins/input/mousewheelscroller/MouseWheelScroller';
 
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
@@ -8,29 +7,16 @@ import { ParadroidGame } from './core/paradroid.game';
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'paradroid-scene';
-    iter = 0;
     #paradroidGame!: ParadroidGame;
     constructor() {
         super({ key: ParadroidScene.key });
     }
 
-    async setupComponents() {
+    setupComponents() {
         this.#paradroidGame = new ParadroidGame(this);
         this.addComponent(this.#paradroidGame);
         // TODO: ParadroidIntro still depends on the removed layer cameras ('ui-camera') — rework before re-enabling
         // this.addComponent(new ParadroidIntro(this));
-    }
-
-    init() {
-        super.init();
-        const scroller = new MouseWheelScroller(this, {
-            enable: true,
-            speed: 0.1,
-            focus: true,
-        });
-        scroller.on('scroll', (inc: number, gameObject: unknown, scroll: unknown) => {
-            console.log(inc, gameObject, scroll);
-        });
     }
 
     /**
@@ -59,7 +45,6 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     }
 
     update(time: number, delta: number) {
-        this.iter += 0.01;
         super.update(time, delta);
         this.#paradroidGame.update(time, delta);
     }

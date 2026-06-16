@@ -10,6 +10,10 @@ import { ParadroidField } from './paradroid.field';
 
 const SHEET = { key: 'pipes-paths', url: 'np-paradroid/paths.png', frameWidth: 32, frameHeight: 16 };
 
+// How fast a path fills / drains, in display-pixels per frame (tuned for ~60 FPS).
+const ACTIVATE_SPEED = 160 / 60;
+const DEACTIVATE_SPEED = 60 / 60;
+
 export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameObject {
     static readonly EVENT_ACTIVATED = 'activated';
     static readonly EVENT_DEACTIVATED = 'deactivated';
@@ -33,7 +37,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
         this.#path = path;
         this.#tileWidth = this.#field.tileWidth;
         this.#tileHeight = this.#field.tileHeight;
-        this.#thickness = Math.min(this.#tileWidth, this.#tileHeight ?? Number.MAX_SAFE_INTEGER) / 4;
+        this.#thickness = Math.min(this.#tileWidth, this.#tileHeight) / 4;
     }
 
     preload(): void {
@@ -45,10 +49,9 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
     create(container?: Phaser.GameObjects.Container): void {
         this.setTexture(SHEET.key, this.owner === EParadroidOwner.Droid ? 0 : 1);
         this.#setActivatingOrientation();
-        // set to inactive state
+        // start hidden (zero width); fx-autofire paths begin filling immediately
         this.setDisplaySize(0, this.#thickness);
-        // this.setDisplaySize(this.#fullWidth, this.#thickness);
-        if (this.#path.fx === 'fx-autofire') this.activate(); // probably not here
+        if (this.#path.fx === 'fx-autofire') this.activate();
         container?.add(this);
     }
 
@@ -56,7 +59,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
         super.update(...args);
         switch (this.#state) {
             case 'activating':
-                this.displayWidth += 160 / 60;
+                this.displayWidth += ACTIVATE_SPEED;
                 if (this.displayWidth >= this.#fullWidth) {
                     this.displayWidth = this.#fullWidth;
                     this.#state = 'active';
@@ -64,7 +67,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
                 }
                 break;
             case 'deactivating':
-                this.displayWidth -= 60 / 60;
+                this.displayWidth -= DEACTIVATE_SPEED;
                 if (Math.round(this.displayWidth) === 0) {
                     this.displayWidth = 0;
                     this.#state = 'inactive';

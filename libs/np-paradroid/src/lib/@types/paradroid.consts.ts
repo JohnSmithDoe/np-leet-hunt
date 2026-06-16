@@ -424,7 +424,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
             EParadroidTileType.TrippleCombine,
         ],
         changerRate: -7,
-        autofireRate: -2,
+        autoFireRate: -2,
     },
     [EParadroidDifficulty.Easy]: {
         tileSet: [
@@ -437,7 +437,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
             EParadroidTileType.UpDownCombineDeadEnds,
         ],
         changerRate: -1,
-        autofireRate: 10,
+        autoFireRate: 10,
     },
     [EParadroidDifficulty.Normal]: {
         tileSet: [
@@ -454,7 +454,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
             EParadroidTileType.TrippleCombine,
         ],
         changerRate: 5,
-        autofireRate: 5,
+        autoFireRate: 5,
     },
     [EParadroidDifficulty.Hard]: {
         tileSet: [
@@ -478,7 +478,7 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
             EParadroidTileType.TrippleCombine,
         ],
         changerRate: -7,
-        autofireRate: -2,
+        autoFireRate: -2,
     },
     [EParadroidDifficulty.Brutal]: {
         tileSet: [
@@ -503,6 +503,6 @@ export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
             EParadroidTileType.TrippleCombine,
         ],
         changerRate: 15,
-        autofireRate: 0,
+        autoFireRate: 0,
     },
 };

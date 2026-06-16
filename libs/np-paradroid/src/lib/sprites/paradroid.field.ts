@@ -137,33 +137,26 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
         container?.add(this);
         this.#paths.create();
         container?.add(this.#paths.list);
-        let g: Phaser.GameObjects.Graphics;
-        const size = Math.min(this.#options.width, this.#options.height ?? Number.MAX_SAFE_INTEGER) / 4;
-        const center = this.getCenter();
-        const x = center.x - size / 2;
-        const y = center.y - size / 2;
+
         if (isCombineShape(this.#subTile.shape) || isExpandShape(this.#subTile.shape)) {
-            g = this.scene.make.graphics({ fillStyle: { alpha: 0.1, color: 0xff0000 } });
-            g.fillRect(x, y, size, size);
-            container?.add(g);
+            this.#drawMarker(container, 0xff0000, 0.1);
         } else {
             const fxType = this.#paths.list.reduce(
                 (fx, path) => (fx !== 'none' ? fx : path.fx),
                 'none' as TParadroidFx
             );
-            switch (fxType) {
-                case 'fx-autofire':
-                    g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x00ff00 } });
-                    g.fillRect(x, y, size, size);
-                    container?.add(g);
-                    break;
-                case 'fx-changer':
-                    g = this.scene.make.graphics({ fillStyle: { alpha: 1, color: 0x0000ff } });
-                    g.fillRect(x, y, size, size);
-                    container?.add(g);
-                    break;
-            }
+            if (fxType === 'fx-autofire') this.#drawMarker(container, 0x00ff00, 1);
+            else if (fxType === 'fx-changer') this.#drawMarker(container, 0x0000ff, 1);
         }
+    }
+
+    /** Draw a small square marker centred on the field, flagging combine/expand or fx tiles. */
+    #drawMarker(container: Phaser.GameObjects.Container | undefined, color: number, alpha: number): void {
+        const size = Math.min(this.#options.width, this.#options.height ?? Number.MAX_SAFE_INTEGER) / 4;
+        const center = this.getCenter();
+        const g = this.scene.make.graphics({ fillStyle: { alpha, color } });
+        g.fillRect(center.x - size / 2, center.y - size / 2, size, size);
+        container?.add(g);
     }
 
     update(...args: unknown[]) {
@@ -188,7 +181,6 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
     }
 
     activate(from: EFlowFrom = EFlowFrom.Left) {
-        console.log('188:activate-filed');
         this.#paths.list.filter(p => p.from === from).forEach(p => p.activate());
     }
 
@@ -197,9 +189,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
     }
 
     #onPathActivated(path: ParadroidPath) {
-        console.log('195:#onPathActivated-');
-
-        if (path.isIncoming && this.isActive()) {
+        if (path.isIncoming && this.#isActive()) {
             // all active -> activate outgoing
             this.#paths.list.filter(p => !p.isIncoming).forEach(p => p.activate());
         } else if (!path.isIncoming) {
@@ -218,7 +208,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
         }
     }
 
-    private isActive() {
+    #isActive() {
         return this.#paths.list.reduce((isActive, path) => isActive && (!path.isIncoming || path.isActive), true);
     }
 }

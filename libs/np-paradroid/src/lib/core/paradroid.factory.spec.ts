@@ -1,6 +1,6 @@
-import { EFlowTo } from '../@types/paradroid.consts';
+import { CParadroidModes, EFlowTo, EParadroidDifficulty } from '../@types/paradroid.consts';
 import { TParadroidSubTile } from '../@types/paradroid.types';
-import { defaultFactoryOptions, ParadroidFactory } from './paradroid.factory';
+import { defaultFactoryOptions, factoryOptionsForDifficulty, ParadroidFactory } from './paradroid.factory';
 
 // A serialisable signature of a generated grid (the live structure has circular
 // next/prev path references, so it can't be compared with toEqual directly).
@@ -45,5 +45,29 @@ describe('ParadroidFactory', () => {
 
     it('produces different layouts for different seeds', () => {
         expect(fingerprint(build('seed-A').generateGrid())).not.toBe(fingerprint(build('seed-B').generateGrid()));
+    });
+});
+
+describe('factoryOptionsForDifficulty', () => {
+    it('sources the tileSet and fx rates from the difficulty mode', () => {
+        const mode = CParadroidModes[EParadroidDifficulty.Easy];
+        const opts = factoryOptionsForDifficulty(EParadroidDifficulty.Easy);
+        expect(opts.tileSet).toBe(mode.tileSet);
+        expect(opts.changerRate).toBe(mode.changerRate);
+        expect(opts.autoFireRate).toBe(mode.autoFireRate);
+    });
+
+    it('applies overrides on top of the mode defaults', () => {
+        const opts = factoryOptionsForDifficulty(EParadroidDifficulty.Normal, { seed: 'fixed', columns: 4 });
+        expect(opts.seed).toBe('fixed');
+        expect(opts.columns).toBe(4);
+        expect(opts.changerRate).toBe(CParadroidModes[EParadroidDifficulty.Normal].changerRate);
+    });
+
+    it('defaultFactoryOptions derives its rates from the Brutal mode', () => {
+        const brutal = CParadroidModes[EParadroidDifficulty.Brutal];
+        expect(defaultFactoryOptions.changerRate).toBe(brutal.changerRate);
+        expect(defaultFactoryOptions.autoFireRate).toBe(brutal.autoFireRate);
+        expect(defaultFactoryOptions.tileSet).toBe(brutal.tileSet);
     });
 });
