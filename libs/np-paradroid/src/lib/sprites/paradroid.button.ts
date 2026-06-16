@@ -14,6 +14,16 @@ export class ParadroidButton extends NPButton {
         this.on(NPButton.EVENT_CLICK, () => this.#onClick());
     }
 
+    /** The board row this button activates — how the droid AI addresses its buttons. */
+    get row() {
+        return this.#field.row;
+    }
+
+    /** Trigger this button programmatically (the droid AI's "click"); same path as a human press. */
+    press() {
+        this.emit(NPButton.EVENT_CLICK, this);
+    }
+
     #onClick() {
         this.#field.activate();
         const config: Phaser.Types.Time.TimerEventConfig = {

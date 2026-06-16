@@ -1,11 +1,12 @@
+import { DuelBoardParams } from '@shared/np-state';
+
 import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import {
-    CParadroidModes,
     CParadroidShapeInfo,
     CParadroidTileInfo,
+    CParadroidTileSets,
     EFlowTo,
     EParadroidAccess,
-    EParadroidDifficulty,
     EParadroidOwner,
     EParadroidShape,
     EParadroidTileType,
@@ -35,30 +36,39 @@ export interface TParadroidFactoryOptions {
     seed?: string;
 }
 
-/// Build factory options for a difficulty, sourcing the tileSet and the fx rates
-/// (changerRate / autoFireRate) from its mode in CParadroidModes. Pass `overrides`
-/// to tweak individual fields, e.g. a fixed `seed` for reproducible generation.
-export const factoryOptionsForDifficulty = (
-    difficulty: EParadroidDifficulty,
-    overrides: Partial<TParadroidFactoryOptions> = {}
-): TParadroidFactoryOptions => {
-    const mode = CParadroidModes[difficulty];
-    return {
-        rows: 8,
-        columns: 8, // only use even values
-        tileWidth: 48,
-        tileHeight: 48,
-        stretchFactor: 0, // # of straight tiles after each rnd tile to stretch out the level design
-        tileSet: mode.tileSet,
-        changerRate: mode.changerRate, // percentage chance 0 - 100; <= 0 disables
-        autoFireRate: mode.autoFireRate, // percentage chance 0 - 100; <= 0 disables
-        owner: EParadroidOwner.Player,
-        // seed intentionally omitted: each factory gets a fresh layout (see constructor).
-        ...overrides,
-    };
-};
+/// The fixed board geometry of a duel — same at every difficulty (only the tileSet palette and the
+/// fx rates vary). Exported so the app can assemble factory options alongside `Balance.duelBoardParams`.
+export const DUEL_DIMS = {
+    rows: 8,
+    columns: 8, // only use even values
+    tileWidth: 48,
+    tileHeight: 48,
+    stretchFactor: 0, // # of straight tiles after each rnd tile to stretch out the level design
+} as const;
 
-export const defaultFactoryOptions: TParadroidFactoryOptions = factoryOptionsForDifficulty(EParadroidDifficulty.Brutal);
+/// Assemble factory options from the central numeric board knobs (np-state `Balance.duelBoardParams`)
+/// plus this mode's own tileSet palette (`CParadroidTileSets`). Pass `overrides` to tweak individual
+/// fields, e.g. a fixed `seed` for reproducible generation.
+export const paradroidFactoryOptions = (
+    board: DuelBoardParams,
+    tileSet: EParadroidTileType[],
+    overrides: Partial<TParadroidFactoryOptions> = {}
+): TParadroidFactoryOptions => ({
+    ...DUEL_DIMS,
+    tileSet,
+    changerRate: board.changerRate, // percentage chance 0 - 100; <= 0 disables
+    autoFireRate: board.autoFireRate, // percentage chance 0 - 100; <= 0 disables
+    owner: EParadroidOwner.Player,
+    // seed intentionally omitted: each factory gets a fresh layout (see constructor).
+    ...overrides,
+});
+
+/// A self-contained default (brutal palette + rates) so the factory and its spec need no np-state at
+/// runtime. The live game injects options resolved from `Balance` (see the app's run-conductor).
+export const defaultFactoryOptions: TParadroidFactoryOptions = paradroidFactoryOptions(
+    { changerRate: 15, autoFireRate: 0 },
+    CParadroidTileSets.brutal
+);
 
 const hasCombineShapeOnPath = (path: TParadroidPath): boolean =>
     isCombineShape(path.subTile.shape) ||

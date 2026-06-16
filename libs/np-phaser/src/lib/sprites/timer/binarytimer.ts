@@ -46,6 +46,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
     options: TBinaryTimerConfig;
 
     #startTime = 0;
+    #running = false;
     #barWidth: number;
     #barHeight: number;
     #text!: Phaser.GameObjects.Text;
@@ -88,12 +89,25 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
         this.#startTime = Date.now();
     }
 
+    /** Begin (or restart) the countdown. Until this is called `update()` is a no-op, so the timer
+     * can be created up-front and only start ticking on demand (e.g. a "Start" button). */
+    start(): void {
+        this.reset();
+        this.#running = true;
+    }
+
+    /** Whether the countdown is currently ticking. */
+    get running(): boolean {
+        return this.#running;
+    }
+
     create(container?: Phaser.GameObjects.Container): void {
         container?.add(this);
         container?.add(this.#text);
     }
 
     update(): void {
+        if (!this.#running) return; // idle until start() — keeps the timer frozen before the match begins
         super.update();
         let time: number;
         let reachedEnd: boolean = false;

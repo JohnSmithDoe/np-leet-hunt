@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ParadroidScene } from '@shared/np-paradroid';
+import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
@@ -42,9 +42,19 @@ export class RunConductorService {
             case 'event': // an event is an HTML overlay over the map — keep the sector scenes up (no-op swap)
                 this.#showSpace();
                 break;
-            case 'duel':
-                this.#stage.startScene({ key: ParadroidScene.key, scene: new ParadroidScene() });
+            case 'duel': {
+                // Resolve the duel difficulty from the central balance and inject it (board fx rates +
+                // tile palette + AI tuning). Fixed levels for now — easily scaled by sector later.
+                const boardLevel = 'brutal';
+                const aiLevel = 'normal';
+                const factoryOptions = paradroidFactoryOptions(
+                    Balance.duelBoardParams(boardLevel),
+                    CParadroidTileSets[boardLevel]
+                );
+                const scene = new ParadroidScene({ factoryOptions, aiParams: Balance.duelAiParams(aiLevel) });
+                this.#stage.startScene({ key: ParadroidScene.key, scene });
                 break;
+            }
             case 'dungeon':
                 this.#stage.startScene({ key: PixelDungeonScene.key, scene: new PixelDungeonScene() });
                 break;

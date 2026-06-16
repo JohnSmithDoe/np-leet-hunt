@@ -110,6 +110,11 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
         return this.#state === 'active';
     }
 
+    /** True when the path is at rest (fully filled or fully drained) — not mid-animation. */
+    get settled() {
+        return this.#state === 'active' || this.#state === 'inactive';
+    }
+
     get owner(): TParadroidPlayer {
         return this.#path.owner;
     }

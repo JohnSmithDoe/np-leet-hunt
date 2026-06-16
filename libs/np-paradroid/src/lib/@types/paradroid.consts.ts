@@ -1,4 +1,6 @@
-import { TParadroidMode, TParadroidShape, TParadroidTileDefinition } from './paradroid.types';
+import { DuelBoardLevel } from '@shared/np-state';
+
+import { TParadroidShape, TParadroidTileDefinition } from './paradroid.types';
 
 export enum EFlowFrom {
     Top = 'from-top',
@@ -69,13 +71,6 @@ export enum EParadroidTileType {
     TrippleCombine,
 }
 
-export enum EParadroidDifficulty {
-    Debug,
-    Easy,
-    Normal,
-    Hard,
-    Brutal,
-}
 export const CParadroidShapeInfo: Record<EParadroidShape, TParadroidShape> = {
     [EParadroidShape.Empty]: {
         flows: [],
@@ -398,111 +393,97 @@ export const CParadroidTileInfo: Record<EParadroidTileType, TParadroidTileDefini
     },
 };
 
-export const CParadroidModes: { [difficulty: number]: TParadroidMode } = {
-    [EParadroidDifficulty.Debug]: {
-        tileSet: [
-            EParadroidTileType.Empty,
-            EParadroidTileType.Single,
-            EParadroidTileType.Single,
-            EParadroidTileType.Single,
-            EParadroidTileType.Single,
-            EParadroidTileType.Single,
-            EParadroidTileType.UpDownExpand,
-            EParadroidTileType.UpDownExpandDeadEnds,
-            EParadroidTileType.UpDownCombine,
-            EParadroidTileType.UpDownCombineDeadEnds,
+/**
+ * The tile-shape palette per board difficulty — mode-domain content (lists of EParadroidTileType),
+ * so it stays in np-paradroid rather than np-state. The numeric rate knobs (changer / auto-fire) for
+ * each level live in np-state's `Balance.duelBoardParams`; the app pairs the two via
+ * `paradroidFactoryOptions` when it builds the board (see core/paradroid.factory.ts).
+ */
+export const CParadroidTileSets: Record<DuelBoardLevel, EParadroidTileType[]> = {
+    debug: [
+        EParadroidTileType.Empty,
+        EParadroidTileType.Single,
+        EParadroidTileType.Single,
+        EParadroidTileType.Single,
+        EParadroidTileType.Single,
+        EParadroidTileType.Single,
+        EParadroidTileType.UpDownExpand,
+        EParadroidTileType.UpDownExpandDeadEnds,
+        EParadroidTileType.UpDownCombine,
+        EParadroidTileType.UpDownCombineDeadEnds,
 
-            EParadroidTileType.DoubleTopExpand,
-            EParadroidTileType.DoubleTopExpandDeadEnds,
-            EParadroidTileType.DoubleBottomExpand,
-            EParadroidTileType.DoubleBottomExpandDeadEnds,
-            EParadroidTileType.DoubleTopCombine,
-            EParadroidTileType.DoubleBottomCombine,
+        EParadroidTileType.DoubleTopExpand,
+        EParadroidTileType.DoubleTopExpandDeadEnds,
+        EParadroidTileType.DoubleBottomExpand,
+        EParadroidTileType.DoubleBottomExpandDeadEnds,
+        EParadroidTileType.DoubleTopCombine,
+        EParadroidTileType.DoubleBottomCombine,
 
-            EParadroidTileType.TrippleExpand,
-            EParadroidTileType.TrippleExpandDeadEnds,
-            EParadroidTileType.TrippleCombine,
-        ],
-        changerRate: -7,
-        autoFireRate: -2,
-    },
-    [EParadroidDifficulty.Easy]: {
-        tileSet: [
-            EParadroidTileType.Empty,
-            EParadroidTileType.Single,
+        EParadroidTileType.TrippleExpand,
+        EParadroidTileType.TrippleExpandDeadEnds,
+        EParadroidTileType.TrippleCombine,
+    ],
+    easy: [
+        EParadroidTileType.Empty,
+        EParadroidTileType.Single,
 
-            EParadroidTileType.UpDownExpand,
-            EParadroidTileType.UpDownExpandDeadEnds,
-            EParadroidTileType.UpDownCombine,
-            EParadroidTileType.UpDownCombineDeadEnds,
-        ],
-        changerRate: -1,
-        autoFireRate: 10,
-    },
-    [EParadroidDifficulty.Normal]: {
-        tileSet: [
-            EParadroidTileType.Empty,
-            EParadroidTileType.Single,
+        EParadroidTileType.UpDownExpand,
+        EParadroidTileType.UpDownExpandDeadEnds,
+        EParadroidTileType.UpDownCombine,
+        EParadroidTileType.UpDownCombineDeadEnds,
+    ],
+    normal: [
+        EParadroidTileType.Empty,
+        EParadroidTileType.Single,
 
-            EParadroidTileType.UpDownExpand,
-            EParadroidTileType.UpDownExpandDeadEnds,
-            EParadroidTileType.UpDownCombine,
-            EParadroidTileType.UpDownCombineDeadEnds,
+        EParadroidTileType.UpDownExpand,
+        EParadroidTileType.UpDownExpandDeadEnds,
+        EParadroidTileType.UpDownCombine,
+        EParadroidTileType.UpDownCombineDeadEnds,
 
-            EParadroidTileType.TrippleExpand,
-            EParadroidTileType.TrippleExpandDeadEnds,
-            EParadroidTileType.TrippleCombine,
-        ],
-        changerRate: 5,
-        autoFireRate: 5,
-    },
-    [EParadroidDifficulty.Hard]: {
-        tileSet: [
-            EParadroidTileType.Empty,
-            EParadroidTileType.Single,
+        EParadroidTileType.TrippleExpand,
+        EParadroidTileType.TrippleExpandDeadEnds,
+        EParadroidTileType.TrippleCombine,
+    ],
+    hard: [
+        EParadroidTileType.Empty,
+        EParadroidTileType.Single,
 
-            EParadroidTileType.UpDownExpand,
-            EParadroidTileType.UpDownExpandDeadEnds,
-            EParadroidTileType.UpDownCombine,
-            EParadroidTileType.UpDownCombineDeadEnds,
+        EParadroidTileType.UpDownExpand,
+        EParadroidTileType.UpDownExpandDeadEnds,
+        EParadroidTileType.UpDownCombine,
+        EParadroidTileType.UpDownCombineDeadEnds,
 
-            EParadroidTileType.DoubleTopExpand,
-            EParadroidTileType.DoubleTopExpandDeadEnds,
-            EParadroidTileType.DoubleBottomExpand,
-            EParadroidTileType.DoubleBottomExpandDeadEnds,
-            EParadroidTileType.DoubleTopCombine,
-            EParadroidTileType.DoubleBottomCombine,
+        EParadroidTileType.DoubleTopExpand,
+        EParadroidTileType.DoubleTopExpandDeadEnds,
+        EParadroidTileType.DoubleBottomExpand,
+        EParadroidTileType.DoubleBottomExpandDeadEnds,
+        EParadroidTileType.DoubleTopCombine,
+        EParadroidTileType.DoubleBottomCombine,
 
-            EParadroidTileType.TrippleExpand,
-            EParadroidTileType.TrippleExpandDeadEnds,
-            EParadroidTileType.TrippleCombine,
-        ],
-        changerRate: -7,
-        autoFireRate: -2,
-    },
-    [EParadroidDifficulty.Brutal]: {
-        tileSet: [
-            EParadroidTileType.Empty,
-            EParadroidTileType.Single,
-            // EParadroidTileType.Deadend, // comment out for better grid?
+        EParadroidTileType.TrippleExpand,
+        EParadroidTileType.TrippleExpandDeadEnds,
+        EParadroidTileType.TrippleCombine,
+    ],
+    brutal: [
+        EParadroidTileType.Empty,
+        EParadroidTileType.Single,
+        // EParadroidTileType.Deadend, // comment out for better grid?
 
-            EParadroidTileType.UpDownExpand,
-            EParadroidTileType.UpDownExpandDeadEnds,
-            EParadroidTileType.UpDownCombine,
-            EParadroidTileType.UpDownCombineDeadEnds,
+        EParadroidTileType.UpDownExpand,
+        EParadroidTileType.UpDownExpandDeadEnds,
+        EParadroidTileType.UpDownCombine,
+        EParadroidTileType.UpDownCombineDeadEnds,
 
-            EParadroidTileType.DoubleTopExpand,
-            EParadroidTileType.DoubleTopExpandDeadEnds,
-            EParadroidTileType.DoubleBottomExpand,
-            EParadroidTileType.DoubleBottomExpandDeadEnds,
-            EParadroidTileType.DoubleTopCombine,
-            EParadroidTileType.DoubleBottomCombine,
+        EParadroidTileType.DoubleTopExpand,
+        EParadroidTileType.DoubleTopExpandDeadEnds,
+        EParadroidTileType.DoubleBottomExpand,
+        EParadroidTileType.DoubleBottomExpandDeadEnds,
+        EParadroidTileType.DoubleTopCombine,
+        EParadroidTileType.DoubleBottomCombine,
 
-            EParadroidTileType.TrippleExpand,
-            EParadroidTileType.TrippleExpandDeadEnds,
-            EParadroidTileType.TrippleCombine,
-        ],
-        changerRate: 15,
-        autoFireRate: 0,
-    },
+        EParadroidTileType.TrippleExpand,
+        EParadroidTileType.TrippleExpandDeadEnds,
+        EParadroidTileType.TrippleCombine,
+    ],
 };

@@ -1,4 +1,13 @@
-import { Sector, SECTOR_COUNT, SECTOR_ORDER, SectorParams } from './balance.model';
+import {
+    DuelAiLevel,
+    DuelAiParams,
+    DuelBoardLevel,
+    DuelBoardParams,
+    Sector,
+    SECTOR_COUNT,
+    SECTOR_ORDER,
+    SectorParams,
+} from './balance.model';
 
 /**
  * The central balancing surface — the single place to tune the game. Today it holds the per-sector
@@ -19,6 +28,30 @@ const SECTOR_CURVE: readonly SectorParams[] = [
 /** Clamp a (possibly out-of-range) sector number into 1..SECTOR_COUNT. */
 const clampNumber = (sectorNumber: number): number => Math.min(SECTOR_COUNT, Math.max(1, Math.floor(sectorNumber)));
 
+/**
+ * Per-difficulty duel board knobs (changer / auto-fire chance). Harder boards weave in more
+ * ownership-flipping changers; `<= 0` switches an effect off (e.g. easy has no changers).
+ */
+const DUEL_BOARD: Record<DuelBoardLevel, DuelBoardParams> = {
+    debug: { changerRate: -7, autoFireRate: -2 },
+    easy: { changerRate: -1, autoFireRate: 10 },
+    normal: { changerRate: 5, autoFireRate: 5 },
+    hard: { changerRate: -7, autoFireRate: -2 },
+    brutal: { changerRate: 15, autoFireRate: 0 },
+};
+
+/**
+ * Per-level droid-AI tuning. Up the ladder the AI reacts faster, plays cleaner (less noise,
+ * fewer blunders) and starts timing its shots to land lit at the buzzer. `shotCooldownMs` is
+ * the same human-click floor (250ms) at every level — difficulty never lets it out-click a person.
+ */
+const DUEL_AI: Record<DuelAiLevel, DuelAiParams> = {
+    easy: { reactionMs: 1500, shotCooldownMs: 250, scoreNoise: 6, blunderChance: 0.5, usesTiming: false },
+    normal: { reactionMs: 1000, shotCooldownMs: 250, scoreNoise: 3, blunderChance: 0.25, usesTiming: false },
+    hard: { reactionMs: 600, shotCooldownMs: 250, scoreNoise: 1, blunderChance: 0.1, usesTiming: true },
+    brutal: { reactionMs: 250, shotCooldownMs: 250, scoreNoise: 0, blunderChance: 0, usesTiming: true },
+};
+
 export class Balance {
     /** The generation parameters for a sector by its 1-based number (clamped to a valid sector). */
     static sectorParams(sectorNumber: number): SectorParams {
@@ -29,5 +62,15 @@ export class Balance {
     static sector(sectorNumber: number): Sector {
         const number = clampNumber(sectorNumber);
         return { id: SECTOR_ORDER[number - 1], number, ...Balance.sectorParams(number) };
+    }
+
+    /** The numeric board knobs for a duel board difficulty (unknown levels fall back to `normal`). */
+    static duelBoardParams(level: DuelBoardLevel): DuelBoardParams {
+        return { ...(DUEL_BOARD[level] ?? DUEL_BOARD.normal) };
+    }
+
+    /** The droid-AI tuning for a difficulty level (unknown levels fall back to `normal`). */
+    static duelAiParams(level: DuelAiLevel): DuelAiParams {
+        return { ...(DUEL_AI[level] ?? DUEL_AI.normal) };
     }
 }

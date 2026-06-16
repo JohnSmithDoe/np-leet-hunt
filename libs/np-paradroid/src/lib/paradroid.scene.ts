@@ -1,22 +1,41 @@
 import { NPScene } from '@shared/np-phaser';
+import { DuelAiParams } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
-import { ParadroidGame } from './core/paradroid.game';
+import { TParadroidFactoryOptions } from './core/paradroid.factory';
+import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';
+
+/** What the app injects when starting a duel — the board options and the AI tuning, both optional. */
+export interface TParadroidSceneConfig {
+    factoryOptions?: TParadroidFactoryOptions;
+    aiParams?: DuelAiParams;
+}
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'paradroid-scene';
+    readonly #config: TParadroidSceneConfig;
     #paradroidGame!: ParadroidGame;
-    constructor() {
+    #resultText?: Phaser.GameObjects.Text;
+
+    constructor(config: TParadroidSceneConfig = {}) {
         super({ key: ParadroidScene.key });
+        this.#config = config;
     }
 
     setupComponents() {
-        this.#paradroidGame = new ParadroidGame(this);
+        this.#paradroidGame = this.#createGame();
         this.addComponent(this.#paradroidGame);
         // TODO: ParadroidIntro still depends on the removed layer cameras ('ui-camera') — rework before re-enabling
         // this.addComponent(new ParadroidIntro(this));
+    }
+
+    /** Build a game from the injected config and wire its match-ended announcement. */
+    #createGame(): ParadroidGame {
+        const game = new ParadroidGame(this, this.#config.factoryOptions, this.#config.aiParams);
+        game.events.on(ParadroidGame.EVENT_MATCH_ENDED, (result: TParadroidMatchResult) => this.#showResult(result));
+        return game;
     }
 
     /**
@@ -27,12 +46,20 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         super.create(container);
         this.addExisting(container);
 
+        const startBtn = new TextButton(this, 440, 10, 'Start Game');
+        startBtn.on('pointerup', () => {
+            this.#resultText?.destroy();
+            this.#paradroidGame.startMatch();
+        });
+        this.addExisting(startBtn);
+
         const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
         recreateBtn.on('pointerup', () => {
+            this.#resultText?.destroy();
             this.removeComponent(this.#paradroidGame);
             this.removeExisting(this.#paradroidGame.container);
             const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
-            this.#paradroidGame = new ParadroidGame(this);
+            this.#paradroidGame = this.#createGame();
             this.addComponent(this.#paradroidGame);
             this.#paradroidGame.init();
             this.#paradroidGame.create(newcontainer);
@@ -42,6 +69,21 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.addExisting(recreateBtn);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         this.resize();
+    }
+
+    /** Announce the decided match above the board: "DROID WINS  3 - 5". */
+    #showResult(result: TParadroidMatchResult): void {
+        const label = result.winner === 'draw' ? 'DRAW' : result.winner === 'droid' ? 'DROID WINS' : 'PLAYER WINS';
+        const bounds = this.#paradroidGame.container.getBounds();
+        this.#resultText?.destroy();
+        this.#resultText = this.add
+            .text(bounds.centerX, bounds.top - 40, `${label}  ${result.playerScore} - ${result.droidScore}`, {
+                fontSize: '48px',
+                color: '#4dd3f6',
+                stroke: '#042b2c',
+                strokeThickness: 4,
+            })
+            .setOrigin(0.5);
     }
 
     update(time: number, delta: number) {

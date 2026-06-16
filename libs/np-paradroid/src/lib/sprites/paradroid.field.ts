@@ -180,6 +180,11 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
         return this.#options.height ?? this.tileWidth;
     }
 
+    /** True once none of this field's paths are mid-animation (used to know the board has settled). */
+    get settled() {
+        return this.#paths.list.every(p => p.settled);
+    }
+
     activate(from: EFlowFrom = EFlowFrom.Left) {
         this.#paths.list.filter(p => p.from === from).forEach(p => p.activate());
     }

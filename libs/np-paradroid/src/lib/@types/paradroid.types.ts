@@ -61,10 +61,3 @@ export interface TParadroidTile extends Phaser.Types.Math.Vector2Like, TParadroi
     type: EParadroidTileType;
     subTiles: TParadroidSubTile[];
 }
-
-export interface TParadroidMode {
-    tileSet: EParadroidTileType[];
-    /// Percentage chance (0-100) per eligible tile; <= 0 disables the effect.
-    changerRate: number;
-    autoFireRate: number;
-}

@@ -1,6 +1,6 @@
-import { CParadroidModes, EFlowTo, EParadroidDifficulty } from '../@types/paradroid.consts';
+import { CParadroidTileSets, EFlowTo } from '../@types/paradroid.consts';
 import { TParadroidSubTile } from '../@types/paradroid.types';
-import { defaultFactoryOptions, factoryOptionsForDifficulty, ParadroidFactory } from './paradroid.factory';
+import { defaultFactoryOptions, DUEL_DIMS, paradroidFactoryOptions, ParadroidFactory } from './paradroid.factory';
 
 // A serialisable signature of a generated grid (the live structure has circular
 // next/prev path references, so it can't be compared with toEqual directly).
@@ -48,26 +48,29 @@ describe('ParadroidFactory', () => {
     });
 });
 
-describe('factoryOptionsForDifficulty', () => {
-    it('sources the tileSet and fx rates from the difficulty mode', () => {
-        const mode = CParadroidModes[EParadroidDifficulty.Easy];
-        const opts = factoryOptionsForDifficulty(EParadroidDifficulty.Easy);
-        expect(opts.tileSet).toBe(mode.tileSet);
-        expect(opts.changerRate).toBe(mode.changerRate);
-        expect(opts.autoFireRate).toBe(mode.autoFireRate);
+describe('paradroidFactoryOptions', () => {
+    it('pairs injected board rates with the given tileSet and fixed dims', () => {
+        const opts = paradroidFactoryOptions({ changerRate: 7, autoFireRate: 3 }, CParadroidTileSets.easy);
+        expect(opts.changerRate).toBe(7);
+        expect(opts.autoFireRate).toBe(3);
+        expect(opts.tileSet).toBe(CParadroidTileSets.easy);
+        expect(opts.rows).toBe(DUEL_DIMS.rows);
+        expect(opts.columns).toBe(DUEL_DIMS.columns);
     });
 
-    it('applies overrides on top of the mode defaults', () => {
-        const opts = factoryOptionsForDifficulty(EParadroidDifficulty.Normal, { seed: 'fixed', columns: 4 });
+    it('applies overrides on top (e.g. a fixed seed)', () => {
+        const opts = paradroidFactoryOptions({ changerRate: 5, autoFireRate: 5 }, CParadroidTileSets.normal, {
+            seed: 'fixed',
+            columns: 4,
+        });
         expect(opts.seed).toBe('fixed');
         expect(opts.columns).toBe(4);
-        expect(opts.changerRate).toBe(CParadroidModes[EParadroidDifficulty.Normal].changerRate);
+        expect(opts.changerRate).toBe(5);
     });
 
-    it('defaultFactoryOptions derives its rates from the Brutal mode', () => {
-        const brutal = CParadroidModes[EParadroidDifficulty.Brutal];
-        expect(defaultFactoryOptions.changerRate).toBe(brutal.changerRate);
-        expect(defaultFactoryOptions.autoFireRate).toBe(brutal.autoFireRate);
-        expect(defaultFactoryOptions.tileSet).toBe(brutal.tileSet);
+    it('defaultFactoryOptions uses the brutal palette', () => {
+        expect(defaultFactoryOptions.tileSet).toBe(CParadroidTileSets.brutal);
+        expect(defaultFactoryOptions.changerRate).toBe(15);
+        expect(defaultFactoryOptions.autoFireRate).toBe(0);
     });
 });
