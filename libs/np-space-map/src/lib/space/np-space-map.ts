@@ -14,6 +14,7 @@ import { NormalityFront } from '../reality/normality-front';
 import { Reality } from '../reality/reality';
 import { EventResolvedPayload, SPACE_EVENTS } from '../space.events';
 import { Starmap, StarmapFactory } from './starmap.factory';
+import { TravelButtons } from './travel-buttons';
 
 interface Connection {
     from: Planet;
@@ -43,6 +44,11 @@ const PREVIEW_TINT = 0x88ccff;
 // Camera: drag to pan, wheel to zoom. The only automatic move is a gentle ease to a selected planet.
 const SELECT_PAN_MS = 450; // ease-to-selected-planet duration
 const DRAG_THRESHOLD = 6; // screen px of movement before a press counts as a drag, not a tap
+// Button-initiated (following) jumps zoom the camera all the way in so the ride reads up close.
+const FOLLOW_ZOOM = 1; // == MAX_ZOOM in space-map.scene.ts
+const FOLLOW_ZOOM_MS = 600;
+// The direction buttons are the zoomed-in nav aid, so they only show once the camera is near full zoom.
+const BUTTON_MIN_ZOOM = 0.9;
 
 export class NPSpaceMap extends NPGameObjectList {
     #map!: Starmap;
@@ -56,6 +62,9 @@ export class NPSpaceMap extends NPGameObjectList {
     #reality!: Reality;
     #rocket?: NPMovableSprite;
     #here!: Phaser.GameObjects.Arc;
+    #travelButtons!: TravelButtons;
+    #buttonsShown = false; // whether the direction buttons are currently drawn (gated on zoom + map state)
+    #following = false; // camera is tracking the rocket for a button-initiated jump
 
     #selected?: Planet;
     #traveling = false;
@@ -99,6 +108,8 @@ export class NPSpaceMap extends NPGameObjectList {
         // input and the event-dialog round-trip stay bound to this instance, which always points at the
         // current sector's objects. The per-sector map content is built — and rebuilt — by loadSector().
         this.#setupCameraDrag();
+        this.#travelButtons = new TravelButtons(this.scene);
+        this.#travelButtons.onTap = planet => this.#onTravelButtonTap(planet);
         this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
         this.loadSector(this.#sector);
     }
@@ -126,6 +137,7 @@ export class NPSpaceMap extends NPGameObjectList {
         ];
         this.scene.tweens.killTweensOf(objects);
         objects.forEach(object => object.destroy());
+        this.#travelButtons?.clear(); // drop buttons referencing the planets we just destroyed
         this.#planets = [];
         this.#connections = [];
         this.#adjacency.clear();
@@ -141,6 +153,11 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#jumps = 0;
         this.#dragging = false;
         this.#lastDrag = undefined;
+        // Release any camera follow before the scene re-centres on the new sector's start node.
+        if (this.#following) {
+            this.scene.cameras.main.stopFollow();
+            this.#following = false;
+        }
     }
 
     /** Build the current sector's map objects: the star graph, the front + its veil, and the "here" ring. */
@@ -196,6 +213,9 @@ export class NPSpaceMap extends NPGameObjectList {
     update(...args: number[]) {
         this.#planets.forEach(planet => planet.update(...args));
         this.#connections.forEach(connection => connection.line.update(...args));
+        // Wheel-zoom (and the follow zoom-in) don't run through #refreshStates, so watch the zoom here and
+        // show/hide the buttons as it crosses the threshold.
+        if (this.#shouldShowButtons() !== this.#buttonsShown) this.#updateTravelButtons();
     }
 
     public setRocket(rocket: NPMovableSprite) {
@@ -218,7 +238,7 @@ export class NPSpaceMap extends NPGameObjectList {
             this.#lastDrag = { x: pointer.x, y: pointer.y };
         });
         this.scene.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
-            if (!pointer.isDown || this.#frozen || this.#inEvent || !this.#lastDrag) return;
+            if (!pointer.isDown || this.#frozen || this.#inEvent || this.#following || !this.#lastDrag) return;
             const dx = pointer.x - this.#lastDrag.x;
             const dy = pointer.y - this.#lastDrag.y;
             this.#lastDrag = { x: pointer.x, y: pointer.y };
@@ -248,12 +268,28 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#select(planet);
     }
 
+    /**
+     * A direction button on the "here" marker was tapped. It proxies its target planet under the same
+     * two-tap rule (first tap arms + shows the readout, second commits), but commits a *camera-following*
+     * jump — these buttons are the zoomed-in navigation aid, so the camera rides the rocket to the node.
+     */
+    #onTravelButtonTap(planet: Planet) {
+        if (this.#frozen || this.#traveling || this.#inEvent || this.#dragging || !this.#rocket) return;
+        if (this.#selected === planet) {
+            this.#commitJump(planet, true);
+            return;
+        }
+        // Don't pan to the target: keep the camera on the rocket (the player is zoomed in on it), just
+        // arm the button and surface the readout. The following jump then flies the ship into view.
+        this.#select(planet, false);
+    }
+
     /** Adjacent nodes that are still distorted (swallowed neighbours drop out of reach). */
     #reachable(): Planet[] {
         return (this.#adjacency.get(this.#current) ?? []).filter(neighbour => neighbour.alive);
     }
 
-    #select(planet: Planet) {
+    #select(planet: Planet, pan = true) {
         this.#restoreSelectedVisuals();
         this.#selected = planet;
         planet.setTint(PREVIEW_TINT);
@@ -261,8 +297,10 @@ export class NPSpaceMap extends NPGameObjectList {
         if (this.#reachable().includes(planet)) {
             this.#lineBetween(this.#current, planet)?.setAlpha(LINE_PREVIEW_ALPHA);
         }
-        // Ease the camera to the selected planet so an off-screen pick is brought into view.
-        this.scene.cameras.main.pan(planet.x, planet.y, SELECT_PAN_MS, 'Sine.easeInOut');
+        // Ease the camera to the selected planet so an off-screen pick is brought into view. Button picks
+        // pass pan=false: they keep the camera on the rocket and let the following jump reveal the target.
+        if (pan) this.scene.cameras.main.pan(planet.x, planet.y, SELECT_PAN_MS, 'Sine.easeInOut');
+        this.#syncTravelArmed();
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_SELECTED, planet.info);
     }
 
@@ -270,7 +308,14 @@ export class NPSpaceMap extends NPGameObjectList {
         if (!this.#selected) return;
         this.#restoreSelectedVisuals();
         this.#selected = undefined;
+        this.#syncTravelArmed();
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_DESELECTED);
+    }
+
+    /** Reflect the current selection on the direction buttons (only a reachable pick arms one). */
+    #syncTravelArmed() {
+        const armed = this.#selected && this.#reachable().includes(this.#selected) ? this.#selected : undefined;
+        this.#travelButtons?.setArmed(armed);
     }
 
     #restoreSelectedVisuals() {
@@ -279,13 +324,24 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#lineBetween(this.#current, this.#selected)?.setAlpha(LINE_ALPHA);
     }
 
-    #commitJump(target: Planet) {
+    #commitJump(target: Planet, follow = false) {
         this.#deselect();
         this.#traveling = true;
         this.#jumps += 1;
         this.#here.setVisible(false);
+        this.#updateTravelButtons(); // #traveling is set, so this clears them for the trip
         this.#liveLines().forEach(line => line.setAlpha(LINE_TRAVEL_ALPHA));
         this.scene.game.events.emit(SPACE_EVENTS.JUMP_COMMITTED, { to: target.name });
+
+        // Button-initiated jumps ride the camera on the rocket until it arrives (the zoomed-in nav case);
+        // planet-tap jumps keep the player's overview framing. Lerp so the camera eases onto the ship.
+        if (follow) {
+            const cam = this.scene.cameras.main;
+            cam.panEffect.reset();
+            cam.startFollow(this.#rocket!, false, 0.2, 0.2); // eased lerp: settles onto the ship, tracks it close
+            cam.zoomTo(FOLLOW_ZOOM, FOLLOW_ZOOM_MS, 'Sine.easeInOut'); // close in fully for the ride
+            this.#following = true;
+        }
 
         // The front advances only on jumps (GDD §3). Sweep it — and grey out what falls behind — in
         // lockstep with the rocket, so reality visibly closes in *as* the kid flies, not after landing.
@@ -305,6 +361,12 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#current = target;
         this.#traveling = false;
 
+        // Hand the camera back to the player on arrival (no-op for non-following planet-tap jumps).
+        if (this.#following) {
+            this.scene.cameras.main.stopFollow();
+            this.#following = false;
+        }
+
         // Reaching a rim sun bails the sector (no reward; run-end stub) — takes precedence over snapback.
         if (target.outer) {
             this.#onSectorExit();
@@ -323,13 +385,15 @@ export class NPSpaceMap extends NPGameObjectList {
         // Landed safely → the planet's event fires (event-system.md §6). Lock map input until it resolves.
         // The event is drawn from this sector's pool (+ the core pool), seeded by the planet.
         this.#inEvent = true;
+        this.#updateTravelButtons(); // #inEvent is set, so this clears them while the event holds the map
         const event = resolvePlanetEvent(this.#sector.id, target.info.name);
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_ARRIVED, { event, planet: target.name });
     }
 
     #onEventResolved = (payload: EventResolvedPayload) => {
+        this.#inEvent = false; // clear first so the effect/refresh path below can restore the buttons
         this.#applyEffects(payload.effects);
-        this.#inEvent = false;
+        this.#updateTravelButtons();
     };
 
     /**
@@ -425,6 +489,27 @@ export class NPSpaceMap extends NPGameObjectList {
             this.#selected = undefined;
             this.scene.game.events.emit(SPACE_EVENTS.PLANET_DESELECTED);
         }
+        this.#updateTravelButtons();
+    }
+
+    /** Buttons show only when the map is idle (no jump/event/snapback) AND the camera is zoomed near full in. */
+    #shouldShowButtons(): boolean {
+        if (this.#traveling || this.#frozen || this.#inEvent || !this.#rocket || !this.#current?.alive) return false;
+        return this.scene.cameras.main.zoom >= BUTTON_MIN_ZOOM;
+    }
+
+    /** Draw the direction buttons clustered around the ship, or clear them when they shouldn't show. */
+    #updateTravelButtons() {
+        this.#buttonsShown = this.#shouldShowButtons();
+        if (!this.#buttonsShown) {
+            this.#travelButtons.clear();
+            return;
+        }
+        // Anchor on the ship (parked on the current node), sized to the ship — not the much larger node
+        // marker — so the buttons sit tight around the rocket at full zoom.
+        const ship = this.#rocket!;
+        const shipRadius = Math.max(ship.displayWidth, ship.displayHeight) / 2;
+        this.#travelButtons.render({ x: ship.x, y: ship.y }, shipRadius, this.#reachable(), this.#selected);
     }
 
     #emitFront() {
