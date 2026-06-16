@@ -1,18 +1,39 @@
+import { SectorId } from '@shared/np-state';
+
 import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { grassAlienEncounter } from './content/grass-alien-encounter.event';
+import { emberBeltEvents } from './content/sectors/ember-belt.events';
+import { frozenDriftEvents } from './content/sectors/frozen-drift.events';
+import { homeReachEvents } from './content/sectors/home-reach.events';
+import { longQuietEvents } from './content/sectors/long-quiet.events';
+import { veiledNebulaEvents } from './content/sectors/veiled-nebula.events';
 import { spaceWhale } from './content/space-whale.event';
 import { zeeboGuide } from './content/zeebo-guide.event';
 import { PlanetEvent } from './event.model';
 
 /**
- * The pool of events eligible on planet arrival. Add more here as they come across from AI.md
- * (event-system.md §10). The full design has core + per-sector pools filtered by gates (§5); since
- * there is no sector context yet, every pooled event is eligible everywhere, so keep them core for now.
+ * Event pools (event-system.md §5). Arrival events are picked from the current sector's pool plus the
+ * core pool, so a sector's biome and grey level shape what fires there. ~10 per sector + a small core.
  */
-export const PLANET_EVENT_POOL: PlanetEvent[] = [grassAlienEncounter, spaceWhale, zeeboGuide];
+
+/** Core pool — no sector tag, eligible in every sector (the everyday-distortion pieces). */
+export const CORE_EVENTS: PlanetEvent[] = [spaceWhale, zeeboGuide];
+
+/** Per-sector pools, keyed by {@link SectorId} (the balance model's sector ids). */
+export const SECTOR_EVENT_POOLS: Record<SectorId, PlanetEvent[]> = {
+    'home-reach': [grassAlienEncounter, ...homeReachEvents],
+    'frozen-drift': frozenDriftEvents,
+    'ember-belt': emberBeltEvents,
+    'veiled-nebula': veiledNebulaEvents,
+    'long-quiet': longQuietEvents,
+};
+
+/** Every authored event, flattened — for validation and any sector-agnostic consumer. */
+export const PLANET_EVENT_POOL: PlanetEvent[] = [...CORE_EVENTS, ...Object.values(SECTOR_EVENT_POOLS).flat()];
 
 /**
- * Pick the event that fires when the ship lands on a planet. Seeded by the planet so a given planet
- * always draws the same event (mirrors {@link generatePlanetInfo}'s per-planet seeding).
+ * Pick the event that fires when the ship lands on a planet in `sector`. Seeded by the planet (within
+ * the sector) so a given planet always draws the same event (mirrors `generatePlanetInfo`'s seeding).
  */
-export const resolvePlanetEvent = (seed: string): PlanetEvent => new NPRng(`event-${seed}`).item(PLANET_EVENT_POOL);
+export const resolvePlanetEvent = (sector: SectorId, seed: string): PlanetEvent =>
+    new NPRng(`event-${sector}-${seed}`).item([...CORE_EVENTS, ...SECTOR_EVENT_POOLS[sector]]);

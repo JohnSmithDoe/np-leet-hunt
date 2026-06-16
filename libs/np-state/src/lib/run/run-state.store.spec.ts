@@ -49,6 +49,19 @@ describe('RunStateStore', () => {
         expect(store.resources.hull).toBe(10);
     });
 
+    it('advances through the sectors in order and caps at the last one', () => {
+        const store = new RunStateStore();
+        expect(store.sector).toBe('home-reach');
+        store.advanceSector();
+        expect(store.snapshot()).toMatchObject({ sector: 'frozen-drift', sectorNumber: 2 });
+        store.advanceSector();
+        store.advanceSector();
+        store.advanceSector();
+        expect(store.snapshot()).toMatchObject({ sector: 'long-quiet', sectorNumber: 5 });
+        store.advanceSector(); // past the last sector: stays put
+        expect(store.snapshot()).toMatchObject({ sector: 'long-quiet', sectorNumber: 5 });
+    });
+
     it('reset returns to a fresh run, optionally seeded', () => {
         const store = new RunStateStore();
         store.adjustResources({ marbles: 50 });

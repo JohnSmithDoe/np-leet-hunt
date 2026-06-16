@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { SECTOR_COUNT, SECTOR_ORDER } from '../balance/balance.model';
 import { ResourceDelta, Resources, STARTING_RESOURCES } from '../model/resources';
 import { CrewMember, RunContext, SectorId } from '../model/run-context';
 import { GameState } from './game-state';
@@ -73,6 +74,17 @@ export class RunStateStore implements GameState {
             sector: this.#sector,
             sectorNumber: this.#sectorNumber,
         };
+    }
+
+    /**
+     * Advance to the next sector: bump the 1-based number and set the id from {@link SECTOR_ORDER}.
+     * Caps at the last sector — the run-end decision (reaching the end) lives in the conductor / FSM.
+     * Orchestration-only, so it sits on the store, not the mode-facing `GameState` interface.
+     */
+    advanceSector(): void {
+        this.#sectorNumber = Math.min(SECTOR_COUNT, this.#sectorNumber + 1);
+        this.#sector = SECTOR_ORDER[this.#sectorNumber - 1];
+        this.#publish();
     }
 
     /** Reset to a fresh run (optionally seeded), then publish. Called by `GameStateService.startNewRun`. */

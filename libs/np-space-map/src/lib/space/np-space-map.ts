@@ -1,5 +1,5 @@
 import { NPGameObjectList, NPScene } from '@shared/np-phaser';
-import type { GameState } from '@shared/np-state';
+import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/dashed-line';
@@ -26,10 +26,9 @@ const MAP_SIZE = 15000;
 const MIN_PLANET_DISTANCE = 1750;
 
 // Normality-front tuning. The front sweeps in as a diagonal line from the left (the Hush greying the
-// map one layer at a time); it always takes ~DESIRED_JUMPS to cross, whatever the map size, and stops
-// short of the far edge so a sliver of distorted space (the safe core) never normalises.
+// map one layer at a time); it takes the sector's `frontSteps` jumps to cross, whatever the map size,
+// and stops short of the far edge so a sliver of distorted space (the safe core) never normalises.
 const FRONT_MARGIN = 600;
-const DESIRED_JUMPS = 10;
 const SAFE_FRACTION = 0.15; // far-side fraction of the sweep that stays distorted
 // Sweep axis: points toward still-distorted space (down-and-right), so the grey closes in from the
 // upper-left as a tilted line. The front line itself is perpendicular to this.
@@ -72,15 +71,20 @@ export class NPSpaceMap extends NPGameObjectList {
     // HUD and other modes. The map mutates it through the GameState interface; np-space-map never sees
     // the Angular facade or a global singleton.
     #state: GameState;
+    // The sector being traversed (np-state balance, injected from the app). Drives map size, exit count,
+    // front speed, and which event pool arrival events are drawn from.
+    #sector: Sector;
 
-    constructor(scene: NPScene, state: GameState) {
+    constructor(scene: NPScene, state: GameState, sector: Sector) {
         super(scene);
         this.#state = state;
+        this.#sector = sector;
     }
 
     init = () => {
         this.#map = StarmapFactory.create({
-            planets: 12,
+            planets: this.#sector.planetCount,
+            exits: this.#sector.exits,
             width: MAP_SIZE,
             height: MAP_SIZE,
             minDistance: MIN_PLANET_DISTANCE,
@@ -99,7 +103,8 @@ export class NPSpaceMap extends NPGameObjectList {
             axis: FRONT_AXIS,
             initialPosition,
             maxPosition,
-            step: (maxPosition - initialPosition) / DESIRED_JUMPS,
+            // Front speed is a sector difficulty knob: fewer jumps to cross = the grey closes faster.
+            step: (maxPosition - initialPosition) / this.#sector.frontSteps,
         });
         // The front normalises the axis; reuse it so the renderer's sweep scale matches the geometry.
         this.#reality = this.add(
@@ -263,8 +268,9 @@ export class NPSpaceMap extends NPGameObjectList {
         }
 
         // Landed safely → the planet's event fires (event-system.md §6). Lock map input until it resolves.
+        // The event is drawn from this sector's pool (+ the core pool), seeded by the planet.
         this.#inEvent = true;
-        const event = resolvePlanetEvent(target.info.name);
+        const event = resolvePlanetEvent(this.#sector.id, target.info.name);
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_ARRIVED, { event, planet: target.name });
     }
 

@@ -64,6 +64,26 @@ export class StageService {
             });
     }
 
+    /**
+     * Like {@link startScene}, but rebuilds the mode from scratch: the current scenes — *including*
+     * `persistent` ones — are removed (not slept), then the new entries are added fresh so each runs its
+     * full `create()`. Use when the same scene keys must show different content (e.g. regenerating the
+     * space map for the next sector); plain `startScene` would no-op on identical keys or merely wake the
+     * slept old map.
+     */
+    replace(...entries: NPSceneEntry[]) {
+        if (this.#switching) return;
+        this.#switching = true;
+        this.#fadeOutCurrent()
+            .pipe(take(1))
+            .subscribe(() => {
+                this.#active.forEach(({ key }) => this.#phaser.game.scene.remove(key));
+                this.#active = entries;
+                entries.forEach(({ key, scene }) => this.#phaser.game.scene.add(key, scene, true));
+                this.#switching = false;
+            });
+    }
+
     initStage(stageContainer: HTMLElement) {
         return this.#phaser.init(stageContainer).pipe(tap(isReady => this.#initialized.next(isReady)));
     }

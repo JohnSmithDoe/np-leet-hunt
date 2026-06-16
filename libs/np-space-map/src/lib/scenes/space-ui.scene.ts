@@ -1,5 +1,6 @@
 import { NPScene } from '@shared/np-phaser';
-import type { GameState } from '@shared/np-state';
+import type { GameState, Sector } from '@shared/np-state';
+import { SECTOR_COUNT } from '@shared/np-state';
 import * as Phaser from 'phaser';
 import { Subscription } from 'rxjs';
 
@@ -17,11 +18,18 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     #banner!: Phaser.GameObjects.Text;
     #fraction = 0;
     #state: GameState;
+    #sector: Sector;
     #stateSub?: Subscription;
 
-    constructor(state: GameState) {
+    constructor(state: GameState, sector: Sector) {
         super({ key: SpaceUiScene.key });
         this.#state = state;
+        this.#sector = sector;
+    }
+
+    /** 'home-reach' → 'HOME REACH'. */
+    #sectorName(): string {
+        return this.#sector.id.replace(/-/g, ' ').toUpperCase();
     }
 
     setupComponents() {
@@ -36,6 +44,13 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
                 .setScrollFactor(0)
                 .setDepth(100);
 
+        text(
+            BAR.x,
+            BAR.y - 64,
+            `SECTOR ${this.#sector.number}/${SECTOR_COUNT}  —  ${this.#sectorName()}`,
+            24,
+            '#e7ecff'
+        );
         text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
         this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');

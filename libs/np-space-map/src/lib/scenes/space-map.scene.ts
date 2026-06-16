@@ -1,5 +1,5 @@
 import { NPScene } from '@shared/np-phaser';
-import type { GameState } from '@shared/np-state';
+import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
@@ -17,14 +17,16 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
     #rocket!: NPMovableSprite;
     #map!: NPSpaceMap;
     #state: GameState;
+    #sector: Sector;
 
-    constructor(state: GameState) {
+    constructor(state: GameState, sector: Sector) {
         super({ key: SpaceMapScene.key });
         this.#state = state;
+        this.#sector = sector;
     }
 
     setupComponents() {
-        this.#map = this.addComponent(new NPSpaceMap(this, this.#state));
+        this.#map = this.addComponent(new NPSpaceMap(this, this.#state, this.#sector));
     }
 
     preload() {
