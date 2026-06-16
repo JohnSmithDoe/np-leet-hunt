@@ -22,24 +22,34 @@ export interface TParadroidAiObservation {
 }
 
 /**
- * The droid opponent: a pure, seeded, heuristic move-picker — *not* an LLM. Each tick it scores every
- * legal button by how many extra middle rows it would light for the droid (via {@link analyzeOutcome}
- * over the droid's own board), adds difficulty-scaled RNG noise, and fires the best — sometimes
- * blundering on lower levels, and on higher levels holding its shots so they're still lit at the buzzer.
+ * The droid opponent: a pure, seeded, heuristic move-picker — *not* an LLM. Up front it solves the board
+ * once into a {@link ParadroidAi.#plan|plan} — the minimal set of column-0 rows that, lit *together*,
+ * lights every middle row the droid can win. That set is what makes combine tiles work: a combine middle
+ * only lights when several upstream flows arrive at once, so each feeder row is worthless alone but the
+ * group pays off. A purely greedy click-the-best-single-button player can never start such a combo (every
+ * half scores zero on its own); planning the set first is the fix.
+ *
+ * Each tick it presses toward that plan. During the run-up it spends only *surplus* shots, and only on
+ * presses that pay off on their own (never stranding a combo half that would drain before its partners).
+ * Then, inside the final hold window, it slams the remaining plan rows — including the zero-gain combo
+ * halves — so every combine lights simultaneously at the buzzer. Lower levels blunt this with reaction
+ * lag, score noise and outright blunders (and skip the timed end-game burst entirely).
  *
  * Reproducible by construction: every random choice draws from the injected {@link NPRng}, and all
  * timing comes from `obs.elapsedMs` — so the same seed + the same observation stream yield the same
- * moves, which is what makes it unit-testable.
- *
- * Human-like by construction: it can never fire two shots closer than `params.shotCooldownMs` (250ms),
- * and it accounts for that floor when deciding how early to begin its end-game burst.
+ * moves, which is what makes it unit-testable. It can never fire two shots closer than
+ * `params.shotCooldownMs` (250ms), so it can't out-click a human.
  */
 export class ParadroidAi {
     readonly #grid: TParadroidSubTile[][];
     readonly #params: DuelAiParams;
     readonly #rng: NPRng;
-    /** How many middle rows this board can ever light for the droid — the reserve to saturate at the buzzer. */
-    readonly #winnableRows: number;
+    /**
+     * The minimal set of column-0 rows that lights every middle row the droid can win — its whole game
+     * plan. Every row in it matters (dropping any one loses a middle), so it keeps *both* halves of each
+     * combine. Its length is also the shot reserve the timing AIs hold back for the end-game saturation.
+     */
+    readonly #plan: number[];
     #lastShotAt = -Infinity;
     #nextDecisionAt = 0;
     #shotsFired = 0;
@@ -48,8 +58,7 @@ export class ParadroidAi {
         this.#grid = grid;
         this.#params = params;
         this.#rng = rng;
-        const col0Rows = (grid[0] ?? []).map(subTile => subTile.row);
-        this.#winnableRows = droidScore(analyzeOutcome(grid, col0Rows));
+        this.#plan = this.#computePlan();
     }
 
     /** The column-0 row to press this tick, or `null` to wait (cooldown, off-cadence, or no good move). */
@@ -62,28 +71,40 @@ export class ParadroidAi {
         // Think only on the reaction cadence (keeps the per-frame cost near zero).
         if (obs.elapsedMs < this.#nextDecisionAt) return null;
         this.#nextDecisionAt = obs.elapsedMs + reactionMs;
-
         if (obs.shotsLeft <= 0) return null;
-        if (usesTiming && !this.#shouldFireNow(obs, fireInterval)) return null;
 
-        const candidates = obs.availableRows.filter(row => !obs.pressedRows.includes(row));
-        if (!candidates.length) return null;
+        const legal = obs.availableRows.filter(row => !obs.pressedRows.includes(row));
+        if (!legal.length) return null;
 
-        // A genuine misfire (lower levels only): pick any legal row, even a weak or self-harming one.
+        // A genuine misfire (lower levels only): press any legal row, even a weak or self-harming one.
         if (blunderChance > 0 && this.#rng.percentageHit(Math.round(blunderChance * 100))) {
-            return this.#fire(obs, this.#rng.item(candidates));
+            return this.#fire(obs, this.#rng.item(legal));
         }
 
+        // Only ever work toward the plan: ignore rows already lit and rows that buy the droid nothing
+        // (e.g. ones a changer hands to the player).
+        const wanted = legal.filter(row => this.#plan.includes(row));
+        if (!wanted.length) return null;
+
         const base = droidScore(analyzeOutcome(this.#grid, obs.pressedRows));
-        const scored = candidates.map(row => {
+        const scored = wanted.map(row => {
             const gain = droidScore(analyzeOutcome(this.#grid, [...obs.pressedRows, row])) - base;
             const noise = scoreNoise > 0 ? this.#rng.inRange(scoreNoise) : 0;
             return { row, gain, score: gain + noise };
         });
         const best = scored.reduce((a, b) => (b.score > a.score ? b : a));
-        // Skilled play never wastes a shot on a move with no upside.
-        if (best.gain <= 0) return null;
 
+        // End-game saturation (timing AIs only): slam the remaining plan rows so every combine lights
+        // together at the buzzer. This is the one place zero-gain presses are correct — a combo's halves
+        // each score nothing alone, so assembling the pair *requires* pressing through a zero-gain step.
+        if (usesTiming && obs.elapsedMs >= this.#burstStart(obs.durationMs, fireInterval)) {
+            return this.#fire(obs, best.row);
+        }
+
+        // Run-up: only spend on a press that pays off on its own — never strand a combo half that would
+        // drain before its partners arrive. Timing AIs also keep a reserve back for the end-game burst.
+        if (best.gain <= 0) return null;
+        if (usesTiming && !this.#hasSurplus(obs, fireInterval)) return null;
         return this.#fire(obs, best.row);
     }
 
@@ -95,18 +116,43 @@ export class ParadroidAi {
     }
 
     /**
-     * Timing gate for skilled (usesTiming) AIs. It reserves enough shots to (re)light every winnable row
-     * inside the final hold window — where presses survive to the buzzer — and during the run-up spends
-     * only the *surplus* shots, paced evenly, so the droid is visibly contesting the board rather than
-     * idling and then dumping everything at the end.
+     * When the end-game saturation burst opens. Late enough that the first slammed row is still lit at
+     * the buzzer (its press lands inside the 3s hold), yet leaving the rest of that hold window to fit one
+     * press per remaining plan row at the fire cadence. Slower AIs get a shorter window, so they saturate
+     * fewer rows — the timing skill scales with the level.
      */
-    #shouldFireNow(obs: TParadroidAiObservation, fireInterval: number): boolean {
-        const burstStart = obs.durationMs - Math.max(HOLD_MS, this.#winnableRows * fireInterval);
-        if (obs.elapsedMs >= burstStart) return true; // final saturation window — fire freely
-        const surplus = obs.shotsLeft - this.#winnableRows;
+    #burstStart(durationMs: number, fireInterval: number): number {
+        return durationMs - HOLD_MS + fireInterval;
+    }
+
+    /**
+     * During the run-up a timing AI spends only its *surplus* shots — those beyond the plan-sized reserve
+     * it needs to saturate at the end — paced evenly across the run-up so it visibly contests the board
+     * instead of idling and then dumping everything at once.
+     */
+    #hasSurplus(obs: TParadroidAiObservation, fireInterval: number): boolean {
+        const surplus = obs.shotsLeft - this.#plan.length;
         if (surplus <= 0) return false; // hold the reserve for the finish
-        // Spread the surplus shots across the run-up: the (#shotsFired+1)-th surplus shot is due at its slot.
+        const burstStart = this.#burstStart(obs.durationMs, fireInterval);
         const slot = burstStart / (this.#shotsFired + surplus + 1);
         return obs.elapsedMs >= (this.#shotsFired + 1) * slot;
+    }
+
+    /**
+     * Solve the board once into the smallest set of column-0 rows that lights every middle the droid can
+     * win. {@link droidScore} is monotone in pressed rows (a flow only ever lights more, never less), so
+     * pressing *all* rows is the maximum; we then drop any row whose removal doesn't lower that maximum —
+     * off-plan rows like ones routed to the player by a changer. What survives is a set where every row
+     * earns its press, both halves of each combine included.
+     */
+    #computePlan(): number[] {
+        const allRows = (this.#grid[0] ?? []).map(subTile => subTile.row);
+        const maxScore = droidScore(analyzeOutcome(this.#grid, allRows));
+        let plan = [...allRows];
+        for (const row of allRows) {
+            const trial = plan.filter(r => r !== row);
+            if (droidScore(analyzeOutcome(this.#grid, trial)) === maxScore) plan = trial;
+        }
+        return plan;
     }
 }

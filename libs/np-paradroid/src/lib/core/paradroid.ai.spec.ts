@@ -77,6 +77,20 @@ describe('ParadroidAi', () => {
         }
     });
 
+    it('assembles combine middles: a flawless AI lights every winnable row — even ones needing several presses at once', () => {
+        const col0 = (grid[0] ?? []).map(subTile => subTile.row);
+        const max = droidScore(analyzeOutcome(grid, col0));
+        // Rows that light a middle on their own; the rest are combine middles that need partners pressed
+        // together. This board must actually demand combos, or the test proves nothing.
+        const singleSourceRows = col0.filter(row => droidScore(analyzeOutcome(grid, [row])) > 0).length;
+        expect(max).toBeGreaterThan(singleSourceRows);
+
+        // brutal has no noise and never blunders, so it's deterministic: it should plan the full set and
+        // saturate it inside the final hold window, lighting every winnable middle at the buzzer. A greedy
+        // single-click picker (the old AI) tops out at singleSourceRows and could never reach `max`.
+        expect(runMatch(grid, ai('brutal'), 'combo').finalScore).toBe(max);
+    });
+
     it('plays better up the ladder: brutal/hard end with at least as many lit rows as easy', () => {
         const seeds = ['s1', 's2', 's3', 's4'];
         const total = (level: 'easy' | 'normal' | 'hard' | 'brutal') =>
