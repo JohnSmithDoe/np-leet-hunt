@@ -66,16 +66,29 @@ export class RunConductorService {
         }
     }
 
-    /** Show the space mode for the current sector: rebuild for a new sector, wake for the same one. */
+    /** Show the space mode for the current sector: build first, regenerate on advance, wake on return. */
     #showSpace(): void {
         const number = this.#game.run.snapshot().sectorNumber;
-        if (number !== this.#shownSector) {
-            // A new sector: resolve its params from the balance curve and rebuild the map from scratch.
+        if (this.#shownSector === 0) {
+            // First sector of the run → build the space mode fresh.
             this.#shownSector = number;
             this.#sector = Balance.sector(number);
-            this.#stage.replace(...this.#spaceScenes(this.#sector));
+            this.#stage.startScene(...this.#spaceScenes(this.#sector));
+        } else if (number !== this.#shownSector) {
+            // Advanced to a new sector → rebuild the map in place inside the live, still-running scenes
+            // (no scene swap/restart), so their textures and input survive and only the content reloads.
+            this.#shownSector = number;
+            const sector = Balance.sector(number);
+            this.#sector = sector;
+            const game = this.#stage.phaser.game;
+            const map = game.scene.getScene(SpaceMapScene.key) as SpaceMapScene;
+            const ui = game.scene.getScene(SpaceUiScene.key) as SpaceUiScene;
+            this.#stage.fadeTransition(() => {
+                map.loadSector(sector);
+                ui.loadSector(sector);
+            });
         } else {
-            // Same sector (event overlay, or returning from a dungeon/duel): wake the slept scenes.
+            // Same sector (event overlay, or returning from a dungeon/duel) → wake the slept scenes.
             this.#stage.startScene(...this.#spaceScenes(this.#sector!));
         }
     }

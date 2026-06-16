@@ -48,6 +48,11 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         return NPRNG.item(types);
     }
 
+    /** Queue every planet texture so any sector (and any in-place rebuild) can set it from cache. */
+    static preloadAll(scene: NPScene): void {
+        Object.values(IMAGES).forEach(image => scene.load.image(image));
+    }
+
     constructor(
         public scene: NPScene,
         type: keyof typeof IMAGES

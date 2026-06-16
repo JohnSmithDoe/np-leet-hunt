@@ -29,6 +29,18 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.#map = this.addComponent(new NPSpaceMap(this, this.#state, this.#sector));
     }
 
+    /**
+     * Regenerate the map for a new sector in place (no scene restart): rebuild the map's game objects,
+     * then re-place the rocket and re-centre the camera on the new start. The scene stays running.
+     */
+    loadSector(sector: Sector): void {
+        this.#sector = sector;
+        this.#map.loadSector(sector);
+        const start = this.#map.startingPlanet;
+        this.#rocket.setPosition(start.x, start.y);
+        this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
+    }
+
     preload() {
         super.preload();
         this.load.image('rocket', 'assets/rocket.png');

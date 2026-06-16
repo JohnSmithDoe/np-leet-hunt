@@ -65,21 +65,19 @@ export class StageService {
     }
 
     /**
-     * Like {@link startScene}, but rebuilds the mode from scratch: the current scenes — *including*
-     * `persistent` ones — are removed (not slept), then the new entries are added fresh so each runs its
-     * full `create()`. Use when the same scene keys must show different content (e.g. regenerating the
-     * space map for the next sector); plain `startScene` would no-op on identical keys or merely wake the
-     * slept old map.
+     * Run `apply` between a fade-out and fade-in of the active scenes — without swapping, restarting, or
+     * removing them. Use to mutate the *content* of the live persistent mode (e.g. rebuild the map for
+     * the next sector): the scenes keep running, so their input, cameras, and cached textures stay intact
+     * across the change. `apply` performs the rebuild; this only owns the transition.
      */
-    replace(...entries: NPSceneEntry[]) {
+    fadeTransition(apply: () => void) {
         if (this.#switching) return;
         this.#switching = true;
         this.#fadeOutCurrent()
             .pipe(take(1))
             .subscribe(() => {
-                this.#active.forEach(({ key }) => this.#phaser.game.scene.remove(key));
-                this.#active = entries;
-                entries.forEach(({ key, scene }) => this.#phaser.game.scene.add(key, scene, true));
+                apply();
+                this.#active.forEach(({ key }) => this.#fadeIn(key));
                 this.#switching = false;
             });
     }

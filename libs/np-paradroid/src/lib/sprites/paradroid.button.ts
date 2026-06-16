@@ -9,7 +9,8 @@ export class ParadroidButton extends NPButton {
     #debounce?: Phaser.Time.TimerEvent;
 
     constructor(scene: NPScene, field: ParadroidField, config = { width: 64, height: 64 }) {
-        super(scene, 0, field.y, config);
+        // Centre the (origin-0.5) button on the middle of its row — field.y is the row's top edge.
+        super(scene, 0, field.y + field.tileHeight / 2, config);
         this.#field = field;
         this.on(NPButton.EVENT_CLICK, () => this.#onClick());
     }

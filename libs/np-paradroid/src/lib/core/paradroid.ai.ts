@@ -38,13 +38,18 @@ export class ParadroidAi {
     readonly #grid: TParadroidSubTile[][];
     readonly #params: DuelAiParams;
     readonly #rng: NPRng;
+    /** How many middle rows this board can ever light for the droid — the reserve to saturate at the buzzer. */
+    readonly #winnableRows: number;
     #lastShotAt = -Infinity;
     #nextDecisionAt = 0;
+    #shotsFired = 0;
 
     constructor(grid: TParadroidSubTile[][], params: DuelAiParams, rng: NPRng) {
         this.#grid = grid;
         this.#params = params;
         this.#rng = rng;
+        const col0Rows = (grid[0] ?? []).map(subTile => subTile.row);
+        this.#winnableRows = droidScore(analyzeOutcome(grid, col0Rows));
     }
 
     /** The column-0 row to press this tick, or `null` to wait (cooldown, off-cadence, or no good move). */
@@ -59,21 +64,14 @@ export class ParadroidAi {
         this.#nextDecisionAt = obs.elapsedMs + reactionMs;
 
         if (obs.shotsLeft <= 0) return null;
-
-        // Timing: a skilled AI keeps its powder dry, then fires its whole burst late enough that every
-        // shot is still lit at the buzzer — begun early enough to land them all at the cooldown rate.
-        if (usesTiming) {
-            const burstMs = obs.shotsLeft * fireInterval;
-            if (obs.elapsedMs < obs.durationMs - Math.max(HOLD_MS, burstMs)) return null;
-        }
+        if (usesTiming && !this.#shouldFireNow(obs, fireInterval)) return null;
 
         const candidates = obs.availableRows.filter(row => !obs.pressedRows.includes(row));
         if (!candidates.length) return null;
 
         // A genuine misfire (lower levels only): pick any legal row, even a weak or self-harming one.
         if (blunderChance > 0 && this.#rng.percentageHit(Math.round(blunderChance * 100))) {
-            this.#lastShotAt = obs.elapsedMs;
-            return this.#rng.item(candidates);
+            return this.#fire(obs, this.#rng.item(candidates));
         }
 
         const base = droidScore(analyzeOutcome(this.#grid, obs.pressedRows));
@@ -86,7 +84,29 @@ export class ParadroidAi {
         // Skilled play never wastes a shot on a move with no upside.
         if (best.gain <= 0) return null;
 
+        return this.#fire(obs, best.row);
+    }
+
+    /** Record a shot and return the row pressed. */
+    #fire(obs: TParadroidAiObservation, row: number): number {
         this.#lastShotAt = obs.elapsedMs;
-        return best.row;
+        this.#shotsFired++;
+        return row;
+    }
+
+    /**
+     * Timing gate for skilled (usesTiming) AIs. It reserves enough shots to (re)light every winnable row
+     * inside the final hold window — where presses survive to the buzzer — and during the run-up spends
+     * only the *surplus* shots, paced evenly, so the droid is visibly contesting the board rather than
+     * idling and then dumping everything at the end.
+     */
+    #shouldFireNow(obs: TParadroidAiObservation, fireInterval: number): boolean {
+        const burstStart = obs.durationMs - Math.max(HOLD_MS, this.#winnableRows * fireInterval);
+        if (obs.elapsedMs >= burstStart) return true; // final saturation window — fire freely
+        const surplus = obs.shotsLeft - this.#winnableRows;
+        if (surplus <= 0) return false; // hold the reserve for the finish
+        // Spread the surplus shots across the run-up: the (#shotsFired+1)-th surplus shot is due at its slot.
+        const slot = burstStart / (this.#shotsFired + surplus + 1);
+        return obs.elapsedMs >= (this.#shotsFired + 1) * slot;
     }
 }

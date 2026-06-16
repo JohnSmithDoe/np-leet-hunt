@@ -62,6 +62,7 @@ export class NPSpaceMap extends NPGameObjectList {
     #frozen = false;
     #inEvent = false; // a planet-arrival event dialog is open; map input is locked until it resolves
     #jumps = 0;
+    #built = false; // whether a sector's objects are currently built (guards teardown before first build)
 
     #dragging = false;
     #dragMoved = 0;
@@ -81,7 +82,69 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#sector = sector;
     }
 
-    init = () => {
+    preload() {
+        // Preload every map texture up front — not just the ones the first sector happens to use — so a
+        // sector change can rebuild the map synchronously from cache, with no loader and no async race.
+        Planet.preloadAll(this.scene);
+        DashedLine.preloadAll(this.scene);
+    }
+
+    get startingPlanet() {
+        return this.#start;
+    }
+
+    create(container?: Phaser.GameObjects.Container) {
+        super.create(container);
+        // One-time, instance-level wiring that outlives sector changes (the scene is persistent): map
+        // input and the event-dialog round-trip stay bound to this instance, which always points at the
+        // current sector's objects. The per-sector map content is built — and rebuilt — by loadSector().
+        this.#setupCameraDrag();
+        this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
+        this.loadSector(this.#sector);
+    }
+
+    /**
+     * Swap the map to `sector`: tear down the current sector's game objects and build the new one's, all
+     * inside the same live scene — no scene swap or restart. The persistent space scene keeps running, so
+     * input, cameras, and cached textures stay intact. This is the single airtight path for sector change.
+     */
+    loadSector(sector: Sector) {
+        this.#teardownSector();
+        this.#sector = sector;
+        this.#resetState();
+        this.#buildSector();
+    }
+
+    /** Destroy every game object + tween this sector built, and clear the route graph. No-op if empty. */
+    #teardownSector() {
+        if (!this.#built) return;
+        const objects: Phaser.GameObjects.GameObject[] = [
+            ...this.#planets,
+            ...this.#connections.map(connection => connection.line),
+            this.#reality,
+            this.#here,
+        ];
+        this.scene.tweens.killTweensOf(objects);
+        objects.forEach(object => object.destroy());
+        this.#planets = [];
+        this.#connections = [];
+        this.#adjacency.clear();
+        this.#selected = undefined;
+        this.#built = false;
+    }
+
+    /** Reset per-sector run flags so the new sector starts clean (front fresh, nothing in flight). */
+    #resetState() {
+        this.#traveling = false;
+        this.#frozen = false;
+        this.#inEvent = false;
+        this.#jumps = 0;
+        this.#dragging = false;
+        this.#lastDrag = undefined;
+    }
+
+    /** Build the current sector's map objects: the star graph, the front + its veil, and the "here" ring. */
+    #buildSector() {
         this.#map = StarmapFactory.create({
             planets: this.#sector.planetCount,
             exits: this.#sector.exits,
@@ -106,24 +169,15 @@ export class NPSpaceMap extends NPGameObjectList {
             // Front speed is a sector difficulty knob: fewer jumps to cross = the grey closes faster.
             step: (maxPosition - initialPosition) / this.#sector.frontSteps,
         });
-        // The front normalises the axis; reuse it so the renderer's sweep scale matches the geometry.
-        this.#reality = this.add(
-            new Reality(this.scene, this.#front.origin, this.#front.axis, initialPosition)
-        ) as Reality;
+        this.#reality = new Reality(this.scene, this.#front.origin, this.#front.axis, initialPosition);
+        this.#reality.create();
+        this.#reality.addToScene();
 
         this.#current = this.#start;
-        super.init();
-    };
 
-    get startingPlanet() {
-        return this.#start;
-    }
-
-    create(container?: Phaser.GameObjects.Container) {
-        super.create(container);
+        // Per-sector interactive bits: a tap handler per planet, the pulsing "here" ring, the initial map
+        // states, and the opening front readout (deferred a tick so the HUD's listeners are registered).
         this.#planets.forEach(planet => planet.on('pointerup', () => this.#onPlanetTap(planet)));
-        this.#setupCameraDrag();
-
         this.#here = this.scene.add.circle(0, 0, 1, 0x66ccff, 0).setStrokeStyle(12, 0x66ccff, 0.9).setDepth(25);
         this.scene.tweens.add({
             targets: this.#here,
@@ -133,16 +187,15 @@ export class NPSpaceMap extends NPGameObjectList {
             repeat: -1,
             ease: 'Sine.easeInOut',
         });
-
+        this.#built = true;
         this.#refreshStates();
-        // Let every scene register its FRONT_ADVANCED listener first, then publish the starting front.
-        // (Resources need no kick: the HUD reads the run store's BehaviorSubject, which replays on subscribe.)
-        this.scene.time.delayedCall(0, () => {
-            this.#emitFront();
-        });
+        this.scene.time.delayedCall(0, () => this.#emitFront());
+    }
 
-        // The event dialog (HTML overlay) resolves an arrival event and hands the outcome back here.
-        this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
+    /** Per-frame motion of the map's objects (planet spin, route shimmer); driven by the scene update. */
+    update(...args: number[]) {
+        this.#planets.forEach(planet => planet.update(...args));
+        this.#connections.forEach(connection => connection.line.update(...args));
     }
 
     public setRocket(rocket: NPMovableSprite) {
@@ -420,7 +473,9 @@ export class NPSpaceMap extends NPGameObjectList {
             .setPosition(coords.x, coords.y)
             .setOuter(isOuter);
         planet.setOrigin(0.5);
-        return this.add(planet) as Planet;
+        planet.create(); // textures are preloaded, so setTexture is synchronous (works on rebuild too)
+        this.scene.addExisting(planet);
+        return planet;
     }
 
     #getPlanetType(isOuter: boolean) {
@@ -451,8 +506,9 @@ export class NPSpaceMap extends NPGameObjectList {
     #connect(planet: Planet, target: Planet) {
         if (this.#lineBetween(planet, target)) return;
         const line = new DashedLine(this.scene, 'dashedLineRed', planet, target);
+        line.create(); // dashed-line texture is preloaded
         line.setDepth(2);
-        this.add(line);
+        this.scene.addExisting(line);
         this.#connections.push({ from: planet, to: target, line });
         this.#link(planet, target);
         this.#link(target, planet);

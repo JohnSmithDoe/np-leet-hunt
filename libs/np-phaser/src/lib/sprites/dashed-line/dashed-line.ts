@@ -24,6 +24,11 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameO
         return NPRNG.item(types);
     }
 
+    /** Queue every dashed-line texture so routes can be (re)built from cache without the loader. */
+    static preloadAll(scene: NPScene): void {
+        Object.values(IMAGES).forEach(image => scene.load.image(image));
+    }
+
     constructor(
         public scene: NPScene,
         type: keyof typeof IMAGES,

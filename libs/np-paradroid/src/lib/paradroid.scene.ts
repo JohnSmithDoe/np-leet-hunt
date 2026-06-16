@@ -1,10 +1,11 @@
 import { NPScene } from '@shared/np-phaser';
-import { DuelAiParams } from '@shared/np-state';
+import { Balance, DuelAiLevel, DuelAiParams } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
 import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
-import { TParadroidFactoryOptions } from './core/paradroid.factory';
+import { CParadroidTileSets } from './@types/paradroid.consts';
+import { paradroidFactoryOptions, TParadroidFactoryOptions } from './core/paradroid.factory';
 import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';
 
 /** What the app injects when starting a duel — the board options and the AI tuning, both optional. */
@@ -18,6 +19,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     readonly #config: TParadroidSceneConfig;
     #paradroidGame!: ParadroidGame;
     #resultText?: Phaser.GameObjects.Text;
+    readonly #controls: TextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
 
     constructor(config: TParadroidSceneConfig = {}) {
         super({ key: ParadroidScene.key });
@@ -31,9 +33,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         // this.addComponent(new ParadroidIntro(this));
     }
 
-    /** Build a game from the injected config and wire its match-ended announcement. */
-    #createGame(): ParadroidGame {
-        const game = new ParadroidGame(this, this.#config.factoryOptions, this.#config.aiParams);
+    /** Build a game (defaulting to the injected config) and wire its match-ended announcement. */
+    #createGame(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): ParadroidGame {
+        const game = new ParadroidGame(this, factoryOptions, aiParams);
         game.events.on(ParadroidGame.EVENT_MATCH_ENDED, (result: TParadroidMatchResult) => this.#showResult(result));
         return game;
     }
@@ -46,28 +48,48 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         super.create(container);
         this.addExisting(container);
 
-        const startBtn = new TextButton(this, 440, 10, 'Start Game');
-        startBtn.on('pointerup', () => {
-            this.#resultText?.destroy();
-            this.#paradroidGame.startMatch();
-        });
-        this.addExisting(startBtn);
+        // Header controls, laid out in a row above the board (y=20) and tracked so the camera fit keeps
+        // them on-screen at any window size. Each "Start X" rebuilds a fresh board at that difficulty
+        // (board fx + tile palette) and plays it with the matching AI level.
+        this.#addControl(40, 'Start Normal', () => this.#startDifficulty('normal'));
+        this.#addControl(250, 'Start Brutal', () => this.#startDifficulty('brutal'));
+        this.#addControl(460, 'Re-Create', () => this.#recreate());
 
-        const recreateBtn = new TextButton(this, 600, 10, 'Re-Create');
-        recreateBtn.on('pointerup', () => {
-            this.#resultText?.destroy();
-            this.removeComponent(this.#paradroidGame);
-            this.removeExisting(this.#paradroidGame.container);
-            const newcontainer = new Phaser.GameObjects.Container(this, 0, 0, []);
-            this.#paradroidGame = this.#createGame();
-            this.addComponent(this.#paradroidGame);
-            this.#paradroidGame.init();
-            this.#paradroidGame.create(newcontainer);
-            this.addExisting(newcontainer);
-            this.resize();
-        });
-        this.addExisting(recreateBtn);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
+        this.resize();
+    }
+
+    /** Add a header control button at the given x and track it for the camera fit. */
+    #addControl(x: number, label: string, onClick: () => void): void {
+        const button = new TextButton(this, x, 20, label, { fontSize: '28px', color: '#0f0' });
+        button.on('pointerup', onClick);
+        this.#controls.push(button);
+        this.addExisting(button);
+    }
+
+    /** Rebuild a fresh board + AI at the given difficulty, then start the match. */
+    #startDifficulty(level: DuelAiLevel): void {
+        const factoryOptions = paradroidFactoryOptions(Balance.duelBoardParams(level), CParadroidTileSets[level]);
+        this.#rebuild(factoryOptions, Balance.duelAiParams(level));
+        this.#paradroidGame.startMatch();
+    }
+
+    /** Re-roll the board at the injected difficulty, idle and ready to start. */
+    #recreate(): void {
+        this.#rebuild();
+    }
+
+    /** Tear down the current game and build a fresh one (defaults to the injected config). */
+    #rebuild(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): void {
+        this.#resultText?.destroy();
+        this.removeComponent(this.#paradroidGame);
+        this.removeExisting(this.#paradroidGame.container);
+        const newContainer = new Phaser.GameObjects.Container(this, 0, 0, []);
+        this.#paradroidGame = this.#createGame(factoryOptions, aiParams);
+        this.addComponent(this.#paradroidGame);
+        this.#paradroidGame.init();
+        this.#paradroidGame.create(newContainer);
+        this.addExisting(newContainer);
         this.resize();
     }
 
@@ -112,9 +134,13 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     #fitBoardToViewport(width: number, height: number): void {
         const board = this.#paradroidGame?.container;
         if (!board || width === 0 || height === 0) return;
-        const bounds = board.getBounds();
+        // Fit the board *plus* the header controls, so the buttons are never zoomed off-screen.
+        let bounds = board.getBounds();
+        for (const control of this.#controls) {
+            bounds = Phaser.Geom.Rectangle.Union(bounds, control.getBounds());
+        }
         if (bounds.width === 0 || bounds.height === 0) return;
-        const margin = 1.1; // ~10% padding around the board
+        const margin = 1.1; // ~10% padding around the content
         const zoom = Math.min(width / (bounds.width * margin), height / (bounds.height * margin));
         this.cameras.main.setZoom(zoom).centerOn(bounds.centerX, bounds.centerY);
     }

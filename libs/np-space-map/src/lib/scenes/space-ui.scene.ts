@@ -13,6 +13,7 @@ const BAR = { x: 60, y: 64, w: 520, h: 34 };
 export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-ui-scene';
     #bar!: Phaser.GameObjects.Graphics;
+    #title!: Phaser.GameObjects.Text;
     #jumps!: Phaser.GameObjects.Text;
     #stats!: Phaser.GameObjects.Text;
     #banner!: Phaser.GameObjects.Text;
@@ -27,9 +28,18 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         this.#sector = sector;
     }
 
-    /** 'home-reach' → 'HOME REACH'. */
-    #sectorName(): string {
-        return this.#sector.id.replace(/-/g, ' ').toUpperCase();
+    /** Refresh the HUD for a new sector (the scene is persistent, so create() doesn't re-run). */
+    loadSector(sector: Sector): void {
+        this.#sector = sector;
+        this.#title.setText(this.#titleText());
+        this.#banner.setText(''); // clear the "JUMPED OUT" banner from the sector we just left
+        this.#fraction = 0; // front starts fresh; the build's FRONT_ADVANCED will confirm it
+        this.#drawBar();
+    }
+
+    /** 'home-reach' (sector 2) → 'SECTOR 2/5  —  HOME REACH'. */
+    #titleText(): string {
+        return `SECTOR ${this.#sector.number}/${SECTOR_COUNT}  —  ${this.#sector.id.replace(/-/g, ' ').toUpperCase()}`;
     }
 
     setupComponents() {
@@ -44,13 +54,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
                 .setScrollFactor(0)
                 .setDepth(100);
 
-        text(
-            BAR.x,
-            BAR.y - 64,
-            `SECTOR ${this.#sector.number}/${SECTOR_COUNT}  —  ${this.#sectorName()}`,
-            24,
-            '#e7ecff'
-        );
+        this.#title = text(BAR.x, BAR.y - 64, this.#titleText(), 24, '#e7ecff');
         text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
         this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');

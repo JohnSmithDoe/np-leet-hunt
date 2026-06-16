@@ -119,11 +119,14 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         );
     }
 
-    /** Begin the duel: arm the seeded droid AI and start the countdown. Until this runs the board is idle. */
-    startMatch() {
+    /**
+     * Begin the duel: arm the seeded droid AI and start the countdown. Until this runs the board is idle.
+     * Pass `aiParams` to override the injected difficulty for this match (e.g. a "start hard" button).
+     */
+    startMatch(aiParams: DuelAiParams = this.#aiParams) {
         // Seed the AI from the board seed when present (fully reproducible duel), else a fresh seed.
         const seed = this.#options.seed ? `${this.#options.seed}:ai` : `${Date.now()}`;
-        this.#ai = new ParadroidAi(this.#droidGrid, this.#aiParams, new NPRng(seed));
+        this.#ai = new ParadroidAi(this.#droidGrid, aiParams, new NPRng(seed));
         this.#elapsedMs = 0;
         this.#timeUp = false;
         this.#ended = false;
