@@ -6,7 +6,7 @@ import { filter } from 'rxjs';
 
 import { Answer, Outcome, PlanetEvent, Question, Tone } from '../../events/event.model';
 import { shuffled } from '../../events/shuffle';
-import { PlanetArrivedPayload, SPACE_EVENTS } from '../../space.events';
+import { EventChoiceCommittedPayload, PlanetArrivedPayload, SPACE_EVENTS } from '../../space.events';
 
 /**
  * HTML overlay for planet-arrival events (event-system.md §6–§7): intro → question → three answers →
@@ -53,6 +53,12 @@ export class EventDialogComponent extends NPBaseSubscriber implements OnInit, On
     choose(answer: Answer): void {
         if (answer.gate) return; // gated answers render locked (§4); ignore taps until gating is wired
         this.#path.push(answer.tone);
+        const event = this.event();
+        if (answer.cost?.length && event && this.#events) {
+            // The stake is paid the moment the branch is committed, before its payoff (event-system.md §8).
+            const payload: EventChoiceCommittedPayload = { id: event.id, cost: answer.cost };
+            this.#events.emit(SPACE_EVENTS.EVENT_CHOICE_COMMITTED, payload);
+        }
         if (answer.followUp) {
             this.#showQuestion(answer.followUp);
         } else if (answer.outcome) {

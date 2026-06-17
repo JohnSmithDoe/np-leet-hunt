@@ -753,4 +753,1126 @@ export const frozenDriftEvents: PlanetEvent[] = [
             ],
         },
     },
+    {
+        id: 'frozen-frozen-waterfall',
+        sector: 'frozen-drift',
+        intro:
+            'A whole waterfall hangs off the cliff mid-fall, caught between one instant and the next — a wall ' +
+            'of glass spray frozen in the act of crashing, with the roar still trapped somewhere inside it.',
+        root: {
+            prompt: 'You hover at the frozen falls. What do you do?',
+            answers: [
+                {
+                    choice: 'Press your palm to the ice and listen for the roar',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'Through your glove you feel it — the river still trying to fall, the whole roar held under ' +
+                            'glass like a held breath. You leave without taking a single shard, and the warmth of having ' +
+                            'heard it stays with you.',
+                        effects: [{ kind: 'flag', set: 'frozen-heard-the-falls' }],
+                    },
+                },
+                {
+                    choice: 'Chip a few clear shards to trade as curios',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You knock loose a handful of frozen droplets, each one a tiny suspended splash. They will fetch ' +
+                            'a fair price as oddities, and the falls hang on undiminished, missing only the spray you ' +
+                            'pocketed.',
+                        effects: [{ kind: 'resource', marbles: 7 }],
+                    },
+                },
+                {
+                    choice: 'Blast the falls to free the river underneath',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'The ice lets go all at once, and a winter of water comes down on you — the trapped roar finally ' +
+                            'loosed, deafening, furious. You claw clear with a cracked hull and the falls freeze again above ' +
+                            'you as if nothing was ever owed.',
+                        effects: [{ kind: 'resource', hull: -2 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-comet-rink',
+        sector: 'frozen-drift',
+        intro:
+            'A comet has flattened into a glittering disc of glass-smooth ice, and across it old skate-tracks ' +
+            'loop and figure-eight — fresh, frost-edged, leading from nowhere to nowhere.',
+        root: {
+            prompt: 'The tracks beg to be followed. What do you do?',
+            answers: [
+                {
+                    choice: 'Lace on and skate the old loops yourself',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You find a single skate frozen to the ice where the tracks begin. The other is somewhere out there.',
+                        answers: [
+                            {
+                                choice: 'Skate the figure-eights until you find the second skate',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You trace every loop the way they were cut, and at the heart of the last eight the ' +
+                                        'matching skate waits, and with it a small joy the skater left behind — proof someone ' +
+                                        'played here once. Play is the one thing the grey can not take, and it shows you a way ' +
+                                        'on.',
+                                    effects: [
+                                        { kind: 'openRoute', to: 'frozen-skater-trail' },
+                                        { kind: 'resource', heart: 1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Cut your own fresh loops over the top of theirs',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You skate hard and happy until your legs burn, your tracks crossing the old ones in a ' +
+                                        'tangle. It felt good — but you have lost the thread of where the first skater was ' +
+                                        'going, and that is gone for keeps now.',
+                                    effects: [{ kind: 'resource', heart: 1 }],
+                                },
+                            },
+                            {
+                                choice: 'Skate full-tilt for the far edge to feel the speed',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You misjudge the comet edge in the dark and go over it into open space, snatching at ' +
+                                        'the ship line with frost-numb hands. You make it back aboard, shaking, having learned ' +
+                                        'this rink has no boards and no mercy.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Photograph the tracks and leave the rink untouched',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You log the loops carefully and lift off, leaving the only marks on the comet exactly as you ' +
+                            'found them. A record of someone’s play, kept safe, for whatever that is worth out here.',
+                        effects: [{ kind: 'flag', set: 'frozen-logged-the-rink' }],
+                    },
+                },
+                {
+                    choice: 'Land the ship on the rink to refuel from the ice',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'Your landing struts shear the old tracks to slush and crack the comet from edge to edge. You get ' +
+                            'your water, but the rink will never hold a skate again, and somehow that costs you more than the ' +
+                            'ice was worth.',
+                        effects: [{ kind: 'resource', heart: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-ice-hermit',
+        sector: 'frozen-drift',
+        intro:
+            'A lone figure sits on a stool over a hole cut in the floe, line in the water, back to the whole ' +
+            'frozen sky. They have, it seems, been ice-fishing here long enough to forget there are no fish.',
+        root: {
+            prompt: 'The hermit does not turn around. What do you do?',
+            answers: [
+                {
+                    choice: 'Sit down on the ice beside them and wait',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'After a long silence the hermit speaks: “Caught nothing in years. But I keep a place warm. Tea?”',
+                        answers: [
+                            {
+                                choice: 'Accept the tea and let your grandmother brew the next pot',
+                                tone: 'good',
+                                gate: { kind: 'crew', member: 'grandma' },
+                                outcome: {
+                                    resultText:
+                                        'Grandma takes over the little stove and makes something that actually tastes of home, ' +
+                                        'and the hermit weeps without knowing why. You all sit warm a while. You leave full, ' +
+                                        'mended a little, with a jar of the good leaves for the road.',
+                                    effects: [
+                                        { kind: 'resource', heart: 2 },
+                                        { kind: 'item', grant: 'frozen-warm-tea-leaves' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Accept the tea and trade stories of the road',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'The tea is thin and the stories thinner, but you part as something near friends. The ' +
+                                        'hermit presses a few cold marbles on you, all they have, for the company.',
+                                    effects: [{ kind: 'resource', marbles: 4 }],
+                                },
+                            },
+                            {
+                                choice: 'Tell them there are no fish and they should leave',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You say it kindly and it lands cruelly. The hermit reels in their empty line, packs ' +
+                                        'the stool, and walks off into the white without the tea, without a word. You watch ' +
+                                        'them go and wish you had let them keep the hole and the hope.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Leave a parcel of supplies and slip away quietly',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You set down food and a heat-cell within arm’s reach and lift off before they notice, so they ' +
+                            'need not perform gratitude. The line never twitches. Some kindnesses are best left unwitnessed.',
+                        effects: [
+                            { kind: 'resource', marbles: -3 },
+                            { kind: 'flag', set: 'frozen-fed-the-hermit' },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Snatch the catch from their bucket while they fish',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'The bucket holds only frozen river-water and a child’s lost mitten, kept like treasure. You take ' +
+                            'it before you understand what it is, and put it back with shaking hands, but the hermit has ' +
+                            'already gone still as the statues, watching the place you stood.',
+                        effects: [{ kind: 'resource', heart: -2 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-snow-globe',
+        sector: 'frozen-drift',
+        intro:
+            'A tiny world floats inside a perfect dome of clear ice — one toy town under one toy sky, snow ' +
+            'forever falling, small lights forever lit in small windows. It is no bigger than your ship.',
+        root: {
+            prompt: 'The snow-globe world turns slowly before you. What do you do?',
+            answers: [
+                {
+                    choice: 'Tip it gently to set the snow falling and watch',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You give the dome the softest push and a whole tiny winter swirls up inside — and in the swirl ' +
+                            'you swear the little figures look up, delighted, at the snow. You set it spinning slow and leave ' +
+                            'it to its falling forever. Some things are perfect because no one touches them.',
+                        effects: [{ kind: 'flag', set: 'frozen-shook-the-globe' }],
+                    },
+                },
+                {
+                    choice: 'Tow it carefully home as a wonder to keep',
+                    tone: 'neutral',
+                    followUp: {
+                        prompt: 'In the tractor field the dome chimes a high, thin note of strain. Hold the field, or let go?',
+                        answers: [
+                            {
+                                choice: 'Ease off and let it drift back to where it floated',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You release it before the chime becomes a crack and watch it settle back into its ' +
+                                        'orbit, whole. You go without your wonder, but the little town goes on snowing, and ' +
+                                        'that is its own kind of keeping.',
+                                    effects: [{ kind: 'flag', set: 'frozen-spared-the-globe' }],
+                                },
+                            },
+                            {
+                                choice: 'Cushion it in the cargo bay and creep home slow',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You pad it in everything soft you own and nurse it aboard at a crawl. It survives, ' +
+                                        'mostly — one tiny crack now lets a single flake escape each day. You will spend the ' +
+                                        'rest of the voyage counting them out.',
+                                    effects: [{ kind: 'item', grant: 'frozen-cracked-snow-globe' }],
+                                },
+                            },
+                            {
+                                choice: 'Crank the field harder to muscle it free',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The dome shatters in the beam and the little world breathes out — snow, lights, and a ' +
+                                        'town’s worth of forever, gone to glittering dust across your canopy. You fly on through ' +
+                                        'a fading snow that was a whole place a moment ago.',
+                                    effects: [
+                                        { kind: 'resource', heart: -2 },
+                                        { kind: 'front', advance: 1 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Crack the dome to scavenge the lights inside',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You break the sky open and pluck out the little lamps, still warm, still lit. They are worth ' +
+                            'something. The town goes dark behind you under snow that no longer falls, and the grey leans in ' +
+                            'where the lights were.',
+                        effects: [
+                            { kind: 'resource', marbles: 9 },
+                            { kind: 'front', advance: 1 },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-frostbit-greenhouse',
+        sector: 'frozen-drift',
+        intro:
+            'A dome of cracked glass on the ice still tries to be a garden — rows of flowers caught at full ' +
+            'bloom in a sheath of frost, colour locked under ice the moment the warmth ran out.',
+        root: {
+            prompt: 'The frozen garden holds the last colour for a hundred light-years. What do you do?',
+            answers: [
+                {
+                    choice: 'Coax one bloom back to life with the ship’s heat',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You thread a heat-line to a single frozen rose. The frost on it begins, very slowly, to bead.',
+                        answers: [
+                            {
+                                choice: 'Let your father tune the line to a gardener’s warmth',
+                                tone: 'good',
+                                gate: { kind: 'crew', member: 'dad' },
+                                outcome: {
+                                    resultText:
+                                        'Dad nurses the heat down to almost nothing, the way you warm a cold engine, and the ' +
+                                        'rose opens — one living red thing in all that frost. You cut it for the cockpit, and ' +
+                                        'it does not wilt. A scrap of colour, carried up the channel against the grey.',
+                                    effects: [
+                                        { kind: 'item', grant: 'frozen-living-rose' },
+                                        { kind: 'front', advance: -1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Warm it fast so it blooms before the front comes',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'It opens too quick and too far, blazes one brilliant second, and drops every petal at ' +
+                                        'once. You hold a bare stem and a memory of red. Better, maybe, than leaving it frozen ' +
+                                        'shut — but only just.',
+                                    effects: [{ kind: 'flag', set: 'frozen-bloomed-the-rose' }],
+                                },
+                            },
+                            {
+                                choice: 'Run the heat hot to thaw the whole row at once',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The blast thaws the row to mush and overloads your heat-line in a shower of sparks. ' +
+                                        'Nothing blooms; everything rots; and your ship limps off a little wounded, the garden ' +
+                                        'now just a black smear under glass.',
+                                    effects: [{ kind: 'resource', hull: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Gather frozen seed-pods to plant somewhere warmer',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You collect a pouch of seeds still good under their frost, tucking them away for a world that ' +
+                            'might one day have a spring again. They weigh almost nothing. You carry them like a promise you ' +
+                            'are not sure you can keep.',
+                        effects: [{ kind: 'item', grant: 'frozen-seed-pouch' }],
+                    },
+                },
+                {
+                    choice: 'Smash the glass to grab the rarest bloom whole',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'The dome implodes in the cold and the whole garden shatters to coloured ice in the same breath — ' +
+                            'a hundred years of bloom gone to glitter, the rare one with it. You leave with cut hands and the ' +
+                            'colour bleeding out of the place behind you.',
+                        effects: [
+                            { kind: 'resource', heart: -1 },
+                            { kind: 'front', advance: 1 },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-lighthouse-keeper',
+        sector: 'frozen-drift',
+        intro:
+            'An ice-rimed lighthouse stands on a black reef of frozen wrecks, its great lamp still sweeping ' +
+            'the dark — and in the glass room at the top, a keeper, frost on their shoulders, still standing watch.',
+        root: {
+            prompt: 'The lamp turns. The keeper does not. What do you do?',
+            answers: [
+                {
+                    choice: 'Climb up to keep the watch with them',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You stand the watch beside the frozen keeper through one full sweep of the lamp, and in the ' +
+                            'turning light you understand: they kept the beacon lit so the next ship would not wreck on the ' +
+                            'reef they did. You trim the lamp before you go. It will burn a while longer now.',
+                        effects: [{ kind: 'flag', set: 'frozen-stood-the-watch' }],
+                    },
+                },
+                {
+                    choice: 'Chart the reef of wrecks the lamp has been warning of',
+                    tone: 'neutral',
+                    gate: { kind: 'crew', member: 'mom' },
+                    outcome: {
+                        resultText:
+                            'Mom reads the lamp’s sweep like a sentence and maps every black wreck on the reef, turning the ' +
+                            'keeper’s long warning into a safe lane through the drift. The keeper, you like to think, would be ' +
+                            'glad the watch finally caught something.',
+                        effects: [{ kind: 'openRoute', to: 'frozen-reef-lane' }],
+                    },
+                },
+                {
+                    choice: 'Take the great lamp’s lens for the colour it throws',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You pry the lens free and the lighthouse goes dark behind you for the first time in who knows how ' +
+                            'long. The lens is worth a fortune in light. The reef of wrecks, unwarned, will be worth more in ' +
+                            'ships before long, and the grey loves an unlit shore.',
+                        effects: [
+                            { kind: 'resource', marbles: 13 },
+                            { kind: 'front', advance: 1 },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-iceberg-armada',
+        sector: 'frozen-drift',
+        intro:
+            'A fleet of icebergs sails the void in eerie formation, and frozen inside the largest, dim behind ' +
+            'fathoms of blue ice, are the masts and hulls of actual ships — a harbour that drifted away whole.',
+        root: {
+            prompt: 'The frozen harbour glides past in silence. What do you do?',
+            answers: [
+                {
+                    choice: 'Map the formation to learn where the harbour is bound',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You pace the armada for a day and read its slow current: it is drifting, impossibly, back the way ' +
+                            'the families were taken — toward the front, against all sense, going home. You log the heading. ' +
+                            'Someday it might mean something.',
+                        effects: [
+                            { kind: 'openRoute', to: 'frozen-armada-heading' },
+                            { kind: 'flag', set: 'frozen-charted-the-armada' },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Mine a low berg for fresh water and clean ice',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You carve a clean cargo of ice from an empty berg at the edge of the fleet, careful to take none ' +
+                            'with a ship inside it. The water runs sweet in your tanks, and the armada sails on one berg ' +
+                            'lighter, none the wiser.',
+                        effects: [{ kind: 'resource', marbles: 6 }],
+                    },
+                },
+                {
+                    choice: 'Cut into the great berg to reach the trapped ships',
+                    tone: 'bad',
+                    followUp: {
+                        prompt:
+                            'Your cutter bites blue ice — and from deep inside the berg, something that was frozen with the ' +
+                            'fleet stirs toward the warmth of your beam.',
+                        answers: [
+                            {
+                                choice: 'Kill the cutter and back away before it surfaces',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You cut the beam and drift back into the dark, and the stirring in the ice goes still ' +
+                                        'again, sinking back to whatever sleep it kept with the drowned harbour. You leave the ' +
+                                        'berg sealed and your nerves frayed.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                            {
+                                choice: 'Grab the nearest salvage and run for it',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You snatch a crate of frozen cargo through the gap and gun the engines as the ice ' +
+                                        'behind it groans. You get clear with your prize and the cold sense that you woke ' +
+                                        'something that will remember being woken.',
+                                    effects: [
+                                        { kind: 'resource', marbles: 8 },
+                                        { kind: 'flag', set: 'frozen-woke-the-berg' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Cut deeper toward it, drawn to see its face',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You widen the breach and it comes through — a drowned harbour-thing, all frost and ' +
+                                        'reaching, that will not let you leave with its cargo unanswered. There is no talking ' +
+                                        'to it now. Only the fight.',
+                                    effects: [
+                                        {
+                                            kind: 'spawnGame',
+                                            game: 'duel',
+                                            launch: { reason: 'frozen-armada-thing' },
+                                        },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-held-breath-field',
+        sector: 'frozen-drift',
+        intro:
+            'You drift into a field of small white clouds that do not move — clouds the exact shape of breath ' +
+            'on a cold morning, each one frozen the instant it was exhaled, hanging in the dark with no mouths near.',
+        root: {
+            prompt: 'A whole crowd breathed here once, all at once, and the breath stayed. What do you do?',
+            answers: [
+                {
+                    choice: 'Fly through slowly, breathing with them',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You match your own breath to the frozen ones and slip through the field, one more exhalation ' +
+                            'among the lost. Nothing is gained that a meter could measure. But you leave the field feeling ' +
+                            'less alone in the cold than you went in.',
+                        effects: [],
+                    },
+                },
+                {
+                    choice: 'Sample one frozen breath into a stasis flask',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You ease a single white wisp into a chilled flask — the last breath of someone, kept. It is ' +
+                            'worth something to a collector and worth more than that to you, and you are not sure you will ' +
+                            'ever be able to sell it.',
+                        effects: [{ kind: 'item', grant: 'frozen-last-breath' }],
+                    },
+                },
+                {
+                    choice: 'Burn through the field to clear a faster lane',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'Your engines scatter the frozen breaths to nothing in a single hot pass — a crowd’s last morning ' +
+                            'gone in your wake. You save a few minutes. You do not feel them as a saving. The grey slides ' +
+                            'into the empty space you cleared.',
+                        effects: [
+                            { kind: 'resource', heart: -1 },
+                            { kind: 'front', advance: 1 },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-music-box',
+        sector: 'frozen-drift',
+        intro:
+            'Adrift in the still black turns a music box carved from a single block of ice — comb, cylinder, ' +
+            'tiny dancer and all — its mechanism so cold it has slowed to one note every long, long minute.',
+        root: {
+            prompt: 'The ice box plays its slow, slow song to no one. What do you do?',
+            answers: [
+                {
+                    choice: 'Warm it just enough to hear the whole tune',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'As it warms, the tune speeds toward something you half-know — a lullaby, maybe, from before the grey.',
+                        answers: [
+                            {
+                                choice: 'Hold the warmth steady and let the song finish',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'It plays the lullaby through, the ice dancer turning, and for the length of one small ' +
+                                        'song the cold sector feels like a nursery instead of a tomb. You hum it under your ' +
+                                        'breath for days. Play is the one thing the grey can not take, and you have taken it ' +
+                                        'back a little.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'front', advance: -1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Record the tune and let the box cool again',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You capture the lullaby to your log and ease the box back to its slow frozen sleep, ' +
+                                        'one note a minute. You have the song now, even if you had to stop it playing to keep ' +
+                                        'it.',
+                                    effects: [{ kind: 'flag', set: 'frozen-recorded-the-lullaby' }],
+                                },
+                            },
+                            {
+                                choice: 'Wind it faster to hear it all before it melts',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You over-warm it and the ice comb snaps mid-phrase, the dancer toppling, the tune cut ' +
+                                        'off forever one note from its end. You will never know how the lullaby finished, and ' +
+                                        'that unfinished note follows you out.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Leave it turning and just listen to one slow note',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You cut your engines and wait out one whole minute for the single note it owes the dark. It comes ' +
+                            '— low, clear, lovely — and you fly on having heard exactly one note of a song you will never hear ' +
+                            'the rest of. It is enough.',
+                        effects: [{ kind: 'flag', set: 'frozen-heard-one-note' }],
+                    },
+                },
+                {
+                    choice: 'Crack it open for the gilded mechanism inside',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You break the ice for the little gold comb and cylinder, and they are worth real marbles — but the ' +
+                            'song dies in your hands with a last flat clunk, and the silence afterward is colder than the ice ' +
+                            'ever was.',
+                        effects: [{ kind: 'resource', marbles: 10 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-glacier-tomb',
+        sector: 'frozen-drift',
+        intro:
+            'A glacier the size of a moon hangs in the void, and pressed flat in its deep blue heart, perfectly ' +
+            'preserved, is a single small thing — too far down to make out, too clearly there to ignore.',
+        root: {
+            prompt: 'Something is kept in the glacier’s heart. Do you go down for it?',
+            answers: [
+                {
+                    choice: 'Cut a careful shaft down to whatever it is',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'Two hundred metres down, your lamp finds it: a child’s toy ship, painted, exactly the make of yours.',
+                        answers: [
+                            {
+                                choice: 'Free it gently and carry it back up to the light',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You thaw it loose and cradle it up the shaft — a toy ship like the one that became ' +
+                                        'yours, kept by the ice against all the years. Some other kid flew this once, and ' +
+                                        'played, and the grey did not get the playing. You set it on your dash beside the ' +
+                                        'controls.',
+                                    effects: [
+                                        { kind: 'item', grant: 'frozen-twin-toy-ship' },
+                                        { kind: 'resource', heart: 1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Leave it where it lies and seal the shaft behind you',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You decide some things are kept better than taken, and pack the shaft with snow so the ' +
+                                        'toy ship sleeps on undisturbed in the blue. You climb out empty-handed and oddly at ' +
+                                        'peace. The glacier will mind it longer than you could.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Blast the last ice away to grab it quickly',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The charge shatters the toy ship along with the ice — paint and timber and a stranger’s ' +
+                                        'whole childhood, gone in your haste. You climb out with splinters and a hollow you can ' +
+                                        'not name, and the cold follows you up the shaft.',
+                                    effects: [
+                                        { kind: 'resource', heart: -2 },
+                                        { kind: 'front', advance: 1 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Send the robo-pet down on a tether to scout it',
+                    tone: 'neutral',
+                    gate: { kind: 'petClass', atLeast: 2 },
+                    outcome: {
+                        resultText:
+                            'Your upgraded pet drops into the blue dark and sends back clean images of what waits below — a ' +
+                            'child’s toy ship, a twin to yours — then climbs out chirping. You know now what the glacier keeps, ' +
+                            'and you can choose when to come back for it.',
+                        effects: [{ kind: 'openRoute', to: 'frozen-glacier-heart' }],
+                    },
+                },
+                {
+                    choice: 'Strip-mine the glacier’s surface for cheap, fast ice',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You rake the surface for quick water and never look at the heart at all. The tanks fill; the ' +
+                            'glacier groans and calves a wall of ice into your flank as it settles, and you limp away with a ' +
+                            'dented hull and a thing left unseen below.',
+                        effects: [{ kind: 'resource', hull: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-vault-of-thaw',
+        sector: 'frozen-drift',
+        intro:
+            'A bank vault stands alone on the floe, blast-door ajar by a hand’s width, the cold inside it so ' +
+            'absolute it has frosted the air solid in the gap. Something behind the door catches the light and ' +
+            'will not let go of it.',
+        root: {
+            prompt: 'The door is frozen mid-swing. How do you open it?',
+            answers: [
+                {
+                    choice: 'Pour marbles’ worth of heat-charges to thaw it open clean',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -8 }],
+                    followUp: {
+                        prompt: 'The seal sighs and gives. Cold rolls out, and beyond it the strongroom waits with its hoard.',
+                        answers: [
+                            {
+                                choice: 'Take only the deed-box left out on the counter',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'Inside the box is a clear title to a safe berth on the far side of the drift, signed ' +
+                                        'and never claimed. The owner is a hundred winters gone. You take the berth they never ' +
+                                        'reached, and a fat purse besides.',
+                                    effects: [
+                                        { kind: 'openRoute', to: 'frozen-claimed-berth' },
+                                        { kind: 'resource', marbles: 16 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Sweep the open shelf of loose marbles into your pack',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'A respectable scoop of cold currency, no more than the thaw cost and a little over. You ' +
+                                        'break even on the gamble and come away with the story of a vault that kept its secrets ' +
+                                        'longer than its owners.',
+                                    effects: [{ kind: 'resource', marbles: 11 }],
+                                },
+                            },
+                            {
+                                choice: 'Force the inner safe behind the counter for the big haul',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The inner safe was a decoy rigged to seize — it clamps shut on your tools and the ' +
+                                        'refrozen door nearly takes your arm. You wrench loose with a couple of stray coins and ' +
+                                        'a cracked plate, the thaw-charges spent for almost nothing.',
+                                    effects: [{ kind: 'resource', hull: -1, marbles: 3 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Slip a thin probe through the gap and skim what you can reach',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'No fortune spent, no fortune found — the probe hooks a single coin off the lip of the gap and ' +
+                            'comes back rimed in frost. The vault keeps the rest, and you keep your charges.',
+                        effects: [{ kind: 'resource', marbles: 4 }],
+                    },
+                },
+                {
+                    choice: 'Leave the frozen vault to guard whatever it is guarding',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You lift off without testing the cold. Probably wise. But the catch of light behind that door ' +
+                            'follows you for three jumps, and you will always wonder what the drift was keeping safe.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-geyser-gamble',
+        sector: 'frozen-drift',
+        intro:
+            'A frozen geyser rises from the ice like a glass tree, branch on branch of suspended spray — and ' +
+            'deep in its trunk, a slow blue glow pulses, warm enough that the ice around it weeps. Heat, down ' +
+            'here, where there should be none.',
+        root: {
+            prompt: 'The geyser could blow if it thaws. Do you tap the warmth inside?',
+            answers: [
+                {
+                    choice: 'Vent hull heat into the trunk to coax the glow up gently',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', hull: -1 }],
+                    followUp: {
+                        prompt: 'The glass trunk warms and brightens. Then it shudders — the pressure inside is rising fast.',
+                        answers: [
+                            {
+                                choice: 'Catch the rising column in your battery banks and ride it out',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You time the surge and drink the whole warm column into the banks before it can blow — ' +
+                                        'a flood of living colour that shoves the grey back a full step and leaves the geyser ' +
+                                        'spent but standing.',
+                                    effects: [
+                                        { kind: 'front', advance: -1 },
+                                        { kind: 'resource', marbles: 6 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Cap the trunk early and bottle the warm overflow',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You seal it before the big surge and skim off a flask of the glowing melt — modest, ' +
+                                        'but real, and enough to warm the cabin for a week. The geyser sinks back to its frozen ' +
+                                        'sleep, undisturbed.',
+                                    effects: [{ kind: 'resource', marbles: 5 }],
+                                },
+                            },
+                            {
+                                choice: 'Crack the trunk wide to take the whole glow at once',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The geyser blows. A column of frozen spray and superheated melt slams your hull and the ' +
+                                        'glow gutters out in the blast. You limp clear scalded and dented, with a thimble of warmth ' +
+                                        'for all the damage done.',
+                                    effects: [{ kind: 'resource', hull: -1, marbles: 2 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Chip a few warm shards off the outer branches',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You break loose a handful of shards still faintly glowing — they will sell as novelties and warm ' +
+                            'your gloves on the way home. The geyser does not stir. A small, safe taking.',
+                        effects: [{ kind: 'resource', marbles: 4 }],
+                    },
+                },
+                {
+                    choice: 'Photograph the glass tree and leave the warmth be',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You log the impossible warm thing and fly on without touching it. A scientist’s caution. But you ' +
+                            'leave the only heat for light-years burning alone in the dark, and the cold of the cabin feels ' +
+                            'sharper for the choice.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-thin-ice-crossing',
+        sector: 'frozen-drift',
+        intro:
+            'Between you and a frost-locked observatory lies a sheet of new black ice, thin as window-glass, ' +
+            'and under it the dark water shows the dim drowned shapes of a sunken supply train — crates and ' +
+            'crates of it, just below the surface.',
+        root: {
+            prompt: 'The ice will not hold long. How do you reach the sunken train?',
+            answers: [
+                {
+                    choice: 'Crawl out flat on your belly, spreading your weight thin',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', heart: -1 }],
+                    followUp: {
+                        prompt: 'The ice creaks under you like a living thing. A crate sits within reach, lid already sprung.',
+                        answers: [
+                            {
+                                choice: 'Ease the one nearest crate up through a cut hole',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You fish the crate up slow and patient and the ice never breaks. Inside: sealed rations ' +
+                                        'and a spare drive-coil, dry as the day they sank. You belly back to shore richer and ' +
+                                        'shaking, having paid only in nerve.',
+                                    effects: [
+                                        { kind: 'item', grant: 'frozen-dry-drive-coil' },
+                                        { kind: 'resource', marbles: 9 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Grab the loose marbles spilled across the nearest crate-lid',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You sweep the spilled coins into your glove and inch back the way you came. A fair handful ' +
+                                        'for the fear, and the ice held — barely. You will dream about the creaking for a while.',
+                                    effects: [{ kind: 'resource', marbles: 7 }],
+                                },
+                            },
+                            {
+                                choice: 'Lunge for the deep crate before the ice gives',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You overreach and the sheet splits. You go through to your chest in the killing water and ' +
+                                        'haul yourself out empty-handed, soaked, your heart hammering pure cold. You make the ship ' +
+                                        'with nothing but the chill in your bones.',
+                                    effects: [{ kind: 'resource', heart: -2 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Cast a magnet-line from the safe shore and trawl',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You stay on solid ice and fish blind with a magnet, snagging one small tin off the top of the ' +
+                            'pile before the line ices up. Modest, but you never trusted your weight to glass, and that counts ' +
+                            'for something.',
+                        effects: [{ kind: 'resource', marbles: 4 }],
+                    },
+                },
+                {
+                    choice: 'Drive the ship out onto the ice to lift the whole train',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'The ice never had a chance against your landing struts. The whole sheet caves and the train sinks ' +
+                            'a fathom deeper into black water, gone for good, while you claw the ship back skyward off a ' +
+                            'collapsing shelf with a wrenched strut.',
+                        effects: [{ kind: 'resource', hull: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-avalanche-shelf',
+        sector: 'frozen-drift',
+        intro:
+            'A shelf of blue ice the size of a city overhangs a frozen ravine, and pinned in the wall beneath ' +
+            'it, half-buried, is a courier drone with its cargo light still blinking. One loud noise and the ' +
+            'whole shelf comes down.',
+        root: {
+            prompt: 'The drone’s cargo is right there, under a hanging death. What do you do?',
+            answers: [
+                {
+                    choice: 'Hover under the shelf and pluck the drone free by hand',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', hull: -2 }],
+                    followUp: {
+                        prompt: 'Ice groans overhead as you ease in close, hull shaving the shelf. The drone’s cargo hatch pops.',
+                        answers: [
+                            {
+                                choice: 'Take the sealed cargo and drift out the way you came in',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You lift the drone clear without a sound and back out under the groaning shelf. Its cargo ' +
+                                        'is a relief-run of medicine and marbles bound for a colony that never got it — yours now, ' +
+                                        'and worth every scrape on the hull.',
+                                    effects: [
+                                        { kind: 'item', grant: 'frozen-relief-cargo' },
+                                        { kind: 'resource', marbles: 14 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Snatch just the loose pouch off the drone’s hook',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You grab the dangling pouch and pull out fast, leaving the bolted-down cargo to the ice. A ' +
+                                        'decent purse for a bad position, and the shelf holds. You count yourself lucky and a little ' +
+                                        'poorer than you hoped.',
+                                    effects: [{ kind: 'resource', marbles: 6 }],
+                                },
+                            },
+                            {
+                                choice: 'Fire the cutter to free the bolted cargo faster',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The cutter’s whine is the one loud thing the shelf could not abide. It comes down in a ' +
+                                        'white roar; you punch out from under it with the drone’s pouch and a hull battered front ' +
+                                        'to back, the cargo buried under a hundred metres of fresh ice.',
+                                    effects: [{ kind: 'resource', hull: -1, marbles: 5 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Snipe the drone loose with a soft grapple from a safe distance',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You hang well back and tease the drone out with a low-power line. It comes free missing half its ' +
+                            'cargo, snagged on the ice, but you keep your distance and your hull. A cautious half-prize.',
+                        effects: [{ kind: 'resource', marbles: 5 }],
+                    },
+                },
+                {
+                    choice: 'Mark the wreck and move on — not worth the shelf',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You log the drone’s position and burn for clear sky, leaving its blinking light to the hanging ' +
+                            'ice. Sensible. But somewhere a colony’s relief is still waiting under a cliff, and you chose not to ' +
+                            'be the one who brought it.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'frozen-aurora-forge',
+        sector: 'frozen-drift',
+        intro:
+            'In a cavern under the ice cap, a smith’s forge stands cold, and racked above it hang half-made ' +
+            'blades of frozen aurora — light worked like steel, then abandoned mid-temper when the warmth ran ' +
+            'out. One anvil still holds a blade waiting for its final quench.',
+        root: {
+            prompt: 'The forge is dead, but the aurora-steel is sound. Do you finish the work?',
+            answers: [
+                {
+                    choice: 'Feed the forge a charge of your own marbles to relight it',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -6 }],
+                    followUp: {
+                        prompt: 'Spent currency burns colour-bright in the firebox; the aurora-blade glows, ready for the quench.',
+                        answers: [
+                            {
+                                choice: 'Quench it slow in the cavern’s meltwater, the smith’s way',
+                                tone: 'good',
+                                gate: { kind: 'crew', member: 'grandpa' },
+                                outcome: {
+                                    resultText:
+                                        'Grandpa reads the colour of the steel like he was born to it and calls the quench to the ' +
+                                        'heartbeat. The aurora-blade comes out singing, a thing of worked light that throws the ' +
+                                        'grey back wherever it points. Worth ten times what you fed the fire.',
+                                    effects: [
+                                        { kind: 'item', grant: 'frozen-aurora-blade' },
+                                        { kind: 'front', advance: -1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Quench it quick before the forge cools again',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You dunk it the moment it glows and it sets — not the masterwork the smith meant, but a ' +
+                                        'sound bright tool that fetches a fair price and lights a dark hold. You break even on the ' +
+                                        'marbles and come out a little ahead in wonder.',
+                                    effects: [{ kind: 'resource', marbles: 9 }],
+                                },
+                            },
+                            {
+                                choice: 'Crank the firebox white-hot to forge the whole rack at once',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You overfeed the fire and the rack of half-blades flares and shatters, raw aurora bleeding ' +
+                                        'out into the cavern in a useless dazzle. The forge dies for good, your marbles with it, and ' +
+                                        'you climb out with a single warped sliver and a hard lesson.',
+                                    effects: [{ kind: 'resource', marbles: 2 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Pry one finished blade off the cold rack and go',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You take a single completed aurora-blade from the rack without lighting a thing — duller than a ' +
+                            'fresh-quenched one, but real, and bought with nothing but the care to lift it clean. The forge ' +
+                            'stays dark behind you.',
+                        effects: [{ kind: 'item', grant: 'frozen-cold-aurora-blade' }],
+                    },
+                },
+                {
+                    choice: 'Strip the forge of its rare fittings for scrap',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You wrench loose the brass and the bellows-coils and leave the aurora-steel to dull on its dead ' +
+                            'anvil. The scrap is worth a little. The smith’s whole life’s work, abandoned a second time, is ' +
+                            'worth more than you can carry, and you carried none of it.',
+                        effects: [{ kind: 'resource', marbles: 5 }],
+                    },
+                },
+            ],
+        },
+    },
 ];

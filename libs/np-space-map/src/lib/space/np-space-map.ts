@@ -12,7 +12,7 @@ import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
 import { NormalityFront } from '../reality/normality-front';
 import { Reality } from '../reality/reality';
-import { EventResolvedPayload, SPACE_EVENTS } from '../space.events';
+import { EventChoiceCommittedPayload, EventResolvedPayload, SPACE_EVENTS } from '../space.events';
 import { Starmap, StarmapFactory } from './starmap.factory';
 import { TravelButtons } from './travel-buttons';
 
@@ -110,6 +110,7 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#setupCameraDrag();
         this.#travelButtons = new TravelButtons(this.scene);
         this.#travelButtons.onTap = planet => this.#onTravelButtonTap(planet);
+        this.scene.game.events.on(SPACE_EVENTS.EVENT_CHOICE_COMMITTED, this.#onChoiceCommitted);
         this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
         this.loadSector(this.#sector);
     }
@@ -389,6 +390,12 @@ export class NPSpaceMap extends NPGameObjectList {
         const event = resolvePlanetEvent(this.#sector.id, target.info.name);
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_ARRIVED, { event, planet: target.name });
     }
+
+    // An answer's stake (spec §8): spent the instant the player commits to that branch, before its
+    // payoff. The dialog stays open and the run continues, so this only touches the run-state store.
+    #onChoiceCommitted = (payload: EventChoiceCommittedPayload) => {
+        this.#applyEffects(payload.cost);
+    };
 
     #onEventResolved = (payload: EventResolvedPayload) => {
         this.#inEvent = false; // clear first so the effect/refresh path below can restore the buttons

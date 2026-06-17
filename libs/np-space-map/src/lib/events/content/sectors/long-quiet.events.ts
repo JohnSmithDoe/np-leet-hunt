@@ -735,4 +735,1134 @@ export const longQuietEvents: PlanetEvent[] = [
             ],
         },
     },
+    {
+        id: 'quiet-last-candle',
+        sector: 'long-quiet',
+        intro:
+            'A tiny world, no bigger than a chapel, and on it a single candle burns down in a window — the ' +
+            'last open flame in the whole grey quarter, guttering in a draught that has no business out here.',
+        root: {
+            prompt: 'The candle has minutes left. What do you do with its little light?',
+            answers: [
+                {
+                    choice: 'Cup your hands around it against the draught',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You shield it with both palms and your own breath held. The flame leans into the shelter ' +
+                            'and steadies, and for a while it is just you and one warm fleck of orange holding off an ' +
+                            'enormous grey. Small things, done stubbornly, are how the dark gets cheated.',
+                        effects: [
+                            { kind: 'resource', heart: 1 },
+                            { kind: 'front', advance: -1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Light a wick of your own from it before it goes',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You touch a taper to the failing flame and carry a daughter-light back to the ship. The ' +
+                            'first candle dies in the window the moment you turn away, but its fire goes on, smaller and ' +
+                            'somewhere else. That is most of what passing-on ever is.',
+                        effects: [{ kind: 'item', grant: 'carried-flame' }],
+                    },
+                },
+                {
+                    choice: 'Pinch it out — a flame this faint just hurts to watch',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You wet your fingers and snuff it, telling yourself it is mercy. The little world goes ' +
+                            'dark all at once, and the draught dies too, having nothing left to push against. You did ' +
+                            'the grey one chore it had not gotten to yet.',
+                        effects: [{ kind: 'front', advance: 1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-frozen-procession',
+        sector: 'long-quiet',
+        intro:
+            'A grey boulevard, and along it a funeral procession stopped dead mid-step — mourners, bearers, a ' +
+            'small coffin draped in colourless flowers, all of them caught and held by the Hush in the act of ' +
+            'grieving, forever about to take the next pace.',
+        root: {
+            prompt: 'The procession is frozen mid-mourning. What do you do here?',
+            answers: [
+                {
+                    choice: 'Walk the route with them to its end',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You fall in at the back of the stilled column. To finish the rite, what do you give it?',
+                        answers: [
+                            {
+                                choice: 'Say the few words you can remember for the lost',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You do not know who is in the little coffin, so you speak for all of them — the ' +
+                                        'taken, the tidied, the family up the channel ahead of you. The frozen mourners ' +
+                                        'do not move, but somehow the boulevard feels less unfinished. A rite needs only ' +
+                                        'one living voice.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'flag', set: 'spoke-for-the-procession' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Lay one of your own keepsakes on the bier',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You leave something small and yours among the grey flowers — a gift to strangers ' +
+                                        'who will never thank you. It costs you a little and buys you nothing, which is, ' +
+                                        'you suspect, the entire point of leaving flowers for the dead.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Take a flower from the coffin as a token',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You lift a single bloom off the small coffin to keep. It crumbles to grey dust ' +
+                                        'in your hand before you reach the ship, and the gap it left in the flowers is the ' +
+                                        'only thing about the whole procession that ever changed. You wish you had not.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Read the names on the stilled banners',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'The banners carry names in a faded hand, the dead and the mourning both. You read each one ' +
+                            'and the pet writes them down, so that somewhere off this boulevard a record exists that these ' +
+                            'people once walked, and grieved, and were going somewhere.',
+                        effects: [{ kind: 'flag', set: 'logged-the-mourners' }],
+                    },
+                },
+                {
+                    choice: 'Slip past quietly — this is not your grief',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You edge along the wall and out the far end, careful not to disturb a single stilled hem. ' +
+                            'It is the polite thing, the respectful thing. It is also one more procession that no living ' +
+                            'soul will ever finish walking, and you knew that, and you left anyway.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-drifting-bedroom',
+        sector: 'long-quiet',
+        intro:
+            "A whole child's bedroom adrift in the void — bed, rug, a shelf of slumping toys, one wall torn " +
+            'clean off a house that is no longer anywhere. The Hush took the home and somehow forgot this one ' +
+            'room, tumbling slowly with the lights still on inside.',
+        root: {
+            prompt: "Someone's whole childhood is drifting here, half-grey. What do you do?",
+            answers: [
+                {
+                    choice: 'Play one game the room was made for, just once',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You step in among the toys. Which do you pick up to play with?',
+                        answers: [
+                            {
+                                choice: 'Wind the toys up and let them march across the rug',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You set the tin soldiers and the spotted dog marching, and for one daft minute ' +
+                                        'the room is a room a child lives in. The grey on the walls actually pulls back a ' +
+                                        'shade where the playing reaches. Play is the loophole; it works even here, even now.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'front', advance: -1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Sit on the bed and read the open storybook',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'A storybook lies open where it was set down mid-tale. You read to the end of it, ' +
+                                        "sitting on a stranger-child's bed at the edge of nothing, and you do not know how " +
+                                        'the story comes out because the last pages have already gone grey. You make up a ' +
+                                        'kind ending and leave it at that.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Pocket the brightest toy and call it salvage',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You take the one toy with any colour left in it and tell yourself a child would ' +
+                                        'want it loved rather than lost. Maybe. The room dims behind you as you go, the way ' +
+                                        'a room does when its last bright thing has left it.',
+                                    effects: [{ kind: 'item', grant: 'salvaged-bright-toy' }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Tow the room somewhere it can be kept safe',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You rig a line and tow the tumbling room toward steadier dark, where the grey thins. It is ' +
+                            'slow, clumsy work for no reward you can spend, and you do it anyway, so that one childhood ' +
+                            'gets to keep drifting a while longer with its lights on.',
+                        effects: [{ kind: 'flag', set: 'towed-the-bedroom' }],
+                    },
+                },
+                {
+                    choice: 'Strip it for the working lights and fittings',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'Good lamps, sound wiring, a battery still half-charged — it all comes out clean and it all ' +
+                            'spends well down the line. You leave the room dark and tumbling, the bed unmade for a child ' +
+                            'who will not be back to it. The marbles feel heavier than they should.',
+                        effects: [{ kind: 'resource', marbles: 8 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-wishing-fountain',
+        sector: 'long-quiet',
+        intro:
+            'A plaza built around a great fountain that has run dry, its basin a grey bowl of dust and dull ' +
+            'coins — every coin a wish someone once threw, none of them granted now, none of them ever to be.',
+        root: {
+            prompt: 'The wishing fountain is dust. What do you do at the dry basin?',
+            answers: [
+                {
+                    choice: 'Throw in a coin and make a wish anyway',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You flick one marble in. It clinks among a thousand dead wishes and you wish the daft, ' +
+                            'enormous, only wish there is — them, back, all of them. Nothing happens. You feel oddly ' +
+                            'better for having asked the universe out loud, even into a fountain too tired to listen.',
+                        effects: [
+                            { kind: 'resource', marbles: -3 },
+                            { kind: 'resource', heart: 1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Read the wishes scratched around the rim',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'People carved their wishes into the stone lip where the water used to lap. A bicycle. A ' +
+                            'baby. One more summer. You read them all and add none of your own, and you leave the plaza ' +
+                            'carrying the weight of a thousand small ordinary hopes that the grey is busy un-hoping.',
+                        effects: [],
+                    },
+                },
+                {
+                    choice: 'Scoop the old coins out of the basin',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'A dry fountain is just a bowl of free money, you tell yourself, and rake the wishes into ' +
+                            'your hold by the handful. They spend exactly as well as any other marbles, which is the worst ' +
+                            'thing about them. The basin is clean and grey and utterly empty when you go.',
+                        effects: [{ kind: 'resource', marbles: 9 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-winding-music-box',
+        sector: 'long-quiet',
+        intro:
+            'A planet shaped like a vast music box, its surface a cylinder studded with hill-sized pins, turning ' +
+            'so slowly now you can count the teeth. The tune it plays is a single note every few minutes, ' +
+            'spaced wider each time as the great mainspring lets go.',
+        root: {
+            prompt: 'The whole world is one music box winding down. What do you do?',
+            answers: [
+                {
+                    choice: 'Find the keyhole and give the world a turn',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'The keyhole is a canyon, and your old broken winding key just fits it. How do you wind?',
+                        answers: [
+                            {
+                                choice: 'Wind it just enough to hear the whole song through once',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'The cylinder gathers speed and the spaced notes draw together into a melody — ' +
+                                        'wobbly, ancient, achingly sweet, a lullaby a whole planet was built to play. You ' +
+                                        'listen to all of it, once, and the listening pushes the grey back a step. Then you ' +
+                                        'let it slow again, gently.',
+                                    effects: [
+                                        { kind: 'flag', set: 'heard-the-world-song' },
+                                        { kind: 'front', advance: -1 },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Over-wind it to wring out every last note',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You crank the great key past the mark, greedy for more song. The mainspring sings ' +
+                                        'too high, too fast, and snaps with a sound like a continent breaking. The tune ' +
+                                        'stops for good, but you got a frantic, glorious verse of it that no one else ever ' +
+                                        'will. You keep the snapped-off key-end.',
+                                    effects: [{ kind: 'item', grant: 'music-box-key-tip' }],
+                                },
+                            },
+                            {
+                                choice: 'Pry pins off the cylinder to sell as curios',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'Each hill-sized pin is a single note of the song, and each one fetches a fair ' +
+                                        'price as a curio. You lever a few loose. The melody comes back missing teeth now, ' +
+                                        'gap-toothed and limping, a tune with holes worn in it by your own two hands.',
+                                    effects: [{ kind: 'resource', marbles: 7 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Record the slowing notes before the spring lets go',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You sit in orbit and let the pet capture each far-spaced note as it comes, the last ' +
+                            'heartbeats of a music-box world. Stretched out, the recording sounds less like a song ending ' +
+                            'than like one being very, very patient. You keep it.',
+                        effects: [{ kind: 'item', grant: 'slow-lullaby-recording' }],
+                    },
+                },
+                {
+                    choice: 'Leave it to wind down in its own time',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You decide the kindest thing is to let it finish on its own and fly on. The notes come ' +
+                            'wider and wider behind you until you cannot tell the last one from the silence after it. No ' +
+                            'one was there to hear the world stop singing. It only seemed kind.',
+                        effects: [{ kind: 'front', advance: 1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-fading-photograph',
+        sector: 'long-quiet',
+        intro:
+            'Hung in the grey on invisible wire, a single photograph the size of a sail turns gently in the ' +
+            'void. It shows a family at a kitchen table, laughing — and as you watch, the faces are paling, the ' +
+            'edges going white, the whole image quietly forgetting itself.',
+        root: {
+            prompt: 'The great photograph is fading before your eyes. What do you do?',
+            answers: [
+                {
+                    choice: 'Memorise the picture out loud while it lasts',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You start describing it, fast, to fix it in the telling. What do you fasten on?',
+                        answers: [
+                            {
+                                choice: 'The small details — the spilled cup, the dog under the table',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        "You name the spilled cup, the dog's ear, the way the littlest one is mid-laugh " +
+                                        'with eyes shut. The pet writes it all down. When the photograph finally goes white, ' +
+                                        'the words are still there — a family kept alive in a description, which is, after ' +
+                                        'all, how every family outlasts itself.',
+                                    effects: [
+                                        { kind: 'item', grant: 'described-photograph' },
+                                        { kind: 'flag', set: 'kept-a-family-in-words' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Just the faces, before the faces go',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You race to fix the faces and lose the race; they pale faster than you can ' +
+                                        'speak them. By the end you have five blurred descriptions of people you never met, ' +
+                                        'half-right at best. It is more than the grey wanted you to have. It is less than ' +
+                                        'they deserved.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Wonder aloud whether it is your own family',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'For one cold instant you let yourself think the fading laughers might be yours. ' +
+                                        'They are not — the kitchen is wrong, the dog is wrong — but the fear of it has ' +
+                                        'already got its hooks in, and it rides home with you, heavier than any salvage.',
+                                    effects: [{ kind: 'resource', heart: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Photograph the photograph before it vanishes',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You capture the fading image to memory — a picture of a picture, already half-gone. The ' +
+                            'copy keeps what was left when you found it, no more, no less: a family with white where their ' +
+                            'smiles used to be. You file it anyway. Half a face is still a face.',
+                        effects: [{ kind: 'flag', set: 'copied-the-photograph' }],
+                    },
+                },
+                {
+                    choice: 'Take the frame — good wood is good wood',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'The image is past saving, so you salvage the gilt frame, which is worth a tidy sum, and ' +
+                            'let the blank canvas drift. You have framed a great many things in your life. You have never ' +
+                            'before kept the frame and thrown away the family. There is a first time, it seems.',
+                        effects: [{ kind: 'resource', marbles: 6 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-unmelting-snow',
+        sector: 'long-quiet',
+        intro:
+            'A world under snow that has not melted in a hundred grey years — every flake stopped where it ' +
+            'landed, drifts smooth as poured wax, a single sledge abandoned at the top of a long white hill, ' +
+            'waiting for a winter that will never end and a child who never came back.',
+        root: {
+            prompt: 'The snow here will never melt and never fall again. What do you do on the hill?',
+            answers: [
+                {
+                    choice: 'Take the sledge down the hill, the way it was meant to go',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You drag the old sledge to the crest and shove off. The frozen snow lets you cut it after ' +
+                            'all, and you go whooping down a hundred-year hill with the robo-pet shrieking behind you, and ' +
+                            'for the length of one ride the stopped winter is just winter, and winter is wonderful. The ' +
+                            'grey loses the hill for an afternoon.',
+                        effects: [
+                            { kind: 'resource', heart: 1 },
+                            { kind: 'front', advance: -1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Build one snowman where the child would have',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'The snow packs strangely, but it packs. You build a small lopsided snowman near the sledge ' +
+                            'and give it a stone for a smile, so the hill has someone on it again. It will stand there ' +
+                            'unmelting forever, which is either very sad or very faithful. You decide it is faithful.',
+                        effects: [{ kind: 'flag', set: 'built-the-snowman' }],
+                    },
+                },
+                {
+                    choice: "Cut ice from the drifts for the ship's tanks",
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'Hundred-year ice is pure as glass and worth carving for water. You quarry a hold-full from ' +
+                            'the hillside, leaving raw grey scars in the smooth white. The sledge tips over in the wind ' +
+                            'your cutters kicked up, and lies on its side, and you tell yourself you will right it, and ' +
+                            'you do not.',
+                        effects: [{ kind: 'resource', marbles: 7 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-unreached-door',
+        sector: 'long-quiet',
+        intro:
+            'A door stands in the open void, freestanding, painted a green so vivid it hurts after all this ' +
+            'grey — a colour the Hush has somehow not reached. Warm light leaks round its edges, and from the ' +
+            'far side comes the muffled, impossible sound of an ordinary day.',
+        root: {
+            prompt: 'A door the grey has not touched, with something living behind it. What do you do?',
+            answers: [
+                {
+                    choice: 'Knock, and wait to be let in',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'Footsteps approach the far side. A voice asks, kindly, who is there. What do you say?',
+                        answers: [
+                            {
+                                choice: 'Tell them honestly who you are and why you came',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You say your name, and the kid you are, and the family you are chasing. The voice ' +
+                                        'goes soft. They cannot open the door — it is the last colour they have, and the grey ' +
+                                        'is at every wall — but they pass a warm parcel of food under it and a word of where ' +
+                                        'the front is thinnest. Kindness, behind the last green door.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'openRoute', to: 'thin-front-crossing' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Ask them to come out and run with you',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You beg them to open up and flee with you while there is still a you to flee with. ' +
+                                        'A long quiet. Then, gently: no. They have someone here who cannot be moved, and they ' +
+                                        'will not leave them to keep one door bright. You understand it completely and it ' +
+                                        'breaks your heart completely. You leave them their door.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Force the door before the grey can reach it',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You throw your shoulder to it, sure you can save them faster than they can save ' +
+                                        'themselves. The lock gives — and so does the seal, and the grey pours in through ' +
+                                        'the gap you made before the warm room can so much as cry out. The green goes to ' +
+                                        'ash under your hand. You meant to help.',
+                                    effects: [{ kind: 'front', advance: 1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Sit by the door and listen to the day going on',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You do not knock. You put your back to the warm green wood and just listen — a kettle, a ' +
+                            'radio, someone humming, the whole untaken music of an ordinary afternoon. You stay until you ' +
+                            'have to go, and you carry the sound of it with you like a coal in your chest.',
+                        effects: [{ kind: 'flag', set: 'listened-at-the-door' }],
+                    },
+                },
+                {
+                    choice: 'Scrape a flake of the green paint to keep',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You shave one curl of impossible green off the doorframe for yourself, a chip of real colour ' +
+                            'in a world that has run out. The instant it leaves the door it dulls to grey in your palm. The ' +
+                            'colour only held while it stayed where it belonged. You should have known.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-stopped-droid-foundry',
+        sector: 'long-quiet',
+        intro:
+            'A foundry-moon where the Hush builds its tidy little machines, gone quiet now mid-shift — half-' +
+            'finished grey droids hang stilled on the lines, and one nearly-complete unit twitches on its ' +
+            'cradle, caught between waking up and never waking at all.',
+        root: {
+            prompt: 'The foundry is stopped, but one droid is half-awake on its cradle. What do you do?',
+            answers: [
+                {
+                    choice: 'Reach it before the grey finishes its programming',
+                    tone: 'good',
+                    followUp: {
+                        prompt: "You get to the cradle as the droid's eyes flicker, unsure what it is yet. How do you reach it?",
+                        answers: [
+                            {
+                                choice: 'Teach it a game before the Hush can teach it a job',
+                                tone: 'good',
+                                gate: { kind: 'crew', member: 'grandpa' },
+                                outcome: {
+                                    resultText:
+                                        'Grandpa leans in with his screwdriver and his patience and shows the waking thing ' +
+                                        'patty-cake, of all the daft holy things — and the droid, never told it was meant to ' +
+                                        "tidy and take, learns to play instead. It hops off the cradle the pet's new " +
+                                        'cousin. The Hush built a soldier; you stole back a child.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'flag', set: 'foundry-droid-freed' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Pull its core before either side finishes it',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You yank the half-written core loose. The droid stills mid-flicker, neither freed ' +
+                                        'nor finished, just stopped — same as everything here. The core is good salvage and ' +
+                                        'you take it, and you try not to think about the look that was almost on its face.',
+                                    effects: [{ kind: 'resource', marbles: 6 }],
+                                },
+                            },
+                            {
+                                choice: 'Trigger its boot and let it finish waking',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You jolt it the rest of the way awake — and the grey wins the race for its mind by ' +
+                                        'a hair. It comes up off the cradle knowing exactly one thing, which is its orders: ' +
+                                        'tidy this away, starting with you. Its grip-arms unfold and it advances.',
+                                    effects: [
+                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'foundry-droid-wakes' } },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Salvage the stilled line for parts and patches',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You leave the half-awake unit on its cradle and work the dead line instead, prying good plate ' +
+                            'and sound servos from the droids that never finished. The foundry meant to mend the grey by ' +
+                            'unmaking everything else; you turn a little of it to mending your own hull.',
+                        effects: [{ kind: 'resource', hull: 1 }],
+                    },
+                },
+                {
+                    choice: 'Wreck the cradle so the grey builds nothing more here',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You smash the cradle and the half-awake droid with it, sure you are choking the foundry off ' +
+                            'at the source. It is a satisfying ruin. It is also one more thing here stopped forever by a hand ' +
+                            'that meant well, and the foundry is exactly as grey afterward, only louder for a moment.',
+                        effects: [{ kind: 'resource', heart: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-grandmother-kitchen',
+        sector: 'long-quiet',
+        intro:
+            'A house worn nearly to nothing, but its kitchen window still glows faint amber, and on the cold ' +
+            'stove sits a pot of soup the grey has stopped mid-simmer — held one degree below warm, one breath ' +
+            'short of a meal, for no one knows how long.',
+        root: {
+            prompt: 'A kitchen the grey almost took, with a pot of soup gone cold. What do you do?',
+            answers: [
+                {
+                    choice: 'Light the stove and finish the soup',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'The old stove coughs back to life. The recipe card is faded — how do you finish it?',
+                        answers: [
+                            {
+                                choice: 'Cook it the way it was always cooked here',
+                                tone: 'good',
+                                gate: { kind: 'crew', member: 'grandma' },
+                                outcome: {
+                                    resultText:
+                                        'Grandma reads the faded card, sniffs the pot, and ignores them both — her hands ' +
+                                        'know this soup the way they know a hundred others. She finishes it from memory and ' +
+                                        'the whole grey house fills with the smell of being fed. You all eat at the dead ' +
+                                        "family's table. No one is a stranger over good soup.",
+                                    effects: [
+                                        { kind: 'resource', heart: 2 },
+                                        { kind: 'flag', set: 'finished-the-soup' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Cook it your own clumsy way and serve it round',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You guess at the faded recipe and get it nearly wrong — too much salt, not enough ' +
+                                        'patience — but it is hot, and it is shared, and that turns out to be most of what ' +
+                                        'soup is for. You leave the pot clean and the bowls washed, the way you would want ' +
+                                        'someone to leave yours.',
+                                    effects: [{ kind: 'resource', heart: 1 }],
+                                },
+                            },
+                            {
+                                choice: 'Bottle the soup to ration on the long jumps',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You decant the finished soup into flasks for later rather than eat it here, in the ' +
+                                        'warm, where it was meant to be eaten. It keeps. It travels. And by the time you drink ' +
+                                        'it, cold, three jumps on, it is just calories — the kitchen and the warmth and the ' +
+                                        'point of it all left behind in the grey.',
+                                    effects: [{ kind: 'item', grant: 'flasks-of-soup' }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Set the table for the family that never sat down',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You do not light the stove. You lay the table instead — bowls, spoons, the chairs pulled out ' +
+                            'just so — for the family the grey took before supper. It is a small, useless, achingly tidy ' +
+                            'thing, a place set for ghosts. You leave it ready, in case. Then you go.',
+                        effects: [],
+                    },
+                },
+                {
+                    choice: 'Take the copper pot and the good knives',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'A heavy copper pot and a roll of well-kept knives are worth real marbles anywhere with cooking ' +
+                            'left in it. You bundle them out. The amber light in the window gutters as you cross the ' +
+                            "threshold with the kitchen's heart under your arm, and the soup you left behind will be cold " +
+                            'now forever.',
+                        effects: [{ kind: 'resource', marbles: 10 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-handwound-clock',
+        sector: 'long-quiet',
+        intro:
+            "In a watchmaker's shop pared down to grey, one small clock still keeps time — but only because " +
+            'a worn spring holds it by a thread. The mainspring will let go within the hour, and there is no ' +
+            'key, only the bare arbor you would have to turn by hand against the full pull of the works.',
+        root: {
+            prompt: 'The last working clock needs winding by hand, and the spring will fight you. Do you try?',
+            answers: [
+                {
+                    choice: 'Set your fingers to the bare arbor and wind it the hard way',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', heart: -1 }],
+                    followUp: {
+                        prompt: 'The steel bites your fingers and the works resist every turn. How does it go?',
+                        answers: [
+                            {
+                                choice: 'Hold on through the pain and bring the spring up full',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'Your fingers are raw and your hand will not unclench for an hour, but the clock ' +
+                                        'ticks on full and proud, and a wound spring keeps time long after the winding is ' +
+                                        'forgotten. You leave it ticking into the grey, the only living hour for light-years.',
+                                    effects: [
+                                        { kind: 'front', advance: -1 },
+                                        { kind: 'flag', set: 'handwound-the-last-clock' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Get a few turns in before your grip gives out',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You manage a handful of turns before your hand simply will not hold. The clock ' +
+                                        'gains an hour, maybe two, bought with skin and sweat — a short reprieve, but you ' +
+                                        'were the one who chose to grant it. It ticks behind you as you go.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Slip on the last turn and snap the tired spring',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'Your raw fingers lose the arbor at the worst moment and it spins back free. The ' +
+                                        'overtaxed spring lets go with a flat little twang, and the last clock in the grey ' +
+                                        'goes still in your bleeding hands. You hurt yourself to stop a clock a minute early.',
+                                    effects: [],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Note the time it shows and leave it to run down',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You read the hands, log the hour for your charts, and let the little clock keep its own ' +
+                            'last appointment without you. Somewhere out there it will stop, unwitnessed, and the grey ' +
+                            'will not even notice it had been counting.',
+                        effects: [{ kind: 'flag', set: 'logged-the-last-hour' }],
+                    },
+                },
+                {
+                    choice: 'Pocket the clock to sell while it still ticks',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'A working clock is a rare thing this deep in the grey, worth real marbles to the right ' +
+                            'buyer. You wrap it carefully. By the time you reach the ship the spring has run down in ' +
+                            'your pack, and you are carrying just another stopped clock to a sector that has plenty.',
+                        effects: [{ kind: 'resource', marbles: 8 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-dimming-star',
+        sector: 'long-quiet',
+        intro:
+            'A small old star, the last warm thing for parsecs, has guttered to a dull ember the colour of ' +
+            'cooling iron. The handful of grey worlds still huddled around it are going cold in its dimming, ' +
+            'and your hold carries fuel cells that would burn bright enough to feed a fading sun, for a while.',
+        root: {
+            prompt: 'You could pour your reserves into the dying star to stoke it. Do you spend them?',
+            answers: [
+                {
+                    choice: 'Vent your fuel cells into its corona to stoke the fire',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -8 }],
+                    followUp: {
+                        prompt: 'The cells dump their charge into the failing star. Does the old fire take?',
+                        answers: [
+                            {
+                                choice: 'It catches, and the worlds below feel the warmth',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'The ember flares back to a steady amber glow, and across the cold worlds below, ' +
+                                        'grey shutters open to a sun that came back. It will not last forever. But you bought ' +
+                                        'them a long bright while, and the grey has to start its tidying all over again.',
+                                    effects: [
+                                        { kind: 'front', advance: -1 },
+                                        { kind: 'flag', set: 'fed-the-dying-star' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'It flickers up, then settles back to embers',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'The star brightens, gloriously, for the length of an afternoon — long enough for ' +
+                                        'one warm day on the cold worlds, for shadows to fall the old way one more time. Then ' +
+                                        'it sinks back to ember. A day of sun, paid for in full. Some gifts are only a day long.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'It swallows the charge and dims regardless',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The fuel pours in and the star drinks it down and dims anyway, too far gone to ' +
+                                        'feel the feeding. You watch your reserves vanish into a fire that was always going ' +
+                                        'out. You cannot save a sun with a full hold, it turns out. You only get to try.',
+                                    effects: [],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Warn the cold worlds to gather what warmth they can',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You broadcast the simple, useless, necessary truth — the sun is going, hold each other close ' +
+                            'while it lasts. The replies come back quiet and grateful. You gave them no heat, only honesty, ' +
+                            'and a chance to spend the last of the light on purpose.',
+                        effects: [{ kind: 'flag', set: 'warned-the-cold-worlds' }],
+                    },
+                },
+                {
+                    choice: 'Skim the dying star for cheap, easy fuel',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'A guttering star sheds plasma loose and slow, and you scoop a hold-full of nearly-free fuel ' +
+                            'from a fire too weak to stop you. The worlds below dim a shade faster for what you took. Easy ' +
+                            'marbles, off the back of a sun in its last days.',
+                        effects: [{ kind: 'resource', marbles: 9 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-grey-toll',
+        sector: 'long-quiet',
+        intro:
+            'A narrow rift through a wall of stilled debris is the only quick way deeper into the grey, and a ' +
+            'lone, half-faded tollkeeper sits at its mouth in a booth worn smooth by waiting. He does not take ' +
+            'marbles. "A memory," he says, gently. "One you would rather keep. That is the toll, or the long way round."',
+        root: {
+            prompt: 'The tollkeeper wants a treasured memory to let you through the rift. Do you pay it?',
+            answers: [
+                {
+                    choice: 'Give him a memory you love, to take the fast road',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', heart: -2 }],
+                    followUp: {
+                        prompt: 'You hand over a warm and private memory. What does he do with it, and what does it open?',
+                        answers: [
+                            {
+                                choice: 'He keeps it kindly, and the rift opens onto a sheltered passage',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'He cups your memory like a coal and the rift sighs open ahead. The way through is ' +
+                                        'short and sheltered, the front thin along it — he saves the easy roads for those who ' +
+                                        'pay dear. You go on lighter by one bright thing, and faster for the lack of it.',
+                                    effects: [
+                                        { kind: 'front', advance: -1 },
+                                        { kind: 'openRoute', to: 'sheltered-rift-passage' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'He simply waves you through the gap and says no more',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'The barrier parts and he gestures you on, your memory already fading from you as ' +
+                                        'you pass — you know there was something you loved here a moment ago, and now there ' +
+                                        'is only the shape of the missing it. The road ahead is ordinary. The toll was not.',
+                                    effects: [{ kind: 'openRoute', to: 'grey-rift' }],
+                                },
+                            },
+                            {
+                                choice: 'He pockets it, and the rift turns out to lead nowhere good',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'He takes the memory and the gap opens onto a dead-end gully of stalled wrecks, ' +
+                                        'no quicker than the long way and a good deal colder. You paid in something you ' +
+                                        'cannot get back for a road that was never worth it. He was already gone when you turned.',
+                                    effects: [],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Offer him company and a story instead of a memory',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You sit in his worn booth and trade tellings for an hour — yours of the family, his of the ' +
+                            'thousands who passed before the grey came. He will not waive the toll, but he points you to ' +
+                            'the long way round and a few quiet places along it. Some keepers only ever wanted the company.',
+                        effects: [{ kind: 'flag', set: 'sat-with-the-tollkeeper' }],
+                    },
+                },
+                {
+                    choice: 'Run the rift without paying, and chance the debris',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You gun the drives and thread the stilled wreckage on nerve alone. You make it through, ' +
+                            'scraped and rattled, the hull singing where a girder kissed it. The tollkeeper does not chase ' +
+                            'you. He only watches you go, the way you watch a thing you already know the ending of.',
+                        effects: [{ kind: 'resource', hull: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-remembering-pool',
+        sector: 'long-quiet',
+        intro:
+            'A still grey pool fills a crater on a dead moon, and the robo-pet goes rigid at its edge: the ' +
+            'water shows not your reflection but the past, the day the Hush came, if you are willing to look. ' +
+            'Looking will cost you — the seeing of it again is its own small wound — but you have forgotten so much.',
+        root: {
+            prompt: 'The pool will show you a lost memory of that day, if you pay the ache of looking. Do you look?',
+            answers: [
+                {
+                    choice: 'Kneel and look into the water, whatever it costs to see',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', heart: -1 }],
+                    followUp: {
+                        prompt: 'The grey surface clears. Out of the forgetting, what does it give back to you?',
+                        answers: [
+                            {
+                                choice: 'A clear, kind moment — a face, a name, a way home',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'The water shows you the last bright minute before the grey — a face turning to ' +
+                                        'call your name, a door you know, a direction you had lost. It hurts to see and it is ' +
+                                        'worth the hurt. You rise knowing one true thing about where they were taken.',
+                                    effects: [
+                                        { kind: 'flag', set: 'looked-in-the-pool' },
+                                        { kind: 'openRoute', to: 'remembered-way-home' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'A small ordinary memory, dear and useless',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'No map, no name — just an ordinary morning, breakfast and bickering and someone ' +
+                                        'laughing at a joke you have forgotten. It tells you nothing you can fly toward. But ' +
+                                        'you had lost even this, and now you have it back, and you find you needed it more.',
+                                    effects: [{ kind: 'resource', heart: 1 }],
+                                },
+                            },
+                            {
+                                choice: 'Only the grey arriving, and the cold of it',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The pool gives you the worst of it: the colour going out of the world, the quiet ' +
+                                        'coming down, the helpless watching. You paid to remember and it remembered you the ' +
+                                        'fear. You stand a long time before you can make yourself walk away from the edge.',
+                                    effects: [],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Let the robo-pet sample the water without looking yourself',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You keep your eyes on the dead horizon and let the pet take a careful reading instead. It ' +
+                            'logs faint traces of a day it has no feelings to be hurt by — data, not memory — and stores ' +
+                            'them safe against a time you are stronger. Some things are better met later, or never alone.',
+                        effects: [{ kind: 'flag', set: 'sampled-the-pool' }],
+                    },
+                },
+                {
+                    choice: 'Throw a stone to break the surface and walk on',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You will not be made to bleed for a puddle. You pitch a rock dead-centre and the past ' +
+                            'shatters into ripples and grey. By the time the water stills again you are over the crater ' +
+                            'rim, telling yourself you did not want to know, and almost believing it.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'quiet-last-streetlamp',
+        sector: 'long-quiet',
+        intro:
+            'A whole greyed-out town, and at the end of its longest street one lamp still burns, its little ' +
+            'pool of warm light the size of a doorstep — the last lit thing in a place the Hush has nearly ' +
+            'finished. Its cell is failing. You carry a battery that could feed it, but it is a battery you need.',
+        root: {
+            prompt: 'The last streetlamp is dying, and your spare cell would keep it lit. Do you give it up?',
+            answers: [
+                {
+                    choice: 'Wire your spare cell into the lamp to keep it burning',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -5 }],
+                    followUp: {
+                        prompt: 'The lamp drinks the new charge and brightens. In its restored light, what comes out of the grey?',
+                        answers: [
+                            {
+                                choice: 'An old stray, drawn out of the dark to the warm pool of light',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'A small grey shape pads into the lamplight — a cat, half-faded, that had been ' +
+                                        'waiting in the dark for a light to come back. It curls in the warm circle and lives ' +
+                                        'there now, the keeper of the last lit step in town. The grey gives that corner up.',
+                                    effects: [
+                                        { kind: 'front', advance: -1 },
+                                        { kind: 'flag', set: 'kept-the-streetlamp' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Nothing, but the light holds, steady and stubborn',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'No one comes. The street stays empty. But the lamp burns on, steady now, a single ' +
+                                        'lit doorstep refusing the grey on a road no one walks. You leave it shining behind ' +
+                                        'you, and somehow that one held light makes the whole dark town easier to leave.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'A surge through the old wiring, and the lamp blows dark',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The corroded wiring cannot take the fresh charge. The lamp flares painfully bright, ' +
+                                        'the filament whines, and the glass cracks and goes black for good. You spent your ' +
+                                        'spare to snuff the last light a little sooner than the grey would have. It happens.',
+                                    effects: [],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Stand in the lamplight a while before its cell dies',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You step into the little warm circle and just stand in it, the way you would stand in a ' +
+                            'doorway saying a long goodbye. The cell gives out while you are in it, and the dark comes ' +
+                            'gentle, and you are glad you were the last one the lamp got to shine on.',
+                        effects: [{ kind: 'flag', set: 'stood-in-the-last-light' }],
+                    },
+                },
+                {
+                    choice: "Salvage the lamp's good cell and copper for yourself",
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'There is still a little charge in the failing cell and good copper in the housing, and it ' +
+                            'all comes out clean and spends fine. The street goes dark behind you the instant you pull the ' +
+                            'cell, the whole town finally, completely grey, and you carrying off the last of its light.',
+                        effects: [{ kind: 'resource', marbles: 7 }],
+                    },
+                },
+            ],
+        },
+    },
 ];

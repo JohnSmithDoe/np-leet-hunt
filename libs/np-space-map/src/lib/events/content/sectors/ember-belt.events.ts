@@ -744,4 +744,989 @@ export const emberBeltEvents: PlanetEvent[] = [
             ],
         },
     },
+    {
+        id: 'ember-card-sharp',
+        sector: 'ember-belt',
+        intro:
+            'A card sharp works a cinder-station table, dealing from a deck printed on sheets of cooled lava-glass. ' +
+            'Each card catches the forge-light and throws it back as a wink. "Sit," he says. "Win something."',
+        root: {
+            prompt: 'The sharp fans the glass deck and waits. How do you sit down at his table?',
+            answers: [
+                {
+                    choice: 'Play the man, not the cards',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You watch his hands instead of the deck. Twice he glances left before a big hand. Use it how?',
+                        answers: [
+                            {
+                                choice: 'Wait for the tell, then bet big',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You let him think he has you, then call the hand his eyes already named. He pays ' +
+                                        'out laughing, a man who respects being read more than he loves winning.',
+                                    effects: [{ kind: 'resource', marbles: 13 }],
+                                },
+                            },
+                            {
+                                choice: 'Play it safe and grind small pots',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You nickel-and-dime him for an hour and leave a little ahead. He tips an imaginary ' +
+                                        'hat; you both know nothing real changed hands.',
+                                    effects: [{ kind: 'resource', marbles: 4 }],
+                                },
+                            },
+                            {
+                                choice: 'Accuse him before you are sure',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You name the glance a cheat too loud and too soon. He folds the deck, the table ' +
+                                        'empties, and you leave the cinder-station with nothing but the heat on your face.',
+                                    effects: [{ kind: 'flag', set: 'ember-burned-the-table' }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Buy a glass card off him as a souvenir',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You skip the game and buy a single card — the ace, glowing faintly, warm as a held hand. He ' +
+                            'sells it gladly; he can print another, and you cannot keep a moment like this otherwise.',
+                        effects: [
+                            { kind: 'resource', marbles: -3 },
+                            { kind: 'item', grant: 'glass-ace' },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Bet the ship papers on one big hand',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You shove everything onto the felt to feel the heat of it. The river card lands cold and ' +
+                            'his, and you buy the papers back at his price — a stupid tax on a stupid thrill.',
+                        effects: [{ kind: 'resource', marbles: -12 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-lava-surfer',
+        sector: 'ember-belt',
+        intro:
+            'A lava-surfer rides a heat-shield board across the molten seas of a forge world, trailing sparks ' +
+            'and whooping. She carves up alongside your hull. "You fly that thing or just sit in it?" she grins.',
+        root: {
+            prompt: 'The surfer dares you to run the magma channel with her. What do you say to the dare?',
+            answers: [
+                {
+                    choice: 'Match her run, flying for the joy of it',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You drop into the channel beside her and just fly — no cargo, no front, no family, only the ' +
+                            'roar and the laughing. For one bright minute the grey has nothing to take, and it knows it.',
+                        effects: [
+                            { kind: 'resource', heart: 1 },
+                            { kind: 'front', advance: -1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Pace her carefully and learn the channel',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You hang back a length and read the heat-currents off her board, banking your flying knowledge ' +
+                            'for later. She calls you cautious. You call it surviving.',
+                        effects: [{ kind: 'flag', set: 'ember-knows-magma-currents' }],
+                    },
+                },
+                {
+                    choice: 'Show off with a tight pass over the magma',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You dive too low to impress her and the magma kisses your belly plating. She hauls you up by ' +
+                            'a tow-line, shaking her head — the joy curdled the second you made it about being watched.',
+                        effects: [{ kind: 'resource', hull: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-meteor-foundry',
+        sector: 'ember-belt',
+        intro:
+            'A foundry built into a captured meteor catches falling rock and forges it mid-flight, hammers ' +
+            'ringing in the vacuum. The foundry-master leans out a glowing port. "Bring me work or bring me ore."',
+        root: {
+            prompt: 'The meteor foundry will forge you a part — if you supply the labour or the raw rock. Which?',
+            answers: [
+                {
+                    choice: 'Haul it a fresh meteor and earn the work honestly',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You drag in a fat, ore-heavy rock the foundry can chew on for a week. Delighted, the master ' +
+                            'forges you a part of his very best steel and waves the fee — fair trade, well met.',
+                        effects: [
+                            { kind: 'item', grant: 'meteor-forged-strut' },
+                            { kind: 'resource', hull: 1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Lend your tinkerer to dial in the hammers',
+                    tone: 'neutral',
+                    gate: { kind: 'crew', member: 'grandpa' },
+                    outcome: {
+                        resultText:
+                            'Grandpa squints at the hammer-timing, mutters about lazy calibration, and rebuilds the cadence ' +
+                            'over an afternoon. The master pays for the tune-up in a sturdy part and a fistful of marbles.',
+                        effects: [
+                            { kind: 'item', grant: 'meteor-forged-strut' },
+                            { kind: 'resource', marbles: 5 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Rush the master to forge it hot and fast',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You badger him into skipping the temper. The part comes out fast and brittle, and it cracks the ' +
+                            'first time the hull takes a real strain. You paid for the privilege of doing it twice.',
+                        effects: [{ kind: 'resource', marbles: -4, hull: -1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-fireworks-barge',
+        sector: 'ember-belt',
+        intro:
+            'A drifting barge packed with festival fireworks signals weakly — its crew long gone, its cargo ' +
+            'still live and humming with stored colour. The grey has been nibbling at one corner of the hold.',
+        root: {
+            prompt: 'The abandoned fireworks barge is half-claimed by the Hush. What do you do with it?',
+            answers: [
+                {
+                    choice: 'Tow it clear and set the whole sky alight',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You drag it into open space, finger over the launch key. How do you fire the display?',
+                        answers: [
+                            {
+                                choice: 'Burn it all at once in one mad bloom',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You light the lot. The dark blooms purple and gold and impossible green for a full ' +
+                                        'minute, and the front actually recoils from a hold full of pure, useless joy.',
+                                    effects: [{ kind: 'front', advance: -1 }],
+                                },
+                            },
+                            {
+                                choice: 'Sell the fireworks to the next station',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You ration the colour into crates and trade them down the line. Good marbles for ' +
+                                        'someone else to set off. Practical. A little sad, in the quiet after.',
+                                    effects: [{ kind: 'resource', marbles: 10 }],
+                                },
+                            },
+                            {
+                                choice: 'Pry into the grey-touched corner first',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You poke at the Hush-bitten crates and a string of half-drained rockets cooks off ' +
+                                        'wrong, all ash and no colour. The blast rattles your hull and the grey leans in.',
+                                    effects: [
+                                        { kind: 'resource', hull: -1 },
+                                        { kind: 'front', advance: 1 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Strip the launch tubes for parts',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You salvage the firing rigs and leave the colour to the grey. Useful hardware, a hold that ' +
+                            'still smells faintly of festivals you will not get to.',
+                        effects: [{ kind: 'item', grant: 'firework-launch-tube' }],
+                    },
+                },
+                {
+                    choice: 'Leave the barge to the Hush',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You log it and pass it by. By the time you look back the colour has gone out of the hold ' +
+                            'entirely, one more bright thing the grey ate while you watched.',
+                        effects: [{ kind: 'front', advance: 1 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-coin-flip-toll',
+        sector: 'ember-belt',
+        intro:
+            'A toll-gate spans the only safe gap through a grinding asteroid wall. The keeper, a one-eyed ' +
+            'tinker-bot, flips a forge-cast coin in the air. "Heads you pass free," it clicks. "Tails you pay."',
+        root: {
+            prompt: 'The toll-bot offers a coin flip for passage. How do you take the gamble?',
+            answers: [
+                {
+                    choice: 'Ask to inspect the coin before the flip',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You turn the coin over and feel the weighted rim — tails, every time. The bot freezes, then ' +
+                            'clicks something that might be a laugh and waves you through free for catching it.',
+                        effects: [{ kind: 'flag', set: 'ember-caught-the-toll' }],
+                    },
+                },
+                {
+                    choice: 'Just pay the toll and skip the flip',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You drop the marbles in the slot without playing. The gate grinds open. The bot seems almost ' +
+                            'disappointed not to fleece you, but a toll paid is a toll paid.',
+                        effects: [{ kind: 'resource', marbles: -4 }],
+                    },
+                },
+                {
+                    choice: 'Take the flip and trust the coin',
+                    tone: 'bad',
+                    followUp: {
+                        prompt: 'The coin spins up glinting and comes down tails, of course. The bot extends a hand. Pay up?',
+                        answers: [
+                            {
+                                choice: 'Pay the loss and let it go',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You hand over the toll without a fuss. The bot pockets it and, oddly touched by ' +
+                                        'the grace, marks a shortcut on your chart for the trouble.',
+                                    effects: [
+                                        { kind: 'resource', marbles: -5 },
+                                        { kind: 'openRoute', to: 'ember-asteroid-shortcut' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Haggle the toll down by half',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You argue the rigged coin entitles you to a discount. The bot considers the logic, ' +
+                                        'concedes it, and takes half. A small win dressed up as a loss.',
+                                    effects: [{ kind: 'resource', marbles: -2 }],
+                                },
+                            },
+                            {
+                                choice: 'Run the gate without paying',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You gun it through the closing gate. The asteroid wall takes its own toll off your ' +
+                                        'flank in scrapes, and the bot transmits your heading to the grey out of spite.',
+                                    effects: [
+                                        { kind: 'resource', hull: -1 },
+                                        { kind: 'front', advance: 1 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-salamander-pet',
+        sector: 'ember-belt',
+        intro:
+            'A creature-seller hawks a forge-salamander from a heat-lamp cage — a little fire-lizard that ' +
+            'curls round a hot coal and purrs sparks. "Lonely up here, traveller?" she asks. "It runs cold engines warm."',
+        root: {
+            prompt: 'The salamander blinks up at you, its tail-flame guttering. What do you do about the little thing?',
+            answers: [
+                {
+                    choice: 'Take it aboard as ship-pet and friend',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'It settles by your robo-pet at once, sparks meeting servos. Where do you let it live?',
+                        answers: [
+                            {
+                                choice: 'Let it nest in the cold engine bay',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'It coils in the engine bay and runs the whole drive a few degrees warmer, purring. ' +
+                                        'Your robo-pet adopts it instantly. The ship feels less empty with two small things in it.',
+                                    effects: [
+                                        { kind: 'resource', heart: 1 },
+                                        { kind: 'flag', set: 'ember-salamander-aboard' },
+                                    ],
+                                },
+                            },
+                            {
+                                choice: 'Keep it caged where it is safe',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You keep it lamp-lit and contained, fed and dim. It survives. It does not sing. You ' +
+                                        'tell yourself caution is kindness and almost believe it.',
+                                    effects: [],
+                                },
+                            },
+                            {
+                                choice: 'Let it roam the wiring unwatched',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You let it explore and it nests in the wiring loom, chewing through a heat-line ' +
+                                        'before you smell the smoke. You love it anyway; the repair still stings.',
+                                    effects: [{ kind: 'resource', hull: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Buy a season of feed for the cage instead',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You cannot keep it, but you pay for its coal and care so it stays fed and warm here. The ' +
+                            'seller nods. The salamander watches you leave with one bright, unbothered eye.',
+                        effects: [{ kind: 'resource', marbles: -3 }],
+                    },
+                },
+                {
+                    choice: 'Haggle her down by talking the beast cheap',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You run the salamander down to drop the price — sickly, common, half-cooked. It works, and the ' +
+                            'creature flinches at every word, and you carry a small mean thing away wrapped in cheap cloth.',
+                        effects: [
+                            { kind: 'resource', marbles: -1, heart: -1 },
+                            { kind: 'item', grant: 'forge-salamander' },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-blacksmith-ghost',
+        sector: 'ember-belt',
+        intro:
+            'A forge-world long gone cold, every fire grey ash — yet one anvil still rings, struck by a smith ' +
+            'who is mostly memory now, a flicker of orange in the shape of a worker who would not stop working.',
+        root: {
+            prompt: 'The ghost-smith hammers nothing on a dead anvil, over and over. How do you meet it?',
+            answers: [
+                {
+                    choice: 'Sit with it and listen to the old work-songs',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You sit on the cold step and let it tell you, in clangs and half-words, about the apprentices ' +
+                            'and the orders and the heat. When the song ends the flicker simply goes out, finished, at peace.',
+                        effects: [],
+                    },
+                },
+                {
+                    choice: "Take a tool from the smith's cold rack",
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You lift a hammer the ghost no longer needs. It does not stop you — perhaps it is glad the ' +
+                            'tools will swing again. The grip is still warm where a hand held it for forty years.',
+                        effects: [{ kind: 'item', grant: 'ghost-smith-hammer' }],
+                    },
+                },
+                {
+                    choice: 'Demand it forge you something before it fades',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You bark an order at the dead like it is a vending machine. The flicker turns, and what little ' +
+                            'warmth was left in the forge-world goes out faster — you hurried a thing that wanted only to rest.',
+                        effects: [
+                            { kind: 'resource', heart: -1 },
+                            { kind: 'front', advance: 1 },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-demolition-derby',
+        sector: 'ember-belt',
+        intro:
+            'A demolition derby roars inside a hollowed asteroid arena — junk-ships ramming junk-ships for a pot ' +
+            'of marbles and the howl of the crowd. A barker waves you toward the starting grid. "Fresh meat! Sign here!"',
+        root: {
+            prompt: 'The asteroid derby wants your ship on the grid. How do you take the bait?',
+            answers: [
+                {
+                    choice: 'Race clean, win on flying not wrecking',
+                    tone: 'good',
+                    followUp: {
+                        prompt: 'You enter the chaos meaning to dance, not crash. The pack closes in fast. How do you run it?',
+                        answers: [
+                            {
+                                choice: 'Thread the wrecks and never get touched',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You slip every ram and let the bruisers total each other behind you, then coast in ' +
+                                        'untouched to take the pot. The crowd hates it and the marbles spend the same.',
+                                    effects: [{ kind: 'resource', marbles: 12 }],
+                                },
+                            },
+                            {
+                                choice: 'Trade a few hits for a podium finish',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You take some knocks staying in the scrum and finish third — a fair pot for a few ' +
+                                        'fresh dents. The hull will forgive you eventually.',
+                                    effects: [{ kind: 'resource', marbles: 6, hull: -1 }],
+                                },
+                            },
+                            {
+                                choice: 'Pick a grudge match with the favourite',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You single out the crowd favourite and it becomes personal fast. The derby stops ' +
+                                        'being a race and becomes a fight, and the arena loves it.',
+                                    effects: [
+                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'ember-derby-grudge' } },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Bet on a driver from the stands instead',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You sit it out and back a grizzled veteran in a patched hauler. She survives, you cash a modest ' +
+                            'ticket, and your hull stays pristine through the whole glorious mess.',
+                        effects: [{ kind: 'resource', marbles: 4 }],
+                    },
+                },
+                {
+                    choice: 'Enter the wreckers and ram for the lead',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You go in swinging your prow like a hammer. You win some marbles and lose more hull, and limp ' +
+                            'out the gate while the barker cheerfully books you for a rematch you cannot afford.',
+                        effects: [{ kind: 'resource', marbles: 5, hull: -2 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-marble-kiln',
+        sector: 'ember-belt',
+        intro:
+            "A magma kiln on a smith-moon casts marbles by the thousand — the sector's mint, where the world's " +
+            'currency is literally made. The kilnmaster offers you a turn at the casting trough. "Pour true," she warns.',
+        root: {
+            prompt: 'The kiln lets you cast your own marbles from molten glass. How steady is your hand?',
+            answers: [
+                {
+                    choice: 'Pour slow and let each bead cool true',
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You take your time at the trough and pour a tray of flawless marbles, each one catching light ' +
+                            'like a tiny captured sun. The kilnmaster lets you keep the lot for the craft of it.',
+                        effects: [{ kind: 'resource', marbles: 10 }],
+                    },
+                },
+                {
+                    choice: 'Cast one perfect marble and keep it',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You pour a single marble, slow and deliberate, and pocket it instead of spending it — a small ' +
+                            'round thing the colour of a home you are flying to find. It is not currency. It is a promise.',
+                        effects: [
+                            { kind: 'item', grant: 'kept-marble' },
+                            { kind: 'resource', heart: 1 },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Pour fast to flood the tray and grab more',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You rush the pour, greedy for volume, and the trough overflows in a wave of glass that sets ' +
+                            'half the tray bubbling worthless. The kilnmaster sweeps the slag away and you with it.',
+                        effects: [{ kind: 'resource', marbles: -3 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-roulette-comet',
+        sector: 'ember-belt',
+        intro:
+            'A comet has been hollowed into a roulette wheel a kilometre wide, its tail the spinning rim, ' +
+            'lit pockets streaking through the dark. A casino-warden hails you from the hub. "Place your final bet."',
+        root: {
+            prompt: 'The roulette comet spins toward its next number. The warden waits for your bet. How do you play it?',
+            answers: [
+                {
+                    choice: "Read the comet's drift yourself and bet the physics",
+                    tone: 'good',
+                    outcome: {
+                        resultText:
+                            'You watch the tail slow for three spins, eyeball the arc, and call a pocket on a hunch dressed ' +
+                            'as arithmetic. The wheel lands close enough to pay, and the warden settles up grinding his teeth.',
+                        effects: [{ kind: 'resource', marbles: 11 }],
+                    },
+                },
+                {
+                    choice: 'Let your navigator chart the spin exactly',
+                    tone: 'neutral',
+                    gate: { kind: 'crew', member: 'mom' },
+                    outcome: {
+                        resultText:
+                            "Mom plots the comet's spin off your charts in her head and names the pocket cold. You bet small " +
+                            "and sure, win clean, and best of all she logs the wheel's orbit as a quiet new route home.",
+                        effects: [
+                            { kind: 'resource', marbles: 6 },
+                            { kind: 'openRoute', to: 'ember-comet-orbit-lane' },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Stake it all on a single lit pocket',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            "You ride one number all the way down. The comet's tail sweeps past your pocket and stops a " +
+                            "hair short, the way the house likes it. The warden bows; the marbles are already the comet's.",
+                        effects: [{ kind: 'resource', marbles: -10 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-ante-pit',
+        sector: 'ember-belt',
+        intro:
+            'A sunken ante-pit on a smelter-station, ringed by gamblers who bet on which crucible cracks first. ' +
+            'The pit-boss, a slag-jawed golem cousin to the Dicekeeper, rakes the pot with a glowing hook.',
+        root: {
+            prompt: 'The pit-boss waves you to a seat at the crucible-bet. How heavy do you sit down?',
+            answers: [
+                {
+                    choice: 'Ante a fat stack and read the heat-cracks yourself',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -10 }],
+                    followUp: {
+                        prompt:
+                            'Your stack is on the rail and the crucibles glow hotter. One is hairlining early. ' +
+                            'How do you call it?',
+                        answers: [
+                            {
+                                choice: 'Bet the hairline crucible and ride it hard',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You called the crack three breaths before it split. The pot lands in your lap ' +
+                                        'in a steaming heap and the pit-boss bows like it tastes something sour.',
+                                    effects: [{ kind: 'resource', marbles: 16 }],
+                                },
+                            },
+                            {
+                                choice: 'Hedge across two likely crucibles',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You spread the stack and one of your picks goes early. A tidy return, nothing ' +
+                                        'wild — you walk a little ahead of where you sat down.',
+                                    effects: [{ kind: 'resource', marbles: 13 }],
+                                },
+                            },
+                            {
+                                choice: 'Chase the long-shot last crucible',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You held for the cold one that never split, and the rake hooks your stack into ' +
+                                        "the pot. You leave with a thin handful and the pit-boss's grinding chuckle.",
+                                    effects: [{ kind: 'resource', marbles: 2 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Lay one careful chip on the safe crucible',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You bet small on the obvious crack and collect small. Nobody at the rail is impressed, ' +
+                            'but your stack is intact and your night is calm.',
+                        effects: [{ kind: 'resource', marbles: 4 }],
+                    },
+                },
+                {
+                    choice: 'Watch the pit and bet nothing at all',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You keep your marbles in your pocket and your nerve to yourself. The pit-boss reads the ' +
+                            'cowardice off you and signals the door; you leave learning nothing and earning less.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-slag-plunge',
+        sector: 'ember-belt',
+        intro:
+            'A slag-diving crew has cordoned off a cooling lake of molten waste, betting on who can dredge the ' +
+            'most fire-glass before the crust sets. "Heat-shield only gets you so far," their captain warns, grinning.',
+        root: {
+            prompt: 'The crew dares you to plunge your ship into the slag-lake for the deep glass. Do you dive?',
+            answers: [
+                {
+                    choice: 'Plunge prow-first and dredge the deep seam',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', hull: -2 }],
+                    followUp: {
+                        prompt:
+                            'The hull screams as it sinks, scoops filling with white-hot glass. The crust is closing ' +
+                            'overhead. How long do you stay under?',
+                        answers: [
+                            {
+                                choice: 'Grab a full load and punch out clean',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You break the setting crust at the last second, scoops brimming, prow glowing. ' +
+                                        'The diving crew whoops and counts you a champion of the slag-lake.',
+                                    effects: [{ kind: 'resource', marbles: 15 }],
+                                },
+                            },
+                            {
+                                choice: 'Surface early with a partial scoop',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You pull out cautious and half-full, sloshing glass over the rim as you climb. ' +
+                                        'A fair haul for a careful dive; the crew shrugs and toasts you anyway.',
+                                    effects: [{ kind: 'resource', marbles: 7 }],
+                                },
+                            },
+                            {
+                                choice: 'Stay down for the richest pocket',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The crust seals while you greedily dredge, and you have to blast up through it. ' +
+                                        'You surface with a thin take, a cracked scoop, and the heat still in your bones.',
+                                    effects: [{ kind: 'resource', marbles: 3, hull: -1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Skim the cool rim with a tow-net',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You trawl the safe edge of the lake for the glass that floats. A modest catch, no scorch, ' +
+                            'and the crew razzes you for fishing instead of diving.',
+                        effects: [{ kind: 'resource', marbles: 5 }],
+                    },
+                },
+                {
+                    choice: 'Wave the dare off and watch from above',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You hang back and let the divers risk their hulls. They surface rich and laughing, and ' +
+                            'you fly on with nothing but the secondhand thrill of someone else having lived a little.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-molten-auction',
+        sector: 'ember-belt',
+        intro:
+            'A molten-glass auction floats in a forge-bubble: artisan beads, still glowing, sold blind in clay ' +
+            'pots so no one sees the colour until they pay. The auctioneer rings a tuning-fork hot off the anvil.',
+        root: {
+            prompt: 'The blind pots come up one by one, contents unknown. How do you bid the molten auction?',
+            answers: [
+                {
+                    choice: 'Pay big for the pot the artisans whisper about',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -9 }],
+                    followUp: {
+                        prompt:
+                            'The pot is yours. You crack the clay in the forge-light and the glow spills out. What ' +
+                            'has the heat made?',
+                        answers: [
+                            {
+                                choice: 'A masterwork bead, flawless and rare',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'The bead inside is a once-a-decade pour, colour shifting like a memory you almost ' +
+                                        'have. Collectors mob you the moment it catches light, and you sell it for a fortune.',
+                                    effects: [{ kind: 'resource', marbles: 16 }],
+                                },
+                            },
+                            {
+                                choice: 'A solid, sellable piece of trade-glass',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'It is honest work, well-poured and worth its weight. No fortune, but you turn it ' +
+                                        'over for a fair return and call the gamble settled.',
+                                    effects: [{ kind: 'resource', marbles: 11 }],
+                                },
+                            },
+                            {
+                                choice: 'A cracked dud the kiln rejected',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'The clay holds a fractured bead that crazes the moment it cools. The artisans were ' +
+                                        'whispering a warning, not a wonder. You salvage a few marbles of slag and your pride.',
+                                    effects: [{ kind: 'resource', marbles: 1 }],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Bid modestly on a plain, visible lot',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You take the one open pot on the floor — a simple bead, no mystery, no markup. You pay ' +
+                            'what it is worth and flip it for the same. A wash, but a safe one.',
+                        effects: [{ kind: 'resource', marbles: -2 }],
+                    },
+                },
+                {
+                    choice: 'Heckle the prices and bid on nothing',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You call every lot overpriced until the auctioneer rings you out of the bubble. You keep ' +
+                            'every marble and miss every bead, which the floor agrees is its own kind of poverty.',
+                        effects: [],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-meteor-snatch',
+        sector: 'ember-belt',
+        intro:
+            'Bookmakers run a meteor-catch wager off a forge-platform: a burning rock falls on a timer, and the ' +
+            'crowd bets whether anyone is mad enough to net it mid-fall. The odds-bot flashes a fat payout at you.',
+        root: {
+            prompt: 'The bookmakers want you to catch the falling meteor for the long-odds pot. How do you wager?',
+            answers: [
+                {
+                    choice: 'Ante deep and fly the catch yourself',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -8, hull: -1 }],
+                    followUp: {
+                        prompt:
+                            'You climb to meet the falling rock, hull already singed from the ante-run. The net-field ' +
+                            'hums hot. How do you take the meteor?',
+                        answers: [
+                            {
+                                choice: 'Cradle it soft and ride the heat down',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You meet the rock at its own speed and let the net soak the fall. It settles glowing ' +
+                                        'in your arms and the long-odds pot avalanches onto your tab — the crowd loses its mind.',
+                                    effects: [{ kind: 'resource', marbles: 16 }],
+                                },
+                            },
+                            {
+                                choice: 'Snatch it hard and brace for the jolt',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You grab the meteor late and the catch nearly tears the net off its mounts. You ' +
+                                        'keep it, barely, and collect a bruised pot with a fresh dent to remember it by.',
+                                    effects: [{ kind: 'resource', marbles: 10, hull: -1 }],
+                                },
+                            },
+                            {
+                                choice: 'Misjudge the fall and clip it sideways',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You meet the rock at the wrong angle and it skips off the net into the platform. The ' +
+                                        'bookmakers void the pot, dock you for the damage, and the grey grins at the wreckage.',
+                                    effects: [
+                                        { kind: 'resource', hull: -1 },
+                                        { kind: 'front', advance: 1 },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Lay a small bet on the house catcher',
+                    tone: 'neutral',
+                    gate: { kind: 'crew', member: 'sibling' },
+                    outcome: {
+                        resultText:
+                            'Your sibling eyes the house catcher, picks the steady one, and nudges you to back them. ' +
+                            'The pro nets the rock clean and your modest ticket pays out without a single scorch on you.',
+                        effects: [{ kind: 'resource', marbles: 5 }],
+                    },
+                },
+                {
+                    choice: 'Bet against the catch out of spite',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You put your marbles on disaster and the crowd jeers you for it. Some hotshot nets the rock ' +
+                            'perfectly, the odds-bot eats your stake, and you fly off poorer and meaner than you arrived.',
+                        effects: [{ kind: 'resource', marbles: -4 }],
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: 'ember-rigged-wheel',
+        sector: 'ember-belt',
+        intro:
+            'A back-room forge-casino runs a glowing prize-wheel that everyone knows is rigged — that is the draw. ' +
+            'The croupier-golem, another of the Dicekeeper\'s kin, slaps the wheel and lets it shed sparks. "Buy a spin?"',
+        root: {
+            prompt: 'The croupier-golem offers a spin on the rigged wheel. How do you take it on?',
+            answers: [
+                {
+                    choice: 'Buy the maximum spin and play the rig itself',
+                    tone: 'good',
+                    cost: [{ kind: 'resource', marbles: -12 }],
+                    followUp: {
+                        prompt:
+                            'The wheel screams round, sparks fanning. You can see the loaded pocket dragging it. What ' +
+                            'do you do as it slows?',
+                        answers: [
+                            {
+                                choice: 'Bet the loaded pocket and call its bluff',
+                                tone: 'good',
+                                outcome: {
+                                    resultText:
+                                        'You play the rig against itself and land exactly where the golem meant the house to. ' +
+                                        'The jackpot drum cracks open and you rake out more glass than you can comfortably carry.',
+                                    effects: [{ kind: 'resource', marbles: 18 }],
+                                },
+                            },
+                            {
+                                choice: 'Demand a fair re-spin when it slows',
+                                tone: 'neutral',
+                                outcome: {
+                                    resultText:
+                                        'You call the rig aloud and the golem, caught, grudgingly re-spins clean. You win a ' +
+                                        'middling pocket — less than the jackpot, more than your stake. A small justice, paid out.',
+                                    effects: [{ kind: 'resource', marbles: 14 }],
+                                },
+                            },
+                            {
+                                choice: 'Grab the wheel and force it where you want',
+                                tone: 'bad',
+                                outcome: {
+                                    resultText:
+                                        'You clamp the spinning rim to steer it and the golem decides the house is being robbed. ' +
+                                        'The back room empties of friendly faces and fills with the hum of a fight about to start.',
+                                    effects: [
+                                        {
+                                            kind: 'spawnGame',
+                                            game: 'duel',
+                                            launch: { reason: 'ember-rigged-wheel-grab' },
+                                        },
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    choice: 'Buy the cheapest token spin and shrug at the odds',
+                    tone: 'neutral',
+                    outcome: {
+                        resultText:
+                            'You drop one marble for a courtesy spin, expecting nothing and getting nearly that. The ' +
+                            'wheel pays a consolation handful and the golem waves you on, mildly bored.',
+                        effects: [{ kind: 'resource', marbles: 2 }],
+                    },
+                },
+                {
+                    choice: 'Lecture the floor that the wheel is rigged',
+                    tone: 'bad',
+                    outcome: {
+                        resultText:
+                            'You announce the obvious to a room that came precisely for the rig. The golem flicks a spark ' +
+                            'at your boots, the floor laughs, and the bouncer-arms walk you out into the rock-cold dark.',
+                        effects: [{ kind: 'flag', set: 'ember-banned-rigged-wheel' }],
+                    },
+                },
+            ],
+        },
+    },
 ];

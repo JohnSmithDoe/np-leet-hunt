@@ -9,6 +9,8 @@ export enum SPACE_EVENTS {
     JUMP_COMMITTED = 'npJumpCommitted',
     /** The ship landed on a planet; its event fires. Payload: `PlanetArrivedPayload`. */
     PLANET_ARRIVED = 'npPlanetArrived',
+    /** An answer with a stake was chosen; its cost applies at once. Payload: `EventChoiceCommittedPayload`. */
+    EVENT_CHOICE_COMMITTED = 'npEventChoiceCommitted',
     /** A planet event was resolved by the player. Payload: `EventResolvedPayload`. */
     EVENT_RESOLVED = 'npEventResolved',
     /** The normality front advanced after a jump. Payload: `{ closedFraction, position, jumps }`. */
@@ -32,6 +34,13 @@ export interface PlanetArrivedPayload {
     event: PlanetEvent;
     /** The name of the planet just landed on. */
     planet: string;
+}
+
+export interface EventChoiceCommittedPayload {
+    /** The resolving event's id. */
+    id: string;
+    /** The chosen answer's stake — spent immediately, before its follow-up/outcome (event-system.md §8). */
+    cost: Effect[];
 }
 
 export interface EventResolvedPayload {

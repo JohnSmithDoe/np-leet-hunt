@@ -21,6 +21,8 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     #state: GameState;
     #sector: Sector;
     #stateSub?: Subscription;
+    /** Last seen meter values, to diff each `changes$` snapshot into gain/loss floaters. */
+    #prevResources?: { hull: number; heart: number; marbles: number };
 
     constructor(state: GameState, sector: Sector) {
         super({ key: SpaceUiScene.key });
@@ -72,9 +74,12 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#drawBar();
         });
         // Read the run store directly: its BehaviorSubject replays the current resources on subscribe
-        // and pushes every change, so the HUD needs no RESOURCES_CHANGED event bus.
+        // and pushes every change, so the HUD needs no RESOURCES_CHANGED event bus. Diff each snapshot
+        // against the last to float a gain/loss number per changed meter (event outcomes & answer costs).
         this.#stateSub = this.#state.changes$.subscribe(({ resources }) => {
             this.#stats.setText(`HULL ${resources.hull}   HEART ${resources.heart}   MARBLES ${resources.marbles}`);
+            if (this.#prevResources) this.#showResourceDeltas(this.#prevResources, resources);
+            this.#prevResources = { hull: resources.hull, heart: resources.heart, marbles: resources.marbles };
         });
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.#stateSub?.unsubscribe());
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
@@ -84,6 +89,56 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         });
         this.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => {
             this.#banner.setColor('#8affc8').setText('JUMPED OUT — SECTOR LEFT');
+        });
+    }
+
+    /** Float a "+/- N" number per meter that changed, and give the stats line a quick pop. */
+    #showResourceDeltas(
+        prev: { hull: number; heart: number; marbles: number },
+        next: { hull: number; heart: number; marbles: number }
+    ) {
+        const meters: { label: string; delta: number }[] = [
+            { label: 'HULL', delta: next.hull - prev.hull },
+            { label: 'HEART', delta: next.heart - prev.heart },
+            { label: 'MARBLES', delta: next.marbles - prev.marbles },
+        ];
+        let row = 0;
+        for (const meter of meters) {
+            if (meter.delta !== 0) this.#floatDelta(meter.label, meter.delta, row++);
+        }
+        if (row > 0) {
+            // A brief scale pop on the readout itself, so the change reads even off-screen of the floater.
+            this.tweens.add({
+                targets: this.#stats,
+                scale: { from: 1.18, to: 1 },
+                duration: 280,
+                ease: 'Quad.easeOut',
+            });
+        }
+    }
+
+    /** One rising, fading gain/loss number, stacked to the right of the stats readout (clear of the text). */
+    #floatDelta(label: string, delta: number, row: number) {
+        const gain = delta > 0;
+        const color = gain ? '#8affc8' : '#ff8a8a'; // same green/red as the front bar + snapback banner
+        const sign = gain ? '+' : '-';
+        const floater = this.add
+            .text(BAR.x + 360, BAR.y + BAR.h + 36 + row * 26, `${label} ${sign}${Math.abs(delta)}`, {
+                fontFamily: 'sans-serif',
+                fontSize: '22px',
+                fontStyle: 'bold',
+                color,
+            })
+            .setScrollFactor(0)
+            .setDepth(102)
+            .setScale(1.15);
+        this.tweens.add({
+            targets: floater,
+            y: floater.y - 44,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: 'Cubic.easeOut',
+            onComplete: () => floater.destroy(),
         });
     }
 

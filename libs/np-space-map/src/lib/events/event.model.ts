@@ -42,6 +42,13 @@ export interface Answer {
     tone: Tone;
     /** Gated answer (crew/pet/item/flag) — shown locked with its reason by default (spec §4). */
     gate?: Requirement;
+    /**
+     * The stake paid the *moment this answer is chosen* — applied before its follow-up or outcome
+     * (spec §4/§8). A risk/commitment mechanic: you spend to take the branch, then its outcome decides
+     * the payoff. Typically negative `resource` deltas (trade hull/heart/marbles for a shot at more).
+     * Omit for a free choice.
+     */
+    cost?: Effect[];
     /** Branch one level deeper — recursion allowed (flexible depth). Exactly one of followUp/outcome (spec §4). */
     followUp?: Question;
     /** ...or resolve here. */

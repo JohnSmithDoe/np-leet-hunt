@@ -13,6 +13,11 @@ const assertQuestionValid = (question: Question) => {
         expect(answer.choice.length).toBeGreaterThan(0);
         // Exactly one of followUp / outcome.
         expect(!!answer.followUp !== !!answer.outcome).toBe(true);
+        // An optional stake (spec §4/§8) is a non-empty effects array applied when the answer is chosen.
+        if (answer.cost) {
+            expect(Array.isArray(answer.cost)).toBe(true);
+            expect(answer.cost.length).toBeGreaterThan(0);
+        }
         if (answer.followUp) assertQuestionValid(answer.followUp);
         if (answer.outcome) expect(Array.isArray(answer.outcome.effects)).toBe(true);
     }
