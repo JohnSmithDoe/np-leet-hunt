@@ -1,6 +1,6 @@
 import { EDirection } from '@shared/np-library';
 import { NPGameObject } from '@shared/np-phaser';
-import ChessData from 'phaser3-rex-plugins/plugins/board/chess/ChessData';
+import ChessData from 'phaser4-rex-plugins/plugins/board/chess/ChessData';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';

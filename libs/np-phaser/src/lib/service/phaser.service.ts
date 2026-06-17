@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as Phaser from 'phaser';
-import MouseWheelScrollerPlugin from 'phaser3-rex-plugins/plugins/mousewheelscroller-plugin';
-import ShipPlugin from 'phaser3-rex-plugins/plugins/ship-plugin';
-import StateManagerPlugin from 'phaser3-rex-plugins/plugins/statemanager-plugin';
+import MouseWheelScrollerPlugin from 'phaser4-rex-plugins/plugins/mousewheelscroller-plugin';
+import ShipPlugin from 'phaser4-rex-plugins/plugins/ship-plugin';
+import StateManagerPlugin from 'phaser4-rex-plugins/plugins/statemanager-plugin';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({

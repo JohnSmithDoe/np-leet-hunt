@@ -1,4 +1,4 @@
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
 
 import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
 

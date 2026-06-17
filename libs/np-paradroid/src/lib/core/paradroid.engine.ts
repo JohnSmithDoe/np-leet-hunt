@@ -1,3 +1,5 @@
+import * as Phaser from 'phaser';
+
 import { EFlowFrom } from '../@types/paradroid.consts';
 import { getNextFlow } from '../@types/paradroid.utils';
 import { ParadroidField } from '../sprites/paradroid.field';

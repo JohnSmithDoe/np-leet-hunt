@@ -1,6 +1,6 @@
 import { EDirection, mapRexPluginDirection, mapToRexPluginDirection } from '@shared/np-library';
-import FieldOfView from 'phaser3-rex-plugins/plugins/board/fieldofview/FieldOfView';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import FieldOfView from 'phaser4-rex-plugins/plugins/board/fieldofview/FieldOfView';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeonMob } from '../pixel-dungeon.mob';
 

@@ -1,4 +1,4 @@
-import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
+import StateManager from 'phaser4-rex-plugins/plugins/logic/statemanager/StateManager';
 
 import { PixelDungeonEngine } from './pixel-dungeon.engine';
 

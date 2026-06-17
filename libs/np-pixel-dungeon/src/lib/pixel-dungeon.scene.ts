@@ -1,6 +1,6 @@
 import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import BoardPlugin from 'phaser3-rex-plugins/plugins/board-plugin';
+import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { NPSceneWithBoard } from './@types/pixel-dungeon.types';

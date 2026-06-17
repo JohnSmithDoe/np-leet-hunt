@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import * as Phaser from 'phaser';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { EMobInfoType } from '../../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../../sprites/pixel-dungeon.mob';

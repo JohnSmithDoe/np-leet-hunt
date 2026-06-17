@@ -1,4 +1,5 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
+import * as Phaser from 'phaser';
 
 import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer } from '../@types/paradroid.types';

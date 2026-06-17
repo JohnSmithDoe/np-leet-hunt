@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeonTile } from '../../dungeon/parts/pixel-dungeon.tile';
 import { NPTilesetMappingNew, PixelDungeonTileset } from '../pixel-dungeon-tileset';

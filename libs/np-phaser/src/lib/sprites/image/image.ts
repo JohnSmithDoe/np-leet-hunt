@@ -1,4 +1,5 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
+import * as Phaser from 'phaser';
 
 export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;

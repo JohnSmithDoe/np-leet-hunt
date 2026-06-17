@@ -1,7 +1,7 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-import MoveToTask from 'phaser3-rex-plugins/plugins/behaviors/moveto/MoveTo';
-import Ship from 'phaser3-rex-plugins/plugins/ship';
+import MoveToTask from 'phaser4-rex-plugins/plugins/behaviors/moveto/MoveTo';
+import Ship from 'phaser4-rex-plugins/plugins/ship';
 
 export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGameObject {
     // private controls: Phaser.Cameras.Controls.SmoothedKeyControl;

@@ -1,5 +1,5 @@
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
-import StateManager from 'phaser3-rex-plugins/plugins/logic/statemanager/StateManager';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
+import StateManager from 'phaser4-rex-plugins/plugins/logic/statemanager/StateManager';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonPathfinder } from '../core/pixel-dungeon.pathfinder';

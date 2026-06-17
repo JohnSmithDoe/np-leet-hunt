@@ -1,7 +1,7 @@
 import { mapRexPluginDirection } from '@shared/np-library';
-import MoveToTask from 'phaser3-rex-plugins/plugins/behaviors/moveto/MoveTo';
-import MoveTo from 'phaser3-rex-plugins/plugins/board/moveto/MoveTo';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import MoveToTask from 'phaser4-rex-plugins/plugins/behaviors/moveto/MoveTo';
+import MoveTo from 'phaser4-rex-plugins/plugins/board/moveto/MoveTo';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { WalkToAction } from '../../engine/states/handle-action.state';
 import { EMobInfoType } from '../pixel-dungeon.info-text';

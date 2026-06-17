@@ -1,5 +1,5 @@
 import { NPScene } from '@shared/np-phaser';
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { TDungeonOptions } from '../@types/pixel-dungeon.types';
 import { PixelDungeonBoard } from '../core/pixel-dungeon-board';

@@ -1,4 +1,5 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
+import * as Phaser from 'phaser';
 
 import { NPTimer } from '../../utilities/np-timer';
 import { NPRNG } from '../../utilities/piecemeal';

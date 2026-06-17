@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A hobby space-RPG game ("leet hunt") built as an Nx monorepo: an Angular 21 / Ionic 8 shell app (standalone components, zoneless — no zone.js — with OnPush change detection, `bootstrapApplication` + `app.config.ts`) hosting a Phaser 3 game, packaged for iOS/Android via Capacitor 8. The design doc is `game-design.md` (full GDD, built with the `/game-designer` skill); the active issue backlog is `BACKLOG.md` (continues the `Leet-<n>` numbering). Neither contains coding rules.
+A hobby space-RPG game ("leet hunt") built as an Nx monorepo: an Angular 21 / Ionic 8 shell app (standalone components, zoneless — no zone.js — with OnPush change detection, `bootstrapApplication` + `app.config.ts`) hosting a Phaser 4 game, packaged for iOS/Android via Capacitor 8. The design doc is `game-design.md` (full GDD, built with the `/game-designer` skill); the active issue backlog is `BACKLOG.md` (continues the `Leet-<n>` numbering). Neither contains coding rules.
 
 Version constraints to respect:
-- **Phaser stays on 3.x** — Phaser 4 is a ground-up rewrite incompatible with the game code and `phaser3-rex-plugins`.
+- **Phaser is on 4.x** (migrated from 3.x). The rex plugins moved with it: use **`phaser4-rex-plugins`**, never `phaser3-rex-plugins` — they share the same `plugins/...` submodule layout, so it was a package rename + import-path swap. **Phaser 4 is pure ESM and sets no global `Phaser`** (Phaser 3's UMD build did): every file that references `Phaser` as a *value* (e.g. `extends Phaser.GameObjects.X`, `new Phaser.Math.Vector2`) must `import * as Phaser from 'phaser'`. Type-only references still resolve via the package's ambient `export as namespace Phaser`, so a clean build is *not* proof the runtime works — exercise it. Also: `Phaser.Geom.Point` was removed in 4.0 → use `Phaser.Math.Vector2`.
 - **Angular tracks the newest version Nx supports** (Nx's peer range usually lags one major behind Angular's latest).
 
 ## Commands

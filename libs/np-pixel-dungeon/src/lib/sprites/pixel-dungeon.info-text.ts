@@ -1,4 +1,5 @@
-import { TileXYType } from 'phaser3-rex-plugins/plugins/board/types/Position';
+import * as Phaser from 'phaser';
+import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 

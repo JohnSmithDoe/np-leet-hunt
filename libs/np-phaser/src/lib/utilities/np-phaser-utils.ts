@@ -37,7 +37,7 @@ export const poissonDiscSampler = (
         distanceFunction,
     })
         .fill()
-        .map(p => new Phaser.Geom.Point(p[0], p[1]));
+        .map(p => new Phaser.Math.Vector2(p[0], p[1]));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const distributePointsInRectangle = (n: number, w: number, h: number) => {
