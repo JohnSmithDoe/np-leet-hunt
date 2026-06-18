@@ -7,6 +7,10 @@ import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/s
 import { CParadroidTileSets } from './@types/paradroid.consts';
 import { paradroidFactoryOptions, TParadroidFactoryOptions } from './core/paradroid.factory';
 import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';
+import { ParadroidIntro } from './sprites/paradroid.intro';
+
+/** How long the camera takes to settle from the splash's neutral 1:1 view onto the board-fit view. */
+const FOCUS_MS = 600;
 
 /** What the app injects when starting a duel — the board options and the AI tuning, both optional. */
 export interface TParadroidSceneConfig {
@@ -18,6 +22,8 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     static key = 'paradroid-scene';
     readonly #config: TParadroidSceneConfig;
     #paradroidGame!: ParadroidGame;
+    #intro!: ParadroidIntro;
+    #busy = false; // true while the VS intro is playing — Start/Re-Create are ignored until it clears
     #resultText?: Phaser.GameObjects.Text;
     readonly #controls: TextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
 
@@ -29,8 +35,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     setupComponents() {
         this.#paradroidGame = this.#createGame();
         this.addComponent(this.#paradroidGame);
-        // TODO: ParadroidIntro still depends on the removed layer cameras ('ui-camera') — rework before re-enabling
-        // this.addComponent(new ParadroidIntro(this));
+        // Registered only so the VS-splash textures preload at scene boot; it's played on demand from Start.
+        this.#intro = new ParadroidIntro(this);
+        this.addComponent(this.#intro);
     }
 
     /** Build a game (defaulting to the injected config) and wire its match-ended announcement. */
@@ -67,21 +74,96 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.addExisting(button);
     }
 
-    /** Rebuild a fresh board + AI at the given difficulty, then start the match. */
+    /** Rebuild a fresh board + AI at the given difficulty, play the VS splash, then start the match. */
     #startDifficulty(level: DuelAiLevel): void {
+        if (this.#busy) return;
         const factoryOptions = paradroidFactoryOptions(Balance.duelBoardParams(level), CParadroidTileSets[level]);
         this.#rebuild(factoryOptions, Balance.duelAiParams(level));
-        this.#paradroidGame.startMatch();
+        this.#playIntro(() => this.#paradroidGame.startMatch());
+    }
+
+    /**
+     * Play the Street-Fighter VS splash, then run `onDone` (the actual fight).
+     *
+     * The duel uses a single camera that's normally zoomed to fit the board, so to give the splash a
+     * clean full-screen stage we hide the board and hold the camera at a neutral 1:1 view for the whole
+     * splash (it lays out in plain screen coordinates). The splash crossfades the board in part-way
+     * through (`#revealBoard`) and, once it's fully gone, we settle the camera onto the board
+     * (`#focusBoard`) and start the match — see ParadroidIntro for the choreography.
+     */
+    #playIntro(onDone: () => void): void {
+        this.#busy = true;
+        // A previous match's buzzer leaves the scene clock frozen; unfreeze it so the splash's timed
+        // hand-off fires (startMatch re-asserts this, but the splash runs first).
+        this.time.paused = false;
+        this.#setBoardVisible(false);
+        this.cameras.main.setZoom(1).setScroll(0, 0);
+        this.#intro.play({
+            revealBoard: durationMs => this.#revealBoard(durationMs),
+            onComplete: () => {
+                // The board is on-screen at the neutral view; settle the camera onto it and start the
+                // fight (clock + AI begin now — after the FIGHT splash has cleared).
+                this.#focusBoard(FOCUS_MS, () => (this.#busy = false));
+                onDone();
+            },
+        });
+    }
+
+    /** Reveal the board with a fade-in (crossfading against the VS splash) and bring the controls back. */
+    #revealBoard(durationMs: number): void {
+        const board = this.#paradroidGame.container;
+        board.setAlpha(0).setVisible(true);
+        this.#controls.forEach(control => control.setVisible(true));
+        this.tweens.add({ targets: board, alpha: 1, ease: 'Sine.easeOut', duration: durationMs });
+    }
+
+    /** Smoothly tween the camera from the neutral 1:1 view onto the board-fit view (no jarring snap). */
+    #focusBoard(duration: number, onDone: () => void): void {
+        const { width, height } = this.scale.gameSize;
+        const fit = this.#computeBoardFit(width, height);
+        const cam = this.cameras.main;
+        if (!fit) {
+            onDone();
+            return;
+        }
+        const startZoom = cam.zoom;
+        const startCx = cam.scrollX + width / 2 / cam.zoom; // world point at the current viewport centre
+        const startCy = cam.scrollY + height / 2 / cam.zoom;
+        this.tweens.addCounter({
+            from: 0,
+            to: 1,
+            ease: 'Sine.easeInOut',
+            duration,
+            onUpdate: tween => {
+                const t = tween.getValue() ?? 1;
+                cam.setZoom(Phaser.Math.Linear(startZoom, fit.zoom, t)).centerOn(
+                    Phaser.Math.Linear(startCx, fit.centerX, t),
+                    Phaser.Math.Linear(startCy, fit.centerY, t)
+                );
+            },
+            onComplete: () => {
+                this.#fitBoardToViewport(width, height); // land exactly on the fit
+                onDone();
+            },
+        });
+    }
+
+    /** Hide (or show) the board and its header controls together (used to clear the stage for the splash). */
+    #setBoardVisible(visible: boolean): void {
+        this.#paradroidGame.container.setVisible(visible);
+        this.#controls.forEach(control => control.setVisible(visible));
     }
 
     /** Re-roll the board at the injected difficulty, idle and ready to start. */
     #recreate(): void {
+        if (this.#busy) return;
         this.#rebuild();
     }
 
     /** Tear down the current game and build a fresh one (defaults to the injected config). */
     #rebuild(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): void {
         this.#resultText?.destroy();
+        this.#resultText = undefined;
         this.removeComponent(this.#paradroidGame);
         this.removeExisting(this.#paradroidGame.container);
         const newContainer = new Phaser.GameObjects.Container(this, 0, 0, []);
@@ -122,6 +204,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     resize(gameSize?: Phaser.Structs.Size): void {
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
+        // While the VS splash owns the screen the camera is held at a neutral 1:1 view; don't refit the
+        // (hidden) board underneath it — #playIntro refits once the splash clears.
+        if (this.#busy) return;
         this.#fitBoardToViewport(width, height);
     }
 
@@ -132,16 +217,22 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
      * centre the camera on it. Scaling down for now — proper responsive layout TODO.
      */
     #fitBoardToViewport(width: number, height: number): void {
+        const fit = this.#computeBoardFit(width, height);
+        if (fit) this.cameras.main.setZoom(fit.zoom).centerOn(fit.centerX, fit.centerY);
+    }
+
+    /** The zoom + centre that fits the board (plus its header controls) into the given viewport, if known. */
+    #computeBoardFit(width: number, height: number): { zoom: number; centerX: number; centerY: number } | undefined {
         const board = this.#paradroidGame?.container;
-        if (!board || width === 0 || height === 0) return;
+        if (!board || width === 0 || height === 0) return undefined;
         // Fit the board *plus* the header controls, so the buttons are never zoomed off-screen.
         let bounds = board.getBounds();
         for (const control of this.#controls) {
             bounds = Phaser.Geom.Rectangle.Union(bounds, control.getBounds());
         }
-        if (bounds.width === 0 || bounds.height === 0) return;
+        if (bounds.width === 0 || bounds.height === 0) return undefined;
         const margin = 1.1; // ~10% padding around the content
         const zoom = Math.min(width / (bounds.width * margin), height / (bounds.height * margin));
-        this.cameras.main.setZoom(zoom).centerOn(bounds.centerX, bounds.centerY);
+        return { zoom, centerX: bounds.centerX, centerY: bounds.centerY };
     }
 }
