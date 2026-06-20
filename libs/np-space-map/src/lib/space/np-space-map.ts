@@ -463,8 +463,8 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#deselect();
         this.#here.setVisible(false);
         this.scene.cameras.main.flash(600, 200, 200, 220);
+        // The conductor listens for this and ends the run with the snap-back ending (Leet-33).
         this.scene.game.events.emit(SPACE_EVENTS.REALITY_SNAPBACK, { jumps: this.#jumps });
-        // TODO(Leet-27): hand off to the run state machine for the snap-back ending screen.
     }
 
     #onSectorExit() {
@@ -472,8 +472,8 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#deselect();
         this.#here.setVisible(false);
         this.scene.cameras.main.flash(600, 120, 220, 180); // calm green-cyan, distinct from the red snapback
+        // The conductor listens for this: it advances to the next sector, or ends the run (bail) past the last.
         this.scene.game.events.emit(SPACE_EVENTS.SECTOR_EXIT, { jumps: this.#jumps });
-        // TODO(Leet-27): hand off to the run state machine — bailing leaves the sector with no rescue.
     }
 
     #refreshStates() {

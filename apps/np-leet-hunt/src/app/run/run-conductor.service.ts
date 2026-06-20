@@ -3,7 +3,16 @@ import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@sh
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
-import { Balance, GameStateService, ModeResult, RunPhase, Sector, SECTOR_COUNT } from '@shared/np-state';
+import {
+    Balance,
+    describeEnding,
+    EndingKind,
+    GameStateService,
+    ModeResult,
+    RunPhase,
+    Sector,
+    SECTOR_COUNT,
+} from '@shared/np-state';
 
 /**
  * The app-side wrapper that turns run-phase changes into scene swaps (Leet-28). The run FSM is the
@@ -26,6 +35,10 @@ export class RunConductorService {
     #sector?: Sector;
     #shownSector = 0;
 
+    // How the current run ended, recorded the moment it resolves (snapback / bail / wiped) so #showEnding
+    // can render the matching text ending (Leet-33). Defaults to 'wiped' as a safe fallback.
+    #endingKind: EndingKind = 'wiped';
+
     /**
      * Begin reacting to the run FSM. The effects are created in the constructor (the only valid place —
      * `effect` cannot be called from within another effect, so this can't be deferred behind a caller's
@@ -34,12 +47,14 @@ export class RunConductorService {
      * → lives for the whole app → the effects need no teardown.
      */
     constructor() {
-        // Once Phaser is up, wire the rim-sun bail listener: the map fires SECTOR_EXIT on the bus when the
-        // ship bails at a rim sun. `#wired` guards against a re-run double-registering.
+        // Once Phaser is up, wire the two run-ending bus events the map fires: SECTOR_EXIT when the ship
+        // bails at a rim sun, and REALITY_SNAPBACK when the front catches the ship. `#wired` guards against
+        // a re-run double-registering.
         effect(() => {
             if (!this.#stage.initialized() || this.#wired) return;
             this.#wired = true;
             this.#stage.phaser.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => this.#onSectorExit());
+            this.#stage.phaser.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => this.#onSnapback());
         });
         // React to every *settled* phase (incl. the initial 'hangar'), but only once Phaser is up. A
         // synchronous double-step like `to('sectorExit')→to('sector')` coalesces to 'sector' directly —
@@ -119,6 +134,7 @@ export class RunConductorService {
         this.#stage.clear();
         this.#sector = undefined;
         this.#shownSector = 0;
+        this.#endingKind = 'wiped'; // reset the exit record for the next run
         this.#showPlaceholder('hangar', {
             title: 'Hangar',
             lines: ['The garage. Reality is bent; a rescue run waits.'],
@@ -134,7 +150,7 @@ export class RunConductorService {
             lines: ['The sector boss blocks the lane. (staged duel + lair gimmick — Phase 4)'],
             actions: [
                 { label: '⚔ Defeat → back to map', onSelect: () => this.#clearGuardian() },
-                { label: '☠ Get wiped (end run)', onSelect: () => this.#game.fsm.to('ending') },
+                { label: '☠ Get wiped (end run)', onSelect: () => this.#endRun('wiped') },
             ],
         });
     }
@@ -146,19 +162,31 @@ export class RunConductorService {
             lines: ['A Grey Fleet ship — take the bridge or be overwhelmed. (ship dungeon — Phase 4)'],
             actions: [
                 { label: '⚓ Take the bridge → map', onSelect: () => this.#game.fsm.to('sector') },
-                { label: '☠ Overwhelmed (end run)', onSelect: () => this.#game.fsm.to('ending') },
+                { label: '☠ Overwhelmed (end run)', onSelect: () => this.#endRun('wiped') },
             ],
         });
     }
 
-    /** The run is over: a stub ending screen that returns to the hangar (text endings come in Phase 1). */
+    /** The run is over (Leet-33): render the text ending for the exit taken, then return to the hangar. */
     #showEnding(): void {
-        const { sectorNumber, resources } = this.#game.run.snapshot();
+        const ending = describeEnding(this.#endingKind, this.#game.run.snapshot());
         this.#showPlaceholder('ending', {
-            title: 'Run over',
-            lines: [`Reached sector ${sectorNumber} · marbles ${resources.marbles}`, '(text endings — Phase 1)'],
+            title: ending.title,
+            lines: ending.lines,
             actions: [{ label: '⤺ Return to hangar', onSelect: () => this.#game.fsm.to('hangar') }],
         });
+    }
+
+    /** The front caught the ship (REALITY_SNAPBACK from the map): end the run with the snap-back ending. */
+    #onSnapback(): void {
+        this.#endingKind = 'snapback';
+        if (this.#game.fsm.can('ending')) this.#game.fsm.to('ending');
+    }
+
+    /** End the run via a direct ending transition (guardian/boarding wipes), recording the exit taken. */
+    #endRun(kind: EndingKind): void {
+        this.#endingKind = kind;
+        this.#game.fsm.to('ending');
     }
 
     /** Start a fresh run from the hangar: reset the run store, then enter the first sector. */
@@ -221,8 +249,9 @@ export class RunConductorService {
             this.#game.fsm.to('sectorExit');
             this.#game.fsm.to('sector'); // → #enter('sector') → #showSpace() rebuilds with the new sector
         } else {
+            this.#endingKind = 'bail'; // bailed past the final sector → the rim-sun "leave poor" ending
             this.#game.fsm.to('sectorExit');
-            this.#game.fsm.to('ending'); // last sector left → run ends (no ending scene yet — TODO)
+            this.#game.fsm.to('ending');
         }
     }
 }

@@ -4,6 +4,7 @@ export * from './lib/game-state.service';
 export * from './lib/mode/mode-contract';
 export * from './lib/model/resources';
 export * from './lib/model/run-context';
+export * from './lib/run/ending';
 export * from './lib/run/game-state';
 export * from './lib/run/run-state.store';
 export * from './lib/run/run.fsm';

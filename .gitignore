@@ -112,5 +112,9 @@ dist
 # DS_STORE
 .DS_Store
 
+# Source-art exports (Leonardo/Affinity) + their lock files, not game assets
+*.af
+*~lock~
+
 .nx
 .idea

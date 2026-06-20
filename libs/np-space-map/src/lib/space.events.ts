@@ -17,9 +17,9 @@ export enum SPACE_EVENTS {
     FRONT_ADVANCED = 'npFrontAdvanced',
     /** A node fell behind the front and was normalised. Payload: `{ planet: string }`. */
     PLANET_SWALLOWED = 'npPlanetSwallowed',
-    /** The front caught the ship — reality snapped back (run-end stub). Payload: `{ jumps }`. */
+    /** The front caught the ship — reality snapped back; the conductor ends the run (snapback). Payload: `{ jumps }`. */
     REALITY_SNAPBACK = 'npRealitySnapback',
-    /** Reached a rim sun and bailed the sector (no reward; run-end stub). Payload: `{ jumps }`. */
+    /** Reached a rim sun and bailed the sector (no reward); the conductor advances, or ends the run (bail) past the last. Payload: `{ jumps }`. */
     SECTOR_EXIT = 'npSectorExit',
 }
 
