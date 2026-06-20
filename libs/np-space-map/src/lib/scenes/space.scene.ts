@@ -17,7 +17,7 @@ export class SpaceScene extends NPScene implements OnScenePreload, OnSceneCreate
         this.#space = this.addComponent(new Space(this, Space.getRandom()));
     }
 
-    create() {
+    override create() {
         super.create();
         this.addExisting(this.#space);
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);

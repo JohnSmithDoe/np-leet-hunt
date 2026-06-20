@@ -6,7 +6,7 @@ export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     #frameKey?: number;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         image: Phaser.Types.Loader.FileTypes.ImageFileConfig,

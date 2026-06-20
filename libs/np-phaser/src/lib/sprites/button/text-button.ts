@@ -3,7 +3,7 @@ import * as Phaser from 'phaser';
 
 export class TextButton extends Phaser.GameObjects.Text implements NPGameObject {
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         text: string | string[],

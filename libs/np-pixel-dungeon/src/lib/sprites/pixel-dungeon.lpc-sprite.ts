@@ -57,7 +57,7 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
     #options: TPixelDungeonLPCSpriteOptions;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         options: TPixelDungeonLPCSpriteOptions
@@ -110,7 +110,7 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
         );
     }
 
-    play(key: TLpcAnimationKey): this {
+    override play(key: TLpcAnimationKey): this {
         return super.play(key, true);
     }
 

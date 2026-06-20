@@ -2,15 +2,12 @@
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
-            <ion-button aria-label='Space map' (click)='toSpace()'>
-                <ion-icon name='heart' aria-hidden='true'></ion-icon>
-            </ion-button>
-            <ion-button aria-label='Paradroid duel' (click)='toParadroid()'>
-                <ion-icon name='heart' aria-hidden='true'></ion-icon>
-            </ion-button>
-            <ion-button aria-label='Pixel dungeon' (click)='toPixeldungeon()'>
-                <ion-icon name='heart' aria-hidden='true'></ion-icon>
-            </ion-button>
+            <ion-button aria-label='Space map' (click)='toMap()'>Map</ion-button>
+            <ion-button aria-label='Planet event' (click)='toEvent()'>Event</ion-button>
+            <ion-button aria-label='Paradroid duel' (click)='toDuel()'>Duel</ion-button>
+            <ion-button aria-label='Pixel dungeon' (click)='toDungeon()'>Dungeon</ion-button>
+            <ion-button aria-label='Boarding action' (click)='toBoarding()'>Board</ion-button>
+            <ion-button aria-label='Sector guardian' (click)='toGuardian()'>Guardian</ion-button>
         </ion-buttons>
         <ion-title>Home</ion-title>
     </ion-toolbar>

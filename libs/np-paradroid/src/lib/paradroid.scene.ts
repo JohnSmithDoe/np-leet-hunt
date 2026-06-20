@@ -1,5 +1,5 @@
 import { NPScene } from '@shared/np-phaser';
-import { Balance, DuelAiLevel, DuelAiParams } from '@shared/np-state';
+import { Balance, DuelAiLevel, DuelAiParams, DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
@@ -16,6 +16,8 @@ const FOCUS_MS = 600;
 export interface TParadroidSceneConfig {
     factoryOptions?: TParadroidFactoryOptions;
     aiParams?: DuelAiParams;
+    /** Called once when the player leaves the duel — reports the outcome back to the run (Leet-29). */
+    onResult?: (result: DuelResult) => void;
 }
 
 export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
@@ -24,6 +26,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     #paradroidGame!: ParadroidGame;
     #intro!: ParadroidIntro;
     #busy = false; // true while the VS intro is playing — Start/Re-Create are ignored until it clears
+    #lastOutcome: DuelResult['outcome'] = 'lose'; // forfeit by default; a decided match sets win/lose
     #resultText?: Phaser.GameObjects.Text;
     readonly #controls: TextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
 
@@ -50,7 +53,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     /**
      * * Phaser will only call create after all assets in Preload have been loaded
      */
-    create() {
+    override create() {
         const container = new Phaser.GameObjects.Container(this, 0, 0, []);
         super.create(container);
         this.addExisting(container);
@@ -61,6 +64,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.#addControl(40, 'Start Normal', () => this.#startDifficulty('normal'));
         this.#addControl(250, 'Start Brutal', () => this.#startDifficulty('brutal'));
         this.#addControl(460, 'Re-Create', () => this.#recreate());
+        this.#addControl(640, '↩ Map', () => this.#leave());
 
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         this.resize();
@@ -160,6 +164,12 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.#rebuild();
     }
 
+    /** Leave the duel and report the latest outcome to the run (Leet-29). Ignored while the intro plays. */
+    #leave(): void {
+        if (this.#busy) return;
+        this.#config.onResult?.({ kind: 'duel', outcome: this.#lastOutcome });
+    }
+
     /** Tear down the current game and build a fresh one (defaults to the injected config). */
     #rebuild(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): void {
         this.#resultText?.destroy();
@@ -177,6 +187,8 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
 
     /** Announce the decided match above the board: "DROID WINS  3 - 5". */
     #showResult(result: TParadroidMatchResult): void {
+        // A decided match settles the outcome the next "↩ Map" reports (draw counts as not-won → lose).
+        this.#lastOutcome = result.winner === 'player' ? 'win' : 'lose';
         const label = result.winner === 'draw' ? 'DRAW' : result.winner === 'droid' ? 'DROID WINS' : 'PLAYER WINS';
         const bounds = this.#paradroidGame.container.getBounds();
         this.#resultText?.destroy();
@@ -190,7 +202,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
             .setOrigin(0.5);
     }
 
-    update(time: number, delta: number) {
+    override update(time: number, delta: number) {
         super.update(time, delta);
         this.#paradroidGame.update(time, delta);
     }

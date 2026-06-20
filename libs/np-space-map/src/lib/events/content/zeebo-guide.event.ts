@@ -131,7 +131,7 @@ export const zeeboGuide: PlanetEvent = {
                                     'Zeebo bolts, and a distress klaxon answers him. Armed locals close in — looks like ' +
                                     'you will be settling this the hard way.',
                                 effects: [
-                                    { kind: 'spawnGame', game: 'duel', launch: { reason: 'zeebo-ambush' } },
+                                    { kind: 'spawnGame', game: 'duel', reason: 'zeebo-ambush' },
                                     { kind: 'resource', heart: -1 },
                                 ],
                             },

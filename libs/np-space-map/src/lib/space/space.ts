@@ -23,7 +23,7 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject
     }
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         type: keyof typeof IMAGES
     ) {
         super(scene, 0, 0, scene.scale.width, scene.scale.height, '');
@@ -40,7 +40,7 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
-    preUpdate(): void {
+    override preUpdate(): void {
         this.tilePositionX += 0.5;
     }
 

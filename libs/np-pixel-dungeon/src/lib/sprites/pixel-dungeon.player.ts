@@ -39,7 +39,7 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
 };
 
 export class PixelDungeonPlayer extends PixelDungeonMob {
-    options!: TPixelDungeonPlayerOptions;
+    override options!: TPixelDungeonPlayerOptions;
 
     constructor(engine: PixelDungeonEngine, options?: TPixelDungeonPlayerOptions) {
         super(engine, Object.assign({}, defaultOptions, options ?? {}));
@@ -49,7 +49,7 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
         console.log('init player');
     }
 
-    get action() {
+    override get action() {
         if (!super.action && this.movement.hasMoves()) {
             const pathTile = this.movement.nextMove();
             this.activity.setNextAction(new WalkToAction(this, pathTile));

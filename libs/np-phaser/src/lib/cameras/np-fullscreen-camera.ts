@@ -8,7 +8,7 @@ export class NPFullscreenCamera extends NPCamera {
         super(scene, 0, 0, scene.scale.width, scene.scale.height, makeMain);
     }
 
-    init() {
+    override init() {
         super.init();
         this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }

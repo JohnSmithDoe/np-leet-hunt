@@ -106,9 +106,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                                     resultText:
                                         'The smith does not so much as flinch. Tools clatter as every apprentice in the ' +
                                         'forge turns toward the sound of a fight starting.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'ember-smith-theft' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'ember-smith-theft' }],
                                 },
                             },
                         ],
@@ -435,7 +433,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                         resultText:
                             'You suit up and go down into the dying forges to tear the siphon out by its roots. It will ' +
                             'be hot, close work in the dark — exactly the kind the grey hopes you will walk away from.',
-                        effects: [{ kind: 'spawnGame', game: 'dungeon', launch: { reason: 'ember-sabotage-siphon' } }],
+                        effects: [{ kind: 'spawnGame', game: 'dungeon', reason: 'ember-sabotage-siphon' }],
                     },
                 },
                 {
@@ -509,9 +507,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                                     resultText:
                                         'It reads the grab as the attack the heat has been promising it for years. The ' +
                                         'hangar fills with the scream of an old machine deciding to fight.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'ember-stray-droid' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'ember-stray-droid' }],
                                 },
                             },
                         ],
@@ -640,7 +636,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                                         {
                                             kind: 'spawnGame',
                                             game: 'duel',
-                                            launch: { reason: 'ember-thief-drone-board' },
+                                            reason: 'ember-thief-drone-board',
                                         },
                                         { kind: 'resource', marbles: 6 },
                                     ],
@@ -1227,9 +1223,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                                     resultText:
                                         'You single out the crowd favourite and it becomes personal fast. The derby stops ' +
                                         'being a race and becomes a fight, and the arena loves it.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'ember-derby-grudge' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'ember-derby-grudge' }],
                                 },
                             },
                         ],
@@ -1698,7 +1692,7 @@ export const emberBeltEvents: PlanetEvent[] = [
                                         {
                                             kind: 'spawnGame',
                                             game: 'duel',
-                                            launch: { reason: 'ember-rigged-wheel-grab' },
+                                            reason: 'ember-rigged-wheel-grab',
                                         },
                                     ],
                                 },

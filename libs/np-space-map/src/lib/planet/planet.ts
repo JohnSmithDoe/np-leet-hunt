@@ -54,7 +54,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
     }
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         type: keyof typeof IMAGES
     ) {
         super(scene, 0, 0, '');
@@ -153,7 +153,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         return this;
     }
 
-    public update(...args: number[]): void {
+    public override update(...args: number[]): void {
         super.update(...args);
         if (this.#alive) {
             this.angle += 0.05;

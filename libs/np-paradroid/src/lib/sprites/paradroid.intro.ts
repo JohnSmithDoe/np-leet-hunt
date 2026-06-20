@@ -38,7 +38,7 @@ export class ParadroidIntro extends NPGameObjectList {
     }
 
     /** Load the splash textures up front (called via the scene's component lifecycle). */
-    preload() {
+    override preload() {
         this.scene.load.spritesheet(PARADROID_IMAGES.vsPlayerFemale);
         this.scene.load.image(PARADROID_IMAGES.vsImage);
         this.scene.load.image(PARADROID_IMAGES.vsDroid);

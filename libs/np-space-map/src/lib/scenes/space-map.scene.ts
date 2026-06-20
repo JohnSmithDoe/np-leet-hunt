@@ -41,12 +41,12 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
     }
 
-    preload() {
+    override preload() {
         super.preload();
         this.load.image('rocket', 'assets/rocket.png');
     }
 
-    create() {
+    override create() {
         super.create();
         const start = this.#map.startingPlanet;
         this.#rocket = new NPMovableSprite(this, start.x, start.y, 'rocket').setScale(0.5);
@@ -64,7 +64,7 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }
 
-    update(time: number, delta: number) {
+    override update(time: number, delta: number) {
         this.#map.update(time, delta); // drives planet spin + route shimmer
         super.update(time, delta);
     }

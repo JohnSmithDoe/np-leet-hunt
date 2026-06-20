@@ -446,7 +446,7 @@ export const longQuietEvents: PlanetEvent[] = [
                             'You strike his pauldron to wake him to a fight. Old gears scream into motion — he will ' +
                             'not refuse a challenge even now — and he comes up off his knee with a rust-bitten blade, ' +
                             'bound by a duty he cannot remember to a foe he never wanted.',
-                        effects: [{ kind: 'spawnGame', game: 'duel', launch: { reason: 'unwound-knight-duel' } }],
+                        effects: [{ kind: 'spawnGame', game: 'duel', reason: 'unwound-knight-duel' }],
                     },
                 },
             ],
@@ -572,7 +572,7 @@ export const longQuietEvents: PlanetEvent[] = [
                             'A surge brings the drone shuddering back online. It is half-greyed and entirely sure of ' +
                             'its orders: defend the cargo, flee with it, feed it to the front. Its clamps come up and ' +
                             'its drives spin hot.',
-                        effects: [{ kind: 'spawnGame', game: 'duel', launch: { reason: 'derelict-drone-wakes' } }],
+                        effects: [{ kind: 'spawnGame', game: 'duel', reason: 'derelict-drone-wakes' }],
                     },
                 },
             ],
@@ -1342,9 +1342,7 @@ export const longQuietEvents: PlanetEvent[] = [
                                         'You jolt it the rest of the way awake — and the grey wins the race for its mind by ' +
                                         'a hair. It comes up off the cradle knowing exactly one thing, which is its orders: ' +
                                         'tidy this away, starting with you. Its grip-arms unfold and it advances.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'foundry-droid-wakes' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'foundry-droid-wakes' }],
                                 },
                             },
                         ],

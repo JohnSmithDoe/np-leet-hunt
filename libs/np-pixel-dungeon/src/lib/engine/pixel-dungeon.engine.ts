@@ -24,7 +24,7 @@ export class PixelDungeonEngine extends StateManager {
         this.#setup();
     }
 
-    update(time: number, delta: number) {
+    override update(time: number, delta: number) {
         if (this.scene.game.loop.actualFps < 58) {
             console.log('40:update-laaag:', this.scene.game.loop.actualFps);
         }

@@ -6,7 +6,7 @@ export class StartGameState extends PixelDungeonState {
     name = States.StartGame;
     next = States.HandleAction;
 
-    enter(engine: PixelDungeonEngine) {
+    override enter(engine: PixelDungeonEngine) {
         super.enter(engine);
     }
 }

@@ -30,7 +30,7 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameO
     }
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         type: keyof typeof IMAGES,
         public start: Phaser.Types.Math.Vector2Like,
         public target: Phaser.Types.Math.Vector2Like
@@ -71,7 +71,7 @@ export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameO
         // this.stop();
     }
 
-    public update(...args: number[]): void {
+    public override update(...args: number[]): void {
         super.update(...args);
         // console.log(this.anims.currentFrame.index, this.anims.currentFrame);
 

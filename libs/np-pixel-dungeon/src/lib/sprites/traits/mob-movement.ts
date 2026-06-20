@@ -42,9 +42,12 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
     }
     update(time: number, delta: number) {
         // Do the move first and then check if completed
-        // Parent checks complete and then moves
+        // Parent checks complete and then moves.
+        // rex's MoveTo.update is untyped here (variadic base signature), so both the TS error and the
+        // resulting unsafe-call lint are suppressed at this one third-party boundary.
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         super.update(time, delta);
         if (!this.isRunning || !this.enable) {
             return this;
@@ -57,6 +60,7 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
             this.moveToTask.complete(); // complete early
             return this;
         }
+        return this;
     }
     get isMoving() {
         return this.moveToTask.isRunning;

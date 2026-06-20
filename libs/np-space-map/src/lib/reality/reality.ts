@@ -25,7 +25,7 @@ export class Reality extends Phaser.GameObjects.Rectangle implements NPGameObjec
     readonly #angle: number;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         origin: FrontPoint,
         axis: FrontPoint,
         position: number

@@ -1,6 +1,7 @@
 export * from './lib/balance/balance';
 export * from './lib/balance/balance.model';
 export * from './lib/game-state.service';
+export * from './lib/mode/mode-contract';
 export * from './lib/model/resources';
 export * from './lib/model/run-context';
 export * from './lib/run/game-state';

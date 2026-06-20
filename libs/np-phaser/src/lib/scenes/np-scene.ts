@@ -1,8 +1,8 @@
-import { NPGameObject, NPGameObjectList } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { Observable, take } from 'rxjs';
 
 import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
+import { NPGameObject, NPGameObjectList } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
 

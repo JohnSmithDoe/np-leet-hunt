@@ -9,7 +9,7 @@ export class NPMovableSprite extends Phaser.Physics.Arcade.Image implements NPGa
     private moveTo!: MoveToTask;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         texture: string | Phaser.Textures.Texture

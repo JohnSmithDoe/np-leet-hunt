@@ -91,7 +91,7 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#sector = sector;
     }
 
-    preload() {
+    override preload() {
         // Preload every map texture up front — not just the ones the first sector happens to use — so a
         // sector change can rebuild the map synchronously from cache, with no loader and no async race.
         Planet.preloadAll(this.scene);
@@ -102,7 +102,7 @@ export class NPSpaceMap extends NPGameObjectList {
         return this.#start;
     }
 
-    create(container?: Phaser.GameObjects.Container) {
+    override create(container?: Phaser.GameObjects.Container) {
         super.create(container);
         // One-time, instance-level wiring that outlives sector changes (the scene is persistent): map
         // input and the event-dialog round-trip stay bound to this instance, which always points at the
@@ -211,7 +211,7 @@ export class NPSpaceMap extends NPGameObjectList {
     }
 
     /** Per-frame motion of the map's objects (planet spin, route shimmer); driven by the scene update. */
-    update(...args: number[]) {
+    override update(...args: number[]) {
         this.#planets.forEach(planet => planet.update(...args));
         this.#connections.forEach(connection => connection.line.update(...args));
         // Wheel-zoom (and the follow zoom-in) don't run through #refreshStates, so watch the zoom here and

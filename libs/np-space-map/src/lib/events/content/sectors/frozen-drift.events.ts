@@ -400,7 +400,7 @@ export const frozenDriftEvents: PlanetEvent[] = [
                                         {
                                             kind: 'spawnGame',
                                             game: 'duel',
-                                            launch: { reason: 'frozen-matron-affront' },
+                                            reason: 'frozen-matron-affront',
                                         },
                                         { kind: 'resource', heart: -1 },
                                     ],
@@ -1251,7 +1251,7 @@ export const frozenDriftEvents: PlanetEvent[] = [
                                         {
                                             kind: 'spawnGame',
                                             game: 'duel',
-                                            launch: { reason: 'frozen-armada-thing' },
+                                            reason: 'frozen-armada-thing',
                                         },
                                     ],
                                 },

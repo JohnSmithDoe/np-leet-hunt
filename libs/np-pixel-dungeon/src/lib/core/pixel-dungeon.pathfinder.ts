@@ -19,7 +19,7 @@ export class PixelDungeonPathfinder extends PathFinder {
         this.#board = board;
         this.#pathGraphics = this.scene.add.graphics({ lineStyle: { width: 3 } });
     }
-    findPath(endTileXY: TileXYType) {
+    override findPath(endTileXY: TileXYType) {
         const pathToMove = super.findPath(endTileXY);
         if (!this.#debug) return pathToMove;
         // debug

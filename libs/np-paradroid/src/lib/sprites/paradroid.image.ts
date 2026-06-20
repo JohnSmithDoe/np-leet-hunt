@@ -21,7 +21,7 @@ export class ParadroidImage extends Image {
         super(scene, x, y, PARADROID_IMAGES[image], frame);
     }
 
-    create(container?: Phaser.GameObjects.Container) {
+    override create(container?: Phaser.GameObjects.Container) {
         super.create();
         container?.add(this);
     }

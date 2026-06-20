@@ -55,7 +55,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
     #timer = new NPTimer();
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         options?: TBinareTimerOptions
@@ -107,7 +107,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
         container?.add(this.#text);
     }
 
-    update(): void {
+    override update(): void {
         if (!this.#running) return; // idle until start() — keeps the timer frozen before the match begins
         super.update();
         let time: number;

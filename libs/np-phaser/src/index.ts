@@ -4,3 +4,4 @@ export * from './lib/scenes/world.scene';
 export * from './lib/basics/stage/stage.component';
 export * from './lib/scenes/np-scene';
 export * from './lib/scenes/np-scene-component';
+export * from './lib/scenes/placeholder.scene';

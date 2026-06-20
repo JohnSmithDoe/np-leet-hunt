@@ -41,7 +41,7 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
         super(mob);
     }
 
-    perform(): boolean {
+    override perform(): boolean {
         if (!this.#isRunning) {
             this.#isRunning = true;
             const angle = this.mob.engine.level.angleBetween(this.mob, this.target);
@@ -74,7 +74,7 @@ export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeon
         super(mob);
     }
 
-    perform(): boolean {
+    override perform(): boolean {
         if (this.tile) {
             this.mob.movement.moveToTile(this.tile);
             this.tile = undefined;
@@ -84,7 +84,7 @@ export class WalkToAction extends PixelDungeonBaseAction implements PixelDungeon
 }
 
 export class WarpAction extends WalkToAction implements PixelDungeonAction {
-    perform(): boolean {
+    override perform(): boolean {
         if (this.tile) {
             this.mob.movement.warp(this.tile);
             this.tile = undefined;
@@ -94,14 +94,14 @@ export class WarpAction extends WalkToAction implements PixelDungeonAction {
 }
 
 export class RestAction extends PixelDungeonBaseAction implements PixelDungeonAction {
-    perform(): boolean {
+    override perform(): boolean {
         // this.mob.gainEnergy(); // extra energy
         return true;
     }
 }
 
 export class WaitForInputAction extends PixelDungeonBaseAction implements PixelDungeonAction {
-    perform(): boolean {
+    override perform(): boolean {
         return false;
     }
 }

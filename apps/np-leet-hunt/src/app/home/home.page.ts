@@ -4,7 +4,6 @@ import {
     IonButtons,
     IonContent,
     IonHeader,
-    IonIcon,
     IonMenuButton,
     IonTitle,
     IonToolbar,
@@ -13,8 +12,6 @@ import { NPBaseSubscriber } from '@shared/np-library';
 import { StageComponent, StageService } from '@shared/np-phaser';
 import { EventDialogComponent, PlanetInfoComponent } from '@shared/np-space-map';
 import { GameStateService, RunPhase } from '@shared/np-state';
-import { addIcons } from 'ionicons';
-import { heart } from 'ionicons/icons';
 import { filter } from 'rxjs';
 
 import { RunConductorService } from '../run/run-conductor.service';
@@ -30,7 +27,6 @@ import { RunConductorService } from '../run/run-conductor.service';
         IonButtons,
         IonMenuButton,
         IonButton,
-        IonIcon,
         IonTitle,
         IonContent,
         StageComponent,
@@ -43,18 +39,12 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
     #game = inject(GameStateService);
     #conductor = inject(RunConductorService);
 
-    constructor() {
-        super();
-        addIcons({ heart });
-    }
-
     ngOnInit(): void {
         this.listen(
             this.#stage.initialized$.pipe(filter(isInitialized => isInitialized)).subscribe(() => {
-                // Composition root: start a run (hangar → sector), then let the conductor render each
-                // phase. The conductor builds scenes with the injected run store, so StageService stays
-                // domain-free and the FSM is the single source of truth for the active mode.
-                this.#game.startNewRun();
+                // Composition root: hand the stage to the conductor. The run FSM starts in the hangar; the
+                // conductor renders each phase as a scene, so StageService stays domain-free and the FSM is
+                // the single source of truth for the active mode. The hangar's "Launch run" begins the run.
                 this.#conductor.start();
             })
         );
@@ -62,14 +52,23 @@ export class HomePageComponent extends NPBaseSubscriber implements OnInit {
 
     // Debug toolbar: each button is a run-phase *intent* — the conductor turns the phase into a scene
     // swap. Illegal transitions (e.g. duel → dungeon directly) are ignored; bounce via the map first.
-    public toSpace(): void {
+    public toMap(): void {
         this.#toPhase('sector');
     }
-    public toParadroid(): void {
+    public toEvent(): void {
+        this.#toPhase('event');
+    }
+    public toDuel(): void {
         this.#toPhase('duel');
     }
-    public toPixeldungeon(): void {
+    public toDungeon(): void {
         this.#toPhase('dungeon');
+    }
+    public toBoarding(): void {
+        this.#toPhase('boarding');
+    }
+    public toGuardian(): void {
+        this.#toPhase('guardian');
     }
 
     #toPhase(phase: RunPhase): void {

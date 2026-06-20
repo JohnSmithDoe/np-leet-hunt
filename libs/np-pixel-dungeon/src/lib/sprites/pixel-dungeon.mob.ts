@@ -34,7 +34,7 @@ const defaultOptions: TPixelDungeonMobOptions = {
 
 export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObject {
     rexChess!: ChessData;
-    scene!: NPSceneWithBoard;
+    override scene!: NPSceneWithBoard;
     options: TPixelDungeonMobOptions;
 
     #movement!: MobMovement;
@@ -50,7 +50,7 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
         this.options = mobOptions;
     }
 
-    create() {
+    override create() {
         super.create();
         this.#movement = new MobMovement(this);
         this.#vision = new MobVision(this);

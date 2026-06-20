@@ -30,7 +30,7 @@ export class ParadroidMiddle extends Phaser.GameObjects.Sprite implements NPGame
     #active = { player: false, droid: false };
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         public row: number,
         x: number,
         y: number,

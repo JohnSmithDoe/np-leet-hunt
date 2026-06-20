@@ -272,7 +272,7 @@ export const homeReachEvents: PlanetEvent[] = [
                                     resultText:
                                         'It will not surrender the cargo without a duel. You drop your gear and square up ' +
                                         'in the quiet of the cul-de-sac.',
-                                    effects: [{ kind: 'spawnGame', game: 'duel', launch: { reason: 'thief-drone' } }],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'thief-drone' }],
                                 },
                             },
                             {
@@ -1286,9 +1286,7 @@ export const homeReachEvents: PlanetEvent[] = [
                                     resultText:
                                         'The sign said NO GROWNUPS and they meant it. The torch snuffs, the fort bristles, and ' +
                                         'a pillow-and-ruler skirmish breaks out across the threshold.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'home-fort-defenders' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'home-fort-defenders' }],
                                 },
                             },
                         ],

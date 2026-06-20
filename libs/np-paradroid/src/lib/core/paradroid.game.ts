@@ -64,7 +64,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#aiParams = aiParams ?? Balance.duelAiParams('normal');
     }
 
-    init() {
+    override init() {
         this.#factory = new ParadroidFactory(this.#options);
         this.#fields = this.#generateFields(EParadroidOwner.Player);
         this.#engine = new ParadroidEngine(this.#fields.list);
@@ -136,7 +136,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#timer.start();
     }
 
-    update(...args: unknown[]) {
+    override update(...args: unknown[]) {
         super.update(...args); // drive children: timer countdown + path animations
         if (!this.#running || this.#ended) return;
         this.#elapsedMs += (args[1] as number) ?? 0;
@@ -195,7 +195,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         return { player, droid };
     }
 
-    create(container?: Phaser.GameObjects.Container) {
+    override create(container?: Phaser.GameObjects.Container) {
         let x = 0;
         let y = 100;
         const buttons = new Phaser.GameObjects.Container(this.scene, x, y, []);

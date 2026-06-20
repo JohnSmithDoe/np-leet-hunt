@@ -1,6 +1,11 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {},
+    "angularCompilerOptions": {
+        "strictTemplates": true,
+        "strictInjectionParameters": true,
+        "strictInputAccessModifiers": true
+    },
     "exclude": [
         "vitest.config.ts"
     ],

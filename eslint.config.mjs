@@ -48,11 +48,13 @@ export default tseslint.config(
                     "checksConditionals": true
                 }
             ],
-            "@typescript-eslint/no-unsafe-call": "off",
-            "@typescript-eslint/no-unsafe-assignment": "off",
-            "@typescript-eslint/no-unsafe-argument": "off",
-            "@typescript-eslint/no-unsafe-member-access": "off",
-            "@typescript-eslint/no-unsafe-return": "off",
+            // Re-enabled in Leet-26: Phaser 4 is TS-native, so its surface is now properly typed and
+            // these only fire at genuine untyped boundaries (suppressed locally where unavoidable).
+            "@typescript-eslint/no-unsafe-call": "error",
+            "@typescript-eslint/no-unsafe-assignment": "error",
+            "@typescript-eslint/no-unsafe-argument": "error",
+            "@typescript-eslint/no-unsafe-member-access": "error",
+            "@typescript-eslint/no-unsafe-return": "error",
             "@typescript-eslint/unbound-method": "off",
             "@typescript-eslint/restrict-plus-operands": "error",
             "@typescript-eslint/restrict-template-expressions": "off",

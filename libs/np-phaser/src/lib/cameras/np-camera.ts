@@ -10,7 +10,7 @@ export class NPCamera extends Phaser.Cameras.Scene2D.Camera {
     #makeMain = false;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         width: number,
@@ -37,7 +37,7 @@ export class NPCamera extends Phaser.Cameras.Scene2D.Camera {
         return this;
     }
 
-    addToRenderList(child: Phaser.GameObjects.GameObject) {
+    override addToRenderList(child: Phaser.GameObjects.GameObject) {
         if (
             (!this.focusLayer && !this.focusObject) ||
             (this.focusLayer && this.focusLayer.getChildren()?.includes(child)) ||

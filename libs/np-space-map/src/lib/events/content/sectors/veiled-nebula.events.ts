@@ -746,9 +746,7 @@ export const veiledNebulaEvents: PlanetEvent[] = [
                                         'You hold it overhead like a trophy, and the whole club goes cold and quiet. ' +
                                         'Faded heroes remember, all at once, how to be dangerous. This is going to ' +
                                         'be a fight.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'fan-club-heist' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'fan-club-heist' }],
                                 },
                             },
                         ],
@@ -1097,9 +1095,7 @@ export const veiledNebulaEvents: PlanetEvent[] = [
                                     resultText:
                                         'Your sharpest double steps clean out of the glass to meet you, armed with ' +
                                         'every move you’ve got. There’s no talking your way past yourself.',
-                                    effects: [
-                                        { kind: 'spawnGame', game: 'duel', launch: { reason: 'veiled-mirror-self' } },
-                                    ],
+                                    effects: [{ kind: 'spawnGame', game: 'duel', reason: 'veiled-mirror-self' }],
                                 },
                             },
                         ],
@@ -1866,7 +1862,7 @@ export const veiledNebulaEvents: PlanetEvent[] = [
                                         {
                                             kind: 'spawnGame',
                                             game: 'duel',
-                                            launch: { reason: 'veiled-high-roller-standoff' },
+                                            reason: 'veiled-high-roller-standoff',
                                         },
                                     ],
                                 },

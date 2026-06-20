@@ -28,7 +28,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
     #thickness: number;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         field: ParadroidField,
         path: TParadroidPath
     ) {
@@ -55,7 +55,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
         container?.add(this);
     }
 
-    update(...args: unknown[]) {
+    override update(...args: unknown[]) {
         super.update(...args);
         switch (this.#state) {
             case 'activating':

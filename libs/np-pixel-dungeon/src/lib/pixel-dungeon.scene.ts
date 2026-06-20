@@ -1,10 +1,17 @@
 import { NPScene } from '@shared/np-phaser';
+import { DungeonResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
 
 import { OnSceneCreate, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { NPSceneWithBoard } from './@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
+
+/** What the app injects when starting a dungeon run (Leet-29). */
+export interface TPixelDungeonSceneConfig {
+    /** Called once when the player leaves the dungeon — reports the outcome back to the run. */
+    onResult?: (result: DungeonResult) => void;
+}
 
 export class PixelDungeonScene extends NPScene implements OnScenePreload, OnSceneCreate, NPSceneWithBoard {
     static readonly key = 'pixel-dungeon-scene';
@@ -14,15 +21,17 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     cam!: Phaser.Cameras.Scene2D.Camera;
     private cameraDrag = false;
     private engine!: PixelDungeonEngine;
-    constructor() {
+    readonly #config: TPixelDungeonSceneConfig;
+    constructor(config: TPixelDungeonSceneConfig = {}) {
         super({ key: PixelDungeonScene.key });
+        this.#config = config;
     }
 
     public setupComponents(): void {
         this.engine = new PixelDungeonEngine(this);
     }
 
-    preload() {
+    override preload() {
         this.engine.preload();
         this.load.scenePlugin({
             key: 'rexboardplugin',
@@ -33,7 +42,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         super.preload();
     }
 
-    create() {
+    override create() {
         this.engine.create();
         super.create();
         this.cam = this.cameras.main;
@@ -118,11 +127,15 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         this.cam.setZoom(5);
         // keyboard input is enabled by default in the game config
         this.cursors = this.input.keyboard!.createCursorKeys();
+        // Phase-0 bail: press M to leave the dungeon and report a (stub) result to the run (Leet-29). The
+        // real objective-driven exit lands with the Phase-3 dungeon rebuild; the map's debug toolbar is
+        // the touch escape until then.
+        this.input.keyboard!.on('keydown-M', () => this.#config.onResult?.({ kind: 'dungeon', outcome: 'failed' }));
         this.engine.startUP();
         this.engine.startUpdate();
     }
 
-    update() {
+    override update() {
         if (this.cameraDrag) return;
 
         //this.updatePlayerMovement();

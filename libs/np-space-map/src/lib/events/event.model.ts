@@ -5,10 +5,7 @@
  * the spec.
  */
 
-import type { CrewMember, SectorId } from '@shared/np-state';
-
-// TODO(Leet-29): replace this placeholder with the real ModeLaunch from the mode-result contract.
-export type ModeLaunch = unknown;
+import type { CrewMember, ModeLaunch, SectorId } from '@shared/np-state';
 
 /** Internal balance tag, never rendered (spec §4). Order of a question's answers is always good|neutral|bad. */
 export type Tone = 'good' | 'neutral' | 'bad';
@@ -66,7 +63,7 @@ export interface Outcome {
 export type Effect =
     | { kind: 'resource'; hull?: number; heart?: number; marbles?: number } // signed deltas
     | { kind: 'item'; grant?: string; take?: string } // inventory ids
-    | { kind: 'spawnGame'; game: 'dungeon' | 'duel'; launch: ModeLaunch } // hand-off (Leet-29)
+    | { kind: 'spawnGame'; game: 'dungeon' | 'duel'; reason: string; launch?: ModeLaunch } // hand-off (Leet-29)
     | { kind: 'openRoute'; to: string } // reveal a map connection
     | { kind: 'front'; advance: number } // <0 = distortion-battery pushback
     | { kind: 'flag'; set: string }; // run-scoped story/state flag

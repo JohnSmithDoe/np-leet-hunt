@@ -90,6 +90,18 @@ export class StageService {
         this.#phaser.destroyActiveGame();
     }
 
+    /**
+     * Tear the whole stage down — remove every scene Phaser knows about (active, transient, AND slept
+     * persistent ones), then reset to empty. Slept persistent scenes (e.g. the space map between
+     * excursions) are not tracked in `#active`, so `startScene` alone can't reach them; this is how a run
+     * end clears the board so the next run builds fresh instead of waking stale content.
+     */
+    clear(): void {
+        [...this.#phaser.game.scene.scenes].forEach(scene => this.#phaser.game.scene.remove(scene.scene.key));
+        this.#active = [];
+        this.#switching = false;
+    }
+
     /** True when the requested keys are exactly the mode already on stage (order-independent). */
     #isCurrent(keys: string[]): boolean {
         return keys.length === this.#active.length && keys.every(key => this.#active.some(entry => entry.key === key));

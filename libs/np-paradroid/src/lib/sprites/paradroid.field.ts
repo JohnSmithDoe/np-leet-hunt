@@ -93,7 +93,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
     #options: { width: number; height?: number };
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         subTile: TParadroidSubTile,
         options: { width: number; height?: number }
     ) {
@@ -159,7 +159,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
         container?.add(g);
     }
 
-    update(...args: unknown[]) {
+    override update(...args: unknown[]) {
         super.update(...args);
         this.#paths.list.forEach(path => path.update(...args));
     }

@@ -29,7 +29,7 @@ export class NPButton extends Phaser.GameObjects.Sprite implements NPGameObject 
     #disabled = false;
 
     constructor(
-        public scene: NPScene,
+        public override scene: NPScene,
         x: number,
         y: number,
         private config = { width: 64, height: 64 }

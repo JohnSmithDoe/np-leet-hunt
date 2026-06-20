@@ -48,7 +48,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         // HUD is built in create(): it needs no preloaded assets, only text + graphics.
     }
 
-    create() {
+    override create() {
         super.create();
         const text = (x: number, y: number, value: string, size: number, color: string) =>
             this.add

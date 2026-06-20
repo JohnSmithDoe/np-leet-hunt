@@ -1,100 +1,76 @@
-# Backlog — Phase 0: The Spine
+# Backlog — Phase 0: The Spine ✅ COMPLETE
 
 Issues for [game-design.md §7, Phase 0](game-design.md). Numbering continues the `Leet-<n>`
-commit convention (last used: Leet-25). Ready to paste into GitHub issues; until then this
-file is the tracker.
+commit convention.
+
+**Status:** Phase 0 is done — `nx run-many -t build lint test` and the Playwright e2e are green, and
+a full fake run flows hangar → sector → (map ⇄ event/duel/dungeon/boarding/guardian) → ending → hangar
+through every run phase. Much of the spine (the FSM, run store, save skeleton) was actually built across
+commits Claude-16…26 ahead of this tracker; the closing work was the mode-result contract and the
+placeholder scenes that make the run traversable end-to-end. Next: **Phase 1 — The Map Run**.
 
 ---
 
-## Leet-26: Strict TypeScript baseline
+## Leet-26: Strict TypeScript baseline — ✅ done
 
-**Context:** Design decision (§7 Phase 0): big-bang switch to strict before the spine is built,
-so all new systems are strict from day one.
+**Context:** big-bang switch to strict before the spine is built.
 
-**Tasks**
-- [ ] `"strict": true` in `tsconfig.base.json`; remove weaker per-project overrides.
-- [ ] Fix fallout lib by lib (`np-library` → `np-phaser` → game libs → app).
-- [ ] Tighten ESLint where strict unlocks it (e.g. re-evaluate disabled `no-unsafe-*` rules).
-
-**Acceptance:** `nx run-many -t build test lint` green with strict on; no `any`-suppression
-comments added just to pass.
-
----
-
-## Leet-27: Run state machine
-
-**Context:** The spine of every run: `hangar → sector → (map ⇄ event|dungeon|duel|boarding) →
-guardian → sector exit → … → ending(partial|full|true)`. Today no run state exists at all —
-the home page just adds scenes.
-
-**Tasks**
-- [ ] Evaluate building blocks: `rexStateManager` (already registered as global plugin),
-      the old RxJS sketch (`apps/old/stateMachine.ts`), or a fresh small typed FSM.
-- [ ] Typed states + transition table + observable current state; illegal transitions throw.
-- [ ] Run context object carried through states (sector no., rescued members, resources — stub).
-- [ ] Debug UI (dev-only) to force transitions.
-
-**Acceptance:** a fake run traverses every state via debug controls; transition table covered
-by unit tests.
+**Outcome**
+- [x] `strict` was already on in `tsconfig.base.json` (since Claude-4) with no weakening per-project
+      overrides; verified the whole workspace builds/tests/lints green under it.
+- [x] Added the strict-adjacent flags `strict` doesn't cover: `noImplicitOverride`, `noImplicitReturns`,
+      `noFallthroughCasesInSwitch`, `forceConsistentCasingInFileNames` — fixed the fallout (~50 `override`
+      modifiers on the Phaser-extending classes; one not-all-paths-return).
+- [x] Added Angular `strictTemplates` / `strictInjectionParameters` / `strictInputAccessModifiers` to the
+      app (zero fallout — the shell has minimal templates).
+- [x] Re-evaluated the disabled `no-unsafe-*` ESLint rules: Phaser 4 is TS-native, so only **6** violations
+      workspace-wide → re-enabled all five (`no-unsafe-call/assignment/argument/member-access/return`).
+      Typed the dead `ReversePipe`; one documented local disable at the rex-plugin `MoveTo.update` boundary.
 
 ---
 
-## Leet-28: Scene transition cleanup
+## Leet-27: Run state machine — ✅ done (mostly pre-built)
 
-**Context:** `StageService.startScene` tracks a single current scene, but the space map adds
-three scenes directly (`home.page.ts#goToSpace`), bypassing it — switching modes stacks scenes
-on top of each other (paradroid currently renders above the still-running space scenes).
-
-**Tasks**
-- [ ] `StageService` becomes the only scene authority; no direct `game.scene.add` outside it.
-- [ ] Scene *groups*: the space map's three concurrent scenes start/stop/fade as one unit.
-- [ ] Unified fade-out → swap → fade-in driven by the run state machine (Leet-27).
-
-**Acceptance:** switching between space map, dungeon, and paradroid never stacks scenes;
-transitions fade cleanly; Playwright e2e stays green.
+`RunFsm` (typed phases + `RUN_TRANSITIONS` table + observable `current$`; illegal moves throw),
+`RunContext`/`RunStateStore`, and the `GameStateService` facade all live in `@shared/np-state` and are
+wired into the app via `RunConductorService`. The home-page debug toolbar (Map/Event/Duel/Dungeon/
+Board/Guardian) is the dev "force a transition" UI. Transition table covered by `run.fsm.spec.ts`.
 
 ---
 
-## Leet-29: Mode result contract
+## Leet-28: Scene transition cleanup — ✅ done
 
-**Context:** Modes must be launchable with parameters and must report results back (§3 mode
-handoff; old paradroid note: "intro → select game → play → end → return result").
-
-**Tasks**
-- [ ] Define `ModeLaunch` / `ModeResult` types (per mode: duel config/grid/AI level → outcome
-      win/lose, absorbed class, time left; dungeon objective → completed/failed/loot).
-- [ ] Scenes receive launch config via the state machine and resolve a result on exit.
-- [ ] Paradroid wired as the first real implementer (it already returns to the map).
-
-**Acceptance:** a duel started from a debug map button returns a typed result that the run
-state machine logs/consumes.
+`StageService` is the sole scene authority (`startScene(...entries)` with a `#switching` guard +
+`#isCurrent` dedupe; persistent scenes sleep, transient ones are removed) and `RunConductorService` is its
+only caller — the old `home.page#goToSpace` bypass is gone. The space map's three scenes start/stop/fade
+as one group. Added `StageService.clear()` to tear down all scenes (incl. slept persistent ones) on a run
+end so the next run builds fresh. No scene stacking; e2e green.
 
 ---
 
-## Leet-30: Save-file skeleton
+## Leet-29: Mode result contract — ✅ done
 
-**Context:** Meta persistence lands in Phase 5, but the format starts now so every phase saves
-compatible data (§4 meta: pet evolution, unlocks, story pieces).
-
-**Tasks**
-- [ ] Persistence service: versioned JSON schema (`version`, `meta { petEvolution, unlocks[],
-      storyPieces[] }`, `settings`), localStorage-backed (Capacitor Preferences later).
-- [ ] Load/save/migrate stub with one fake migration test.
-
-**Acceptance:** meta survives a reload; schema-version bump path unit-tested.
+`@shared/np-state` `mode/mode-contract.ts` defines `ModeLaunch` (`DuelLaunch | DungeonLaunch`),
+`ModeResult` (`DuelResult | DungeonResult`), `ModeResultHandler`, and `isModeSuccess` (+ spec). The duel
+(`ParadroidScene`) maps its match result to a typed `DuelResult` and reports it via a "↩ Map" control; the
+dungeon reports a stub `DungeonResult` (press M — real objective exit is Phase 3). `RunConductorService`
+injects `onResult` into both and advances the FSM back to `sector` on report. The event model's
+`spawnGame` effect now carries `reason` + an optional real `ModeLaunch` (was a `unknown` placeholder).
 
 ---
 
-## Leet-31: Phase 0 exit — the fake run
+## Leet-30: Save-file skeleton — ✅ done (pre-built)
 
-**Context:** Phase 0's exit criterion (§7): a fake run flows end-to-end through placeholder
-scenes.
+Versioned `SaveFile` (`version`, `meta { petEvolution, unlocks[], storyPieces[] }`, `settings`),
+`PersistencePort` (in-memory default + the app's Capacitor adapter), and `SaveStore` with `load`/`save`/
+`migrate` (the v0→v1 migration is unit-tested in `save.store.spec.ts`).
 
-**Tasks**
-- [ ] Placeholder scenes/screens for hangar, sector map, dungeon, duel, ending.
-- [ ] Wire Leet-27/28/29/30 together: full fake run from app start to an ending screen and
-      back to the hangar.
-- [ ] Feed learnings back into game-design.md §7 if the plan needs correcting.
+---
 
-**Acceptance:** from a fresh app start, a complete fake run reaches an ending screen through
-every state; build/test/lint/e2e all green.
+## Leet-31: Phase 0 exit — the fake run — ✅ done
+
+A domain-free `PlaceholderScene` (np-phaser: title + lines + action buttons) backs every phase without a
+real scene (hangar, guardian, boarding, ending); each action wires a legal FSM transition. From a fresh
+start the run reaches an ending screen through every phase and loops back to the hangar. `sectorExit` stays
+a scene-less routing phase (driven by the rim-sun `SECTOR_EXIT` bus event) so it doesn't fight the async
+`StageService` swap. build/test/lint/e2e all green.

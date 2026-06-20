@@ -406,17 +406,23 @@ dialogs inherit system text scaling.
 
 No release pressure — this is a private hobby build; phases exist for momentum, and every
 phase ends in something playable. Issues keep the `Leet-<n>` convention. Current code state:
-space-map has travel/zoom/transitions; paradroid is playable (needs AI + result flow);
-pixel-dungeon has generation but open FoV/movement bugs; the run spine doesn't exist yet.
+the run **spine is in place** (Phase 0 done) — a run FSM, run store, save skeleton, and a fake run that
+flows through every phase to an ending and back to the hangar; space-map has travel/zoom/transitions;
+paradroid is playable and returns a typed result; pixel-dungeon has generation but open FoV/movement bugs.
 
-### Phase 0 — The Spine
+### Phase 0 — The Spine ✅ done
 
 Goal: the skeleton every later phase hangs on.
-- Switch the workspace to TypeScript strict (big bang, clean baseline).
-- Run state machine: hangar → sector → (map ⇄ modes) → ending; modes return results.
-- Scene transition cleanup in `StageService` (today's scene-stacking quirk dies here).
-- Save-file skeleton (meta persistence comes later, the format starts now).
-- *Exit: a fake run flows end-to-end through placeholder scenes.*
+- [x] Workspace on TypeScript strict (+ `noImplicitOverride`/`noImplicitReturns`/strict templates; the
+      `no-unsafe-*` lint rules re-enabled now Phaser 4 is TS-native).
+- [x] Run state machine (`@shared/np-state`): hangar → sector → (map ⇄ modes) → ending; illegal moves throw.
+- [x] Mode-result contract: modes launch with config and report a typed `ModeResult`; the conductor consumes it.
+- [x] `StageService` is the sole scene authority (scene groups, sleep/wake/clear) — the scene-stacking quirk is gone.
+- [x] Versioned save-file skeleton with a tested migration path.
+- [x] *Exit met: a fake run flows end-to-end through placeholder scenes (build/test/lint/e2e green).*
+
+Note: most of the spine landed across commits Claude-16…26 ahead of the tracker; the closing work was
+the mode-result contract (Leet-29) and the placeholder scenes wiring the run together (Leet-31).
 
 ### Phase 1 — The Map Run *(the old v0.1, with teeth)*
 
