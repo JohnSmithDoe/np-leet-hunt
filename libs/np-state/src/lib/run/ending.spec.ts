@@ -12,7 +12,7 @@ const ctx = (over: Partial<RunContext> = {}): RunContext => ({
 });
 
 describe('describeEnding', () => {
-    const kinds: EndingKind[] = ['snapback', 'bail', 'wiped'];
+    const kinds: EndingKind[] = ['rescued', 'snapback', 'bail', 'wiped'];
 
     it('gives each exit its own headline', () => {
         const titles = kinds.map(kind => describeEnding(kind, ctx()).title);
@@ -33,5 +33,16 @@ describe('describeEnding', () => {
     it('lists the rescued family when crew is aboard', () => {
         const lines = describeEnding('wiped', ctx({ crew: ['mom', 'grandpa'] })).lines;
         expect(lines).toContain('Home safe: Mom, Grandpa.');
+    });
+
+    it('bail still banks rescues already made (Leet-34: bail keeps prior crew)', () => {
+        const lines = describeEnding('bail', ctx({ crew: ['grandma'] })).lines;
+        expect(lines).toContain('Home safe: Grandma.');
+    });
+
+    it("the rescued ending opens the way to the Hush", () => {
+        const ending = describeEnding('rescued', ctx({ crew: ['grandma', 'grandpa', 'dad', 'mom', 'sibling'] }));
+        expect(ending.title).toBe('The last gate opened');
+        expect(ending.lines.some(line => /Hush/.test(line))).toBe(true);
     });
 });

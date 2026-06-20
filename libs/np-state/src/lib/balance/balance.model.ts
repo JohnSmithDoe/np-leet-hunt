@@ -1,4 +1,4 @@
-import { SectorId } from '../model/run-context';
+import { CrewMember, SectorId } from '../model/run-context';
 
 /**
  * Difficulty tier — a future global knob over the whole balance surface. Only `normal` is tuned today;
@@ -19,6 +19,14 @@ export const SECTOR_ORDER: readonly SectorId[] = [
 export const SECTOR_COUNT = SECTOR_ORDER.length;
 
 /**
+ * Which captive each sector's guardian holds (GDD §5 / Leet-34). The sibling is *always* the Hush's
+ * most-prized piece in sector 5; mom/dad/grandma/grandpa fill sectors 1–4. The GDD shuffles those four
+ * per run for crew-ability build variety — that randomisation is deferred to Phase 4 (crew abilities);
+ * for now the order is fixed and deterministic. Aligned 1:1 with {@link SECTOR_ORDER} (index 0 = sector 1).
+ */
+export const SECTOR_RESCUE: readonly CrewMember[] = ['grandma', 'grandpa', 'dad', 'mom', 'sibling'];
+
+/**
  * Mode-agnostic generation parameters for one sector — plain numbers only. np-space-map turns these
  * into a map (inner planets + rim suns) and the normality-front step; the event pool is keyed by
  * `Sector.id` over there. Keeping these primitive is what lets np-state stay free of any mode lib.
@@ -30,6 +38,12 @@ export interface SectorParams {
     exits: number;
     /** Jumps for the normality front to cross the sector — lower = the grey closes faster. */
     frontSteps: number;
+    /**
+     * Route density: how many nearest inner planets each inner planet links to (the old hard-coded "3
+     * nearest" in np-space-map, Leet-34). Higher = more interconnected = more ways to route around the
+     * grey. Denser early sectors are more forgiving; lower bound is 2 (1 risks a disconnected graph).
+     */
+    linkDegree: number;
 }
 
 /** A fully-resolved sector: its identity plus its generation parameters. */

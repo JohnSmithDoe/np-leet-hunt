@@ -19,9 +19,15 @@ interface Connection {
     line: NPDashedLine;
 }
 
+/** A node's role on the map: a main-graph planet, an out-of-the-way bonus sun, or the guardian gate. */
+type PlanetKind = 'inner' | 'outer' | 'guardian';
+
 // Map generation.
 const MAP_SIZE = 15000;
 const MIN_PLANET_DISTANCE = 1750;
+// The guardian gate links to its few nearest inner planets — several routes in, so the grey can't easily
+// cut every path to the rewarding exit at once.
+const GUARDIAN_LINKS = 3;
 
 // Normality-front tuning. The front sweeps in as a diagonal line from the left (the Hush greying the
 // map one layer at a time); it takes the sector's `frontSteps` jumps to cross, whatever the map size,
@@ -167,12 +173,17 @@ export class NPSpaceMap extends NPGameObjectList {
             height: MAP_SIZE,
             minDistance: MIN_PLANET_DISTANCE,
             outerSpaceDim: 5000,
+            // Drop the guardian gate out along the front's safe axis, on the far side the grey never reaches.
+            guardianDir: FRONT_AXIS,
         });
         this.#initPlanets();
         this.#initConnections();
 
         const origin = { x: 0, y: 0 };
-        const bounds = NormalityFront.enclosingBounds(origin, FRONT_AXIS, this.#planets, FRONT_MARGIN);
+        // The guardian sits past the farthest planet in the safe zone; leave it out of the front bounds so
+        // it doesn't stretch the sweep (and so the front still stops short of the real graph's far edge).
+        const frontPlanets = this.#planets.filter(planet => !planet.guardian);
+        const bounds = NormalityFront.enclosingBounds(origin, FRONT_AXIS, frontPlanets, FRONT_MARGIN);
         const span = bounds.max - bounds.min;
         const initialPosition = bounds.min;
         const maxPosition = bounds.min + span * (1 - SAFE_FRACTION);
@@ -347,7 +358,7 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#reality.sweepTo(this.#front.advance(), flightMs);
         this.#front
             .swallowed(this.#planets)
-            .filter(planet => planet.alive)
+            .filter(planet => planet.alive && !planet.guardian)
             .forEach(planet => this.#swallow(planet, flightMs));
         this.#emitFront();
 
@@ -365,7 +376,12 @@ export class NPSpaceMap extends NPGameObjectList {
             this.#following = false;
         }
 
-        // Reaching a rim sun bails the sector (no reward; run-end stub) — takes precedence over snapback.
+        // Reaching the guardian gate hands off to the guardian fight (the rewarding exit, Leet-34); reaching
+        // a rim sun bails the sector (no reward). Both take precedence over a snapback check on arrival.
+        if (target.guardian) {
+            this.#onGuardianReached();
+            return;
+        }
         if (target.outer) {
             this.#onSectorExit();
             return;
@@ -439,7 +455,7 @@ export class NPSpaceMap extends NPGameObjectList {
             this.#reality.sweepTo(position, 600);
             this.#front
                 .swallowed(this.#planets)
-                .filter(planet => planet.alive)
+                .filter(planet => planet.alive && !planet.guardian)
                 .forEach(planet => this.#swallow(planet, 600));
         } else {
             this.#reality.sweepTo(this.#front.pushFront(-steps), 600);
@@ -474,6 +490,16 @@ export class NPSpaceMap extends NPGameObjectList {
         this.scene.cameras.main.flash(600, 120, 220, 180); // calm green-cyan, distinct from the red snapback
         // The conductor listens for this: it advances to the next sector, or ends the run (bail) past the last.
         this.scene.game.events.emit(SPACE_EVENTS.SECTOR_EXIT, { jumps: this.#jumps });
+    }
+
+    #onGuardianReached() {
+        this.#frozen = true;
+        this.#deselect();
+        this.#here.setVisible(false);
+        this.scene.cameras.main.flash(600, 235, 200, 120); // warm gold — the rewarding gate, distinct from both
+        // The conductor listens for this: it hands off to the guardian fight (Leet-34); a win frees the
+        // sector's captive and advances. The space scenes sleep meanwhile and rebuild on the next sector.
+        this.scene.game.events.emit(SPACE_EVENTS.GUARDIAN_REACHED, { jumps: this.#jumps });
     }
 
     #refreshStates() {
@@ -538,7 +564,7 @@ export class NPSpaceMap extends NPGameObjectList {
         let topLeft: Planet | undefined;
         this.#map.coords.planets.forEach((coords, index) => {
             // Seed the readout by index so a planet reports the same stats every time it's reselected.
-            const planet = this.#addPlanet(coords, false)
+            const planet = this.#addPlanet(coords, 'inner')
                 .setDepth(3)
                 .setInfo(generatePlanetInfo(new NPRng(`planet-${index}`)));
             this.#planets.push(planet);
@@ -550,44 +576,63 @@ export class NPSpaceMap extends NPGameObjectList {
         // Outer suns join the same node list as navigable bonus detours — sized + flagged via #addPlanet.
         this.#map.coords.outerSpace.forEach((coords, index) => {
             this.#planets.push(
-                this.#addPlanet(coords, true)
+                this.#addPlanet(coords, 'outer')
                     .setDepth(3)
                     .setInfo(generatePlanetInfo(new NPRng(`outer-${index}`), true))
             );
         });
+        // The guardian gate node (Leet-34): the rewarding exit, on the far distorted side. One per sector.
+        if (this.#map.coords.guardian) {
+            this.#planets.push(
+                this.#addPlanet(this.#map.coords.guardian, 'guardian')
+                    .setDepth(3)
+                    .setInfo(generatePlanetInfo(new NPRng('guardian'), true))
+            );
+        }
     }
 
-    #addPlanet(coords: Phaser.Types.Math.Vector2Like, isOuter: boolean): Planet {
-        const planet = new Planet(this.scene, this.#getPlanetType(isOuter))
+    #addPlanet(coords: Phaser.Types.Math.Vector2Like, kind: PlanetKind): Planet {
+        const planet = new Planet(this.scene, this.#getPlanetType(kind))
             .setPosition(coords.x, coords.y)
-            .setOuter(isOuter);
+            .setOuter(kind === 'outer')
+            .setGuardian(kind === 'guardian');
         planet.setOrigin(0.5);
         planet.create(); // textures are preloaded, so setTexture is synchronous (works on rebuild too)
         this.scene.addExisting(planet);
         return planet;
     }
 
-    #getPlanetType(isOuter: boolean) {
-        if (isOuter) return 'planetSun';
+    #getPlanetType(kind: PlanetKind) {
+        if (kind === 'guardian') return 'planetPurpleTwo'; // reserved for the guardian gate
+        if (kind === 'outer') return 'planetSun';
+        // Inner planets draw a random texture, skipping the two reserved ones (sun = bail-exit, purple-two
+        // = guardian) so those shapes always mean what they look like on the map.
         let type = Planet.getRandom();
-        while (type === 'planetSun') {
+        while (type === 'planetSun' || type === 'planetPurpleTwo') {
             type = Planet.getRandom();
         }
         return type;
     }
 
-    // Inner planets form the main graph (each linked to its 3 nearest inner planets); each outer sun
-    // spurs off its single nearest inner planet — an out-of-the-way bonus detour.
+    // Inner planets form the main graph (each linked to its `linkDegree` nearest inner planets — a sector
+    // density knob, Leet-34). Each outer sun spurs off its single nearest inner planet (an out-of-the-way
+    // bonus detour); the guardian gate links to several near inner planets so the front can't strand it.
     #initConnections() {
-        const inner = this.#planets.filter(planet => !planet.outer);
+        const inner = this.#planets.filter(planet => !planet.outer && !planet.guardian);
         for (const planet of inner) {
-            for (const target of getClosest(planet, inner, 3)) {
+            for (const target of getClosest(planet, inner, this.#sector.linkDegree)) {
                 this.#connect(planet, target.item);
             }
         }
         for (const sun of this.#planets.filter(planet => planet.outer)) {
             for (const target of getClosest(sun, inner, 1)) {
                 this.#connect(sun, target.item);
+            }
+        }
+        const guardian = this.#planets.find(planet => planet.guardian);
+        if (guardian) {
+            for (const target of getClosest(guardian, inner, GUARDIAN_LINKS)) {
+                this.#connect(guardian, target.item);
             }
         }
     }

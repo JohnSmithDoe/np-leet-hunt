@@ -6,6 +6,15 @@ export type SectorId = 'home-reach' | 'frozen-drift' | 'ember-belt' | 'veiled-ne
 /** Rescuable family aboard the ship — gates events and answers (GDD §4). */
 export type CrewMember = 'mom' | 'dad' | 'grandma' | 'grandpa' | 'sibling';
 
+/** Display names for the rescued family — the single source for crew names across endings and the HUD. */
+export const CREW_DISPLAY_NAMES: Record<CrewMember, string> = {
+    mom: 'Mom',
+    dad: 'Dad',
+    grandma: 'Grandma',
+    grandpa: 'Grandpa',
+    sibling: 'your sibling',
+};
+
 /**
  * The full carried state of a single run — serialisable (plain arrays, no Set), so it doubles as the
  * snapshot the store emits and, later, a run-resume payload. Resets every run via `RunStateStore.reset`.

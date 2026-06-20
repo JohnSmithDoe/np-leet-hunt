@@ -1,3 +1,4 @@
+import { CrewMember } from '../model/run-context';
 import {
     DuelAiLevel,
     DuelAiParams,
@@ -6,6 +7,7 @@ import {
     Sector,
     SECTOR_COUNT,
     SECTOR_ORDER,
+    SECTOR_RESCUE,
     SectorParams,
 } from './balance.model';
 
@@ -14,15 +16,17 @@ import {
  * difficulty curve; duel and dungeon resolvers (`duelParams`, `dungeonParams`) join this class as those
  * modes gain difficulty inputs. Pure and deterministic, so it unit-tests directly (cf. run.fsm.spec.ts).
  *
- * The sector curve (1→5): bigger maps, fewer bail-exits, and a faster grey front the deeper you go
- * (GDD §4 difficulty knobs / §5 grey gradient). Brackets the old hard-coded values (12 planets, ~10 jumps).
+ * The sector curve (1→5): bigger maps, fewer bail-exits, a faster grey front, and a sparser route graph
+ * the deeper you go (GDD §4 difficulty knobs / §5 grey gradient). Brackets the old hard-coded values
+ * (12 planets, ~10 jumps, 3 routes). `linkDegree` eases off from 4 (sector 1, generously connected) to
+ * 3 — never below 2, which risks stranding the graph.
  */
 const SECTOR_CURVE: readonly SectorParams[] = [
-    { planetCount: 10, exits: 5, frontSteps: 12 },
-    { planetCount: 12, exits: 4, frontSteps: 11 },
-    { planetCount: 14, exits: 4, frontSteps: 10 },
-    { planetCount: 16, exits: 3, frontSteps: 9 },
-    { planetCount: 18, exits: 3, frontSteps: 8 },
+    { planetCount: 10, exits: 5, frontSteps: 12, linkDegree: 4 },
+    { planetCount: 12, exits: 4, frontSteps: 11, linkDegree: 3 },
+    { planetCount: 14, exits: 4, frontSteps: 10, linkDegree: 3 },
+    { planetCount: 16, exits: 3, frontSteps: 9, linkDegree: 3 },
+    { planetCount: 18, exits: 3, frontSteps: 8, linkDegree: 3 },
 ];
 
 /** Clamp a (possibly out-of-range) sector number into 1..SECTOR_COUNT. */
@@ -62,6 +66,11 @@ export class Balance {
     static sector(sectorNumber: number): Sector {
         const number = clampNumber(sectorNumber);
         return { id: SECTOR_ORDER[number - 1], number, ...Balance.sectorParams(number) };
+    }
+
+    /** The captive freed by beating a sector's guardian (Leet-34 / GDD §5); sibling is always sector 5. */
+    static rescueForSector(sectorNumber: number): CrewMember {
+        return SECTOR_RESCUE[clampNumber(sectorNumber) - 1];
     }
 
     /** The numeric board knobs for a duel board difficulty (unknown levels fall back to `normal`). */

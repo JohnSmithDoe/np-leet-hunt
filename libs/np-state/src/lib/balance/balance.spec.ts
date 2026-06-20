@@ -35,6 +35,26 @@ describe('Balance.sector', () => {
         a.planetCount = 999;
         expect(Balance.sector(1).planetCount).not.toBe(999);
     });
+
+    it('exposes a route-density knob that stays connectable (>= 2 every sector)', () => {
+        for (let n = 1; n <= SECTOR_COUNT; n++) {
+            expect(Balance.sector(n).linkDegree).toBeGreaterThanOrEqual(2);
+        }
+    });
+});
+
+describe('Balance.rescueForSector', () => {
+    it('holds the sibling behind the final guardian (GDD §5), family across the rest', () => {
+        expect(Balance.rescueForSector(SECTOR_COUNT)).toBe('sibling');
+        const earlier = Array.from({ length: SECTOR_COUNT - 1 }, (_, i) => Balance.rescueForSector(i + 1));
+        expect(earlier).not.toContain('sibling');
+        expect(new Set(earlier).size).toBe(SECTOR_COUNT - 1); // each of mom/dad/grandma/grandpa exactly once
+    });
+
+    it('clamps out-of-range sector numbers like the rest of the curve', () => {
+        expect(Balance.rescueForSector(0)).toBe(Balance.rescueForSector(1));
+        expect(Balance.rescueForSector(99)).toBe('sibling');
+    });
 });
 
 describe('Balance duel params', () => {

@@ -35,6 +35,7 @@ export type PlanetMapState = 'current' | 'reachable' | 'dim' | 'swallowed';
 const SWALLOWED_TINT = 0x6b7280;
 const INNER_DISPLAY = 512; // base size for a normal planet (small textures scale up to this)
 const OUTER_DISPLAY = 1100; // out-of-the-way bonus suns read noticeably bigger
+const GUARDIAN_DISPLAY = 1400; // the guardian gate is the biggest node on the map — its own distinct marker
 
 export class Planet extends NPSprite {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
@@ -44,6 +45,7 @@ export class Planet extends NPSprite {
     #state: PlanetMapState = 'dim';
     #info!: PlanetInfo;
     #outer = false;
+    #guardian = false;
 
     static getRandom() {
         const types = Object.keys(IMAGES) as (keyof typeof IMAGES)[];
@@ -90,6 +92,16 @@ export class Planet extends NPSprite {
         return this;
     }
 
+    /** The guardian gate node — the rewarding exit (Leet-34). Distinct texture + size; never swallowed. */
+    get guardian(): boolean {
+        return this.#guardian;
+    }
+
+    setGuardian(value = true): this {
+        this.#guardian = value;
+        return this;
+    }
+
     preload(): void {
         this.scene.load.image(this.#image);
     }
@@ -97,8 +109,11 @@ export class Planet extends NPSprite {
     public create(): void {
         this.setTexture(this.#image.key);
         this.setOrigin(0.5);
-        // Outer (bonus) suns read bigger; inner planets just scale small textures up to a base size.
-        if (this.#outer) {
+        // The guardian gate is the biggest node; outer (bonus) suns read bigger than inner planets, which
+        // just scale small textures up to a base size.
+        if (this.#guardian) {
+            this.setDisplaySize(GUARDIAN_DISPLAY, GUARDIAN_DISPLAY);
+        } else if (this.#outer) {
             this.setDisplaySize(OUTER_DISPLAY, OUTER_DISPLAY);
         } else if (this.width < INNER_DISPLAY) {
             this.setDisplaySize(INNER_DISPLAY, INNER_DISPLAY);

@@ -15,8 +15,8 @@ and the map HUD (`space-ui.scene.ts`). The four issues below are what's left to 
 # Phase 1 — The Map Run *(active)*
 
 Goal (GDD §7): *a map-only run is genuinely playable — reach the exit before the front; text endings.*
-Recommended order: **~~Leet-33~~ → 34 → 35 → 36** (33 ✅ closed the literal exit criterion; **34 is next** —
-the central design payoff; 35/36 add teeth).
+Recommended order: **~~Leet-33~~ → ~~34~~ → 35 → 36** (33 ✅ closed the literal exit criterion; 34 ✅ settled
+the two-exit core loop — the central design payoff; **35 is next**; 35/36 add teeth).
 
 ## Leet-33: Run-end & text endings — ✅ done
 
@@ -41,27 +41,39 @@ placeholder ("text endings — Phase 1"). This issue makes the run actually *end
 
 **Exit:** the literal Phase 1 exit criterion — reach the exit before the front; text endings.
 
-## Leet-34: Guardian gate node — the rewarding exit — ☐ todo
+## Leet-34: Guardian gate node — the rewarding exit — ✅ done
 
-**Context:** the graph today has only **bail-suns** (no-reward rim exits — `StarmapFactory` rim `outerSpace`
+**Context:** the graph had only **bail-suns** (no-reward rim exits — `StarmapFactory` rim `outerSpace`
 nodes). GDD §3/§8: rim suns stay no-reward bail-exits and the **guardian becomes the *rewarding* exit**
-(rescue + advance). §8 parked this "until the duel and run-state machine land" — they have, so this is the
-moment to settle it. The real guardian *fight* is Phase 4; here the guardian is a graph node that gates the
+(rescue + advance). The real guardian *fight* is Phase 4; here the guardian is a graph node that gates the
 rewarding exit and hands off to the existing guardian placeholder scene.
 
-**Decide first (GDD §8, before coding):**
-- Does bailing via a rim sun still bank partial rescues, or is bailing strictly "leave poor"?
-- Is there a cost to bail beyond the lost rim loot, or is "leave empty-handed" cost enough?
+**Decided (GDD §3/§5):**
+- **Bailing keeps prior rescues.** A rim sun forfeits only *this* sector's captive + rim loot; crew already
+  won back stays aboard (consistent with GDD §3 "a partial rescue is still a rescue"). Run state already
+  persisted crew across sectors — only the bail ending copy needed reframing.
+- **No extra bail cost.** Walking away empty-handed (no new captive) is cost enough — bail stays a clean,
+  low-punishment escape valve, matching the bittersweet tone.
 
-**Scope**
-- [ ] `StarmapFactory` generates a guardian node on the far (distorted) side of the graph, **always reachable**
-      from the inner graph (the front shouldn't be able to strand it).
-- [ ] Distinct map marker + state for the guardian node; reaching it → `guardian` phase (placeholder scene stays).
-- [ ] Guardian win → advance to the next sector **with a rescue recorded** (crew abilities are Phase 4 — just
-      flag the rescue in run state for now).
-- [ ] Rim suns stay no-reward bail; the pull between the two exits is the core loop (GDD §3).
-- [ ] *(Folded-in polish)* make the hardcoded "3 nearest" route linkage (`#initConnections`) a sector density
-      knob in np-state `Balance`.
+**Outcome**
+- [x] `StarmapFactory` generates one guardian node out past the farthest inner planet along the front's
+      *safe* axis (`guardianDir`), deep on the far side the grey never normalises. It's also explicitly kept
+      out of the front bounds and the swallow set, so the front can't strand the rewarding exit.
+- [x] Distinct guardian node: dedicated `planetPurpleTwo` texture (reserved from the random inner pool — gives
+      the just-added asset a purpose) + biggest display size; `Planet.guardian` flag. Reaching it fires the
+      new `GUARDIAN_REACHED` bus event → conductor drives the FSM to `guardian` (placeholder scene stays).
+- [x] Guardian win (`#winGuardian`) records the sector's captive via `Balance.rescueForSector(n)` (sibling
+      always sector 5 per GDD §5; mom/dad/grandma/grandpa across 1–4, per-run shuffle deferred to Phase 4) and
+      advances to the next sector. Beating the **final** guardian wins the sibling and ends the run on the new
+      **`'rescued'`** text ending — the way to the Hush opens (GDD §2 full rescue / true-final, Phase 4).
+- [x] Rim suns stay no-reward bail; the pull between the two exits is the core loop (GDD §3).
+- [x] *Fixed a latent integration bug:* `#showSpace`'s "advanced to a new sector" path assumed the space
+      scenes were awake (only ever hit via rim-sun bail). A guardian win advances while those scenes are
+      *slept* off-stage — now it rebuilds their content while hidden, then wakes + fades them back in.
+- [x] *(Folded-in polish)* the hardcoded "3 nearest" route linkage is now a `linkDegree` knob in np-state
+      `Balance` (4 in sector 1, easing to 3; floor 2 to stay connectable).
+- [x] build + lint + all unit tests green (np-state 41 incl. new `rescueForSector` + `'rescued'` ending tests,
+      np-space-map 20, app bootstrap smoke 1). *UI not exercised here* — user verifies the map visually.
 
 **Exit:** a sector has two real exits — bail (poor) and guardian (rescue + advance).
 

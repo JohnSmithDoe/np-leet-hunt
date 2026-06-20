@@ -1,15 +1,17 @@
 import { SECTOR_COUNT } from '../balance/balance.model';
-import { CrewMember, RunContext } from '../model/run-context';
+import { CREW_DISPLAY_NAMES, CrewMember, RunContext } from '../model/run-context';
 
 /**
- * How a run ended — which of the three exits the player took (Leet-33 / GDD §2 "Endings"). The conductor
- * records this the moment the run resolves, then renders the matching text ending. Bittersweet by design:
- * per GDD §3 even a partial rescue is a rescue, never a flat "game over".
+ * How a run ended — which exit the player took (Leet-33/34 / GDD §2 "Endings"). The conductor records
+ * this the moment the run resolves, then renders the matching text ending. Bittersweet by design: per
+ * GDD §3 even a partial rescue is a rescue, never a flat "game over".
  */
 export type EndingKind =
+    /** Beat the final guardian — the sibling is won back and the channel to the Hush opens (GDD §2 full rescue). */
+    | 'rescued'
     /** The normality front caught the ship — reality snapped back mid-hunt (partial rescue stands). */
     | 'snapback'
-    /** Bailed out through a rim boundary sun — escaped the Hush, but left empty-handed. */
+    /** Bailed out through a rim boundary sun — escaped the Hush, this sector's captive left behind. */
     | 'bail'
     /** The ship was destroyed / the crew overwhelmed — the hunt ended in the dark. */
     | 'wiped';
@@ -22,6 +24,11 @@ export interface Ending {
 
 /** Headline + opening beat + sign-off per exit; the run-state lines (progress, rescued, marbles) are shared. */
 const ENDING_COPY: Record<EndingKind, { title: string; opening: string; closing: string }> = {
+    rescued: {
+        title: 'The last gate opened',
+        opening: 'You broke the final gate and won the sibling back; ahead, the grey thins around a stillness.',
+        closing: "That stillness is the Hush's own quarter — and for the first time, the way in stands open.",
+    },
     snapback: {
         title: 'Reality snapped back',
         opening: 'The grey caught the ship and the channel folded shut behind you.',
@@ -29,23 +36,14 @@ const ENDING_COPY: Record<EndingKind, { title: string; opening: string; closing:
     },
     bail: {
         title: 'Bailed to the rim',
-        opening: 'You burned for a boundary sun and slipped the Hush — empty-handed.',
-        closing: 'Safe, for now — but the family are still out there in the grey.',
+        opening: 'You burned for a boundary sun and slipped the Hush — this gate left unbroken behind you.',
+        closing: 'Whoever you won back is home and safe; the rest are still out there in the grey.',
     },
     wiped: {
         title: 'The ship was lost',
         opening: 'The ship came apart in the dark; the hunt ended here.',
         closing: 'The robo-pet remembers. By the next telling, it tries again.',
     },
-};
-
-/** Display names for the rescued family aboard the ship (crew is empty until rescues land in Phase 4). */
-const CREW_NAMES: Record<CrewMember, string> = {
-    mom: 'Mom',
-    dad: 'Dad',
-    grandma: 'Grandma',
-    grandpa: 'Grandpa',
-    sibling: 'your sibling',
 };
 
 /** Humanise a kebab-case SectorId for display ('frozen-drift' → 'Frozen Drift'). */
@@ -58,7 +56,7 @@ function sectorName(id: string): string {
 
 function rescuedLine(crew: readonly CrewMember[]): string {
     if (crew.length === 0) return 'No one won back yet — the crew bays stand empty.';
-    return `Home safe: ${crew.map(member => CREW_NAMES[member]).join(', ')}.`;
+    return `Home safe: ${crew.map(member => CREW_DISPLAY_NAMES[member]).join(', ')}.`;
 }
 
 /**

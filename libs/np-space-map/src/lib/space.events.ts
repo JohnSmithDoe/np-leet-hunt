@@ -21,6 +21,8 @@ export enum SPACE_EVENTS {
     REALITY_SNAPBACK = 'npRealitySnapback',
     /** Reached a rim sun and bailed the sector (no reward); the conductor advances, or ends the run (bail) past the last. Payload: `{ jumps }`. */
     SECTOR_EXIT = 'npSectorExit',
+    /** Reached the guardian gate node — the *rewarding* exit (Leet-34); the conductor hands off to the guardian fight. Payload: `{ jumps }`. */
+    GUARDIAN_REACHED = 'npGuardianReached',
 }
 
 export interface FrontAdvancedPayload {

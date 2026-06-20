@@ -11,6 +11,12 @@ export interface StarmapConfig {
     outerSpaceDim: number;
     minDistance: number;
     maxDistance?: number;
+    /**
+     * Direction toward still-distorted (safe) space — the normality front's sweep axis (Leet-34). When
+     * given, the factory drops a single guardian node out past the farthest inner planet along it, deep on
+     * the far side the front never normalises, so the rewarding exit can't be stranded by the grey.
+     */
+    guardianDir?: { x: number; y: number };
 }
 
 export interface Starmap {
@@ -20,6 +26,8 @@ export interface Starmap {
     coords: {
         planets: Phaser.Types.Math.Vector2Like[];
         outerSpace: Phaser.Types.Math.Vector2Like[];
+        /** The guardian gate node (the rewarding exit), on the far distorted side. Absent if no `guardianDir`. */
+        guardian?: Phaser.Types.Math.Vector2Like;
         start: Phaser.Types.Math.Vector2Like;
         end: Phaser.Types.Math.Vector2Like;
     };
@@ -93,6 +101,19 @@ export class StarmapFactory {
                 .filter(p => !inner.contains(p.x, p.y))
                 .map(p => p.setTo(p.x - config.outerSpaceDim, p.y - config.outerSpaceDim));
             map.coords.outerSpace = selectSpread(outerCandidates, config.exits);
+        }
+
+        // Guardian gate (Leet-34): one node beyond the farthest inner planet along the safe direction, so
+        // it sits deep on the never-normalised far side. Placed relative to that anchor (not a fixed corner)
+        // so it lands just off the real graph whatever the scatter produced.
+        const innerPlanets = map.coords.planets;
+        if (config.guardianDir && innerPlanets.length) {
+            const length = Math.hypot(config.guardianDir.x, config.guardianDir.y) || 1;
+            const dir = { x: config.guardianDir.x / length, y: config.guardianDir.y / length };
+            const along = (p: Phaser.Types.Math.Vector2Like) => p.x * dir.x + p.y * dir.y;
+            const anchor = innerPlanets.reduce((best, p) => (along(p) > along(best) ? p : best), innerPlanets[0]);
+            const reach = config.minDistance * 2;
+            map.coords.guardian = { x: anchor.x + dir.x * reach, y: anchor.y + dir.y * reach };
         }
 
         return map;

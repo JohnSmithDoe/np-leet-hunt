@@ -5,6 +5,7 @@ import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
 import {
     Balance,
+    CREW_DISPLAY_NAMES,
     describeEnding,
     EndingKind,
     GameStateService,
@@ -47,14 +48,15 @@ export class RunConductorService {
      * → lives for the whole app → the effects need no teardown.
      */
     constructor() {
-        // Once Phaser is up, wire the two run-ending bus events the map fires: SECTOR_EXIT when the ship
-        // bails at a rim sun, and REALITY_SNAPBACK when the front catches the ship. `#wired` guards against
-        // a re-run double-registering.
+        // Once Phaser is up, wire the map's three run-routing bus events: SECTOR_EXIT (bailed at a rim sun),
+        // REALITY_SNAPBACK (the front caught the ship), and GUARDIAN_REACHED (reached the rewarding gate).
+        // `#wired` guards against a re-run double-registering.
         effect(() => {
             if (!this.#stage.initialized() || this.#wired) return;
             this.#wired = true;
             this.#stage.phaser.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => this.#onSectorExit());
             this.#stage.phaser.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => this.#onSnapback());
+            this.#stage.phaser.game.events.on(SPACE_EVENTS.GUARDIAN_REACHED, () => this.#onGuardianReached());
         });
         // React to every *settled* phase (incl. the initial 'hangar'), but only once Phaser is up. A
         // synchronous double-step like `to('sectorExit')→to('sector')` coalesces to 'sector' directly —
@@ -142,14 +144,18 @@ export class RunConductorService {
         });
     }
 
-    /** Sector boss (placeholder until Phase 4): clear back to the map, or get wiped and end the run. */
+    /** Sector boss (placeholder until Phase 4): win → free the captive + advance, or get wiped and end the run. */
     #showGuardian(): void {
         const { sectorNumber } = this.#game.run.snapshot();
+        const captive = CREW_DISPLAY_NAMES[Balance.rescueForSector(sectorNumber)];
         this.#showPlaceholder('guardian', {
             title: `Sector ${sectorNumber} — Guardian`,
-            lines: ['The sector boss blocks the lane. (staged duel + lair gimmick — Phase 4)'],
+            lines: [
+                `The gate-keeper holds ${captive}. (staged duel + lair gimmick — Phase 4)`,
+                'Win to free them and push on — or bail at a rim sun to leave this captive behind.',
+            ],
             actions: [
-                { label: '⚔ Defeat → back to map', onSelect: () => this.#clearGuardian() },
+                { label: `⚔ Win → free ${captive}`, onSelect: () => this.#winGuardian() },
                 { label: '☠ Get wiped (end run)', onSelect: () => this.#endRun('wiped') },
             ],
         });
@@ -183,6 +189,11 @@ export class RunConductorService {
         if (this.#game.fsm.can('ending')) this.#game.fsm.to('ending');
     }
 
+    /** Reached the guardian gate (GUARDIAN_REACHED from the map): hand off to the guardian fight (Leet-34). */
+    #onGuardianReached(): void {
+        if (this.#game.fsm.can('guardian')) this.#game.fsm.to('guardian');
+    }
+
     /** End the run via a direct ending transition (guardian/boarding wipes), recording the exit taken. */
     #endRun(kind: EndingKind): void {
         this.#endingKind = kind;
@@ -195,10 +206,21 @@ export class RunConductorService {
         this.#game.fsm.to('sector');
     }
 
-    /** Clear the guardian back to the map (same sector; boss-advances-sector wiring is Phase 4). */
-    #clearGuardian(): void {
-        this.#game.fsm.to('sectorExit');
-        this.#game.fsm.to('sector');
+    /**
+     * Won the guardian fight (Leet-34): free this sector's captive (recorded in run state — crew abilities
+     * are Phase 4), then advance to the next sector. Beating the *final* guardian wins the sibling and ends
+     * the run on the 'rescued' ending — the way to the Hush opens (GDD §2 full rescue / true-final, Phase 4).
+     */
+    #winGuardian(): void {
+        const { sectorNumber } = this.#game.run.snapshot();
+        this.#game.run.addCrew(Balance.rescueForSector(sectorNumber));
+        if (sectorNumber < SECTOR_COUNT) {
+            this.#game.run.advanceSector();
+            this.#game.fsm.to('sectorExit');
+            this.#game.fsm.to('sector'); // → #enter('sector') → #showSpace() rebuilds with the new sector
+        } else {
+            this.#endRun('rescued');
+        }
     }
 
     /** Show a transient placeholder scene for a run phase that has no real scene yet (Leet-31). */
@@ -215,18 +237,28 @@ export class RunConductorService {
             this.#sector = Balance.sector(number);
             this.#stage.startScene(...this.#spaceScenes(this.#sector));
         } else if (number !== this.#shownSector) {
-            // Advanced to a new sector → rebuild the map in place inside the live, still-running scenes
-            // (no scene swap/restart), so their textures and input survive and only the content reloads.
+            // Advanced to a new sector → rebuild the map content in place (no scene swap/restart), so the
+            // persistent scenes' textures and input survive and only the content reloads.
             this.#shownSector = number;
             const sector = Balance.sector(number);
             this.#sector = sector;
             const game = this.#stage.phaser.game;
             const map = game.scene.getScene(SpaceMapScene.key) as SpaceMapScene;
             const ui = game.scene.getScene(SpaceUiScene.key) as SpaceUiScene;
-            this.#stage.fadeTransition(() => {
+            if (game.scene.isSleeping(SpaceMapScene.key)) {
+                // We advanced from an excursion that slept the space scenes off-stage (a guardian win):
+                // rebuild their content while hidden (instant — they're not rendering), then wake + fade
+                // them back in showing the new sector. A single transition, no awkward fade-chaining.
                 map.loadSector(sector);
                 ui.loadSector(sector);
-            });
+                this.#stage.startScene(...this.#spaceScenes(sector));
+            } else {
+                // Rim-sun bail: the space scenes are still on stage → rebuild in place behind a fade.
+                this.#stage.fadeTransition(() => {
+                    map.loadSector(sector);
+                    ui.loadSector(sector);
+                });
+            }
         } else {
             // Same sector (event overlay, or returning from a dungeon/duel) → wake the slept scenes.
             this.#stage.startScene(...this.#spaceScenes(this.#sector!));
