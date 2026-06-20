@@ -1,4 +1,5 @@
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
+import { NPRng } from '@shared/np-library';
+
 import { PLANET_INFO_DATA } from './planet-info.data';
 
 /** A planet's survey readout, shown in the HTML info overlay when the planet is selected. */

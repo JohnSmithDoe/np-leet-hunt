@@ -1,9 +1,7 @@
-import { NPScene } from '@shared/np-phaser';
+import { NPScene, OnSceneCreate, OnSceneInit, OnScenePreload, TextButton } from '@shared/np-phaser';
 import { Balance, DuelAiLevel, DuelAiParams, DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { TextButton } from '../../../np-phaser/src/lib/sprites/button/text-button';
-import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../np-phaser/src/lib/types/np-phaser';
 import { CParadroidTileSets } from './@types/paradroid.consts';
 import { paradroidFactoryOptions, TParadroidFactoryOptions } from './core/paradroid.factory';
 import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';

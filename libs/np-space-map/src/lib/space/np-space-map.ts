@@ -1,11 +1,8 @@
-import { NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { NPRng } from '@shared/np-library';
+import { DashedLine, getClosest, NPGameObjectList, NPMovableSprite, NPScene } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { DashedLine } from '../../../../np-phaser/src/lib/sprites/dashed-line/dashed-line';
-import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
-import { getClosest } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { Effect } from '../events/event.model';
 import { resolvePlanetEvent } from '../events/event.pool';
 import { Planet } from '../planet/planet';

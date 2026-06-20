@@ -1,6 +1,6 @@
+import { NPRng } from '@shared/np-library';
 import { SectorId } from '@shared/np-state';
 
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { grassAlienEncounter } from './content/grass-alien-encounter.event';
 import { emberBeltEvents } from './content/sectors/ember-belt.events';
 import { frozenDriftEvents } from './content/sectors/frozen-drift.events';

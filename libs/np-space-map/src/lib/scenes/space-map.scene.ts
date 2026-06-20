@@ -1,9 +1,7 @@
-import { NPScene } from '@shared/np-phaser';
+import { NPMovableSprite, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { NPMovableSprite } from '../../../../np-phaser/src/lib/sprites/np-movable-sprite';
-import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
 import { NPSpaceMap } from '../space/np-space-map';
 
 // Zoomed well out by default so the closing front is legible; the wheel zooms in for node detail.

@@ -1,10 +1,9 @@
-import { NPScene } from '@shared/np-phaser';
+import { NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import { SECTOR_COUNT } from '@shared/np-state';
 import * as Phaser from 'phaser';
 import { Subscription } from 'rxjs';
 
-import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
 import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
 
 const BAR = { x: 60, y: 64, w: 520, h: 34 };

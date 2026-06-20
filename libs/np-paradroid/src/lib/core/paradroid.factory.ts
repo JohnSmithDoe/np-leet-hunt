@@ -1,6 +1,6 @@
+import { NPRng } from '@shared/np-library';
 import { DuelBoardParams } from '@shared/np-state';
 
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import {
     CParadroidShapeInfo,
     CParadroidTileInfo,

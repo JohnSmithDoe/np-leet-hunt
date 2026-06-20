@@ -1,7 +1,6 @@
+import { NPRNG } from '@shared/np-library';
 import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-
-import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 
 const IMAGES = {
     space1: { key: 'space-1', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-1.jpg' },

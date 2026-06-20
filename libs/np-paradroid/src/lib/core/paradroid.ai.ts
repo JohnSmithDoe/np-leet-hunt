@@ -1,6 +1,6 @@
+import { NPRng } from '@shared/np-library';
 import type { DuelAiParams } from '@shared/np-state';
 
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { TParadroidSubTile } from '../@types/paradroid.types';
 import { analyzeOutcome, droidScore } from './paradroid.analysis';
 

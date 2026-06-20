@@ -1,6 +1,5 @@
+import { poissonDiscSampler } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
-
-import { poissonDiscSampler } from '../../../../np-phaser/src/lib/utilities/np-phaser-utils';
 
 export interface StarmapConfig {
     /** Inner travel-graph planets to keep (selected, well-spread, from the Poisson candidates). */

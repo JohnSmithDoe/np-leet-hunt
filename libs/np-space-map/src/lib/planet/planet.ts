@@ -1,7 +1,7 @@
+import { NPRNG } from '@shared/np-library';
 import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPRNG } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { PlanetInfo } from './planet-info';
 
 const IMAGES = {

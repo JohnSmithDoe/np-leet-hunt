@@ -1,7 +1,6 @@
-import { NPScene } from '@shared/np-phaser';
+import { NPButton, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { NPButton } from '../../../../np-phaser/src/lib/sprites/button/NpButton';
 import { ParadroidField } from './paradroid.field';
 
 export class ParadroidButton extends NPButton {

@@ -1,7 +1,6 @@
-import { NPScene } from '@shared/np-phaser';
+import { NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-import { OnSceneCreate, OnSceneInit, OnScenePreload } from '../../../../np-phaser/src/lib/types/np-phaser';
 import { Space } from '../space/space';
 
 /** The drifting nebula backdrop, rendered below the map scene on its own camera. */

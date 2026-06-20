@@ -1,6 +1,5 @@
+import { NPScene } from '@shared/np-phaser';
 import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
-
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
 
 export enum ETileType {
     none = 'empty',

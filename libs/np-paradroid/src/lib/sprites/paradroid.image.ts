@@ -1,5 +1,4 @@
-import { NPScene } from '../../../../np-phaser/src/lib/scenes/np-scene';
-import { Image } from '../../../../np-phaser/src/lib/sprites/image/image';
+import { Image, NPScene } from '@shared/np-phaser';
 
 /** Texture configs for the paradroid sprites. Exported so the VS intro can preload them up front. */
 export const PARADROID_IMAGES = {

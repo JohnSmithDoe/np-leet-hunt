@@ -1,9 +1,8 @@
-import { NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { NPRng } from '@shared/np-library';
+import { BinaryTimer, NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
 import { Balance, DuelAiParams } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { BinaryTimer } from '../../../../np-phaser/src/lib/sprites/timer/binarytimer';
-import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { EParadroidOwner } from '../@types/paradroid.consts';
 import { TParadroidPlayer, TParadroidSubTile } from '../@types/paradroid.types';
 import { ParadroidButton } from '../sprites/paradroid.button';
