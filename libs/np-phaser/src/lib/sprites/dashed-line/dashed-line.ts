@@ -16,7 +16,7 @@ const IMAGES = {
     },
 };
 
-export class DashedLine extends Phaser.GameObjects.TileSprite implements NPGameObject {
+export class NPDashedLine extends Phaser.GameObjects.TileSprite implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
 
     static getRandom() {

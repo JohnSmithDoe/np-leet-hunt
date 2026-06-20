@@ -1,5 +1,5 @@
 import { NPRNG } from '@shared/np-library';
-import { NPGameObject, NPScene } from '@shared/np-phaser';
+import { NPScene, NPSprite } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { PlanetInfo } from './planet-info';
@@ -34,7 +34,7 @@ const SWALLOWED_TINT = 0x6b7280;
 const INNER_DISPLAY = 512; // base size for a normal planet (small textures scale up to this)
 const OUTER_DISPLAY = 1100; // out-of-the-way bonus suns read noticeably bigger
 
-export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class Planet extends NPSprite {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
     #baseScale = 1;
     #alive = true;
@@ -53,10 +53,7 @@ export class Planet extends Phaser.GameObjects.Sprite implements NPGameObject {
         Object.values(IMAGES).forEach(image => scene.load.image(image));
     }
 
-    constructor(
-        public override scene: NPScene,
-        type: keyof typeof IMAGES
-    ) {
+    constructor(scene: NPScene, type: keyof typeof IMAGES) {
         super(scene, 0, 0, '');
         this.#image = IMAGES[type];
         this.setName(type);

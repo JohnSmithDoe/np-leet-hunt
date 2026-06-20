@@ -1,4 +1,4 @@
-import { TextButton } from '../sprites/button/text-button';
+import { NPTextButton } from '../sprites/button/text-button';
 import { NPScene } from './np-scene';
 
 /** One choice on a placeholder screen — a label and what to do when it's picked. */
@@ -46,7 +46,7 @@ export class PlaceholderScene extends NPScene {
         });
 
         this.#config.actions.forEach((action, i) => {
-            const button = new TextButton(this, cx, height * 0.58 + i * 64, action.label, {
+            const button = new NPTextButton(this, cx, height * 0.58 + i * 64, action.label, {
                 fontSize: '34px',
                 color: '#0f0',
             });

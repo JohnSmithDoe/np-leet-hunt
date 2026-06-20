@@ -1,4 +1,4 @@
-import { NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
+import { clamp, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import { SECTOR_COUNT } from '@shared/np-state';
 import * as Phaser from 'phaser';
@@ -142,7 +142,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     }
 
     #drawBar() {
-        const f = Phaser.Math.Clamp(this.#fraction, 0, 1);
+        const f = clamp(this.#fraction, 0, 1);
         const fill = f < 0.5 ? 0x6fcf97 : f < 0.8 ? 0xf2c94c : 0xeb5757; // green → amber → red as it closes
         this.#bar.clear();
         this.#bar.fillStyle(0x10131c, 0.85).fillRoundedRect(BAR.x, BAR.y, BAR.w, BAR.h, 8);

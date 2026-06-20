@@ -1,4 +1,4 @@
-import { poissonDiscSampler } from '@shared/np-phaser';
+import { scatterPointsInArea } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 export interface StarmapConfig {
@@ -55,7 +55,7 @@ const selectSpread = (points: Phaser.Types.Math.Vector2Like[], count: number): P
 
 export class StarmapFactory {
     static create(config: StarmapConfig) {
-        const planetCandidates = poissonDiscSampler(
+        const planetCandidates = scatterPointsInArea(
             config.width,
             config.height,
             config.minDistance,
@@ -85,7 +85,7 @@ export class StarmapFactory {
                 config.width + 2 * config.minDistance,
                 config.height + 2 * config.minDistance
             );
-            const outerCandidates = poissonDiscSampler(w, h, config.minDistance * 2, undefined, (p: number[]) => {
+            const outerCandidates = scatterPointsInArea(w, h, config.minDistance * 2, undefined, (p: number[]) => {
                 const x = p[0];
                 const y = p[1];
                 return inner.contains(x, y) ? 0 : 1;

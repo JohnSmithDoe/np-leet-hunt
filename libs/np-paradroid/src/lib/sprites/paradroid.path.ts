@@ -1,7 +1,7 @@
 // noinspection JSSuspiciousNameCombination
 
 import { PI, PIAndAHalf, PIHalf } from '@shared/np-library';
-import { NPGameObject, NPScene } from '@shared/np-phaser';
+import { NPScene, NPSprite } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { EFlowFrom, EFlowTo, EParadroidOwner } from '../@types/paradroid.consts';
@@ -14,7 +14,7 @@ const SHEET = { key: 'pipes-paths', url: 'np-paradroid/paths.png', frameWidth: 3
 const ACTIVATE_SPEED = 160 / 60;
 const DEACTIVATE_SPEED = 60 / 60;
 
-export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class ParadroidPath extends NPSprite {
     static readonly EVENT_ACTIVATED = 'activated';
     static readonly EVENT_DEACTIVATED = 'deactivated';
     #state: 'inactive' | 'activating' | 'deactivating' | 'active' = 'inactive';
@@ -27,11 +27,7 @@ export class ParadroidPath extends Phaser.GameObjects.Sprite implements NPGameOb
     #tileHeight: number;
     #thickness: number;
 
-    constructor(
-        public override scene: NPScene,
-        field: ParadroidField,
-        path: TParadroidPath
-    ) {
+    constructor(scene: NPScene, field: ParadroidField, path: TParadroidPath) {
         super(scene, field.x, field.y, '');
         this.#field = field;
         this.#path = path;

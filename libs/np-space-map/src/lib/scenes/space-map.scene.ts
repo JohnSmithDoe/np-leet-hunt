@@ -1,4 +1,4 @@
-import { NPMovableSprite, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
+import { clamp, NPMovableSprite, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -57,7 +57,7 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
         this.input.on('wheel', (_pointer: unknown, _over: unknown, _dx: number, dy: number) => {
             const cam = this.cameras.main;
-            cam.setZoom(Phaser.Math.Clamp(cam.zoom * (dy > 0 ? 1 - ZOOM_STEP : 1 + ZOOM_STEP), MIN_ZOOM, MAX_ZOOM));
+            cam.setZoom(clamp(cam.zoom * (dy > 0 ? 1 - ZOOM_STEP : 1 + ZOOM_STEP), MIN_ZOOM, MAX_ZOOM));
         });
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
     }

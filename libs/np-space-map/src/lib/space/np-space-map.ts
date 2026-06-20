@@ -1,5 +1,5 @@
 import { NPRng } from '@shared/np-library';
-import { DashedLine, getClosest, NPGameObjectList, NPMovableSprite, NPScene } from '@shared/np-phaser';
+import { degToRad, getClosest, NPDashedLine, NPGameObjectList, NPMovableSprite, NPScene } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -16,7 +16,7 @@ import { TravelButtons } from './travel-buttons';
 interface Connection {
     from: Planet;
     to: Planet;
-    line: DashedLine;
+    line: NPDashedLine;
 }
 
 // Map generation.
@@ -30,7 +30,7 @@ const FRONT_MARGIN = 600;
 const SAFE_FRACTION = 0.15; // far-side fraction of the sweep that stays distorted
 // Sweep axis: points toward still-distorted space (down-and-right), so the grey closes in from the
 // upper-left as a tilted line. The front line itself is perpendicular to this.
-const FRONT_AXIS = { x: Math.cos(Phaser.Math.DegToRad(25)), y: Math.sin(Phaser.Math.DegToRad(25)) };
+const FRONT_AXIS = { x: Math.cos(degToRad(25)), y: Math.sin(degToRad(25)) };
 
 // Route alphas: the resting look, the previewed jump, and the dimmed-down look while travelling.
 const LINE_ALPHA = 0.7;
@@ -92,7 +92,7 @@ export class NPSpaceMap extends NPGameObjectList {
         // Preload every map texture up front — not just the ones the first sector happens to use — so a
         // sector change can rebuild the map synchronously from cache, with no loader and no async race.
         Planet.preloadAll(this.scene);
-        DashedLine.preloadAll(this.scene);
+        NPDashedLine.preloadAll(this.scene);
     }
 
     get startingPlanet() {
@@ -524,13 +524,13 @@ export class NPSpaceMap extends NPGameObjectList {
         });
     }
 
-    #lineBetween(a: Planet, b: Planet): DashedLine | undefined {
+    #lineBetween(a: Planet, b: Planet): NPDashedLine | undefined {
         return this.#connections.find(conn => (conn.from === a && conn.to === b) || (conn.from === b && conn.to === a))
             ?.line;
     }
 
     // Routes whose endpoints are both still distorted — the dead ones have already faded to 0.
-    #liveLines(): DashedLine[] {
+    #liveLines(): NPDashedLine[] {
         return this.#connections.filter(conn => conn.from.alive && conn.to.alive).map(conn => conn.line);
     }
 
@@ -594,7 +594,7 @@ export class NPSpaceMap extends NPGameObjectList {
 
     #connect(planet: Planet, target: Planet) {
         if (this.#lineBetween(planet, target)) return;
-        const line = new DashedLine(this.scene, 'dashedLineRed', planet, target);
+        const line = new NPDashedLine(this.scene, 'dashedLineRed', planet, target);
         line.create(); // dashed-line texture is preloaded
         line.setDepth(2);
         this.scene.addExisting(line);

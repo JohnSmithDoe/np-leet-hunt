@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable, of, take, tap } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { forkJoin, Observable, of, take, tap } from 'rxjs';
 
 import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPScene } from '../scenes/np-scene';
@@ -22,8 +22,7 @@ export interface NPSceneEntry {
 })
 export class StageService {
     #phaser = inject(PhaserService);
-    #initialized = new BehaviorSubject(false);
-    initialized$ = this.#initialized.asObservable();
+    readonly initialized = signal(false);
     #active: NPSceneEntry[] = [];
     #switching = false;
 
@@ -83,7 +82,7 @@ export class StageService {
     }
 
     initStage(stageContainer: HTMLElement) {
-        return this.#phaser.init(stageContainer).pipe(tap(isReady => this.#initialized.next(isReady)));
+        return this.#phaser.init(stageContainer).pipe(tap(isReady => this.initialized.set(isReady)));
     }
 
     destroyStage(): void {

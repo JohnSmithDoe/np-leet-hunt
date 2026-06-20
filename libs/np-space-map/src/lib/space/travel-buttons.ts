@@ -1,4 +1,4 @@
-import { NPScene } from '@shared/np-phaser';
+import { angleBetween, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { Planet } from '../planet/planet';
@@ -44,7 +44,7 @@ export class TravelButtons {
         this.clear();
         const offset = centerRadius + BUTTON_RADIUS + GAP;
         for (const planet of neighbours) {
-            const angle = Phaser.Math.Angle.Between(center.x, center.y, planet.x, planet.y);
+            const angle = angleBetween(center.x, center.y, planet.x, planet.y);
             const x = center.x + Math.cos(angle) * offset;
             const y = center.y + Math.sin(angle) * offset;
             this.#buttons.push(this.#make(x, y, angle, planet));

@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { NPBaseSubscriber } from '@shared/np-library';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { StageService } from '@shared/np-phaser';
 import type * as Phaser from 'phaser';
-import { filter } from 'rxjs';
 
 import { Answer, Outcome, PlanetEvent, Question, Tone } from '../../events/event.model';
 import { shuffled } from '../../events/shuffle';
@@ -20,7 +18,7 @@ import { EventChoiceCommittedPayload, PlanetArrivedPayload, SPACE_EVENTS } from 
     styleUrls: ['./event-dialog.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventDialogComponent extends NPBaseSubscriber implements OnInit, OnDestroy {
+export class EventDialogComponent {
     #stage = inject(StageService);
 
     readonly event = signal<PlanetEvent | null>(null);
@@ -34,20 +32,22 @@ export class EventDialogComponent extends NPBaseSubscriber implements OnInit, On
     #events?: Phaser.Events.EventEmitter;
     #path: Tone[] = [];
 
+    constructor() {
+        // Once the stage is up, listen for planet arrivals on the game event bus. The effect runs when
+        // `initialized` flips true; onCleanup removes the listener on re-run and on destroy.
+        effect(onCleanup => {
+            if (!this.#stage.initialized()) return;
+            this.#events = this.#stage.phaser.game.events;
+            this.#events.on(SPACE_EVENTS.PLANET_ARRIVED, this.#onArrived);
+            onCleanup(() => this.#events?.off(SPACE_EVENTS.PLANET_ARRIVED, this.#onArrived));
+        });
+    }
+
     #onArrived = ({ event }: PlanetArrivedPayload) => {
         this.#path = [];
         this.event.set(event);
         this.#showQuestion(event.root);
     };
-
-    ngOnInit(): void {
-        this.listen(
-            this.#stage.initialized$.pipe(filter(Boolean)).subscribe(() => {
-                this.#events = this.#stage.phaser.game.events;
-                this.#events.on(SPACE_EVENTS.PLANET_ARRIVED, this.#onArrived);
-            })
-        );
-    }
 
     /** Walk to the answer's follow-up question, or to its terminal outcome. */
     choose(answer: Answer): void {
@@ -90,10 +90,5 @@ export class EventDialogComponent extends NPBaseSubscriber implements OnInit, On
         this.question.set(null);
         this.displayAnswers.set([]);
         this.outcome.set(null);
-    }
-
-    override ngOnDestroy(): void {
-        this.#events?.off(SPACE_EVENTS.PLANET_ARRIVED, this.#onArrived);
-        super.ngOnDestroy();
     }
 }

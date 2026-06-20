@@ -10,8 +10,8 @@ export class NPLayer extends Phaser.GameObjects.Layer {
     camera?: NPCamera;
 
     constructor(
-        public scene: NPScene,
-        public readonly name: TNPLayerKeys,
+        public override scene: NPScene,
+        public override readonly name: TNPLayerKeys,
         makeMain: boolean
     ) {
         super(scene, []);

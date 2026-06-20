@@ -1,5 +1,4 @@
-import { NPGameObject, NPScene } from '@shared/np-phaser';
-import * as Phaser from 'phaser';
+import { NPRectangle, NPScene } from '@shared/np-phaser';
 
 import { FrontPoint } from './normality-front';
 
@@ -19,17 +18,12 @@ const VEIL_ALPHA = 0.64;
  * that rectangle along the sweep axis. It sits above the planets/routes so they desaturate as it passes
  * over them, but below the ship and HUD.
  */
-export class Reality extends Phaser.GameObjects.Rectangle implements NPGameObject {
+export class Reality extends NPRectangle {
     readonly #origin: FrontPoint;
     readonly #axis: FrontPoint;
     readonly #angle: number;
 
-    constructor(
-        public override scene: NPScene,
-        origin: FrontPoint,
-        axis: FrontPoint,
-        position: number
-    ) {
+    constructor(scene: NPScene, origin: FrontPoint, axis: FrontPoint, position: number) {
         const front = pointAt(origin, axis, position);
         super(scene, front.x, front.y, VEIL_SIZE, VEIL_SIZE, VEIL_COLOUR, VEIL_ALPHA);
         this.#origin = origin;

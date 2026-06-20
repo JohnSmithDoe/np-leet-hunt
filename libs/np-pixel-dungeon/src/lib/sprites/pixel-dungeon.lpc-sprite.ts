@@ -1,6 +1,5 @@
 import { EDirection } from '@shared/np-library';
-import { NPGameObject, NPScene } from '@shared/np-phaser';
-import * as Phaser from 'phaser';
+import { NPScene, NPSprite } from '@shared/np-phaser';
 
 type TLpcSheetType = 'standard' | 'extended';
 type TLpcAnimationDirection = 'up' | 'down' | 'left' | 'right';
@@ -53,15 +52,10 @@ export const CLpcSheetConfigs: Record<TLpcSheetKeys, { url: string }> = {
  *
  * @see https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/
  */
-export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class PixelDungeonLPCSprite extends NPSprite {
     #options: TPixelDungeonLPCSpriteOptions;
 
-    constructor(
-        public override scene: NPScene,
-        x: number,
-        y: number,
-        options: TPixelDungeonLPCSpriteOptions
-    ) {
+    constructor(scene: NPScene, x: number, y: number, options: TPixelDungeonLPCSpriteOptions) {
         super(scene, x, y, '');
         this.#options = options;
     }

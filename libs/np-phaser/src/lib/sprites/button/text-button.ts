@@ -1,7 +1,7 @@
 import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-export class TextButton extends Phaser.GameObjects.Text implements NPGameObject {
+export class NPTextButton extends Phaser.GameObjects.Text implements NPGameObject {
     constructor(
         public override scene: NPScene,
         x: number,

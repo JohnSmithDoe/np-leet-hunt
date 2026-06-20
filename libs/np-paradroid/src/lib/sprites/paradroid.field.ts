@@ -1,4 +1,4 @@
-import { NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { NPGameObjectList, NPScene, NPSprite } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { EFlowFrom, EParadroidShape } from '../@types/paradroid.consts';
@@ -84,7 +84,7 @@ const shapeToFieldDefinition = (shape: EParadroidShape) => {
     }
 };
 
-export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class ParadroidField extends NPSprite {
     static readonly EVENT_ACTIVATE_NEXT = 'activate_next';
     static readonly EVENT_DEACTIVATE_NEXT = 'deactivate_next';
 
@@ -92,11 +92,7 @@ export class ParadroidField extends Phaser.GameObjects.Sprite implements NPGameO
     #paths: NPGameObjectList<ParadroidPath>;
     #options: { width: number; height?: number };
 
-    constructor(
-        public override scene: NPScene,
-        subTile: TParadroidSubTile,
-        options: { width: number; height?: number }
-    ) {
+    constructor(scene: NPScene, subTile: TParadroidSubTile, options: { width: number; height?: number }) {
         super(scene, 0, 0, '');
         this.#subTile = subTile;
         this.#options = options;

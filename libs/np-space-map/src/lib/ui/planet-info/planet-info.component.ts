@@ -1,8 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { NPBaseSubscriber } from '@shared/np-library';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { StageService } from '@shared/np-phaser';
-import type * as Phaser from 'phaser';
-import { filter } from 'rxjs';
 
 import { PlanetInfo } from '../../planet/planet-info';
 import { SPACE_EVENTS } from '../../space.events';
@@ -18,27 +15,25 @@ import { SPACE_EVENTS } from '../../space.events';
     styleUrls: ['./planet-info.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlanetInfoComponent extends NPBaseSubscriber implements OnInit, OnDestroy {
+export class PlanetInfoComponent {
     #stage = inject(StageService);
     readonly info = signal<PlanetInfo | null>(null);
 
-    #events?: Phaser.Events.EventEmitter;
     #onSelected = (info: PlanetInfo) => this.info.set(info);
     #onDeselected = () => this.info.set(null);
 
-    ngOnInit(): void {
-        this.listen(
-            this.#stage.initialized$.pipe(filter(Boolean)).subscribe(() => {
-                this.#events = this.#stage.phaser.game.events;
-                this.#events.on(SPACE_EVENTS.PLANET_SELECTED, this.#onSelected);
-                this.#events.on(SPACE_EVENTS.PLANET_DESELECTED, this.#onDeselected);
-            })
-        );
-    }
-
-    override ngOnDestroy(): void {
-        this.#events?.off(SPACE_EVENTS.PLANET_SELECTED, this.#onSelected);
-        this.#events?.off(SPACE_EVENTS.PLANET_DESELECTED, this.#onDeselected);
-        super.ngOnDestroy();
+    constructor() {
+        // Once the stage is up, listen for planet (de)selection on the game event bus. The effect runs
+        // when `initialized` flips true; onCleanup removes the listeners on re-run and on destroy.
+        effect(onCleanup => {
+            if (!this.#stage.initialized()) return;
+            const events = this.#stage.phaser.game.events;
+            events.on(SPACE_EVENTS.PLANET_SELECTED, this.#onSelected);
+            events.on(SPACE_EVENTS.PLANET_DESELECTED, this.#onDeselected);
+            onCleanup(() => {
+                events.off(SPACE_EVENTS.PLANET_SELECTED, this.#onSelected);
+                events.off(SPACE_EVENTS.PLANET_DESELECTED, this.#onDeselected);
+            });
+        });
     }
 }

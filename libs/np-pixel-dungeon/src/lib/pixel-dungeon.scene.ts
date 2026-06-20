@@ -1,4 +1,4 @@
-import { NPScene, OnSceneCreate, OnScenePreload } from '@shared/np-phaser';
+import { clamp, NPScene, OnSceneCreate, OnScenePreload } from '@shared/np-phaser';
 import { DungeonResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
@@ -95,7 +95,7 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
                 // per-frame re-centre in update() keeps the zoom centred on the player instead.)
                 const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
                 const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
-                camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 10);
+                camera.zoom = clamp(newZoom, 0.25, 10);
                 const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
                 camera.scrollX -= newWorldPoint.x - worldPoint.x;
                 camera.scrollY -= newWorldPoint.y - worldPoint.y;

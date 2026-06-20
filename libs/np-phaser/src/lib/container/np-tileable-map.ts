@@ -1,6 +1,4 @@
-import { NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
-
-import { NPMovableSprite } from '../sprites/np-movable-sprite';
+import { NPGameObject, NPGameObjectList, NPMovableSprite, NPScene } from '@shared/np-phaser';
 
 export class NPTileableMap extends NPGameObjectList<NPGameObject> {
     iter = 0;
@@ -13,12 +11,12 @@ export class NPTileableMap extends NPGameObjectList<NPGameObject> {
         super(scene);
     }
 
-    preload() {
+    override preload() {
         super.preload();
         this.scene.load.image('test', 'assets/resolutiontesthd.png');
     }
 
-    create() {
+    override create() {
         super.create();
         // const img = new Phaser.GameObjects.Image(this.scene, 0, 0, 'test').setOrigin(0);
         // this.scene.addToLayer('np', img);

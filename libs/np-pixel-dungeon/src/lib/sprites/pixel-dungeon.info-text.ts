@@ -1,3 +1,4 @@
+import { NPText } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
@@ -17,7 +18,7 @@ const CMobInfoColors: Record<EMobInfoType, string> = {
     [EMobInfoType.Doged]: '#ece212',
 };
 
-export class PixelDungeonInfoText extends Phaser.GameObjects.Text {
+export class PixelDungeonInfoText extends NPText {
     constructor(
         public engine: PixelDungeonEngine,
         tile: TileXYType,

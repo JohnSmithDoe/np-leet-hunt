@@ -42,7 +42,7 @@ const defaultOptions: TBinaryTimerConfig = {
     ms: true,
 };
 
-export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameObject {
+export class NPBinaryTimer extends Phaser.GameObjects.Graphics implements NPGameObject {
     static EVENT_TIMER_ENDED = 'binary-timer-ended';
     options: TBinaryTimerConfig;
 
@@ -117,7 +117,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
         } else {
             time = this.#getTime();
             if ((reachedEnd = this.#reachedEnd(time))) {
-                this.emit(BinaryTimer.EVENT_TIMER_ENDED);
+                this.emit(NPBinaryTimer.EVENT_TIMER_ENDED);
                 this.#frenzyMode = true;
             }
         }
@@ -140,7 +140,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
         }
     }
 
-    #drawBounds(): BinaryTimer {
+    #drawBounds(): NPBinaryTimer {
         this.lineStyle(1, this.options.frameColor, 1).strokeRect(
             0,
             0,
@@ -150,7 +150,7 @@ export class BinaryTimer extends Phaser.GameObjects.Graphics implements NPGameOb
         return this;
     }
 
-    #drawDigit(digit: number, position: number): BinaryTimer {
+    #drawDigit(digit: number, position: number): NPBinaryTimer {
         let binary: string = digit.toString(2);
         while (binary.length < 4) {
             binary = '0' + binary;

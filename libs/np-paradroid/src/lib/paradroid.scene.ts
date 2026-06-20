@@ -1,4 +1,4 @@
-import { NPScene, OnSceneCreate, OnSceneInit, OnScenePreload, TextButton } from '@shared/np-phaser';
+import { lerp, NPScene, NPTextButton, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import { Balance, DuelAiLevel, DuelAiParams, DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -26,7 +26,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     #busy = false; // true while the VS intro is playing — Start/Re-Create are ignored until it clears
     #lastOutcome: DuelResult['outcome'] = 'lose'; // forfeit by default; a decided match sets win/lose
     #resultText?: Phaser.GameObjects.Text;
-    readonly #controls: TextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
+    readonly #controls: NPTextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
 
     constructor(config: TParadroidSceneConfig = {}) {
         super({ key: ParadroidScene.key });
@@ -70,7 +70,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
 
     /** Add a header control button at the given x and track it for the camera fit. */
     #addControl(x: number, label: string, onClick: () => void): void {
-        const button = new TextButton(this, x, 20, label, { fontSize: '28px', color: '#0f0' });
+        const button = new NPTextButton(this, x, 20, label, { fontSize: '28px', color: '#0f0' });
         button.on('pointerup', onClick);
         this.#controls.push(button);
         this.addExisting(button);
@@ -138,9 +138,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
             duration,
             onUpdate: tween => {
                 const t = tween.getValue() ?? 1;
-                cam.setZoom(Phaser.Math.Linear(startZoom, fit.zoom, t)).centerOn(
-                    Phaser.Math.Linear(startCx, fit.centerX, t),
-                    Phaser.Math.Linear(startCy, fit.centerY, t)
+                cam.setZoom(lerp(startZoom, fit.zoom, t)).centerOn(
+                    lerp(startCx, fit.centerX, t),
+                    lerp(startCy, fit.centerY, t)
                 );
             },
             onComplete: () => {

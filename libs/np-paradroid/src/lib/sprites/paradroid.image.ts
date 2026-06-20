@@ -1,4 +1,4 @@
-import { Image, NPScene } from '@shared/np-phaser';
+import { NPImage, NPScene } from '@shared/np-phaser';
 
 /** Texture configs for the paradroid sprites. Exported so the VS intro can preload them up front. */
 export const PARADROID_IMAGES = {
@@ -15,7 +15,7 @@ export const PARADROID_IMAGES = {
 
 export type TParadroidImageKey = keyof typeof PARADROID_IMAGES;
 
-export class ParadroidImage extends Image {
+export class ParadroidImage extends NPImage {
     constructor(scene: NPScene, x: number, y: number, image: TParadroidImageKey, frame?: number) {
         super(scene, x, y, PARADROID_IMAGES[image], frame);
     }

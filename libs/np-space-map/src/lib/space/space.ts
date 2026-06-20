@@ -1,5 +1,5 @@
 import { NPRNG } from '@shared/np-library';
-import { NPGameObject, NPScene } from '@shared/np-phaser';
+import { NPScene, NPTileSprite } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 const IMAGES = {
@@ -13,7 +13,7 @@ const IMAGES = {
     space8: { key: 'space-8', url: 'np-space-map/space/tileable-classic-nebula-space-patterns-8.jpg' },
 };
 
-export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject {
+export class Space extends NPTileSprite {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
 
     static getRandom() {
@@ -21,10 +21,7 @@ export class Space extends Phaser.GameObjects.TileSprite implements NPGameObject
         return NPRNG.item(types);
     }
 
-    constructor(
-        public override scene: NPScene,
-        type: keyof typeof IMAGES
-    ) {
+    constructor(scene: NPScene, type: keyof typeof IMAGES) {
         super(scene, 0, 0, scene.scale.width, scene.scale.height, '');
         this.#image = IMAGES[type];
         this.setName(type);

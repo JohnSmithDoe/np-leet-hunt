@@ -1,7 +1,14 @@
-import { NPGameObject, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
-export class Image extends Phaser.GameObjects.Image implements NPGameObject {
+import { NPScene } from '../../scenes/np-scene';
+import { NPGameObject } from '../../scenes/np-scene-component';
+
+/**
+ * A Phaser Image wired to our framework that loads its own asset: pass an image/spritesheet config and
+ * it queues the load in `preload()` and sets the texture in `create()`. Use instead of
+ * `Phaser.GameObjects.Image` when you want the object to own its asset loading.
+ */
+export class NPImage extends Phaser.GameObjects.Image implements NPGameObject {
     readonly #image: Phaser.Types.Loader.FileTypes.ImageFileConfig;
     #frameKey?: number;
 
@@ -18,7 +25,6 @@ export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     }
 
     preload(): void {
-        console.log('13:preload');
         if (this.#image.frameConfig) {
             this.scene.load.spritesheet(this.#image);
         } else {
@@ -27,9 +33,6 @@ export class Image extends Phaser.GameObjects.Image implements NPGameObject {
     }
 
     create(container?: Phaser.GameObjects.Container): void {
-        console.log('17:create');
-        console.log(this.#image);
-
         this.setTexture(this.#image.key, this.#frameKey);
         container?.add(this);
     }

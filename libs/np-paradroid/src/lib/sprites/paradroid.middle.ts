@@ -1,4 +1,4 @@
-import { NPGameObject, NPScene } from '@shared/np-phaser';
+import { NPScene, NPSprite } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { EParadroidOwner } from '../@types/paradroid.consts';
@@ -25,12 +25,12 @@ const IMAGES = {
     },
 };
 
-export class ParadroidMiddle extends Phaser.GameObjects.Sprite implements NPGameObject {
+export class ParadroidMiddle extends NPSprite {
     static readonly EVENT_CHANGED = 'np-middle-changed';
     #active = { player: false, droid: false };
 
     constructor(
-        public override scene: NPScene,
+        scene: NPScene,
         public row: number,
         x: number,
         y: number,

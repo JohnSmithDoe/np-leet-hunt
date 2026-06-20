@@ -1,5 +1,5 @@
 import { NPRng } from '@shared/np-library';
-import { BinaryTimer, NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { NPBinaryTimer, NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
 import { Balance, DuelAiParams } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -46,7 +46,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
     #engine!: ParadroidEngine;
     #buttons!: NPGameObjectList<ParadroidButton>;
     #shots!: NPGameObjectList<ParadroidImage>;
-    #timer!: BinaryTimer;
+    #timer!: NPBinaryTimer;
     container!: Phaser.GameObjects.Container;
 
     // Match state — the duel only ticks between startMatch() and the buzzer-plus-settle.
@@ -75,7 +75,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         this.#shots = this.#generateShots();
         this.add(this.#shots);
 
-        this.#timer = new BinaryTimer(
+        this.#timer = new NPBinaryTimer(
             this.scene,
             -125 + this.#options.tileWidth / 2,
             this.#factory.rows * this.#options.tileHeight + this.#options.tileHeight / 4,
@@ -84,7 +84,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
                 min: false,
             }
         );
-        this.#timer.on(BinaryTimer.EVENT_TIMER_ENDED, () => {
+        this.#timer.on(NPBinaryTimer.EVENT_TIMER_ENDED, () => {
             this.#timeUp = true;
             // Freeze the 3s hold timers (and all other scene timers) so the rows lit at the buzzer stay
             // lit while in-flight flows finish — the scene update loop still runs, so fills/drains settle.
