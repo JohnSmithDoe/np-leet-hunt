@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
     IonButton,
     IonButtons,
@@ -8,7 +8,7 @@ import {
     IonTitle,
     IonToolbar,
 } from '@ionic/angular/standalone';
-import { StageComponent, StageService } from '@shared/np-phaser';
+import { StageComponent } from '@shared/np-phaser';
 import { EventDialogComponent, PlanetInfoComponent } from '@shared/np-space-map';
 import { GameStateService, RunPhase } from '@shared/np-state';
 
@@ -33,17 +33,14 @@ import { RunConductorService } from '../run/run-conductor.service';
     ],
 })
 export class HomePageComponent {
-    #stage = inject(StageService);
     #game = inject(GameStateService);
-    #conductor = inject(RunConductorService);
 
     constructor() {
-        // Composition root: once the stage is up, hand it to the conductor. The run FSM starts in the
-        // hangar; the conductor renders each phase as a scene, so StageService stays domain-free and the
-        // FSM is the single source of truth for the active mode. The hangar's "Launch run" begins the run.
-        effect(() => {
-            if (this.#stage.initialized()) this.#conductor.start();
-        });
+        // Composition root: instantiating the conductor wires it to the stage + run FSM (see its
+        // constructor). It waits for the stage to boot, then renders each FSM phase as a scene — so
+        // StageService stays domain-free and the FSM is the single source of truth for the active mode.
+        // The run starts in the hangar; the hangar's "Launch run" begins the run.
+        inject(RunConductorService);
     }
 
     // Debug toolbar: each button is a run-phase *intent* — the conductor turns the phase into a scene

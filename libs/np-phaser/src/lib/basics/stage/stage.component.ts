@@ -7,7 +7,6 @@ import {
     OnDestroy,
     ViewChild,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
 
 import { StageService } from '../../service/stage.service';
 
@@ -19,14 +18,9 @@ import { StageService } from '../../service/stage.service';
 })
 export class StageComponent implements AfterViewInit, OnDestroy {
     #npStage = inject(StageService);
-    #subscription = new Subscription();
     #resizeObserver?: ResizeObserver;
     isReady = false;
     @ViewChild('npStage', { static: true }) stageContainer?: ElementRef<HTMLElement>;
-
-    listen(subscription: Subscription) {
-        this.#subscription.add(subscription);
-    }
 
     ngAfterViewInit(): void {
         if (this.stageContainer) {
@@ -37,7 +31,6 @@ export class StageComponent implements AfterViewInit, OnDestroy {
     ngOnDestroy(): void {
         console.log('destroy stage');
         this.#resizeObserver?.disconnect();
-        this.#subscription.unsubscribe();
         this.#npStage.destroyStage();
     }
 
@@ -62,6 +55,8 @@ export class StageComponent implements AfterViewInit, OnDestroy {
     }
 
     #initStage(container: HTMLElement) {
-        this.listen(this.#npStage.initStage(container).subscribe(isReady => (this.isReady = isReady)));
+        // initStage is synchronous (Phaser boots in-call), so `initialized` is already set after it returns.
+        this.#npStage.initStage(container);
+        this.isReady = this.#npStage.initialized();
     }
 }

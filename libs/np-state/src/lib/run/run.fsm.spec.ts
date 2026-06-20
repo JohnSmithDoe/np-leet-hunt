@@ -33,11 +33,12 @@ describe('RunFsm', () => {
         }
     });
 
-    it('emits the current phase on subscribe and on each change', () => {
+    it('reflects the current phase as a signal, before and after a change', () => {
         const fsm = new RunFsm();
         const seen: RunPhase[] = [];
-        fsm.current$.subscribe(phase => seen.push(phase));
+        seen.push(fsm.phase());
         fsm.to('sector');
+        seen.push(fsm.phase());
         expect(seen).toEqual(['hangar', 'sector']);
     });
 });

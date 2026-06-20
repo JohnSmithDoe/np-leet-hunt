@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import * as Phaser from 'phaser';
 import MouseWheelScrollerPlugin from 'phaser4-rex-plugins/plugins/mousewheelscroller-plugin';
 import ShipPlugin from 'phaser4-rex-plugins/plugins/ship-plugin';
 import StateManagerPlugin from 'phaser4-rex-plugins/plugins/statemanager-plugin';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -16,8 +15,9 @@ export class PhaserService {
     }
 
     actionsHistory: string[] = []; // * Since np-phaser is a singleton, let's store the history of actions here for all components.
-    #initialized = new BehaviorSubject(false);
-    initialized$ = this.#initialized.asObservable();
+    #initialized = signal(false);
+    /** Flips true once the game is created. Read by `StageService` (and through it, the components). */
+    readonly initialized = this.#initialized.asReadonly();
 
     /**
      * * When A user Logs out, destroy the active game.
@@ -44,9 +44,9 @@ export class PhaserService {
         // detection — no NgZone.runOutsideAngular needed around game creation anymore.
         if (!this.#game) {
             this.createGame(parent);
-            this.#initialized.next(true);
+            this.#initialized.set(true);
         }
-        return this.initialized$;
+        return this.initialized;
     }
 
     private createGame(parent: string | HTMLElement) {

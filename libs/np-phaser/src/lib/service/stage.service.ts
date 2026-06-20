@@ -1,5 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { forkJoin, Observable, of, take, tap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
 
 import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPScene } from '../scenes/np-scene';
@@ -22,7 +21,8 @@ export interface NPSceneEntry {
 })
 export class StageService {
     #phaser = inject(PhaserService);
-    readonly initialized = signal(false);
+    /** True once Phaser has booted. Components subscribe via `effect` before starting scenes. */
+    readonly initialized = this.#phaser.initialized;
     #active: NPSceneEntry[] = [];
     #switching = false;
 
@@ -41,26 +41,24 @@ export class StageService {
         if (this.#isCurrent(nextKeys) || this.#switching) return;
 
         this.#switching = true;
-        this.#fadeOutCurrent()
-            .pipe(take(1))
-            .subscribe(() => {
-                // Leave the current mode: keep persistent scenes alive, drop transient ones.
-                this.#active.forEach(({ key, persistent }) =>
-                    persistent ? this.#phaser.game.scene.sleep(key) : this.#phaser.game.scene.remove(key)
-                );
-                this.#active = entries;
-                // Enter the next mode: a slept persistent scene still exists → wake + fade it back in;
-                // otherwise add + start it fresh (NPScene.create fades itself in). Order = render order.
-                entries.forEach(({ key, scene }) => {
-                    if (this.#phaser.game.scene.getScene(key)) {
-                        this.#phaser.game.scene.wake(key);
-                        this.#fadeIn(key);
-                    } else {
-                        this.#phaser.game.scene.add(key, scene, true);
-                    }
-                });
-                this.#switching = false;
+        void this.#fadeOutCurrent().then(() => {
+            // Leave the current mode: keep persistent scenes alive, drop transient ones.
+            this.#active.forEach(({ key, persistent }) =>
+                persistent ? this.#phaser.game.scene.sleep(key) : this.#phaser.game.scene.remove(key)
+            );
+            this.#active = entries;
+            // Enter the next mode: a slept persistent scene still exists → wake + fade it back in;
+            // otherwise add + start it fresh (NPScene.create fades itself in). Order = render order.
+            entries.forEach(({ key, scene }) => {
+                if (this.#phaser.game.scene.getScene(key)) {
+                    this.#phaser.game.scene.wake(key);
+                    this.#fadeIn(key);
+                } else {
+                    this.#phaser.game.scene.add(key, scene, true);
+                }
             });
+            this.#switching = false;
+        });
     }
 
     /**
@@ -72,17 +70,16 @@ export class StageService {
     fadeTransition(apply: () => void) {
         if (this.#switching) return;
         this.#switching = true;
-        this.#fadeOutCurrent()
-            .pipe(take(1))
-            .subscribe(() => {
-                apply();
-                this.#active.forEach(({ key }) => this.#fadeIn(key));
-                this.#switching = false;
-            });
+        void this.#fadeOutCurrent().then(() => {
+            apply();
+            this.#active.forEach(({ key }) => this.#fadeIn(key));
+            this.#switching = false;
+        });
     }
 
-    initStage(stageContainer: HTMLElement) {
-        return this.#phaser.init(stageContainer).pipe(tap(isReady => this.initialized.set(isReady)));
+    initStage(stageContainer: HTMLElement): void {
+        // Synchronous: PhaserService.init creates the game and flips `initialized` in the same call.
+        this.#phaser.init(stageContainer);
     }
 
     destroyStage(): void {
@@ -106,25 +103,22 @@ export class StageService {
         return keys.length === this.#active.length && keys.every(key => this.#active.some(entry => entry.key === key));
     }
 
-    /** Fades every camera of every active scene to black; completes once all fades finish. */
-    #fadeOutCurrent(): Observable<unknown> {
+    /** Fades every camera of every active scene to black; resolves once all fades finish. */
+    #fadeOutCurrent(): Promise<void> {
         const fades = this.#active
             .map(({ key }) => this.#phaser.game.scene.getScene(key) as NPScene | null)
             .filter((scene): scene is NPScene => !!scene)
             .flatMap(scene =>
                 scene.cameras.cameras.map(
                     cam =>
-                        new Observable(sub => {
+                        new Promise<void>(resolve => {
                             cam.fade(1000, 0, 0, 0, false, (_cam: NPFullscreenCamera, percent: number) => {
-                                if (percent === 1) {
-                                    sub.next(true);
-                                    sub.complete();
-                                }
+                                if (percent === 1) resolve();
                             });
                         })
                 )
             );
-        return fades.length ? forkJoin(fades) : of(true);
+        return fades.length ? Promise.all(fades).then(() => undefined) : Promise.resolve();
     }
 
     /** Fades a freshly woken scene's cameras back in from black (wake does not re-run create). */

@@ -31,12 +31,14 @@ describe('RunStateStore', () => {
         expect(store.hasCrew('dad')).toBe(false);
     });
 
-    it('publishes a fresh snapshot on subscribe and on every mutation', () => {
+    it('exposes a fresh snapshot signal on construction and after every mutation', () => {
         const store = new RunStateStore();
         const marbles: number[] = [];
-        store.changes$.subscribe(ctx => marbles.push(ctx.resources.marbles));
+        marbles.push(store.changes().resources.marbles); // initial value
         store.adjustResources({ marbles: 2 });
+        marbles.push(store.changes().resources.marbles);
         store.adjustResources({ marbles: 3 });
+        marbles.push(store.changes().resources.marbles);
         expect(marbles).toEqual([0, 2, 5]);
     });
 

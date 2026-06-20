@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { effect, inject, Injectable } from '@angular/core';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
@@ -19,21 +19,35 @@ import { Balance, GameStateService, ModeResult, RunPhase, Sector, SECTOR_COUNT }
 export class RunConductorService {
     #stage = inject(StageService);
     #game = inject(GameStateService);
-    #started = false;
+    #wired = false;
 
     // The sector currently rendered, and its number, so #showSpace can tell a *new* sector (rebuild the
     // map fresh) from a return to the same one (wake the slept scenes after a dungeon/duel excursion).
     #sector?: Sector;
     #shownSector = 0;
 
-    /** Begin reacting to the run FSM. Idempotent; call once after the stage is initialised. */
-    start(): void {
-        if (this.#started) return;
-        this.#started = true;
-        // Root singleton: lives for the whole app, so these subscriptions need no teardown.
-        this.#game.fsm.current$.subscribe(phase => this.#enter(phase));
-        // The map fires SECTOR_EXIT on the Phaser bus when the ship bails at a rim sun; advance the run.
-        this.#stage.phaser.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => this.#onSectorExit());
+    /**
+     * Begin reacting to the run FSM. The effects are created in the constructor (the only valid place —
+     * `effect` cannot be called from within another effect, so this can't be deferred behind a caller's
+     * effect), and both gate on `stage.initialized()`: they no-op until Phaser has booted, then fire with
+     * the current phase. Injecting this service (home.page does) is what brings it to life. Root singleton
+     * → lives for the whole app → the effects need no teardown.
+     */
+    constructor() {
+        // Once Phaser is up, wire the rim-sun bail listener: the map fires SECTOR_EXIT on the bus when the
+        // ship bails at a rim sun. `#wired` guards against a re-run double-registering.
+        effect(() => {
+            if (!this.#stage.initialized() || this.#wired) return;
+            this.#wired = true;
+            this.#stage.phaser.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => this.#onSectorExit());
+        });
+        // React to every *settled* phase (incl. the initial 'hangar'), but only once Phaser is up. A
+        // synchronous double-step like `to('sectorExit')→to('sector')` coalesces to 'sector' directly —
+        // fine, since 'sectorExit' is a transient routing phase with no scene of its own.
+        effect(() => {
+            const phase = this.#game.fsm.phase();
+            if (this.#stage.initialized()) this.#enter(phase);
+        });
     }
 
     #enter(phase: RunPhase): void {

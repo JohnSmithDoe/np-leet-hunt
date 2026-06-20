@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Signal, signal } from '@angular/core';
 
 /**
  * The phases of a single run (Leet-27 / GDD §7 spine):
@@ -32,40 +32,40 @@ export const RUN_TRANSITIONS: Readonly<Record<RunPhase, readonly RunPhase[]>> = 
     ending: ['hangar'],
 };
 
-/** A tiny typed finite-state machine over `RunPhase`. Observable current phase; illegal moves throw. */
+/**
+ * A tiny typed finite-state machine over `RunPhase`. The current phase is a reactive signal
+ * ({@link phase}); illegal moves throw. Uses Angular's standalone `signal` primitive, which works
+ * outside DI — the class stays unit-testable without TestBed (cf. run.fsm.spec.ts).
+ */
 export class RunFsm {
-    #current: RunPhase;
-    #changes: BehaviorSubject<RunPhase>;
-    readonly current$: Observable<RunPhase>;
+    readonly #phase = signal<RunPhase>('hangar');
+    /** The current run phase, reactive. The app wires an `effect` on it to swap scenes (Leet-28). */
+    readonly phase: Signal<RunPhase> = this.#phase.asReadonly();
 
     constructor(initial: RunPhase = 'hangar') {
-        this.#current = initial;
-        this.#changes = new BehaviorSubject<RunPhase>(initial);
-        this.current$ = this.#changes.asObservable();
+        this.#phase.set(initial);
     }
 
     get current(): RunPhase {
-        return this.#current;
+        return this.#phase();
     }
 
     /** True if `next` is a legal transition from the current phase. */
     can(next: RunPhase): boolean {
-        return RUN_TRANSITIONS[this.#current].includes(next);
+        return RUN_TRANSITIONS[this.#phase()].includes(next);
     }
 
     /** Transition to `next`, or throw if the table forbids it. */
     to(next: RunPhase): RunPhase {
         if (!this.can(next)) {
-            throw new Error(`Illegal run transition: ${this.#current} → ${next}`);
+            throw new Error(`Illegal run transition: ${this.#phase()} → ${next}`);
         }
-        this.#current = next;
-        this.#changes.next(next);
+        this.#phase.set(next);
         return next;
     }
 
     /** Force back to the hangar for a new run (bypasses the table). */
     reset(): void {
-        this.#current = 'hangar';
-        this.#changes.next('hangar');
+        this.#phase.set('hangar');
     }
 }

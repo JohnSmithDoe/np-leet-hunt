@@ -1,7 +1,5 @@
 import * as Phaser from 'phaser';
-import { Observable, take } from 'rxjs';
 
-import { NPFullscreenCamera } from '../cameras/np-fullscreen-camera';
 import { NPGameObject, NPGameObjectList } from './np-scene-component';
 
 export type TNPLayerKeys = 'bg' | 'np' | 'fg' | 'ui' | string;
@@ -67,19 +65,6 @@ export abstract class NPScene extends Phaser.Scene {
     }
 
     private fadeIn() {
-        new Observable(sub => {
-            this.cameras.cameras.forEach(cam => {
-                cam.fadeIn(1000, 0, 0, 0, (cama: NPFullscreenCamera, percent: number) => {
-                    if (percent === 1) {
-                        sub.next(true);
-                        sub.complete();
-                    }
-                });
-            });
-        })
-            .pipe(take(1))
-            .subscribe(() => {
-                console.log('fade done');
-            });
+        this.cameras.cameras.forEach(cam => cam.fadeIn(1000, 0, 0, 0));
     }
 }

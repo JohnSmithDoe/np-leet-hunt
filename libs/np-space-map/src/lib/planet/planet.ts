@@ -19,6 +19,7 @@ const IMAGES = {
     planetGalaxy: { key: 'planet-galaxy', url: 'np-space-map/planets/galaxy.png' },
     planetGasGiant: { key: 'planet-gas-giant', url: 'np-space-map/planets/gas-giant.png' },
     planetPurple: { key: 'planet-purple', url: 'np-space-map/planets/purple-planet.png' },
+    planetGreenForest: { key: 'planet-green-forest', url: 'np-space-map/planets/green-forest.leonardo.png' },
 };
 
 /**

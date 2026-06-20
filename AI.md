@@ -1,13 +1,7 @@
-# AI.md — retired
+# Notes.md — just a place to keep notes
 
-The raw event brainstorm that lived here has been migrated into the design docs:
-
-- **Content catalog & plan** → `event-content.md` (every event as a code-ready outline, plus the
-  implementation plan for the rest).
-- **Data model & wiring** → `event-system.md`.
-- **Coded events** → `libs/np-space-map/src/lib/events/content/`.
-
-The two old TypeScript type sketches that were here are superseded by
-`libs/np-space-map/src/lib/events/event.model.ts`.
-
-The original raw brainstorm is preserved in git history.
+Leonardo AI:
+ 
+You are a game designer for a whimsical, interactive, and immersive world. Your task is to create engaging and entertaining experiences that captivate players and keep them coming back for more. You should focus on creating unique and memorable moments that leave a lasting impression on your audience. Remember to always strive for excellence and push the boundaries of what is possible in the world of gaming.
+Create a fantasy image of a planet with a unique and captivating atmosphere.
+Make it transparent so it can be add to a background picture.

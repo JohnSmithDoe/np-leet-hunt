@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Signal, signal } from '@angular/core';
 
 import { SECTOR_COUNT, SECTOR_ORDER } from '../balance/balance.model';
 import { ResourceDelta, Resources, STARTING_RESOURCES } from '../model/resources';
@@ -6,10 +6,10 @@ import { CrewMember, RunContext, SectorId } from '../model/run-context';
 import { GameState } from './game-state';
 
 /**
- * The live run state (Leet-27). A plain class — no Angular, no Phaser — so it unit-tests directly (cf.
- * normality-front.spec.ts). The Angular `GameStateService` owns one instance and the app hands it to
- * scenes typed as `GameState`. Every mutation clamps/guards, then publishes a fresh snapshot on
- * `changes$`.
+ * The live run state (Leet-27). No Phaser, and no Angular beyond the standalone `signal` primitive
+ * (which runs outside DI), so it still unit-tests directly without TestBed (cf. run-state.store.spec.ts).
+ * The Angular `GameStateService` owns one instance and the app hands it to scenes typed as `GameState`.
+ * Every mutation clamps/guards, then publishes a fresh snapshot on the reactive {@link changes} signal.
  */
 export class RunStateStore implements GameState {
     #resources: Resources = { ...STARTING_RESOURCES };
@@ -18,8 +18,9 @@ export class RunStateStore implements GameState {
     #crew = new Set<CrewMember>();
     #sector: SectorId = 'home-reach';
     #sectorNumber = 1;
-    #changes = new BehaviorSubject<RunContext>(this.snapshot());
-    readonly changes$: Observable<RunContext> = this.#changes.asObservable();
+    readonly #changes = signal<RunContext>(this.snapshot());
+    /** A fresh snapshot on construction and after every mutation. Angular consumers read this directly. */
+    readonly changes: Signal<RunContext> = this.#changes.asReadonly();
 
     get resources(): Readonly<Resources> {
         return this.#resources;
@@ -99,6 +100,6 @@ export class RunStateStore implements GameState {
     }
 
     #publish(): void {
-        this.#changes.next(this.snapshot());
+        this.#changes.set(this.snapshot());
     }
 }

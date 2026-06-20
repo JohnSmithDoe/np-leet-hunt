@@ -1,4 +1,4 @@
-import { inject, Injectable, InjectionToken, signal } from '@angular/core';
+import { inject, Injectable, InjectionToken, Signal } from '@angular/core';
 
 import { RunContext } from './model/run-context';
 import { RunFsm } from './run/run.fsm';
@@ -26,13 +26,11 @@ export class GameStateService {
     readonly run = new RunStateStore();
     readonly fsm = new RunFsm();
     readonly save = new SaveStore(inject(PERSISTENCE_PORT));
-    /** The live run snapshot for Angular consumers (the Phaser HUD still reads `run.changes$`). */
-    readonly snapshot = signal<RunContext>(this.run.snapshot());
-
-    constructor() {
-        // Root singleton: this lives for the whole app, so the subscription needs no teardown.
-        this.run.changes$.subscribe(ctx => this.snapshot.set(ctx));
-    }
+    /**
+     * The live run snapshot for Angular consumers (OnPush HUD/overlay components). Just the store's own
+     * reactive signal — the Phaser HUD instead polls `run.resources` in its game loop.
+     */
+    readonly snapshot: Signal<RunContext> = this.run.changes;
 
     /** Start a fresh run: reset carried state + phase machine, then enter the first sector. */
     startNewRun(seed?: Partial<RunContext>): void {

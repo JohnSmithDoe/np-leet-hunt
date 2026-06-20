@@ -2,7 +2,6 @@ import { clamp, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@sha
 import type { GameState, Sector } from '@shared/np-state';
 import { SECTOR_COUNT } from '@shared/np-state';
 import * as Phaser from 'phaser';
-import { Subscription } from 'rxjs';
 
 import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
 
@@ -19,8 +18,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     #fraction = 0;
     #state: GameState;
     #sector: Sector;
-    #stateSub?: Subscription;
-    /** Last seen meter values, to diff each `changes$` snapshot into gain/loss floaters. */
+    /** Last seen meter values, to diff the polled `state.resources` into gain/loss floaters. */
     #prevResources?: { hull: number; heart: number; marbles: number };
 
     constructor(state: GameState, sector: Sector) {
@@ -59,7 +57,9 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
         this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');
-        this.#stats = text(BAR.x, BAR.y + BAR.h + 36, 'HULL 10   HEART 10   MARBLES 0', 20, '#9fb0d0');
+        const r = this.#state.resources;
+        this.#stats = text(BAR.x, BAR.y + BAR.h + 36, this.#statsText(r), 20, '#9fb0d0');
+        this.#prevResources = { hull: r.hull, heart: r.heart, marbles: r.marbles };
         this.#banner = this.add
             .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
             .setOrigin(0.5)
@@ -72,15 +72,6 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#jumps.setText(`JUMPS  ${payload.jumps}`);
             this.#drawBar();
         });
-        // Read the run store directly: its BehaviorSubject replays the current resources on subscribe
-        // and pushes every change, so the HUD needs no RESOURCES_CHANGED event bus. Diff each snapshot
-        // against the last to float a gain/loss number per changed meter (event outcomes & answer costs).
-        this.#stateSub = this.#state.changes$.subscribe(({ resources }) => {
-            this.#stats.setText(`HULL ${resources.hull}   HEART ${resources.heart}   MARBLES ${resources.marbles}`);
-            if (this.#prevResources) this.#showResourceDeltas(this.#prevResources, resources);
-            this.#prevResources = { hull: resources.hull, heart: resources.heart, marbles: resources.marbles };
-        });
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.#stateSub?.unsubscribe());
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
             this.#fraction = 1;
             this.#drawBar();
@@ -89,6 +80,26 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         this.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => {
             this.#banner.setColor('#8affc8').setText('JUMPED OUT — SECTOR LEFT');
         });
+    }
+
+    /**
+     * Poll the run resources each frame (the scene is the natural place to read game state — no event
+     * bus, no subscription). When a meter moves, refresh the readout and float a gain/loss number. Phaser
+     * only ticks `update` while the scene is awake, so a slept space map does no work; on wake it diffs the
+     * net change accrued during the excursion. Skipped while slept ⇒ no per-frame cost off-screen.
+     */
+    override update() {
+        const { hull, heart, marbles } = this.#state.resources;
+        const prev = this.#prevResources;
+        if (prev && (prev.hull !== hull || prev.heart !== heart || prev.marbles !== marbles)) {
+            this.#stats.setText(this.#statsText({ hull, heart, marbles }));
+            this.#showResourceDeltas(prev, { hull, heart, marbles });
+            this.#prevResources = { hull, heart, marbles };
+        }
+    }
+
+    #statsText(r: { hull: number; heart: number; marbles: number }): string {
+        return `HULL ${r.hull}   HEART ${r.heart}   MARBLES ${r.marbles}`;
     }
 
     /** Float a "+/- N" number per meter that changed, and give the stats line a quick pop. */
