@@ -21,6 +21,15 @@ const IMAGES = {
     planetPurple: { key: 'planet-purple', url: 'np-space-map/planets/purple-planet.png' },
     planetGreenForest: { key: 'planet-green-forest', url: 'np-space-map/planets/green-forest.leonardo.png' },
     planetPurpleTwo: { key: 'planet-purple-two', url: 'np-space-map/planets/purple-planet.leo.png' },
+    planetLeo1: { key: 'planet-leo-1', url: 'np-space-map/planets/planet-01.leo.png' },
+    planetLeo2: { key: 'planet-leo-2', url: 'np-space-map/planets/planet-02.leo.png' },
+    // planet-03 / planet-04 omitted: byte-identical duplicates of planet-02 (no added variety).
+    planetLeo5: { key: 'planet-leo-5', url: 'np-space-map/planets/planet-05.leo.png' },
+    planetLeo6: { key: 'planet-leo-6', url: 'np-space-map/planets/planet-06.leo.png' },
+    planetLeo7: { key: 'planet-leo-7', url: 'np-space-map/planets/planet-07.leo.png' },
+    planetLeo8: { key: 'planet-leo-8', url: 'np-space-map/planets/planet-08.leo.png' },
+    planetLeo9: { key: 'planet-leo-9', url: 'np-space-map/planets/planet-09.leo.png' },
+    planetLeo10: { key: 'planet-leo-10', url: 'np-space-map/planets/planet-10.leo.png' },
 };
 
 /**
