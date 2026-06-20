@@ -8,7 +8,87 @@ Leet-32 "no rxjs"). Much of Phase 1 had landed ahead of this tracker: the route 
 (per-jump advance, color-drain veil, node swallowing — `normality-front.ts` / `reality.ts`), the event
 system v1 (HTML dialog, three answers, resource outcomes; five sector pools + a core pool), and the map HUD
 (`space-ui.scene.ts`). The four issues below closed it out: run-end + text endings, the two-exit core loop,
-en-route intercepts, and the distortion-battery pushback. **Next: Phase 2** (see game-design.md §7).
+en-route intercepts, and the distortion-battery pushback. **Active phase: Phase 2 — The Duel Loop**,
+drafted below (GDD §7).
+
+---
+
+# Phase 2 — The Duel Loop *(active)*
+
+Goal (GDD §7): *duels fire from the map; winning grows the pet within a run.*
+What already exists (Leet-29 + the duel-AI work, ahead of this tracker): the mode hand-off contract
+(`mode-contract.ts` — `DuelLaunch` / `DuelResult` with an `absorbedClass` field / `isModeSuccess`), a
+playable `ParadroidScene` with an intro that reports a typed `DuelResult` via `onResult`, and a seeded,
+sector-tunable droid AI (`paradroid.ai.ts`, `Balance.duelBoardParams`/`duelAiParams`). What's missing is
+everything that makes a duel *part of a run*: nothing in a real run opens one, no result is consumed, and
+there is no robo-pet. The three issues below close that.
+Recommended order: **Leet-37 → 39 → 38** (37 + 39 are the exit criterion — duels fire from the map and a
+win grows the pet; 38 is the teeth: a difficulty curve and the mini-duel variant).
+
+## Leet-37: Duel-as-takeover — fire duels from the map — ☐ todo
+
+**Context:** the `spawnGame` event effect is still **deferred** — `NPSpaceMap.#applyEffects` just
+`console.log`s it (`// TODO(event-system.md §8)`), so no event can open a duel. Duels only start from the
+FSM `duel` phase via the home-page debug toolbar, and `RunConductorService.#showDuel` **hardcodes** the
+difficulty (`boardLevel='brutal'`, `aiLevel='normal'`). `#onModeResult` just logs the `DuelResult` and
+routes back to `sector` ("reward wiring … lands in Phases 2–3"). The contract + scene + AI are ready; the
+run-side wiring is the gap.
+
+**Decide first (GDD §3, before coding):**
+- Which encounters open duels — en-route intercepts (the Leet-35 pool), specific planet events, or both?
+- Does **losing** a duel end the run (a lethal takeover), or just fail the encounter / cost resources?
+
+**Scope**
+- [ ] Wire the `spawnGame` effect: `{ game: 'duel', launch }` → conductor opens a duel with the carried
+      `DuelLaunch` (fall back to a Balance-resolved default when an event omits one).
+- [ ] Give the map a real source: flag en-route intercept and/or planet events with a duel `spawnGame`
+      (replacing the deferred log path), so a real run reaches a duel.
+- [ ] `#onModeResult` **consumes** the `DuelResult` (`isModeSuccess`): apply the encounter outcome (and a
+      lethal-loss ending if that's the decision) instead of just logging, then return to the map.
+- [ ] Resolve duel difficulty from `Balance` per sector/encounter — retire the hardcoded brutal/normal.
+
+**Exit:** a map event/encounter opens a duel and the run continues with its result.
+
+## Leet-38: Duel staging & variety — sector curve + mini-duel — ☐ todo
+
+**Context:** `ParadroidScene` already has intro → play → a "↩ Map" result control (Leet-29) and a seeded AI,
+but duel difficulty is only ever the fixed levels chosen at launch — there's no sector-scaled curve, and no
+small-board **mini-duel** for lightweight encounters (every duel is full guardian-scale). Result framing is
+minimal.
+
+**Scope**
+- [ ] A duel difficulty **curve** in np-state `Balance`, keyed by sector (and encounter type), so duels
+      harden with depth the way the sector curve hardens the map — feeds the launch chosen in Leet-37.
+- [ ] A **mini-duel** (small-grid) board variant for quick map encounters, distinct from the full board.
+- [ ] Tighten intro → play → result staging: clear win/lose readout, time-left, and the absorbed-class beat
+      (the hand-off Leet-39 consumes).
+
+**Exit:** duels scale with depth and a quick mini-duel variant exists alongside the full board.
+
+## Leet-39: Robo-pet v1 — duel avatar + run-scoped class absorption — ☐ todo
+
+**Context:** `DuelResult.absorbedClass` exists but is **unwired**; `RunContext` carries no pet state at all,
+and `SaveFile.meta.petEvolution` is only the between-runs meta stub. GDD §4 (the robo-pet): the pet is the
+duel avatar; beating a stronger droid offers its class for absorption (Paradroid 001→999), **run-scoped and
+lost at run end**; higher class = stronger duel position + better dungeon-companion perks; the pet drags the
+kid out when downed in a dungeon.
+
+**Decide first (GDD §4, before coding):**
+- On a takeover win, **auto-absorb** the beaten droid's class, or **offer** the swap (keep current vs take theirs)?
+- Does pet class feed the **duel start position**, the **dungeon perks**, or both in v1?
+
+**Scope**
+- [ ] Run-scoped **pet class** in run state (`GameState` / `RunStateStore` + `RunContext`), seeded at run
+      start and reset each run (the run-scoped sibling of `SaveFile.meta.petEvolution`).
+- [ ] The duel reports the beaten droid's class (`absorbedClass`); a win raises/offers the pet class via the
+      conductor's result consumption (builds on Leet-37's `#onModeResult`).
+- [ ] Feed pet class into the next duel's `DuelLaunch` (a `Balance` hook for the pet's starting strength).
+- [ ] Surface pet class on the HUD.
+- [ ] Dungeon-rescue **hook (stub)**: the seam for "pet drags you out when downed" — real behaviour is the
+      Phase 3 dungeon loop.
+- [ ] *(Deferred)* sibling temperament (§2/§4) rides with the hangar sibling choice in Phase 4 — note only.
+
+**Exit:** winning a duel grows the pet's class within a run, and it shows on the HUD.
 
 ---
 
