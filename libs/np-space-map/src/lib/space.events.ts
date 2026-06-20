@@ -25,7 +25,12 @@ export enum SPACE_EVENTS {
     SECTOR_EXIT = 'npSectorExit',
     /** Reached the guardian gate node — the *rewarding* exit (Leet-34); the conductor hands off to the guardian fight. Payload: `{ jumps }`. */
     GUARDIAN_REACHED = 'npGuardianReached',
+    /** An event/encounter outcome spawns a transient mode (Leet-37): the conductor opens the duel/dungeon. Payload: {@link SpawnGamePayload}. */
+    SPAWN_GAME = 'npSpawnGame',
 }
+
+/** The `spawnGame` event effect, carried verbatim on {@link SPACE_EVENTS.SPAWN_GAME} for the conductor (Leet-37). */
+export type SpawnGamePayload = Extract<Effect, { kind: 'spawnGame' }>;
 
 export interface FrontAdvancedPayload {
     closedFraction: number;

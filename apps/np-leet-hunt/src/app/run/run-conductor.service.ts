@@ -2,18 +2,23 @@ import { effect, inject, Injectable } from '@angular/core';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
-import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene } from '@shared/np-space-map';
+import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene, SpawnGamePayload } from '@shared/np-space-map';
 import {
     Balance,
     CREW_DISPLAY_NAMES,
     describeEnding,
     EndingKind,
     GameStateService,
+    isModeSuccess,
+    ModeLaunch,
     ModeResult,
     RunPhase,
     Sector,
     SECTOR_COUNT,
 } from '@shared/np-state';
+
+/** Placeholder consequence of losing a duel — non-lethal (Phase 2 decision); tuned by the curve in Leet-38. */
+const DUEL_LOSS_PENALTY = { hull: -2 };
 
 /**
  * The app-side wrapper that turns run-phase changes into scene swaps (Leet-28). The run FSM is the
@@ -40,6 +45,10 @@ export class RunConductorService {
     // can render the matching text ending (Leet-33). Defaults to 'wiped' as a safe fallback.
     #endingKind: EndingKind = 'wiped';
 
+    // The launch a map encounter requested via SPAWN_GAME (Leet-37), read by #showDuel/#showDungeon when the
+    // FSM enters that mode. Cleared when the mode reports back.
+    #pendingLaunch?: ModeLaunch;
+
     /**
      * Begin reacting to the run FSM. The effects are created in the constructor (the only valid place —
      * `effect` cannot be called from within another effect, so this can't be deferred behind a caller's
@@ -57,6 +66,7 @@ export class RunConductorService {
             this.#stage.phaser.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => this.#onSectorExit());
             this.#stage.phaser.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => this.#onSnapback());
             this.#stage.phaser.game.events.on(SPACE_EVENTS.GUARDIAN_REACHED, () => this.#onGuardianReached());
+            this.#stage.phaser.game.events.on(SPACE_EVENTS.SPAWN_GAME, (s: SpawnGamePayload) => this.#onSpawnGame(s));
         });
         // React to every *settled* phase (incl. the initial 'hangar'), but only once Phaser is up. A
         // synchronous double-step like `to('sectorExit')→to('sector')` coalesces to 'sector' directly —
@@ -97,12 +107,23 @@ export class RunConductorService {
         }
     }
 
-    /** Build a duel for the current balance and wire its typed result back to the run (Leet-29). */
+    /**
+     * A map encounter requested a mode (Leet-37): record the launch and drive the FSM into it. The
+     * `spawnGame` effect carries an optional {@link ModeLaunch}; #showDuel/#showDungeon read it on entry.
+     */
+    #onSpawnGame(spawn: SpawnGamePayload): void {
+        this.#pendingLaunch = spawn.launch;
+        const phase: RunPhase = spawn.game === 'dungeon' ? 'dungeon' : 'duel';
+        if (this.#game.fsm.can(phase)) this.#game.fsm.to(phase);
+    }
+
+    /** Build a duel and wire its typed result back to the run (Leet-29/37). */
     #showDuel(): void {
-        // Resolve the duel difficulty from the central balance and inject it (board fx rates + tile
-        // palette + AI tuning). Fixed levels for now — easily scaled by sector later.
-        const boardLevel = 'brutal';
-        const aiLevel = 'normal';
+        // Use the difficulty the encounter asked for (Leet-37); default to normal when launched without one
+        // (e.g. the debug toolbar). The sector-scaled difficulty curve is Leet-38.
+        const launch = this.#pendingLaunch?.kind === 'duel' ? this.#pendingLaunch : undefined;
+        const boardLevel = launch?.boardLevel ?? 'normal';
+        const aiLevel = launch?.aiLevel ?? 'normal';
         const factoryOptions = paradroidFactoryOptions(
             Balance.duelBoardParams(boardLevel),
             CParadroidTileSets[boardLevel]
@@ -122,12 +143,16 @@ export class RunConductorService {
     }
 
     /**
-     * A mode reported its outcome (Leet-29): log it, then return to the map. Reward wiring — pet
-     * absorption on a duel win, loot on a dungeon clear — lands in Phases 2–3. Guarded so a late report
+     * A mode reported its outcome (Leet-29/37): consume it, then return to the map. A **lost duel is
+     * non-lethal** (Phase 2 decision) — it costs resources but never ends the run; a lethal failure belongs
+     * to the dungeon/boarding mode (Phase 3). Pet absorption on a win is Leet-39. Guarded so a late report
      * (after the player already left the mode another way) can't fire an illegal transition.
      */
     #onModeResult(result: ModeResult): void {
-        console.log('[run] mode result', result);
+        if (result.kind === 'duel' && !isModeSuccess(result)) {
+            this.#game.run.adjustResources(DUEL_LOSS_PENALTY);
+        }
+        this.#pendingLaunch = undefined;
         if (this.#game.fsm.can('sector')) this.#game.fsm.to('sector');
     }
 

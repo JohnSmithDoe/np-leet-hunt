@@ -22,30 +22,36 @@ playable `ParadroidScene` with an intro that reports a typed `DuelResult` via `o
 sector-tunable droid AI (`paradroid.ai.ts`, `Balance.duelBoardParams`/`duelAiParams`). What's missing is
 everything that makes a duel *part of a run*: nothing in a real run opens one, no result is consumed, and
 there is no robo-pet. The three issues below close that.
-Recommended order: **Leet-37 → 39 → 38** (37 + 39 are the exit criterion — duels fire from the map and a
-win grows the pet; 38 is the teeth: a difficulty curve and the mini-duel variant).
+Recommended order: **~~Leet-37~~ → 39 → 38** (37 + 39 are the exit criterion — duels fire from the map and a
+win grows the pet; 38 is the teeth: a difficulty curve and the mini-duel variant). **39 is next.**
 
-## Leet-37: Duel-as-takeover — fire duels from the map — ☐ todo
+## Leet-37: Duel-as-takeover — fire duels from the map — ✅ done
 
-**Context:** the `spawnGame` event effect is still **deferred** — `NPSpaceMap.#applyEffects` just
-`console.log`s it (`// TODO(event-system.md §8)`), so no event can open a duel. Duels only start from the
-FSM `duel` phase via the home-page debug toolbar, and `RunConductorService.#showDuel` **hardcodes** the
-difficulty (`boardLevel='brutal'`, `aiLevel='normal'`). `#onModeResult` just logs the `DuelResult` and
-routes back to `sector` ("reward wiring … lands in Phases 2–3"). The contract + scene + AI are ready; the
-run-side wiring is the gap.
+**Context:** the `spawnGame` event effect was **deferred** (`#applyEffects` just `console.log`'d it), so no
+event could open a duel; duels only started from the FSM `duel` phase via the debug toolbar, `#showDuel`
+hardcoded the difficulty, and `#onModeResult` just logged the result. The contract + scene + AI were ready;
+the run-side wiring was the gap.
 
-**Decide first (GDD §3, before coding):**
-- Which encounters open duels — en-route intercepts (the Leet-35 pool), specific planet events, or both?
-- Does **losing** a duel end the run (a lethal takeover), or just fail the encounter / cost resources?
+**Decided:**
+- **Both** open duels — en-route intercepts (the Leet-35 pool) *and* planet events.
+- **A duel loss is non-lethal** — it fails the encounter and costs resources, but never ends the run. Only a
+  failed dungeon/boarding (the ship-map mode, Phase 3) can end the run; a Paradroid loss cannot.
 
-**Scope**
-- [ ] Wire the `spawnGame` effect: `{ game: 'duel', launch }` → conductor opens a duel with the carried
-      `DuelLaunch` (fall back to a Balance-resolved default when an event omits one).
-- [ ] Give the map a real source: flag en-route intercept and/or planet events with a duel `spawnGame`
-      (replacing the deferred log path), so a real run reaches a duel.
-- [ ] `#onModeResult` **consumes** the `DuelResult` (`isModeSuccess`): apply the encounter outcome (and a
-      lethal-loss ending if that's the decision) instead of just logging, then return to the map.
-- [ ] Resolve duel difficulty from `Balance` per sector/encounter — retire the hardcoded brutal/normal.
+**Outcome**
+- [x] `#applyEffects` now **returns** the `spawnGame` effect (instead of logging it) and a new
+      `SPACE_EVENTS.SPAWN_GAME` carries it (`SpawnGamePayload`); the conductor's `#onSpawnGame` records the
+      launch and drives the FSM into `duel`/`dungeon`. `#showDuel` reads the carried `DuelLaunch` (default
+      `normal/normal` for the debug toolbar), retiring the hardcoded `brutal`.
+- [x] Two real sources: a core-pool **`stray-droid`** planet event (jack in → duel, win absorbs its class in
+      Leet-39) and the en-route **escort-fighter** "dare it" branch (it engages → duel) — both `spawnGame`.
+- [x] `#onModeResult` **consumes** the `DuelResult` via `isModeSuccess`: a **non-lethal** loss applies a
+      placeholder hull penalty (tuned by the Leet-38 curve), a win returns clean (pet reward is Leet-39).
+- [x] *Closed the en-route ⇄ duel seam:* an intercept that turns into a duel sleeps the space scenes, so the
+      jump can't fly its second leg mid-duel. It now holds the destination (`#resumeAfterMode`) and finishes
+      the jump on `#onSceneWake` (snap + normal arrival) when the map wakes back from the duel.
+- [x] build + lint + unit tests green (np-space-map 24 incl. a new "an encounter opens a duel" spec,
+      np-state 42, app smoke 1). *UI not exercised* — the duel staging + the en-route-duel return are for the
+      user to eyeball.
 
 **Exit:** a map event/encounter opens a duel and the run continues with its result.
 
@@ -73,9 +79,10 @@ duel avatar; beating a stronger droid offers its class for absorption (Paradroid
 lost at run end**; higher class = stronger duel position + better dungeon-companion perks; the pet drags the
 kid out when downed in a dungeon.
 
-**Decide first (GDD §4, before coding):**
-- On a takeover win, **auto-absorb** the beaten droid's class, or **offer** the swap (keep current vs take theirs)?
-- Does pet class feed the **duel start position**, the **dungeon perks**, or both in v1?
+**Decided:**
+- On a takeover win, **offer the swap** (Paradroid-style: keep your current class or take the beaten droid's) —
+  not auto-absorb.
+- Pet class feeds **both** the duel start position *and* the dungeon-companion perks in v1.
 
 **Scope**
 - [ ] Run-scoped **pet class** in run state (`GameState` / `RunStateStore` + `RunContext`), seeded at run

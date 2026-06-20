@@ -10,6 +10,7 @@ import { homeReachEvents } from './content/sectors/home-reach.events';
 import { longQuietEvents } from './content/sectors/long-quiet.events';
 import { veiledNebulaEvents } from './content/sectors/veiled-nebula.events';
 import { spaceWhale } from './content/space-whale.event';
+import { strayDroid } from './content/stray-droid.event';
 import { zeeboGuide } from './content/zeebo-guide.event';
 import { PlanetEvent } from './event.model';
 
@@ -19,7 +20,7 @@ import { PlanetEvent } from './event.model';
  */
 
 /** Core pool — no sector tag, eligible in every sector (the everyday-distortion pieces). */
-export const CORE_EVENTS: PlanetEvent[] = [spaceWhale, zeeboGuide, distortionCache];
+export const CORE_EVENTS: PlanetEvent[] = [spaceWhale, zeeboGuide, distortionCache, strayDroid];
 
 /** Per-sector pools, keyed by {@link SectorId} (the balance model's sector ids). */
 export const SECTOR_EVENT_POOLS: Record<SectorId, PlanetEvent[]> = {

@@ -5,9 +5,10 @@ import { PlanetEvent } from '../event.model';
  * arrival, resolved through the same choice dialog as a planet event. These are pool-agnostic (no
  * `sector` tag) — `resolveEnRouteEvent` draws from them on an intercept roll, whatever the sector.
  *
- * Authoring note: outcomes here stay to resources / items / flags — no `front` effects (the front already
- * advances exactly once per jump at commit; an intercept must not move it) and no `spawnGame` (ship fights
- * + boarding are Phase 2/3). One level deep, three tones good | neutral | bad (event-system.md §4).
+ * Authoring note: outcomes here avoid `front` effects (the front already advances exactly once per jump at
+ * commit; an intercept must not move it). A branch *may* `spawnGame` a duel (Leet-37) — the jump then
+ * finishes once the duel returns (np-space-map `#onSceneWake`). One level deep, three tones good | neutral |
+ * bad (event-system.md §4).
  */
 
 /** A thief drone reaching for your marble stash to feed it to the grey (GDD §3 Grey Fleet behaviour). */
@@ -89,8 +90,17 @@ export const greyEscortFighter: PlanetEvent = {
                 choice: 'Hold course and dare it',
                 tone: 'bad',
                 outcome: {
-                    resultText: 'It strafes you on the way past — a cold raking burst — then peels off, bored.',
-                    effects: [{ kind: 'resource', hull: -2 }],
+                    resultText:
+                        'It wheels around and opens up — no bluff or detour left. The pet jacks into its ' +
+                        'circuits and the takeover duel is on.',
+                    effects: [
+                        {
+                            kind: 'spawnGame',
+                            game: 'duel',
+                            reason: 'grey-escort-fighter',
+                            launch: { kind: 'duel', boardLevel: 'hard', aiLevel: 'hard' },
+                        },
+                    ],
                 },
             },
         ],

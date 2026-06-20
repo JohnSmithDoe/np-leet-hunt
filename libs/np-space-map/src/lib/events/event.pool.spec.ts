@@ -89,4 +89,15 @@ describe('planet event pools', () => {
             });
         expect(PLANET_EVENT_POOL.some(event => grantsBattery(event.root))).toBe(true);
     });
+
+    it('has at least one encounter that opens a duel (Leet-37 duel-as-takeover)', () => {
+        const spawnsDuel = (question: Question): boolean =>
+            question.answers.some(answer => {
+                if (answer.followUp) return spawnsDuel(answer.followUp);
+                return !!answer.outcome?.effects.some(
+                    effect => effect.kind === 'spawnGame' && effect.game === 'duel'
+                );
+            });
+        expect(PLANET_EVENT_POOL.some(event => spawnsDuel(event.root))).toBe(true);
+    });
 });

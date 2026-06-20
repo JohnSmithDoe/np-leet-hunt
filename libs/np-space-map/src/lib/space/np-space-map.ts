@@ -9,7 +9,7 @@ import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
 import { NormalityFront } from '../reality/normality-front';
 import { Reality } from '../reality/reality';
-import { EventChoiceCommittedPayload, EventResolvedPayload, SPACE_EVENTS } from '../space.events';
+import { EventChoiceCommittedPayload, EventResolvedPayload, SPACE_EVENTS, SpawnGamePayload } from '../space.events';
 import { Starmap, StarmapFactory } from './starmap.factory';
 import { TravelButtons } from './travel-buttons';
 
@@ -83,6 +83,9 @@ export class NPSpaceMap extends NPGameObjectList {
     // the intercept event resolves, and the Grey Fleet ship flying in. Cleared once the jump resumes.
     #interceptTarget?: Planet;
     #enemy?: NPMovableSprite;
+    // A jump whose intercept turned into a duel/dungeon (Leet-37): the ship is off in that mode, so the jump
+    // is finished (snap + arrive) when the space scene wakes back up, not by flying a second leg.
+    #resumeAfterMode?: Planet;
     #built = false; // whether a sector's objects are currently built (guards teardown before first build)
 
     #dragging = false;
@@ -124,6 +127,8 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#travelButtons.onTap = planet => this.#onTravelButtonTap(planet);
         this.scene.game.events.on(SPACE_EVENTS.EVENT_CHOICE_COMMITTED, this.#onChoiceCommitted);
         this.scene.game.events.on(SPACE_EVENTS.EVENT_RESOLVED, this.#onEventResolved);
+        // Finish an intercept-turned-mode jump when the scene wakes back from the duel/dungeon (Leet-37).
+        this.scene.events.on(Phaser.Scenes.Events.WAKE, this.#onSceneWake);
         this.loadSector(this.#sector);
     }
 
@@ -166,8 +171,10 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#jumps = 0;
         this.#dragging = false;
         this.#lastDrag = undefined;
-        // Drop any intercept that was mid-resolution and the Grey Fleet ship with it (Leet-35).
+        // Drop any intercept that was mid-resolution and the Grey Fleet ship with it (Leet-35), and any
+        // jump that was waiting on a mode to return (Leet-37).
         this.#interceptTarget = undefined;
+        this.#resumeAfterMode = undefined;
         this.#despawnEnemy();
         // Release any camera follow before the scene re-centres on the new sector's start node.
         if (this.#following) {
@@ -445,27 +452,57 @@ export class NPSpaceMap extends NPGameObjectList {
         // then fly the jump's second leg to the real destination. The front already advanced at commit, so
         // resuming must not touch it. The destination's own arrival event fires normally on landing.
         if (this.#interceptTarget) {
-            this.#applyEffects(payload.effects);
+            const spawn = this.#applyEffects(payload.effects);
             const target = this.#interceptTarget;
             this.#interceptTarget = undefined;
             this.#inEvent = false;
             this.#despawnEnemy();
+            if (spawn) {
+                // The intercept turned into a fight (Leet-37): hand off to the duel/dungeon and finish the
+                // jump only once it returns (#onSceneWake) — don't fly leg 2 now, the scene is about to sleep.
+                this.#resumeAfterMode = target;
+                this.#emitSpawnGame(spawn);
+                return;
+            }
             this.#rocket!.onceMoved(() => this.#onArrived(target));
             this.#rocket!.moveToTarget({ x: target.x, y: target.y });
             return;
         }
         this.#inEvent = false; // clear first so the effect/refresh path below can restore the buttons
-        this.#applyEffects(payload.effects);
+        const spawn = this.#applyEffects(payload.effects);
         this.#updateTravelButtons();
+        // A planet-arrival event can open a duel/dungeon (Leet-37). The ship is already parked on the node,
+        // so no resume is needed — the conductor sleeps the map, runs the mode, and wakes it back here.
+        if (spawn) this.#emitSpawnGame(spawn);
+    };
+
+    /** Hand a `spawnGame` outcome to the conductor (Leet-37); only it can drive the FSM into a mode. */
+    #emitSpawnGame(spawn: SpawnGamePayload) {
+        this.scene.game.events.emit(SPACE_EVENTS.SPAWN_GAME, spawn);
+    }
+
+    /**
+     * The space scene woke after an excursion (Leet-37). If a jump was interrupted by an intercept that
+     * turned into a mode, finish it now: the ship has been off-stage in the duel/dungeon, so snap it to the
+     * held destination and run the normal arrival (which may fire that planet's own event). No-op otherwise.
+     */
+    #onSceneWake = () => {
+        const target = this.#resumeAfterMode;
+        if (!target) return;
+        this.#resumeAfterMode = undefined;
+        this.#rocket?.setPosition(target.x, target.y);
+        this.#onArrived(target);
     };
 
     /**
-     * Apply an outcome's effects (event-system.md §8). Resources and the normality front are wired for
-     * real; flags/items land in the run-state stub; openRoute/spawnGame are logged hand-offs until the
-     * hidden-route infra and the mode contract (Leet-29) exist.
+     * Apply an outcome's effects (event-system.md §8). Resources, items, flags, and the normality front are
+     * wired for real; `openRoute` is still a logged hand-off (hidden-route infra). A `spawnGame` effect is
+     * *returned* rather than applied here — it opens a transient mode, which only the conductor can drive
+     * (Leet-37), so the caller emits SPAWN_GAME at the right moment. Returns the spawn effect, or undefined.
      */
-    #applyEffects(effects: Effect[]) {
+    #applyEffects(effects: Effect[]): SpawnGamePayload | undefined {
         let frontSteps = 0;
+        let spawn: SpawnGamePayload | undefined;
         for (const effect of effects) {
             switch (effect.kind) {
                 case 'resource':
@@ -487,13 +524,16 @@ export class NPSpaceMap extends NPGameObjectList {
                     }
                     if (effect.take) this.#state.takeItem(effect.take);
                     break;
-                case 'openRoute':
                 case 'spawnGame':
-                    console.log('[event] effect deferred:', effect); // TODO(event-system.md §8)
+                    spawn = effect; // returned to the caller; the conductor opens the mode (Leet-37)
+                    break;
+                case 'openRoute':
+                    console.log('[event] effect deferred:', effect); // TODO(event-system.md §8 hidden routes)
                     break;
             }
         }
         if (frontSteps !== 0) this.#applyFrontShift(frontSteps);
+        return spawn;
     }
 
     // An event can shove the front forward (a bad outcome) or push it back (a distortion battery, §4).
