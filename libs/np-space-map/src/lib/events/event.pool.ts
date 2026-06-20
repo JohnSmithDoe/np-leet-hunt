@@ -1,6 +1,7 @@
 import { NPRng } from '@shared/np-library';
 import { SectorId } from '@shared/np-state';
 
+import { distortionCache } from './content/distortion-battery.event';
 import { enRouteEvents } from './content/en-route.events';
 import { grassAlienEncounter } from './content/grass-alien-encounter.event';
 import { emberBeltEvents } from './content/sectors/ember-belt.events';
@@ -18,7 +19,7 @@ import { PlanetEvent } from './event.model';
  */
 
 /** Core pool — no sector tag, eligible in every sector (the everyday-distortion pieces). */
-export const CORE_EVENTS: PlanetEvent[] = [spaceWhale, zeeboGuide];
+export const CORE_EVENTS: PlanetEvent[] = [spaceWhale, zeeboGuide, distortionCache];
 
 /** Per-sector pools, keyed by {@link SectorId} (the balance model's sector ids). */
 export const SECTOR_EVENT_POOLS: Record<SectorId, PlanetEvent[]> = {

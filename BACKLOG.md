@@ -2,22 +2,22 @@
 
 Issues for [game-design.md §7](game-design.md). Numbering continues the `Leet-<n>` commit convention.
 
-**Active phase: Phase 1 — The Map Run.** Phase 0 (The Spine) is complete (Leet-26…31 below, plus
-Leet-32 "no rxjs"). Much of Phase 1 also landed ahead of this tracker: the route graph with real
-adjacency (`np-space-map.ts`), fire-and-forget two-tap travel + jump preview + camera-follow, the
-normality front (per-jump advance, color-drain veil, node swallowing — `normality-front.ts` / `reality.ts`),
-the event system v1 (HTML dialog, three answers, resource outcomes; five sector pools + a core pool),
-and the map HUD (`space-ui.scene.ts`). The four issues below are what's left to make a map-only run
-*genuinely* playable and to settle the canonical exit model.
+**Phase 1 (The Map Run) is complete** (Leet-33…36 below), on top of Phase 0 — The Spine (Leet-26…31, plus
+Leet-32 "no rxjs"). Much of Phase 1 had landed ahead of this tracker: the route graph with real adjacency
+(`np-space-map.ts`), fire-and-forget two-tap travel + jump preview + camera-follow, the normality front
+(per-jump advance, color-drain veil, node swallowing — `normality-front.ts` / `reality.ts`), the event
+system v1 (HTML dialog, three answers, resource outcomes; five sector pools + a core pool), and the map HUD
+(`space-ui.scene.ts`). The four issues below closed it out: run-end + text endings, the two-exit core loop,
+en-route intercepts, and the distortion-battery pushback. **Next: Phase 2** (see game-design.md §7).
 
 ---
 
-# Phase 1 — The Map Run *(active)*
+# Phase 1 — The Map Run ✅ complete
 
-Goal (GDD §7): *a map-only run is genuinely playable — reach the exit before the front; text endings.*
-Recommended order: **~~Leet-33~~ → ~~34~~ → ~~35~~ → 36** (33 ✅ closed the literal exit criterion; 34 ✅ settled
-the two-exit core loop — the central design payoff; 35 ✅ added en-route intercepts; **36 is next** — the last
-of the teeth, the distortion-battery pushback).
+Goal (GDD §7): *a map-only run is genuinely playable — reach the exit before the front; text endings.* — met.
+Order delivered: **~~Leet-33~~ → ~~34~~ → ~~35~~ → ~~36~~** (33 closed the literal exit criterion; 34 settled
+the two-exit core loop — the central design payoff; 35 added en-route intercepts; 36 added the distortion-
+battery pushback — the last of the teeth).
 
 ## Leet-33: Run-end & text endings — ✅ done
 
@@ -105,16 +105,26 @@ boarding stay Phase 2/3.
 
 **Exit:** some jumps get intercepted and resolve through a choice event before arrival.
 
-## Leet-36: Distortion-battery pushback — ☐ todo
+## Leet-36: Distortion-battery pushback — ✅ done
 
-**Context:** `NPSpaceMap.pushFront()` and the `front` effect with negative `advance` both work, but nothing
-feeds them (`// TODO(Leet-29): wire to event/loot rewards`). The pushback mechanic exists; it just has no source.
+**Context:** `NPSpaceMap.pushFront()` and the `front` effect with negative `advance` existed but nothing fed
+them (`// TODO(Leet-29): wire to event/loot rewards`) — and the negative `front` path was subtly broken.
 
-**Scope**
-- [ ] A **distortion battery** reward — an event outcome / loot item that pushes the front back one node
-      (`pushFront`). The canonical source is the Sabotage dungeon drop (Phase 3); for Phase 1 it comes from an
-      event/loot reward.
-- [ ] Surface it on the HUD — the front bar visibly retreats (`Reality.sweepTo` already animates the veil).
+**Outcome**
+- [x] A **distortion battery** is a loot item (`DISTORTION_BATTERY`, shared const) granted by an event
+      outcome. The map consumes it on grant — it isn't carried — and calls `pushFront()` to ease the grey
+      back one node (`#applyEffects`). This wires the public `pushFront()` (the stale TODO is gone); the
+      Sabotage dungeon drop becomes the same code path in Phase 3.
+- [x] New core-pool reward event `distortion-cache` (a derelict cradling a live charge): the good branch
+      feeds it to the grey (grants the battery → pushback); neutral strips it for marbles; bad overloads.
+- [x] *Fixed a latent bug:* the negative `front` effect pushed back by a raw position **unit**, not a node
+      (`pushFront(-steps)` passed a count as the amount). It now loops `pushFront()` one node at a time,
+      symmetric with the forward shove — so `front: { advance: -1 }` eases the grey by exactly one jump.
+- [x] Surfaced on the HUD: the front bar already retreats via `FRONT_ADVANCED`; added a new `FRONT_PUSHED`
+      bus event + a green "DISTORTION BATTERY — THE GREY PULLS BACK" banner (matching the snapback /
+      sector-exit banners) so the rare reprieve reads as a clear positive beat. `Reality.sweepTo` eases the veil.
+- [x] build + lint + unit tests green (np-space-map 23 incl. a new test asserting a battery source exists,
+      app smoke 1). *UI not exercised here* — user verifies the bar retreat visually.
 
 **Exit:** the player can buy back a little room against the front.
 

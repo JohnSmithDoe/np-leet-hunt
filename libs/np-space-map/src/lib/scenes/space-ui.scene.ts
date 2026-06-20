@@ -80,6 +80,10 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         this.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => {
             this.#banner.setColor('#8affc8').setText('JUMPED OUT — SECTOR LEFT');
         });
+        this.game.events.on(SPACE_EVENTS.FRONT_PUSHED, () => {
+            // The bar already retreats via FRONT_ADVANCED; this calls out the rare reprieve (Leet-36).
+            this.#banner.setColor('#8affc8').setText('DISTORTION BATTERY — THE GREY PULLS BACK');
+        });
     }
 
     /**

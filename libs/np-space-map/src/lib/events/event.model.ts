@@ -10,6 +10,13 @@ import type { CrewMember, ModeLaunch, SectorId } from '@shared/np-state';
 /** Internal balance tag, never rendered (spec §4). Order of a question's answers is always good|neutral|bad. */
 export type Tone = 'good' | 'neutral' | 'bad';
 
+/**
+ * Item id for the distortion battery (GDD §4 / Leet-36): a rare loot/event reward that, fed to the grey,
+ * pushes the normality front back one node. The map consumes it on grant (it isn't carried) — granting it
+ * via an `item` effect is the canonical pushback source until the Sabotage dungeon drop lands (Phase 3).
+ */
+export const DISTORTION_BATTERY = 'distortion-battery';
+
 /** A planet event: a scene-setting intro wrapping a question tree. The unit of authoring and pooling. */
 export interface PlanetEvent {
     /** Stable, kebab-case, unique. Also the migration key (spec §10). */

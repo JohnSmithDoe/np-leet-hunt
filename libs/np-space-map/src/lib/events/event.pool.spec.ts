@@ -1,4 +1,4 @@
-import { Question } from './event.model';
+import { DISTORTION_BATTERY, Question } from './event.model';
 import {
     CORE_EVENTS,
     EN_ROUTE_EVENTS,
@@ -77,5 +77,16 @@ describe('planet event pools', () => {
                 if (event.sector) expect(event.sector).toBe(sector);
             }
         }
+    });
+
+    it('has a source for the distortion battery — the Phase-1 front pushback (Leet-36)', () => {
+        const grantsBattery = (question: Question): boolean =>
+            question.answers.some(answer => {
+                if (answer.followUp) return grantsBattery(answer.followUp);
+                return !!answer.outcome?.effects.some(
+                    effect => effect.kind === 'item' && effect.grant === DISTORTION_BATTERY
+                );
+            });
+        expect(PLANET_EVENT_POOL.some(event => grantsBattery(event.root))).toBe(true);
     });
 });

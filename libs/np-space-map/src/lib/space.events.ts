@@ -15,6 +15,8 @@ export enum SPACE_EVENTS {
     EVENT_RESOLVED = 'npEventResolved',
     /** The normality front advanced after a jump. Payload: `{ closedFraction, position, jumps }`. */
     FRONT_ADVANCED = 'npFrontAdvanced',
+    /** The front was pushed back — a distortion battery fed to the grey (Leet-36). No payload; the bar follows FRONT_ADVANCED. */
+    FRONT_PUSHED = 'npFrontPushed',
     /** A node fell behind the front and was normalised. Payload: `{ planet: string }`. */
     PLANET_SWALLOWED = 'npPlanetSwallowed',
     /** The front caught the ship — reality snapped back; the conductor ends the run (snapback). Payload: `{ jumps }`. */

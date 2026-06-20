@@ -3,7 +3,7 @@ import { degToRad, getClosest, NPDashedLine, NPGameObjectList, NPMovableSprite, 
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { Effect } from '../events/event.model';
+import { DISTORTION_BATTERY, Effect } from '../events/event.model';
 import { resolveEnRouteEvent, resolvePlanetEvent } from '../events/event.pool';
 import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
@@ -243,11 +243,16 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#rocket = rocket;
     }
 
-    /** Distortion-battery pushback (§4): push the front back out. TODO(Leet-29): wire to event/loot rewards. */
+    /**
+     * Distortion-battery pushback (GDD §4 / Leet-36): push the front back out — one node by default. Fed by
+     * a distortion-battery loot grant (see #applyEffects); the Sabotage dungeon becomes the canonical source
+     * in Phase 3. Emits FRONT_PUSHED so the HUD can mark the reprieve (the bar itself follows FRONT_ADVANCED).
+     */
     public pushFront(amount?: number) {
         this.#reality.sweepTo(this.#front.pushFront(amount), 600);
         this.#refreshStates();
         this.#emitFront();
+        this.scene.game.events.emit(SPACE_EVENTS.FRONT_PUSHED);
     }
 
     // Drag-to-pan the map when idle, with a movement threshold so a small wobble still reads as a tap.
@@ -473,7 +478,13 @@ export class NPSpaceMap extends NPGameObjectList {
                     this.#state.setFlag(effect.set);
                     break;
                 case 'item':
-                    if (effect.grant) this.#state.grantItem(effect.grant);
+                    if (effect.grant === DISTORTION_BATTERY) {
+                        // A distortion battery isn't carried — it's fed to the grey at once, buying back one
+                        // node of room (GDD §4 / Leet-36). This is the canonical pushback source for Phase 1.
+                        this.pushFront();
+                    } else if (effect.grant) {
+                        this.#state.grantItem(effect.grant);
+                    }
                     if (effect.take) this.#state.takeItem(effect.take);
                     break;
                 case 'openRoute':
@@ -496,11 +507,16 @@ export class NPSpaceMap extends NPGameObjectList {
                 .filter(planet => planet.alive && !planet.guardian)
                 .forEach(planet => this.#swallow(planet, 600));
         } else {
-            this.#reality.sweepTo(this.#front.pushFront(-steps), 600);
+            // Push back |steps| nodes, mirroring the forward branch — pushFront()'s default is one node, so
+            // a `front` effect of advance:-1 eases the grey by exactly one jump's worth (not one raw unit).
+            let position = this.#front.position;
+            for (let i = 0; i < -steps; i++) position = this.#front.pushFront();
+            this.#reality.sweepTo(position, 600);
         }
         this.#refreshStates();
         this.#emitFront();
-        // A forward shove can overrun the ship's node — same snapback as arriving behind the front.
+        // A forward shove can overrun the ship's node — same snapback as arriving behind the front. (A
+        // pushback only eases the grey, so it can never trigger one.)
         if (!this.#front.contains(this.#current)) this.#onSnapback();
     }
 
