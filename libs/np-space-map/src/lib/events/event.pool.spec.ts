@@ -1,5 +1,12 @@
 import { Question } from './event.model';
-import { CORE_EVENTS, PLANET_EVENT_POOL, resolvePlanetEvent, SECTOR_EVENT_POOLS } from './event.pool';
+import {
+    CORE_EVENTS,
+    EN_ROUTE_EVENTS,
+    PLANET_EVENT_POOL,
+    resolveEnRouteEvent,
+    resolvePlanetEvent,
+    SECTOR_EVENT_POOLS,
+} from './event.pool';
 
 /**
  * Walk a question tree, asserting the model invariants (event-system.md §4): every question has exactly
@@ -33,6 +40,16 @@ describe('resolvePlanetEvent', () => {
 
     it('is reproducible for a given sector + planet seed', () => {
         expect(resolvePlanetEvent('ember-belt', 'Xandris IV')).toBe(resolvePlanetEvent('ember-belt', 'Xandris IV'));
+    });
+});
+
+describe('resolveEnRouteEvent', () => {
+    it('returns an event from the en-route pool', () => {
+        expect(EN_ROUTE_EVENTS).toContain(resolveEnRouteEvent('home-reach', '1'));
+    });
+
+    it('is reproducible for a given sector + jump seed', () => {
+        expect(resolveEnRouteEvent('long-quiet', '3')).toBe(resolveEnRouteEvent('long-quiet', '3'));
     });
 });
 

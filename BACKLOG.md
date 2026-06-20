@@ -15,8 +15,9 @@ and the map HUD (`space-ui.scene.ts`). The four issues below are what's left to 
 # Phase 1 — The Map Run *(active)*
 
 Goal (GDD §7): *a map-only run is genuinely playable — reach the exit before the front; text endings.*
-Recommended order: **~~Leet-33~~ → ~~34~~ → 35 → 36** (33 ✅ closed the literal exit criterion; 34 ✅ settled
-the two-exit core loop — the central design payoff; **35 is next**; 35/36 add teeth).
+Recommended order: **~~Leet-33~~ → ~~34~~ → ~~35~~ → 36** (33 ✅ closed the literal exit criterion; 34 ✅ settled
+the two-exit core loop — the central design payoff; 35 ✅ added en-route intercepts; **36 is next** — the last
+of the teeth, the distortion-battery pushback).
 
 ## Leet-33: Run-end & text endings — ✅ done
 
@@ -77,18 +78,30 @@ rewarding exit and hands off to the existing guardian placeholder scene.
 
 **Exit:** a sector has two real exits — bail (poor) and guardian (rescue + advance).
 
-## Leet-35: En-route intercepts — ☐ todo
+## Leet-35: En-route intercepts — ✅ done
 
-**Context:** a jump goes straight from `JUMP_COMMITTED` to arrival; GDD §3 wants jumps interceptable (an
-enemy ship flies toward yours → choice event / fight / boarding). Event content already carries en-route
-flavor; this wires the mechanic.
+**Context:** a jump went straight from `JUMP_COMMITTED` to arrival; GDD §3 wants jumps interceptable (an
+enemy ship flies toward yours → choice event / fight / boarding). This wires the mechanic; ship fights /
+boarding stay Phase 2/3.
 
-**Scope**
-- [ ] Intercept roll on jump commit, chance = a sector knob in np-state `Balance`.
-- [ ] Visual: an enemy ship flies toward the rocket mid-flight (np-phaser movable sprite).
-- [ ] Resolve through the existing event dialog (a choice-tree event from an en-route pool). Ship fights /
-      boarding (duel + dungeon launch) are deferred to Phase 2/3.
-- [ ] The front still advances exactly **once** for the jump — an intercept must not double-count it.
+**Outcome**
+- [x] Intercept roll on jump commit — chance is a new `interceptChance` sector knob in np-state `Balance`
+      (climbs 10→30% with depth, so ambushes stay rare early and common near the Hush). Seeded by
+      sector + jump count so a jump's roll is reproducible (`NPSpaceMap.#rollIntercept`).
+- [x] Visual: a Grey Fleet ship (the rocket texture, greyed + flipped — no new asset) sweeps in toward the
+      intercept point as a transient `NPMovableSprite` (`#spawnEnemy` / `#despawnEnemy`).
+- [x] Resolves through the **existing** event dialog: an intercepted jump flies in two legs — to a midpoint
+      where it raises a choice event from a new pool-agnostic **en-route pool** (`en-route.events.ts`,
+      `resolveEnRouteEvent`; three Grey Fleet events: thief drone / escort fighter / picket field, one with
+      a stake), then on to the real destination after the event resolves. The destination's own arrival
+      event still fires on landing.
+- [x] The front advances exactly **once** per jump (at commit, unchanged) — the intercept only interrupts
+      the flight, never re-advances it; en-route outcomes deliberately carry no `front` effects.
+- [x] build + lint + unit tests green (np-state 42, np-space-map 22 incl. new `resolveEnRouteEvent` +
+      `interceptChance` tests, app smoke 1). *UI not exercised here* — user verifies the intercept visually.
+
+**Two-leg flight reused the slept-scene insight from Leet-34:** the intercept never sleeps the space scenes
+(the dialog is an HTML overlay over the live map), so no scene-wake juggling was needed.
 
 **Exit:** some jumps get intercepted and resolve through a choice event before arrival.
 

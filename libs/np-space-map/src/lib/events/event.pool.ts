@@ -1,6 +1,7 @@
 import { NPRng } from '@shared/np-library';
 import { SectorId } from '@shared/np-state';
 
+import { enRouteEvents } from './content/en-route.events';
 import { grassAlienEncounter } from './content/grass-alien-encounter.event';
 import { emberBeltEvents } from './content/sectors/ember-belt.events';
 import { frozenDriftEvents } from './content/sectors/frozen-drift.events';
@@ -28,8 +29,18 @@ export const SECTOR_EVENT_POOLS: Record<SectorId, PlanetEvent[]> = {
     'long-quiet': longQuietEvents,
 };
 
+/**
+ * En-route intercept pool (Leet-35) — pool-agnostic events fired when a jump is intercepted, before
+ * arrival. Resolved through the same dialog as planet events; drawn by {@link resolveEnRouteEvent}.
+ */
+export const EN_ROUTE_EVENTS: PlanetEvent[] = enRouteEvents;
+
 /** Every authored event, flattened — for validation and any sector-agnostic consumer. */
-export const PLANET_EVENT_POOL: PlanetEvent[] = [...CORE_EVENTS, ...Object.values(SECTOR_EVENT_POOLS).flat()];
+export const PLANET_EVENT_POOL: PlanetEvent[] = [
+    ...CORE_EVENTS,
+    ...Object.values(SECTOR_EVENT_POOLS).flat(),
+    ...EN_ROUTE_EVENTS,
+];
 
 /**
  * Pick the event that fires when the ship lands on a planet in `sector`. Seeded by the planet (within
@@ -37,3 +48,11 @@ export const PLANET_EVENT_POOL: PlanetEvent[] = [...CORE_EVENTS, ...Object.value
  */
 export const resolvePlanetEvent = (sector: SectorId, seed: string): PlanetEvent =>
     new NPRng(`event-${sector}-${seed}`).item([...CORE_EVENTS, ...SECTOR_EVENT_POOLS[sector]]);
+
+/**
+ * Pick the en-route intercept event for a jump (Leet-35). Seeded by sector + a per-jump seed so the draw
+ * is reproducible for a given jump. Sector is passed for future per-sector intercept flavour; today the
+ * pool is shared across sectors.
+ */
+export const resolveEnRouteEvent = (sector: SectorId, seed: string): PlanetEvent =>
+    new NPRng(`enroute-${sector}-${seed}`).item(EN_ROUTE_EVENTS);

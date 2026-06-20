@@ -41,6 +41,18 @@ describe('Balance.sector', () => {
             expect(Balance.sector(n).linkDegree).toBeGreaterThanOrEqual(2);
         }
     });
+
+    it('raises the Grey Fleet intercept chance with depth, kept in 0..100', () => {
+        const curve = Array.from({ length: SECTOR_COUNT }, (_, i) => Balance.sector(i + 1).interceptChance);
+        for (const chance of curve) {
+            expect(chance).toBeGreaterThanOrEqual(0);
+            expect(chance).toBeLessThanOrEqual(100);
+        }
+        for (let i = 1; i < curve.length; i++) {
+            expect(curve[i]).toBeGreaterThanOrEqual(curve[i - 1]);
+        }
+        expect(curve[curve.length - 1]).toBeGreaterThan(curve[0]); // it genuinely climbs
+    });
 });
 
 describe('Balance.rescueForSector', () => {

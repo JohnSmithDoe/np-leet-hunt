@@ -16,17 +16,18 @@ import {
  * difficulty curve; duel and dungeon resolvers (`duelParams`, `dungeonParams`) join this class as those
  * modes gain difficulty inputs. Pure and deterministic, so it unit-tests directly (cf. run.fsm.spec.ts).
  *
- * The sector curve (1→5): bigger maps, fewer bail-exits, a faster grey front, and a sparser route graph
- * the deeper you go (GDD §4 difficulty knobs / §5 grey gradient). Brackets the old hard-coded values
- * (12 planets, ~10 jumps, 3 routes). `linkDegree` eases off from 4 (sector 1, generously connected) to
- * 3 — never below 2, which risks stranding the graph.
+ * The sector curve (1→5): bigger maps, fewer bail-exits, a faster grey front, a sparser route graph, and
+ * heavier Grey Fleet traffic the deeper you go (GDD §4 difficulty knobs / §5 grey gradient). Brackets the
+ * old hard-coded values (12 planets, ~10 jumps, 3 routes). `linkDegree` eases off from 4 (sector 1,
+ * generously connected) to 3 — never below 2, which risks stranding the graph. `interceptChance` climbs
+ * 10→30% so en-route ambushes (Leet-35) stay rare early and common near the Hush.
  */
 const SECTOR_CURVE: readonly SectorParams[] = [
-    { planetCount: 10, exits: 5, frontSteps: 12, linkDegree: 4 },
-    { planetCount: 12, exits: 4, frontSteps: 11, linkDegree: 3 },
-    { planetCount: 14, exits: 4, frontSteps: 10, linkDegree: 3 },
-    { planetCount: 16, exits: 3, frontSteps: 9, linkDegree: 3 },
-    { planetCount: 18, exits: 3, frontSteps: 8, linkDegree: 3 },
+    { planetCount: 10, exits: 5, frontSteps: 12, linkDegree: 4, interceptChance: 10 },
+    { planetCount: 12, exits: 4, frontSteps: 11, linkDegree: 3, interceptChance: 15 },
+    { planetCount: 14, exits: 4, frontSteps: 10, linkDegree: 3, interceptChance: 20 },
+    { planetCount: 16, exits: 3, frontSteps: 9, linkDegree: 3, interceptChance: 25 },
+    { planetCount: 18, exits: 3, frontSteps: 8, linkDegree: 3, interceptChance: 30 },
 ];
 
 /** Clamp a (possibly out-of-range) sector number into 1..SECTOR_COUNT. */

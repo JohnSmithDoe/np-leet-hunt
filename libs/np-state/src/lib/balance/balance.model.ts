@@ -44,6 +44,11 @@ export interface SectorParams {
      * grey. Denser early sectors are more forgiving; lower bound is 2 (1 risks a disconnected graph).
      */
     linkDegree: number;
+    /**
+     * Chance (0–100%) a jump is intercepted by the Grey Fleet before arrival (Leet-35 / GDD §3). Rises
+     * with depth — the Fleet thickens the closer you get to the Hush. `<= 0` disables intercepts.
+     */
+    interceptChance: number;
 }
 
 /** A fully-resolved sector: its identity plus its generation parameters. */

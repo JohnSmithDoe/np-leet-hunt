@@ -4,7 +4,7 @@ import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { Effect } from '../events/event.model';
-import { resolvePlanetEvent } from '../events/event.pool';
+import { resolveEnRouteEvent, resolvePlanetEvent } from '../events/event.pool';
 import { Planet } from '../planet/planet';
 import { generatePlanetInfo } from '../planet/planet-info';
 import { NormalityFront } from '../reality/normality-front';
@@ -28,6 +28,10 @@ const MIN_PLANET_DISTANCE = 1750;
 // The guardian gate links to its few nearest inner planets — several routes in, so the grey can't easily
 // cut every path to the rewarding exit at once.
 const GUARDIAN_LINKS = 3;
+// En-route intercept (Leet-35): the Grey Fleet ship reuses the rocket texture — greyed + flipped, no new
+// asset — and sweeps in toward the intercept point from this offset (upper-right of it).
+const ENEMY_TINT = 0x8a93a8;
+const ENEMY_APPROACH = { x: 5200, y: -5200 };
 
 // Normality-front tuning. The front sweeps in as a diagonal line from the left (the Hush greying the
 // map one layer at a time); it takes the sector's `frontSteps` jumps to cross, whatever the map size,
@@ -74,6 +78,11 @@ export class NPSpaceMap extends NPGameObjectList {
     #frozen = false;
     #inEvent = false; // a planet-arrival event dialog is open; map input is locked until it resolves
     #jumps = 0;
+
+    // En-route intercept (Leet-35): the destination of a jump that got intercepted mid-flight, parked while
+    // the intercept event resolves, and the Grey Fleet ship flying in. Cleared once the jump resumes.
+    #interceptTarget?: Planet;
+    #enemy?: NPMovableSprite;
     #built = false; // whether a sector's objects are currently built (guards teardown before first build)
 
     #dragging = false;
@@ -157,6 +166,9 @@ export class NPSpaceMap extends NPGameObjectList {
         this.#jumps = 0;
         this.#dragging = false;
         this.#lastDrag = undefined;
+        // Drop any intercept that was mid-resolution and the Grey Fleet ship with it (Leet-35).
+        this.#interceptTarget = undefined;
+        this.#despawnEnemy();
         // Release any camera follow before the scene re-centres on the new sector's start node.
         if (this.#following) {
             this.scene.cameras.main.stopFollow();
@@ -362,6 +374,19 @@ export class NPSpaceMap extends NPGameObjectList {
             .forEach(planet => this.#swallow(planet, flightMs));
         this.#emitFront();
 
+        // Some jumps get intercepted by the Grey Fleet before arrival (Leet-35). The front has already
+        // advanced once above — the intercept only interrupts the flight, it never moves the front again.
+        // The jump flies in two legs: to a midpoint where the enemy converges and the choice event fires,
+        // then on (after the event resolves) to the real destination.
+        if (this.#rollIntercept()) {
+            const mid = { x: (this.#current.x + target.x) / 2, y: (this.#current.y + target.y) / 2 };
+            this.#interceptTarget = target;
+            this.#spawnEnemy(mid);
+            this.#rocket!.onceMoved(() => this.#onIntercepted());
+            this.#rocket!.moveToTarget(mid);
+            return;
+        }
+
         this.#rocket!.onceMoved(() => this.#onArrived(target));
         this.#rocket!.moveToTarget({ x: target.x, y: target.y });
     }
@@ -411,6 +436,19 @@ export class NPSpaceMap extends NPGameObjectList {
     };
 
     #onEventResolved = (payload: EventResolvedPayload) => {
+        // An intercept event resolving mid-jump (Leet-35): bank its effects, send the Grey Fleet ship off,
+        // then fly the jump's second leg to the real destination. The front already advanced at commit, so
+        // resuming must not touch it. The destination's own arrival event fires normally on landing.
+        if (this.#interceptTarget) {
+            this.#applyEffects(payload.effects);
+            const target = this.#interceptTarget;
+            this.#interceptTarget = undefined;
+            this.#inEvent = false;
+            this.#despawnEnemy();
+            this.#rocket!.onceMoved(() => this.#onArrived(target));
+            this.#rocket!.moveToTarget({ x: target.x, y: target.y });
+            return;
+        }
         this.#inEvent = false; // clear first so the effect/refresh path below can restore the buttons
         this.#applyEffects(payload.effects);
         this.#updateTravelButtons();
@@ -500,6 +538,40 @@ export class NPSpaceMap extends NPGameObjectList {
         // The conductor listens for this: it hands off to the guardian fight (Leet-34); a win frees the
         // sector's captive and advances. The space scenes sleep meanwhile and rebuild on the next sector.
         this.scene.game.events.emit(SPACE_EVENTS.GUARDIAN_REACHED, { jumps: this.#jumps });
+    }
+
+    /** Roll whether this jump is intercepted by the Grey Fleet (Leet-35), seeded by sector + jump count. */
+    #rollIntercept(): boolean {
+        if (this.#sector.interceptChance <= 0) return false;
+        return new NPRng(`intercept-${this.#sector.id}-${this.#jumps}`).percentageHit(this.#sector.interceptChance);
+    }
+
+    /** The rocket reached the intercept point: lock the map and raise the en-route choice event (Leet-35). */
+    #onIntercepted() {
+        this.#inEvent = true;
+        this.#updateTravelButtons(); // #inEvent is set, so this clears the buttons while the dialog holds the map
+        const event = resolveEnRouteEvent(this.#sector.id, `${this.#jumps}`);
+        this.scene.game.events.emit(SPACE_EVENTS.PLANET_ARRIVED, { event, planet: this.#interceptTarget!.name });
+    }
+
+    /** Fly a Grey Fleet ship in toward the intercept point — a transient per-jump sprite (Leet-35). */
+    #spawnEnemy(near: Phaser.Types.Math.Vector2Like) {
+        const enemy = new NPMovableSprite(this.scene, near.x + ENEMY_APPROACH.x, near.y + ENEMY_APPROACH.y, 'rocket');
+        enemy.setScale(0.5);
+        enemy.setFlipX(true);
+        enemy.setTint(ENEMY_TINT);
+        enemy.setDepth(29);
+        enemy.create();
+        this.scene.addExisting(enemy);
+        enemy.moveToTarget(near);
+        this.#enemy = enemy;
+    }
+
+    #despawnEnemy() {
+        if (!this.#enemy) return;
+        this.scene.tweens.killTweensOf(this.#enemy);
+        this.#enemy.destroy();
+        this.#enemy = undefined;
     }
 
     #refreshStates() {
