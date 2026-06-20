@@ -120,7 +120,6 @@ export class WaitForInputAction extends PixelDungeonBaseAction implements PixelD
 export class HandleActionState extends PixelDungeonState {
     name = States.HandleAction;
     #mobs: PixelDungeonMob[] = [];
-    #actions: PixelDungeonAction[] = [];
     #waitForInputAction: WaitForInputAction;
 
     constructor(player: PixelDungeonPlayer) {
@@ -130,7 +129,10 @@ export class HandleActionState extends PixelDungeonState {
 
     next = () => {
         while (true) {
-            // gain energy until one or more mobs can act
+            // gain energy until one or more mobs can act. Guard against a misconfigured mob (e.g.
+            // energyGain 0) that can never reach FULL_ENERGY — without this the loop never yields and
+            // freezes the game; fail fast and loud instead.
+            let pumps = 0;
             while (!this.#mobs?.length) {
                 this.engine.gainEnergy();
                 this.#mobs = this.engine.mobs.filter(mob => {
@@ -141,6 +143,9 @@ export class HandleActionState extends PixelDungeonState {
                     }
                     return canAct;
                 });
+                if (++pumps > 10_000) {
+                    throw new Error('PixelDungeon: no mob can gain enough energy to act (check energyGain)');
+                }
             }
             // get the action of the first one and if animated wait for it to end
             while (this.#mobs.length) {

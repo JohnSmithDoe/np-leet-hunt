@@ -96,18 +96,6 @@ export class PixelDungeonLPCSprite extends Phaser.GameObjects.Sprite implements 
         // 222 223 224 225 226 227 228 229 230 231 232 233 234
         // 235 236 237 238 239 240 241 242 243 244 245 246 247
         // 248 ... 260
-
-        this.on(
-            Phaser.Animations.Events.ANIMATION_COMPLETE,
-            (
-                _anim: Phaser.Animations.Animation,
-                _frame: Phaser.Animations.AnimationFrame,
-                _gameObject: Phaser.GameObjects.GameObject,
-                frameKey: string
-            ) => {
-                console.log(`Playing: ${frameKey}`);
-            }
-        );
     }
 
     override play(key: TLpcAnimationKey): this {

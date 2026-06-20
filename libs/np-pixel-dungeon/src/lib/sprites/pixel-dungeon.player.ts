@@ -2,7 +2,6 @@ import { EDirection } from '@shared/np-library';
 
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { AttackMobAction, WalkToAction } from '../engine/states/handle-action.state';
-import { EMobInfoType } from './pixel-dungeon.info-text';
 import { PixelDungeonMob, TPixelDungeonMobOptions } from './pixel-dungeon.mob';
 
 // this.makeAnimation('walk1', 1, 6);
@@ -45,15 +44,10 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
         super(engine, Object.assign({}, defaultOptions, options ?? {}));
     }
 
-    init(): void {
-        console.log('init player');
-    }
-
     override get action() {
         if (!super.action && this.movement.hasMoves()) {
             const pathTile = this.movement.nextMove();
             this.activity.setNextAction(new WalkToAction(this, pathTile));
-            this.info('mov', EMobInfoType.Doged);
         }
         return super.action;
     }

@@ -4,7 +4,6 @@ import MoveTo from 'phaser4-rex-plugins/plugins/board/moveto/MoveTo';
 import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { WalkToAction } from '../../engine/states/handle-action.state';
-import { EMobInfoType } from '../pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../pixel-dungeon.mob';
 
 export class MobMovement extends MoveTo<PixelDungeonMob> {
@@ -22,15 +21,8 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
             blockerTest: true,
             occupiedTest: false,
             sneak: false,
-            // moveableTestScope: undefined,
-            // moveableTest: (from, to) => !!this.costs(to),
         });
     }
-    // costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {
-    //     const tile = this.map.tileMap.getTileAt(tileXY.x, tileXY.y, true);
-    //     const occupied = !this.#board.isEmptyTileXYZ(tileXY.x, tileXY.y, 1);
-    //     return this.#openTileIdx.includes(tile.index) && !occupied ? 1 : null;
-    // }
     onceMoved(fn: () => void) {
         this.once('complete', () => fn());
         return this;
@@ -84,24 +76,20 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
     warp(tile: TileXYType) {
         if (this.canMoveToTile(tile)) {
             this.mob.engine.level.moveMob(this.mob, tile);
-            this.mob.info(`!`, EMobInfoType.GainHealth);
         }
     }
     moveOnPath(path: TileXYType[]) {
-        console.log('269:moveOnPath');
         this.setPath(path);
         if (this.hasMoves()) {
             const pathTile = this.nextMove();
-            console.log('new action walk');
             this.mob.activity.setNextAction(new WalkToAction(this.mob, pathTile));
         }
     }
 
     moveToTile(tile: TileXYType) {
         this.moveTo(tile);
-        console.log('move to tile');
         this.mob.animateFaceToDirection(mapRexPluginDirection(this.destinationDirection));
         this.mob.animateWalk(mapRexPluginDirection(this.destinationDirection));
-        this.mob.engine.updateFoV();
+        this.mob.engine.onMobMoved(this.mob);
     }
 }

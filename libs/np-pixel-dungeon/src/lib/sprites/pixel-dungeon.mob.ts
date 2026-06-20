@@ -40,6 +40,7 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
     #movement!: MobMovement;
     #vision!: MobVision;
     #activity!: MobAction;
+    #lastTile = { x: 0, y: 0, z: 0 };
 
     constructor(
         public engine: PixelDungeonEngine,
@@ -58,8 +59,7 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
         this.setTexture(this.options.key, 1);
         this.setScale(1);
         const size = 20;
-        this.setOrigin((size - 16) / 2 / size, (size - 16) / size);
-        this.setOrigin(0, 0.5); // just put on an own tile layer and move the layer up
+        this.setOrigin(0, 0.5);
         this.setDisplaySize(size, size);
     }
 
@@ -72,12 +72,12 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
     }
 
     get tile() {
-        let tileXYZ = this.rexChess.tileXYZ;
-        if (!tileXYZ) {
-            console.log('no tile on mob............. player stepped on mob with path moving');
-            tileXYZ = { x: 0, y: 0, z: 0 };
-        }
-        return tileXYZ;
+        // rexChess.tileXYZ is briefly null while a mob is between board cells (mid-move/off-board);
+        // fall back to the last known tile rather than the {0,0,0} origin, which mis-placed text,
+        // vision and adjacency checks.
+        const tileXYZ = this.rexChess.tileXYZ;
+        if (tileXYZ) this.#lastTile = tileXYZ;
+        return this.#lastTile;
     }
 
     get vision() {

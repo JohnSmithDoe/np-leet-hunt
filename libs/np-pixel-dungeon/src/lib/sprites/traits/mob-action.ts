@@ -9,7 +9,6 @@ export class MobAction {
 
     constructor(private mob: PixelDungeonMob) {}
     gainEnergy() {
-        //console.log(`${this.key} gain energy: ${this.options.energyGain}/${this.#energy}`);
         return (this.#energy += this.mob.options.energyGain!) >= FULL_ENERGY;
     }
 

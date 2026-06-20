@@ -1,8 +1,10 @@
 # np-pixel-dungeon
 
-A turn-based roguelike dungeon mode: a procedurally-generated dungeon (rooms joined by mazey hallways and doors) rendered to Phaser tilemaps, with energy-gated turns, grid movement, pathfinding, and field-of-view vision. Mobs are drawn from Liberated Pixel Cup (LPC) spritesheets. Built on `@shared/np-phaser` and the `phaser3-rex-plugins` board / pathfinder / field-of-view / state-manager plugins.
+A turn-based roguelike dungeon mode: a procedurally-generated dungeon (rooms joined by mazey hallways and doors) rendered to Phaser tilemaps, with energy-gated turns, grid movement, pathfinding, and field-of-view vision. Mobs are drawn from Liberated Pixel Cup (LPC) spritesheets. Built on `@shared/np-phaser` and the `phaser4-rex-plugins` board / pathfinder / field-of-view / state-manager plugins.
 
 Imported via the `@shared/np-pixel-dungeon` path alias defined in `tsconfig.base.json`.
+
+> For the in-depth design — boot sequence, coordinate systems, and the turn engine — see [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 
 ## How it works
 
@@ -65,16 +67,19 @@ Key types in `@types/pixel-dungeon.types.ts`:
 
 ## What can be improved
 
-- **Vision "blocking bits" (the standing TODO).** In `mob-vision.ts`, FOV runs with `blockerTest: true` but `perspective: false` because the plugin's perspective mode *"crashs"*, and the `preTestCallback`/`costCallback` are commented out. So walls register as blockers but the player never *sees* the shadowed geometry — visibility is effectively radius/cone-shaded rather than true line-of-sight occlusion. Getting perspective mode working (or rendering the blocked tiles explicitly) is the headline gameplay gap.
-- **Enemy AI is placeholder.** Enemies attack only when the player is already adjacent; otherwise they random-walk or warp. The pathfinder exists but is used only for player clicks — enemies never hunt, flee, or path toward the player.
-- **Engine is hard-wired.** `PixelDungeonEngine` constructs mobs directly and `PixelDungeonLevel` builds its map in its constructor; there's no spawn/factory seam, so swapping enemy types or injecting a level is awkward. There's also no event system for mob death / level-complete / player-spotted, so coupling is by direct calls.
-- **`EndGameState` is a stub** — the game never really ends.
+See [`ARCHITECTURE.md` §12 Known gaps](./ARCHITECTURE.md#12-known-gaps) for the maintained list. In short:
+
+- **No health/damage/death model** — attacks are cosmetic (a tween + a `"3"` text); nothing dies.
+- **No win/lose condition** — `EndGameState` is a stub; the only exit is the debug `M` key (always reports `failed`).
+- **The dungeon seed is hard-coded** — every run generates the identical layout, and difficulty/size/spawns ignore the central `@shared/np-state` `Balance` curve other modes use.
+- **Spawn placement is unchecked** — mobs are placed in a line from one room corner with no walkability guard.
+- **Enemy AI is placeholder** — adjacent-attack or random-walk/warp; never hunts or paths toward the player.
+- **Engine is hard-wired** — mobs and level built directly in the engine; no spawn/factory seam, no event bus.
 - **LPC animation coverage is thin** — walk directions plus a die frame; no attack/hurt/idle animations.
-- **Room sizing isn't tunable.** Room dimensions come from a baked-in `inRange(1, 3 + roomExtraSize) * 2 + 1` formula (a `// TODO ... do something better` is in the factory); min/max should be real `TDungeonOptions` fields.
-- **Camera wheel-zoom is broken** — the scene carries a `// TODO not working` around preserving the world point under the cursor while zooming.
-- **Debug `console.log` noise** is scattered across the scene, factory, engine, and traits and should be gated or removed.
-- **Brittle initialisation order** — `PixelDungeonMob.tile` logs an error and returns `{0,0,0}` when the mob has no board position yet, hinting at an ordering bug rather than a real fallback.
-- **No tests.** Zero specs — and the dungeon generator (region connectivity, no overlaps, no unreachable rooms), the energy/action loop, pathfinding, and FOV are all high-value, deterministic things to cover.
+- **Room sizing isn't tunable** — a baked-in formula (`// TODO ... do something better` in the factory) rather than min/max `TDungeonOptions` fields.
+- **Camera wheel-zoom is broken** — a `// TODO not working` around preserving the world point under the cursor.
+- **Debug `console.log` noise** scattered across the scene, engine, traits, and dungeon; floating `"mov"`/`"!"` texts on movement.
+- **Brittle initialisation order** — `PixelDungeonMob.tile` logs and returns `{0,0,0}` when a mob has no board position yet.
 
 ## Running unit tests
 

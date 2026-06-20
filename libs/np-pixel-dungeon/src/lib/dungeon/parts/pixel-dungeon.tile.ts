@@ -1,6 +1,6 @@
+import { EDirection, NPVec2 } from '@shared/np-library';
 import ChessData from 'phaser4-rex-plugins/plugins/board/chess/ChessData';
 
-import { EDirection, NPVec2 } from '../../../../../np-phaser/src/lib/utilities/piecemeal';
 import { TDungeonTile } from '../../@types/pixel-dungeon.types';
 import { PixelDungeonBoard } from '../../core/pixel-dungeon-board';
 import { PixelDungeonMap } from '../../map/pixel-dungeon.map';

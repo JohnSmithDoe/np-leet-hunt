@@ -105,9 +105,24 @@ export class PixelDungeonLevel {
     public angleBetween(mob: PixelDungeonMob, target: PixelDungeonMob) {
         return this.#board.angleBetween(mob, target);
     }
-    get start() {
+    get start(): TileXYType {
         const tile = this.#dungeon.rooms[0].bottomRight();
         return { x: tile.x, y: tile.y };
+    }
+
+    /**
+     * Distinct walkable spawn tiles in the starting room: the player on `start`, then as many other
+     * room-floor tiles as requested. Room floor is always walkable, so mobs never spawn in a wall.
+     */
+    public spawnTiles(count: number): TileXYType[] {
+        const start = this.start;
+        const tiles: TileXYType[] = [start];
+        for (const tile of this.#dungeon.rooms[0].tiles) {
+            if (tiles.length >= count) break;
+            if (tile.x === start.x && tile.y === start.y) continue;
+            tiles.push({ x: tile.x, y: tile.y });
+        }
+        return tiles;
     }
     get board() {
         return this.#board;

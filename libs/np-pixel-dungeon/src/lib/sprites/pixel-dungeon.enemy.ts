@@ -37,41 +37,43 @@ export class PixelDungeonEnemy extends PixelDungeonMob {
 
     #aiAction() {
         const activity = this.activity;
-        if (!activity.hasNextAction && activity.canAct()) {
-            let tile: TileXYType | null = null;
-            const neighbours = this.engine.level.getNeighborChess(this.tile);
-            const playerAsNeigbour = (neighbours && Array.isArray(neighbours) ? neighbours : [neighbours]).find(
-                n => n === this.engine.player
-            );
-            if (playerAsNeigbour) {
-                activity.setNextAction(new AttackMobAction(this, this.engine.player));
-            } else {
-                try {
-                    tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
-                } catch {
-                    console.log('no random tile');
-                }
-                if (tile) {
-                    let i = 0;
-                    while (!this.movement.canMoveToTile(tile)) {
-                        tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
-                        if (i++ > 5) {
-                            tile = null;
-                            break;
-                        }
-                    }
-                }
+        if (activity.hasNextAction || !activity.canAct()) return;
 
-                if (tile) {
-                    if (this.engine.player.vision.canSee(this.tile) || this.engine.player.vision.canSee(tile)) {
-                        activity.setNextAction(new WalkToAction(this, tile));
-                    } else {
-                        activity.setNextAction(new WarpAction(this, tile));
-                    }
-                } else {
-                    activity.setNextAction(new RestAction(this));
-                }
+        const neighbours = this.engine.level.getNeighborChess(this.tile);
+        const playerIsAdjacent = (Array.isArray(neighbours) ? neighbours : [neighbours]).some(
+            n => n === this.engine.player
+        );
+        if (playerIsAdjacent) {
+            activity.setNextAction(new AttackMobAction(this, this.engine.player));
+            return;
+        }
+
+        const tile = this.#randomStepTile();
+        if (!tile) {
+            activity.setNextAction(new RestAction(this));
+        } else if (this.engine.player.vision.canSee(this.tile) || this.engine.player.vision.canSee(tile)) {
+            activity.setNextAction(new WalkToAction(this, tile));
+        } else {
+            // out of the player's sight — teleport instead of animating the step
+            activity.setNextAction(new WarpAction(this, tile));
+        }
+    }
+
+    /**
+     * A random walkable adjacent tile, or null after a few misses. The rex board lookups can throw
+     * when no empty tile is in range, so every call is guarded here (the previous version left the
+     * retry calls unguarded, letting a throw escape into the turn loop).
+     */
+    #randomStepTile(): TileXYType | null {
+        try {
+            let tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
+            for (let i = 0; tile && !this.movement.canMoveToTile(tile); i++) {
+                if (i >= 5) return null;
+                tile = this.engine.level.getRandomEmptyTileXYInRange(this.tile, 1);
             }
+            return tile ?? null;
+        } catch {
+            return null;
         }
     }
 }

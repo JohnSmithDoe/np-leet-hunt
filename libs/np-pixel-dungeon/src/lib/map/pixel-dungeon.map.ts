@@ -3,10 +3,7 @@ import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
 import { NPSceneWithBoard } from '../@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
-import { PixelDungeonFloorLayer } from './layer/pixel-dungeon-floorlayer';
-import { PixelDungeonObjectlayer } from './layer/pixel-dungeon-objectlayer';
 import { PixelDungeonTilelayer } from './layer/pixel-dungeon-tilelayer';
-import { PixelDungeonWallLayer } from './layer/pixel-dungeon-walllayer';
 import { PixelDungeonTileset, TNPTilesetKey } from './pixel-dungeon-tileset';
 
 export interface TPixelDungeonMapOptions {
@@ -20,7 +17,7 @@ export class PixelDungeonMap {
     #tileset: PixelDungeonTileset;
     #options: TPixelDungeonMapOptions;
 
-    #floor!: PixelDungeonFloorLayer;
+    #floor!: PixelDungeonTilelayer;
     #walls!: PixelDungeonTilelayer;
     #objects!: PixelDungeonTilelayer;
     #stitches!: PixelDungeonTilelayer;
@@ -53,17 +50,14 @@ export class PixelDungeonMap {
         this.#map = new Phaser.Tilemaps.Tilemap(this.scene, mapData);
         this.#tileset.addToMap(this.#map);
         // having multiple tile layers
-        this.#floor = new PixelDungeonFloorLayer('floors', this.scene, this.#map, this.#tileset);
-        this.#walls = new PixelDungeonWallLayer('walls', this.scene, this.#map, this.#tileset);
-        this.#objects = new PixelDungeonObjectlayer('objects', this.scene, this.#map, this.#tileset);
-        this.#stitches = new PixelDungeonObjectlayer('stitches', this.scene, this.#map, this.#tileset);
+        this.#floor = new PixelDungeonTilelayer('floors', this.scene, this.#map, this.#tileset);
+        this.#walls = new PixelDungeonTilelayer('walls', this.scene, this.#map, this.#tileset);
+        this.#objects = new PixelDungeonTilelayer('objects', this.scene, this.#map, this.#tileset);
+        this.#stitches = new PixelDungeonTilelayer('stitches', this.scene, this.#map, this.#tileset);
         this.#stitches.tilelayer.setDepth(10);
         // this.#walls.tilelayer.setVisible(false);
         this.#floor.tilelayer.setInteractive({ useHandcursor: true });
         this.tilemap.setLayer('floors');
-        this.scene.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-            this.#floor.tilelayer.off(Phaser.Input.Events.POINTER_UP);
-        });
     }
 
     loseVision(tileXYTypes?: TileXYType[]) {

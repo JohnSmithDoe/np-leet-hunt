@@ -17,9 +17,10 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     static readonly key = 'pixel-dungeon-scene';
     rexBoard!: BoardPlugin; // Declare scene property 'rexBoard' as BoardPlugin type
 
-    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     cam!: Phaser.Cameras.Scene2D.Camera;
     private cameraDrag = false;
+    // the camera tracks the player after a move command, until the user drags to pan away
+    #followPlayer = true;
     private engine!: PixelDungeonEngine;
     readonly #config: TPixelDungeonSceneConfig;
     constructor(config: TPixelDungeonSceneConfig = {}) {
@@ -46,8 +47,11 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         this.engine.create();
         super.create();
         this.cam = this.cameras.main;
-        // this.cam.setRoundPixels(true);
-        const camera = this.cameras.main;
+        const camera = this.cam;
+
+        // Camera controls: drag to pan (which hands control to the user and drops follow), wheel to
+        // zoom toward the cursor, and click a walkable tile to move (which re-enables follow so the
+        // camera tracks the walk).
         let cameraDragStartX = 0;
         let cameraDragStartY = 0;
         this.cameraDrag = false;
@@ -59,21 +63,23 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         this.input.on(Phaser.Input.Events.POINTER_UP, (pointer: Phaser.Input.Pointer) => {
             if (this.cameraDrag) {
                 this.cameraDrag = false;
-            } else {
-                if (!this.engine.player.activity.isIdle()) return;
-                const { worldX, worldY } = pointer;
-                const targetTile = this.engine.level.getTileAtWorldXY(worldX, worldY);
-                console.log('click', targetTile);
-                if (!targetTile) return;
-                this.engine.movePlayer(targetTile);
+                return;
             }
+            if (!this.engine.player.activity.isIdle()) return;
+            const targetTile = this.engine.level.getTileAtWorldXY(pointer.worldX, pointer.worldY);
+            if (!targetTile) return;
+            this.#followPlayer = true; // a move command re-centres the camera on the player
+            this.engine.movePlayer(targetTile);
         });
 
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            if (pointer.isDown) {
-                camera.scrollX = cameraDragStartX + (pointer.downX - pointer.x) / camera.zoom;
-                camera.scrollY = cameraDragStartY + (pointer.downY - pointer.y) / camera.zoom;
-                if (Math.abs(camera.scrollX - cameraDragStartX) > 3) this.cameraDrag = true;
+            if (!pointer.isDown) return;
+            camera.scrollX = cameraDragStartX + (pointer.downX - pointer.x) / camera.zoom;
+            camera.scrollY = cameraDragStartY + (pointer.downY - pointer.y) / camera.zoom;
+            // a move on either axis past the threshold counts as a pan (not a click-to-move)
+            if (Math.abs(camera.scrollX - cameraDragStartX) > 3 || Math.abs(camera.scrollY - cameraDragStartY) > 3) {
+                this.cameraDrag = true;
+                this.#followPlayer = false; // dragging hands camera control to the user
             }
         });
 
@@ -81,52 +87,23 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
             'wheel',
             (
                 pointer: Phaser.Input.Pointer,
-                gameObjects: Phaser.GameObjects.GameObject[],
-                deltaX: number,
+                _gameObjects: Phaser.GameObjects.GameObject[],
+                _deltaX: number,
                 deltaY: number
             ) => {
-                // Get the current world point under pointer.
+                // Zoom toward the cursor: remember the world point under it, apply the zoom, then
+                // scroll back so the same world point stays under the cursor. (While following, the
+                // per-frame re-centre in update() keeps the zoom centred on the player instead.)
                 const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
                 const newZoom = camera.zoom - camera.zoom * 0.001 * deltaY;
                 camera.zoom = Phaser.Math.Clamp(newZoom, 0.25, 10);
-
-                // Update camera matrix, so `getWorldPoint` returns zoom-adjusted coordinates.
                 const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
-                // Scroll the camera to keep the pointer under the same world point.
                 camera.scrollX -= newWorldPoint.x - worldPoint.x;
-                camera.scrollY -= newWorldPoint.y - worldPoint.y; //TODO not working
-                this.cam.scrollX = this.engine.player.x - this.cam.width * 0.5;
-                this.cam.scrollY = this.engine.player.y - this.cam.height * 0.5;
+                camera.scrollY -= newWorldPoint.y - worldPoint.y;
             }
         );
 
-        // moveTo.moveToRandomNeighbor();
-
-        //
-        // // Hide all the rooms
-        // if (!debug) {
-        //     this.tilelayer.forEachTile(tile => {
-        //         tile.alpha = 0;
-        //     });
-        // }
-        //
-        // // Place the player in the first room
-        // const playerRoom = this.dungeon.rooms[0];
-        //
-
-        //
-        // if (!debug) {
-        //     this.setRoomAlpha(playerRoom, 1); // Make the starting room visible
-        // }
-        //
-        // // Scroll to the player
-
-        //
-        // this.cam.setViewport(0, 0, this.scale.width, this.scale.height);
-
-        this.cam.setZoom(5);
-        // keyboard input is enabled by default in the game config
-        this.cursors = this.input.keyboard!.createCursorKeys();
+        camera.setZoom(5);
         // Phase-0 bail: press M to leave the dungeon and report a (stub) result to the run (Leet-29). The
         // real objective-driven exit lands with the Phase-3 dungeon rebuild; the map's debug toolbar is
         // the touch escape until then.
@@ -136,74 +113,12 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     }
 
     override update() {
-        if (this.cameraDrag) return;
-
-        //this.updatePlayerMovement();
-        // const playerTileX = this.map.worldToTileX(this.player.x);
-        // const playerTileY = this.map.worldToTileY(this.player.y);
-        // Another helper method from the dungeon - dungeon XY (in tiles) -> room
-        // const room = this.dungeon.getRoomAt(playerTileX, playerTileY);
-        // If the player has entered a new room, make it visible and dim the last room
-        // if (room && this.activeRoom && this.activeRoom !== room) {
-        //     if (!debug) {
-        //         this.setRoomAlpha(room, 1);
-        //         this.setRoomAlpha(this.activeRoom, 0.5);
-        //     }
-        // }
-        //
-        // this.activeRoom = room;
-        //
-        // // Smooth follow the player
+        if (!this.#followPlayer) return;
+        // Smooth-follow the player while a move is in progress, until the user drags to pan away.
         const smoothFactor = 0.9;
-        // //
         this.cam.scrollX =
             smoothFactor * this.cam.scrollX + (1 - smoothFactor) * (this.engine.player.x - this.cam.width * 0.5);
         this.cam.scrollY =
             smoothFactor * this.cam.scrollY + (1 - smoothFactor) * (this.engine.player.y - this.cam.height * 0.5);
-    }
-
-    // Helpers functions
-    // setRoomAlpha(room: NPRect, alpha: number) {
-    //     this.map.forEachTile(
-    //     tile => {
-    //         tile.alpha = alpha;
-    //     },
-    //     this,
-    //     room.x,
-    //     room.y,
-    //     room.width,
-    //     room.height
-    // );
-    // }
-
-    // isTileOpenAt(worldX: number, worldY: number) {
-    // nonNull = true, don't return null for empty tiles. This means null will be returned only for
-    // tiles outside the bounds of the map.
-    // const tile = this.map.getTileAtWorldXY(worldX, worldY, true);
-    //
-    // return tile && !tile.collides;
-    // }
-
-    updatePlayerMovement() {
-        // if (!this.moveTo.isRunning) {
-        //     if (this.cursors.down.isDown) {
-        //         if (this.moveTo.canMoveTo(this.moveTo.destinationTileX, this.moveTo.destinationTileY + 1)) {
-        //             this.moveTo.moveTo(this.moveTo.destinationTileX, this.moveTo.destinationTileY + 1);
-        //         }
-        //     } else if (this.cursors.up.isDown) {
-        //         if (this.moveTo.canMoveTo(this.moveTo.destinationTileX, this.moveTo.destinationTileY - 1)) {
-        //             this.moveTo.moveTo(this.moveTo.destinationTileX, this.moveTo.destinationTileY - 1);
-        //         }
-        //     }
-        //     if (this.cursors.left.isDown) {
-        //         if (this.moveTo.canMoveTo(this.moveTo.destinationTileX - 1, this.moveTo.destinationTileY)) {
-        //             this.moveTo.moveTo(this.moveTo.destinationTileX - 1, this.moveTo.destinationTileY);
-        //         }
-        //     } else if (this.cursors.right.isDown) {
-        //         if (this.moveTo.canMoveTo(this.moveTo.destinationTileX + 1, this.moveTo.destinationTileY)) {
-        //             this.moveTo.moveTo(this.moveTo.destinationTileX + 1, this.moveTo.destinationTileY);
-        //         }
-        //     }
-        // }
     }
 }

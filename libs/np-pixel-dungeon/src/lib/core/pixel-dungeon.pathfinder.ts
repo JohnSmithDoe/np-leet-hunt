@@ -34,23 +34,4 @@ export class PixelDungeonPathfinder extends PathFinder {
         })(pathToMove);
         return pathToMove;
     }
-
-    // costs(tileXY: PathFinder.NodeType | TileXYType): number | PathFinder.BLOCKER | PathFinder.INFINITY {
-    //     // const tile = this.map.tileMap.getTileAt(tileXY.x, tileXY.y, true);
-    //     // const occupied = !this.#board.isEmptyTileXYZ(tileXY.x, tileXY.y, 1);
-    //     // return this.#openTileIdx.includes(tile.index) && !occupied ? 1 : null;
-    //     return this.BLOCKER;
-    // }
-    //
-    // preTestCallback(a: TileXYType[], fovRange: number) {
-    //     const first = a[0];
-    //     const target = a[a.length - 1];
-    //     const distance = Phaser.Math.Distance.Snake(first.x, first.y, target.x, target.y);
-    //     let lastWasOccupied = false;
-    //     if (a.length > 2) {
-    //         const preLast = a[a.length - 2];
-    //         lastWasOccupied = !this.#board.isEmptyTileXYZ(preLast.x, preLast.y, 1);
-    //     }
-    //     return !lastWasOccupied && distance <= fovRange;
-    // }
 }

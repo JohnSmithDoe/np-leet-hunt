@@ -9,17 +9,7 @@ import { PixelDungeonTile } from './parts/pixel-dungeon.tile';
 import { PixelDungeonWall } from './parts/pixel-dungeon.wall';
 import { PixelDungeonFactory } from './pixel-dungeon.factory';
 
-const defaultDungeon: TDungeonOptions = {
-    roomArea: 75,
-    height: 25,
-    width: 25,
-    extraConnectorChance: 20,
-    roomExtraSize: 0,
-    straightenPercentage: 50,
-};
-
 export class PixelDungeon implements Iterable<TDungeonTile> {
-    readonly #options: TDungeonOptions;
     readonly #dungeon: TDungeonTile[][];
 
     #walls: PixelDungeonWall[] = [];
@@ -40,23 +30,21 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
         return undefined;
     }
 
+    // generation defaults are owned by PixelDungeonFactory (the single source of truth)
     constructor(options?: TDungeonOptions) {
-        this.#options = Object.assign({}, defaultDungeon, options ?? {});
-        this.#dungeon = new PixelDungeonFactory().generate(this.#options);
+        this.#dungeon = new PixelDungeonFactory().generate(options);
         this.#mapDungeon();
         this.#addStructure();
     }
 
     #addStructure() {
-        const singleDoorRooms: PixelDungeonRoom[] = [];
         this.#rooms.forEach(room => {
             room.junctions = this.junctions.filter(j => j.regions.has(room.region));
+            // a room with a single door starts open
             if (room.junctions.length === 1) {
-                singleDoorRooms.push(room);
                 room.junctions[0].setOpen(true, false);
             }
         });
-        console.log(singleDoorRooms);
     }
 
     #mapDungeon() {
