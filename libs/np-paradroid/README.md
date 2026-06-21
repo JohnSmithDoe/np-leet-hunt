@@ -10,6 +10,8 @@ Imported via the `@shared/np-paradroid` path alias defined in `tsconfig.base.jso
 
 **Generation.** `ParadroidFactory` (`core/paradroid.factory.ts`) builds the grid column by column with a seeded `NPRng`, choosing tile types from a difficulty-specific tile set so each new column's entry ports line up with the previous column's exits. It validates that enough of the final column reaches the middle (so the board is winnable), then links every path to its upstream (`prev`) and downstream (`next`) neighbours and stamps on the changer/autofire effects. Difficulty (`CParadroidModes`) tunes the tile set plus changer and autofire rates.
 
+**Grid selection.** Before the fight, the player gets a fixed window (`ParadroidScene` `SELECTION_SECONDS`) to **re-roll** the board as often as they like — choosing the layout is part of the gameplay, so a bad generation is a poor *choice* rather than the game being unfair. Locking in (or the countdown running out) plays the VS intro and starts the match.
+
 **Play & state flow.** The two players' boards are built symmetrically; the droid's grid is rendered mirrored (`setScale(-1, 1)`).
 
 1. The player clicks a `ParadroidButton` on their edge, activating the input path of that row's first field.
@@ -23,7 +25,7 @@ Imported via the `@shared/np-paradroid` path alias defined in `tsconfig.base.jso
 ## Main components
 
 **Scene**
-- `ParadroidScene` (`paradroid.scene.ts`) — entry point; extends `NPScene`, wires up the game, handles resize, and offers a re-create button for iterating on generation.
+- `ParadroidScene` (`paradroid.scene.ts`) — entry point; extends `NPScene`, wires up the game, handles resize, and drives the duel's staging state machine: **`select → intro → fight → outro → done`**. The board is visible and camera-fit only in `select` / `fight`; the intro and outro own the screen at a neutral 1:1 view.
 
 **Core logic** (`core/`)
 - `ParadroidGame` (`paradroid.game.ts`) — orchestrates the two boards, buttons, shots, timer, and middle-row tallies.
@@ -36,7 +38,9 @@ Imported via the `@shared/np-paradroid` path alias defined in `tsconfig.base.jso
 - `ParadroidButton` (`paradroid.button.ts`) — a clickable row starter with a cooldown.
 - `ParadroidMiddle` (`paradroid.middle.ts`) — the contested centre column; visualises per-row ownership.
 - `ParadroidImage` (`paradroid.image.ts`) — image wrapper used for shots/artwork.
-- `ParadroidIntro` (`paradroid.intro.ts`) — an intro animation, currently disabled.
+- `ParadroidIntro` (`paradroid.intro.ts`) — the Street-Fighter "VS" splash played between locking the grid in and the match beginning.
+- `ParadroidCountdown` (`paradroid.countdown.ts`) — the grid-selection countdown: a fixed window (ghosted centre digit + binary block readout) during which the player may re-roll the board freely before it locks.
+- `ParadroidOutro` (`paradroid.outro.ts`) — the ending animation: the loser drops out of the screen while the winner moves to the centre and is promoted.
 
 **Types & constants** (`@types/`)
 - `paradroid.consts.ts` — enums (owner, access, flow-from/to, shape, tile type, difficulty) and the lookup tables `CParadroidShapeInfo`, `CParadroidTileInfo`, `CParadroidModes`.
@@ -55,7 +59,7 @@ The core graph node is `TParadroidPath` — a flow with `from`/`to` ports, an `f
 
 - **Magic numbers everywhere.** Path fill/drain speeds, the button cooldown, and the round timer are inline literals scattered through the sprites and game; pull them into `paradroid.consts.ts`.
 - **Stringly-typed path state.** `ParadroidPath`'s `'inactive' | 'activating' | 'deactivating' | 'active'` union should be an enum to match the rest of the type model.
-- **Dead code.** `ParadroidIntro` references a removed camera and is disabled; `TParadroidPath.triggeredBy` is declared but never used; the factory imports a flow helper it doesn't call — all worth removing.
+- **Dead code.** `TParadroidPath.triggeredBy` is declared but never used; the factory imports a flow helper it doesn't call — both worth removing.
 - **Debug `console.log` noise** on field activation, middle-row changes, and factory stats should be gated or removed.
 - **Undocumented protocols.** The field activate/deactivate rules and the sprite-sheet frame mapping (`shapeToFieldDefinition`) are non-obvious and deserve a doc comment; the shape→frame mapping isn't exhaustively distinct for every tile type.
 - **Hardcoded generation thresholds.** The "≥50 % of the final column must reach the middle" solvability check and the retry count are baked in; expose them (and the RNG seed) through factory options for tuning and reproducibility.

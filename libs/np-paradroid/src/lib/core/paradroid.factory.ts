@@ -84,7 +84,7 @@ export class ParadroidFactory {
     constructor(options: TParadroidFactoryOptions) {
         this.#options = options;
         // An explicit seed makes generation reproducible; without one we pick a
-        // fresh seed per factory so e.g. "Re-Create" yields a new layout.
+        // fresh seed per factory so e.g. the grid-selection "Re-Roll" yields a new layout.
         this.#rng = new NPRng(options.seed ?? new Date().toISOString());
     }
 

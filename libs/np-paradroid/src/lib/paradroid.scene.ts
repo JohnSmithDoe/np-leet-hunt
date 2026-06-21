@@ -1,14 +1,30 @@
 import { lerp, NPScene, NPTextButton, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
-import { Balance, DuelAiLevel, DuelAiParams, DuelResult } from '@shared/np-state';
+import { DuelAiParams, DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
-import { CParadroidTileSets } from './@types/paradroid.consts';
-import { paradroidFactoryOptions, TParadroidFactoryOptions } from './core/paradroid.factory';
+import { TParadroidFactoryOptions } from './core/paradroid.factory';
 import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';
+import { ParadroidCountdown } from './sprites/paradroid.countdown';
 import { ParadroidIntro } from './sprites/paradroid.intro';
+import { ParadroidOutro } from './sprites/paradroid.outro';
 
 /** How long the camera takes to settle from the splash's neutral 1:1 view onto the board-fit view. */
 const FOCUS_MS = 600;
+
+/**
+ * The grid-selection window, in seconds (Leet-40). A fixed budget to re-roll the board before it locks —
+ * choosing the layout is the gameplay. Lives here with the other duel-timing constants (FOCUS_MS,
+ * `MATCH_DURATION_MS`), not in np-state `Balance`, which holds difficulty *tuning* (rates, AI), not staging.
+ */
+const SELECTION_SECONDS = 20;
+
+/**
+ * The duel's staging state machine (Leet-40):
+ *   select → (lock-in / time-out) → intro → fight → (buzzer) → outro → done.
+ * The board is visible and camera-fit only in `select` and `fight`; the intro and outro own the screen at a
+ * neutral 1:1 view with the board hidden (see {@link ParadroidIntro} / {@link ParadroidOutro}).
+ */
+type DuelPhase = 'select' | 'intro' | 'fight' | 'outro' | 'done';
 
 /** What the app injects when starting a duel — the board options and the AI tuning, both optional. */
 export interface TParadroidSceneConfig {
@@ -25,10 +41,17 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     readonly #config: TParadroidSceneConfig;
     #paradroidGame!: ParadroidGame;
     #intro!: ParadroidIntro;
-    #busy = false; // true while the VS intro is playing — Start/Re-Create are ignored until it clears
+    #outro!: ParadroidOutro;
+    #countdown!: ParadroidCountdown;
+    #phase: DuelPhase = 'select';
     #lastOutcome: DuelResult['outcome'] = 'lose'; // forfeit by default; a decided match sets win/lose
-    #resultText?: Phaser.GameObjects.Text;
-    readonly #controls: NPTextButton[] = []; // header controls — folded into the camera fit so they stay on-screen
+
+    // Header controls. Re-Roll / Lock-In drive grid selection; Map reports the result and leaves. Tracked
+    // for the camera fit so they stay on-screen at any window size.
+    #rerollBtn!: NPTextButton;
+    #lockBtn!: NPTextButton;
+    #mapBtn!: NPTextButton;
+    readonly #controls: NPTextButton[] = [];
 
     constructor(config: TParadroidSceneConfig = {}) {
         super({ key: ParadroidScene.key });
@@ -38,15 +61,17 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     setupComponents() {
         this.#paradroidGame = this.#createGame();
         this.addComponent(this.#paradroidGame);
-        // Registered only so the VS-splash textures preload at scene boot; it's played on demand from Start.
+        // Registered only so the VS-splash / portrait textures preload at scene boot; both play on demand.
         this.#intro = new ParadroidIntro(this);
         this.addComponent(this.#intro);
+        this.#outro = new ParadroidOutro(this);
+        this.addComponent(this.#outro);
     }
 
     /** Build a game (defaulting to the injected config) and wire its match-ended announcement. */
-    #createGame(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): ParadroidGame {
-        const game = new ParadroidGame(this, factoryOptions, aiParams);
-        game.events.on(ParadroidGame.EVENT_MATCH_ENDED, (result: TParadroidMatchResult) => this.#showResult(result));
+    #createGame(): ParadroidGame {
+        const game = new ParadroidGame(this, this.#config.factoryOptions, this.#config.aiParams);
+        game.events.on(ParadroidGame.EVENT_MATCH_ENDED, (result: TParadroidMatchResult) => this.#onMatchEnded(result));
         return game;
     }
 
@@ -58,31 +83,51 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         super.create(container);
         this.addExisting(container);
 
-        // Header controls, laid out in a row above the board (y=20) and tracked so the camera fit keeps
-        // them on-screen at any window size. Each "Start X" rebuilds a fresh board at that difficulty
-        // (board fx + tile palette) and plays it with the matching AI level.
-        this.#addControl(40, 'Start Normal', () => this.#startDifficulty('normal'));
-        this.#addControl(250, 'Start Brutal', () => this.#startDifficulty('brutal'));
-        this.#addControl(460, 'Re-Create', () => this.#recreate());
-        this.#addControl(640, '↩ Map', () => this.#leave());
+        // Header controls, laid out in a row above the board (y=20). The board-fit unions the *visible* ones.
+        this.#rerollBtn = this.#addControl(40, '↻ Re-Roll', () => this.#reroll());
+        this.#lockBtn = this.#addControl(280, '⚔ Lock In', () => this.#lockIn());
+        this.#mapBtn = this.#addControl(520, '↩ Map', () => this.#leave());
+
+        this.#countdown = new ParadroidCountdown(this);
 
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         this.resize();
+        this.#beginSelection();
     }
 
     /** Add a header control button at the given x and track it for the camera fit. */
-    #addControl(x: number, label: string, onClick: () => void): void {
+    #addControl(x: number, label: string, onClick: () => void): NPTextButton {
         const button = new NPTextButton(this, x, 20, label, { fontSize: '28px', color: '#0f0' });
         button.on('pointerup', onClick);
         this.#controls.push(button);
         this.addExisting(button);
+        return button;
     }
 
-    /** Rebuild a fresh board + AI at the given difficulty, play the VS splash, then start the match. */
-    #startDifficulty(level: DuelAiLevel): void {
-        if (this.#busy) return;
-        const factoryOptions = paradroidFactoryOptions(Balance.duelBoardParams(level), CParadroidTileSets[level]);
-        this.#rebuild(factoryOptions, Balance.duelAiParams(level));
+    /**
+     * Open the grid-selection window: show the freshly-generated board, let the player re-roll it freely,
+     * and start the countdown that locks it in (Leet-40). On expiry the grid locks and the intro plays.
+     */
+    #beginSelection(): void {
+        this.#phase = 'select';
+        this.time.paused = false; // ensure the scene clock ticks the countdown (a prior match may have frozen it)
+        this.#paradroidGame.container.setVisible(true);
+        this.#setControls(true, true, true);
+        this.resize(); // fit the board (+ controls) into the viewport
+        this.#countdown.play(SELECTION_SECONDS, this.#paradroidGame.container.getBounds(), () => this.#lockIn());
+    }
+
+    /** Re-roll a fresh board at the injected difficulty. The countdown keeps running — the window is fixed. */
+    #reroll(): void {
+        if (this.#phase !== 'select') return;
+        this.#rebuild();
+        this.#countdown.bringToTop(); // the new board was added on top of the display list — lift the overlay back
+    }
+
+    /** Lock the chosen grid in (button or countdown expiry): play the VS splash, then start the match. */
+    #lockIn(): void {
+        if (this.#phase !== 'select') return;
+        this.#countdown.stop();
         this.#playIntro(() => this.#paradroidGame.startMatch());
     }
 
@@ -96,9 +141,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
      * (`#focusBoard`) and start the match — see ParadroidIntro for the choreography.
      */
     #playIntro(onDone: () => void): void {
-        this.#busy = true;
-        // A previous match's buzzer leaves the scene clock frozen; unfreeze it so the splash's timed
-        // hand-off fires (startMatch re-asserts this, but the splash runs first).
+        this.#phase = 'intro';
         this.time.paused = false;
         this.#setBoardVisible(false);
         this.cameras.main.setZoom(1).setScroll(0, 0);
@@ -107,17 +150,17 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
             onComplete: () => {
                 // The board is on-screen at the neutral view; settle the camera onto it and start the
                 // fight (clock + AI begin now — after the FIGHT splash has cleared).
-                this.#focusBoard(FOCUS_MS, () => (this.#busy = false));
+                this.#focusBoard(FOCUS_MS, () => (this.#phase = 'fight'));
                 onDone();
             },
         });
     }
 
-    /** Reveal the board with a fade-in (crossfading against the VS splash) and bring the controls back. */
+    /** Reveal the board with a fade-in (crossfading against the VS splash) and bring the Map control back. */
     #revealBoard(durationMs: number): void {
         const board = this.#paradroidGame.container;
         board.setAlpha(0).setVisible(true);
-        this.#controls.forEach(control => control.setVisible(true));
+        this.#setControls(false, false, true); // only Map during the fight (no re-roll / lock-in mid-match)
         this.tweens.add({ targets: board, alpha: 1, ease: 'Sine.easeOut', duration: durationMs });
     }
 
@@ -152,34 +195,33 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         });
     }
 
-    /** Hide (or show) the board and its header controls together (used to clear the stage for the splash). */
+    /** Hide (or show) the board and all its header controls together (clears the stage for splash/outro). */
     #setBoardVisible(visible: boolean): void {
         this.#paradroidGame.container.setVisible(visible);
-        this.#controls.forEach(control => control.setVisible(visible));
+        this.#setControls(visible, visible, visible);
     }
 
-    /** Re-roll the board at the injected difficulty, idle and ready to start. */
-    #recreate(): void {
-        if (this.#busy) return;
-        this.#rebuild();
+    /** Toggle the three header controls independently. */
+    #setControls(reroll: boolean, lock: boolean, map: boolean): void {
+        this.#rerollBtn.setVisible(reroll);
+        this.#lockBtn.setVisible(lock);
+        this.#mapBtn.setVisible(map);
     }
 
-    /** Leave the duel and report the latest outcome to the run (Leet-29). Ignored while the intro plays. */
+    /** Leave the duel and report the latest outcome to the run (Leet-29). Ignored mid-animation. */
     #leave(): void {
-        if (this.#busy) return;
+        if (this.#phase === 'intro' || this.#phase === 'outro') return;
         // A takeover win offers the beaten droid's class for absorption (Leet-39); a loss/forfeit offers nothing.
         const absorbedClass = this.#lastOutcome === 'win' ? this.#config.droidClass : undefined;
         this.#config.onResult?.({ kind: 'duel', outcome: this.#lastOutcome, absorbedClass });
     }
 
-    /** Tear down the current game and build a fresh one (defaults to the injected config). */
-    #rebuild(factoryOptions = this.#config.factoryOptions, aiParams = this.#config.aiParams): void {
-        this.#resultText?.destroy();
-        this.#resultText = undefined;
+    /** Tear down the current game and build a fresh one at the injected config (the re-roll). */
+    #rebuild(): void {
         this.removeComponent(this.#paradroidGame);
         this.removeExisting(this.#paradroidGame.container);
         const newContainer = new Phaser.GameObjects.Container(this, 0, 0, []);
-        this.#paradroidGame = this.#createGame(factoryOptions, aiParams);
+        this.#paradroidGame = this.#createGame();
         this.addComponent(this.#paradroidGame);
         this.#paradroidGame.init();
         this.#paradroidGame.create(newContainer);
@@ -187,21 +229,35 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.resize();
     }
 
-    /** Announce the decided match above the board: "DROID WINS  3 - 5". */
-    #showResult(result: TParadroidMatchResult): void {
-        // A decided match settles the outcome the next "↩ Map" reports (draw counts as not-won → lose).
+    /**
+     * The match was decided (Leet-40): record the outcome the next "↩ Map" reports, then play the ending
+     * animation (loser drops, winner is promoted) before revealing the return control.
+     */
+    #onMatchEnded(result: TParadroidMatchResult): void {
+        // A decided match settles the outcome (a draw counts as not-won → lose).
         this.#lastOutcome = result.winner === 'player' ? 'win' : 'lose';
-        const label = result.winner === 'draw' ? 'DRAW' : result.winner === 'droid' ? 'DROID WINS' : 'PLAYER WINS';
-        const bounds = this.#paradroidGame.container.getBounds();
-        this.#resultText?.destroy();
-        this.#resultText = this.add
-            .text(bounds.centerX, bounds.top - 40, `${label}  ${result.playerScore} - ${result.droidScore}`, {
-                fontSize: '48px',
-                color: '#4dd3f6',
-                stroke: '#042b2c',
-                strokeThickness: 4,
-            })
-            .setOrigin(0.5);
+        this.#playOutro(result);
+    }
+
+    /** Clear the board, hold the camera neutral, and play the ending animation; reveal "Map" when it's done. */
+    #playOutro(result: TParadroidMatchResult): void {
+        this.#phase = 'outro';
+        this.time.paused = false; // the buzzer froze the clock; unfreeze so the outro's timed beats fire
+        this.#setBoardVisible(false);
+        this.cameras.main.setZoom(1).setScroll(0, 0);
+        this.#outro.play(result, { onComplete: () => this.#finishOutro() });
+    }
+
+    /** Outro finished: drop the player on a clear, centred "return to map" control over the victory tableau. */
+    #finishOutro(): void {
+        this.#phase = 'done';
+        const { width, height } = this.scale.gameSize;
+        this.#setControls(false, false, true);
+        this.#mapBtn
+            .setOrigin(0.5)
+            .setPosition(width / 2, height - 90)
+            .setText('↩ Return to map');
+        this.children.bringToTop(this.#mapBtn); // sit above the outro backdrop/portraits
     }
 
     override update(time: number, delta: number) {
@@ -218,10 +274,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     resize(gameSize?: Phaser.Structs.Size): void {
         const { width, height } = gameSize || this.scale.gameSize;
         this.cameras.resize(width, height);
-        // While the VS splash owns the screen the camera is held at a neutral 1:1 view; don't refit the
-        // (hidden) board underneath it — #playIntro refits once the splash clears.
-        if (this.#busy) return;
-        this.#fitBoardToViewport(width, height);
+        // The board is fit-to-viewport only while it owns the screen (select / fight). During the intro and
+        // outro the camera is held at a neutral 1:1 view (the splashes lay out in screen coords) — don't refit.
+        if (this.#phase === 'select' || this.#phase === 'fight') this.#fitBoardToViewport(width, height);
     }
 
     /**
@@ -235,14 +290,14 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         if (fit) this.cameras.main.setZoom(fit.zoom).centerOn(fit.centerX, fit.centerY);
     }
 
-    /** The zoom + centre that fits the board (plus its header controls) into the given viewport, if known. */
+    /** The zoom + centre that fits the board (plus its visible controls) into the given viewport, if known. */
     #computeBoardFit(width: number, height: number): { zoom: number; centerX: number; centerY: number } | undefined {
         const board = this.#paradroidGame?.container;
         if (!board || width === 0 || height === 0) return undefined;
-        // Fit the board *plus* the header controls, so the buttons are never zoomed off-screen.
+        // Fit the board *plus* the visible header controls, so the buttons are never zoomed off-screen.
         let bounds = board.getBounds();
         for (const control of this.#controls) {
-            bounds = Phaser.Geom.Rectangle.Union(bounds, control.getBounds());
+            if (control.visible) bounds = Phaser.Geom.Rectangle.Union(bounds, control.getBounds());
         }
         if (bounds.width === 0 || bounds.height === 0) return undefined;
         const margin = 1.1; // ~10% padding around the content

@@ -22,8 +22,9 @@ playable `ParadroidScene` with an intro that reports a typed `DuelResult` via `o
 sector-tunable droid AI (`paradroid.ai.ts`, `Balance.duelBoardParams`/`duelAiParams`). What's missing is
 everything that makes a duel *part of a run*: nothing in a real run opens one, no result is consumed, and
 there is no robo-pet. The three issues below close that.
-Recommended order: **~~Leet-37~~ → ~~39~~ → 38** (37 + 39 met the exit criterion — duels fire from the map
-and a win grows the pet; **38 is next** — the teeth: a sector difficulty curve and the mini-duel variant).
+Recommended order: **~~Leet-37~~ → ~~39~~ → ~~40~~ → 38** (37 + 39 met the exit criterion — duels fire from
+the map and a win grows the pet; 40 turned the duel into a *staged* encounter — grid-selection + ending
+animation; **38 is next** — the teeth: a sector difficulty curve and the mini-duel variant).
 
 ## Leet-37: Duel-as-takeover — fire duels from the map — ✅ done
 
@@ -102,6 +103,45 @@ end; higher class = stronger duel position + dungeon perks.
       np-paradroid 10, np-pixel-dungeon 17, np-space-map 24, app smoke 1). *UI not exercised here.*
 
 **Exit:** winning a duel grows the pet's class within a run, and it shows on the HUD.
+
+## Leet-40: Duel staging — grid selection + ending animation — ✅ done
+
+**Context:** the duel opened straight onto an idle board with debug "Start Normal / Start Brutal / Re-Create"
+buttons — you pressed Start, the VS intro played, the match ran, and a decided match just printed a text label
+above the board. Grid generation was invisible and fixed (a bad roll felt like the *game* being unfair), and
+there was no ending beat. This makes choosing the layout part of the gameplay and bookends the fight.
+
+**Decided:**
+- **The grid roll is a timed player choice.** A fixed ~20s window to **re-roll freely** before it locks — the
+  window does *not* reset on a re-roll (the fixed budget is the pressure). A good grid wins easier, a bad one
+  loses more likely, so a poor board is the player's *call*, not the game being unfair (GDD §4 — the sibling's
+  "re-roll a grid row" assist is the same fantasy, scoped smaller).
+- **Countdown honours the "binary clock / 3-2-1" idea:** a big digit punches in at the board's centre each
+  second, *ghosted* (alpha ~0.22) so the board stays readable through it, reddening as it runs out, over a
+  compact binary-block readout (`▮ ▯ ▮`). The selection-window duration is a **duel-timing** constant in
+  np-paradroid (alongside `FOCUS_MS` / `MATCH_DURATION_MS`), not an np-state `Balance` knob — `Balance` holds
+  difficulty *tuning* (rates, AI), not staging.
+- **Ending animation bookends the VS intro:** both portraits fade up over the cleared board, the **loser drops
+  out of the bottom** (tumbling, fading) while the **winner slides to the centre and swells (is promoted)**,
+  then a "WINNER — PROMOTED" / "DROID WINS" / "DRAW" banner stamps in with a screen shake over the final score.
+
+**Outcome**
+- [x] `ParadroidScene` now runs a staging state machine — **`select → intro → fight → outro → done`**
+      (replacing the `#busy` flag). The board is visible + camera-fit only in `select` / `fight`; the intro and
+      outro own the screen at a neutral 1:1 view (the existing intro choreography, reused).
+- [x] New `ParadroidCountdown` (plain object, no textures): ghosted centre digit + binary readout + caption,
+      ticks on the scene clock, expires into `#lockIn`. New `ParadroidOutro` (component, for portrait preload —
+      textures shared with the intro): the drop/promote choreography, draw-aware.
+- [x] Controls are now gameplay-focused: **`↻ Re-Roll` · `⚔ Lock In` · `↩ Map`** (the debug Start-difficulty
+      buttons are retired — difficulty is set by the encounter/launch, `normal` default). The fit unions only
+      *visible* controls; a re-roll lifts the countdown back above the freshly-added board.
+- [x] Pure `toBinaryBlocks` extracted to a Phaser-free `@types/paradroid.format.ts` (+ spec). No
+      run-conductor / contract changes — the new flow is internal to the scene; `onResult` is unchanged.
+- [x] build + lint + unit tests green (np-paradroid 20 incl. the new format spec, app smoke 1, app prod build).
+      *UI not exercised here* — the selection countdown + the win/lose ending are for the user to eyeball.
+
+**Exit:** the grid roll is a timed player choice, and a decided duel plays a win/lose ending animation.
+*(Advances Leet-38's "tighten intro → play → result staging" item; 38's sector curve + mini-duel remain.)*
 
 ---
 
