@@ -35,22 +35,7 @@ export class NpAudioService {
     // A loaded .strudel song (raw code), if one is the current source instead of a mood id.
     #song: MoodBuilder | null = null;
 
-    constructor() {
-        // Browsers block audio until a user gesture (Chrome autoplay policy), so we can't boot on a
-        // phase change (the first one fires with no gesture). Resume on the first real interaction
-        // anywhere on the page — the conductor only *queues* a mood; playback actually starts here.
-        if (typeof document !== 'undefined') {
-            const onFirstGesture = (): void => {
-                document.removeEventListener('pointerdown', onFirstGesture, true);
-                document.removeEventListener('keydown', onFirstGesture, true);
-                void this.unlock();
-            };
-            document.addEventListener('pointerdown', onFirstGesture, true);
-            document.addEventListener('keydown', onFirstGesture, true);
-        }
-    }
-
-    /** Boot audio from a user gesture: resume the context, init the engine, and start any queued mood. */
+    /** Boot audio from the title-screen Start gesture: resume the context, init the engine, play any queued mood. */
     async unlock(): Promise<void> {
         if (this.#ready()) return;
         await this.#engine.init();
@@ -58,25 +43,6 @@ export class NpAudioService {
         this.#engine.setMuted(this.#muted()); // honour a mute toggled before audio booted
         if (this.#song) this.#engine.play(this.#song);
         else if (this.#mood) this.#engine.play(Audio.mood(this.#mood));
-    }
-
-    /**
-     * Whether the browser will start audio without a user gesture (returning visitor / relaxed autoplay
-     * policy). Lets the UI skip the "tap to start" gate when it isn't needed. Probes a throwaway context:
-     * a fresh one is `suspended` until a gesture, so `resume()` only reaches `running` when allowed.
-     */
-    async canAutoplay(): Promise<boolean> {
-        if (typeof AudioContext === 'undefined') return false;
-        let probe: AudioContext | undefined;
-        try {
-            probe = new AudioContext();
-            if (probe.state !== 'running') await probe.resume();
-            return probe.state === 'running';
-        } catch {
-            return false;
-        } finally {
-            void probe?.close();
-        }
     }
 
     /** Flip the global mute. */
