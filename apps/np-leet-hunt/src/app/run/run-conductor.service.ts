@@ -1,11 +1,10 @@
 import { effect, inject, Injectable } from '@angular/core';
+import { Balance, CREW_DISPLAY_NAMES, Sector, SECTOR_COUNT } from '@shared/np-config';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
 import { SPACE_EVENTS, SpaceMapScene, SpaceScene, SpaceUiScene, SpawnGamePayload } from '@shared/np-space-map';
 import {
-    Balance,
-    CREW_DISPLAY_NAMES,
     describeEnding,
     EndingKind,
     GameStateService,
@@ -13,8 +12,6 @@ import {
     ModeLaunch,
     ModeResult,
     RunPhase,
-    Sector,
-    SECTOR_COUNT,
 } from '@shared/np-state';
 
 /** Placeholder consequence of losing a duel — non-lethal (Phase 2 decision); tuned by the curve in Leet-38. */

@@ -1,5 +1,5 @@
+import { DuelBoardParams } from '@shared/np-config';
 import { NPRng } from '@shared/np-library';
-import { DuelBoardParams } from '@shared/np-state';
 
 import {
     CParadroidShapeInfo,

@@ -1,4 +1,4 @@
-import { Balance, DuelAiParams } from '@shared/np-state';
+import { Balance, DuelAiParams } from '@shared/np-config';
 
 import { NPRng } from '../../../../np-phaser/src/lib/utilities/piecemeal';
 import { EParadroidOwner } from '../@types/paradroid.consts';

@@ -1,8 +1,16 @@
 import { Signal, signal } from '@angular/core';
+import {
+    CrewMember,
+    PET_BASE_CLASS,
+    ResourceDelta,
+    Resources,
+    RunContext,
+    SECTOR_COUNT,
+    SECTOR_ORDER,
+    SectorId,
+    STARTING_RESOURCES,
+} from '@shared/np-config';
 
-import { PET_BASE_CLASS, SECTOR_COUNT, SECTOR_ORDER } from '../balance/balance.model';
-import { ResourceDelta, Resources, STARTING_RESOURCES } from '../model/resources';
-import { CrewMember, RunContext, SectorId } from '../model/run-context';
 import { GameState } from './game-state';
 
 /**

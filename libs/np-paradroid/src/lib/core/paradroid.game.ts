@@ -1,6 +1,6 @@
+import { Balance, DuelAiParams } from '@shared/np-config';
 import { NPRng } from '@shared/np-library';
 import { NPBinaryTimer, NPGameObject, NPGameObjectList, NPScene } from '@shared/np-phaser';
-import { Balance, DuelAiParams } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { EParadroidOwner } from '../@types/paradroid.consts';

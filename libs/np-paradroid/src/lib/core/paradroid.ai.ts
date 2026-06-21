@@ -1,5 +1,5 @@
+import type { DuelAiParams } from '@shared/np-config';
 import { NPRng } from '@shared/np-library';
-import type { DuelAiParams } from '@shared/np-state';
 
 import { TParadroidSubTile } from '../@types/paradroid.types';
 import { analyzeOutcome, droidScore } from './paradroid.analysis';

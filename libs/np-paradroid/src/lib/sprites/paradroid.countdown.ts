@@ -1,12 +1,8 @@
+import { DUEL_READOUT_BASE, PALETTE } from '@shared/np-config';
 import { NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { toBinaryBlocks } from '../@types/paradroid.format';
-
-/** Palette — the cyan matches the binary match-timer and the result readout; amber/red flag urgency. */
-const CYAN = '#4dd3f6';
-const AMBER = '#f6c14d';
-const RED = '#f6534d';
 
 const TICK_MS = 1000; // one beat per second of the selection window
 const PUNCH_MS = 600; // each tick the big digit pops and fades back to its ghosted rest alpha
@@ -53,21 +49,23 @@ export class ParadroidCountdown {
         // flank is hidden during selection), so keep it short — the "↻ Re-Roll" button conveys the action.
         const caption = this.#scene.add
             .text(cx, bounds.top - 6, 'CHOOSE YOUR GRID', {
+                ...DUEL_READOUT_BASE,
                 fontSize: `${Math.round(size * 0.09)}px`,
-                color: CYAN,
-                stroke: '#042b2c',
-                strokeThickness: 3,
             })
             .setOrigin(0.5, 1)
             .setAlpha(0.9);
         this.#number = this.#scene.add
-            .text(cx, cy, `${seconds}`, { fontSize: `${Math.round(size * 0.85)}px`, color: CYAN, fontStyle: 'bold' })
+            .text(cx, cy, `${seconds}`, {
+                color: PALETTE.cyan,
+                fontSize: `${Math.round(size * 0.85)}px`,
+                fontStyle: 'bold',
+            })
             .setOrigin(0.5)
             .setAlpha(REST_ALPHA);
         this.#binary = this.#scene.add
             .text(cx, cy + size * 0.46, toBinaryBlocks(seconds, this.#bits), {
+                color: PALETTE.cyan,
                 fontSize: `${Math.round(size * 0.12)}px`,
-                color: CYAN,
             })
             .setOrigin(0.5)
             .setAlpha(0.55);
@@ -96,7 +94,7 @@ export class ParadroidCountdown {
     #punch(n: number): void {
         const digit = this.#number;
         if (!digit) return;
-        const color = n <= 3 ? RED : n <= 6 ? AMBER : CYAN;
+        const color = n <= 3 ? PALETTE.lose : n <= 6 ? PALETTE.amber : PALETTE.cyan;
         digit.setColor(color);
         this.#binary?.setColor(color);
         this.#scene.tweens.killTweensOf(digit);

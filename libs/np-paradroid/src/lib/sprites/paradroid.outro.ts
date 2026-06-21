@@ -1,13 +1,10 @@
+import { TEXT } from '@shared/np-config';
 import { NPRNG } from '@shared/np-library';
-import { fadeIn, fadeTo, NPGameObjectList, NPScene, popIn, slideTo } from '@shared/np-phaser';
+import { centeredText, fadeIn, fadeTo, NPGameObjectList, NPScene, popIn, slideTo } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { TParadroidMatchResult } from '../core/paradroid.game';
 import { PARADROID_IMAGES } from './paradroid.image';
-
-const WIN_TEXT = '#7cfc9a'; // promotion green
-const LOSE_TEXT = '#f6534d'; // defeat red
-const DRAW_TEXT = '#9fe7ef'; // neutral cyan
 
 const APPEAR_MS = 420; // backdrop + both portraits settle in over the cleared board
 const HOLD_MS = 320; // a beat with both fighters up before the verdict resolves
@@ -88,7 +85,7 @@ export class ParadroidOutro extends NPGameObjectList {
         const cy = height / 2;
 
         if (result.winner === 'draw') {
-            this.#banner(group, cx, cy - height * 0.34, 'DRAW', result, DRAW_TEXT);
+            this.#banner(group, cx, cy - height * 0.34, 'DRAW', result, TEXT.duelBannerDraw);
             this.scene.time.delayedCall(STAMP_MS + FINISH_HOLD_MS, () => hooks.onComplete());
             return;
         }
@@ -122,7 +119,7 @@ export class ParadroidOutro extends NPGameObjectList {
                     cy - height * 0.34,
                     winnerIsPlayer ? 'WINNER — PROMOTED' : 'DROID WINS',
                     result,
-                    winnerIsPlayer ? WIN_TEXT : LOSE_TEXT
+                    winnerIsPlayer ? TEXT.duelBannerWin : TEXT.duelBannerLose
                 );
                 this.scene.time.delayedCall(STAMP_MS + FINISH_HOLD_MS, () => hooks.onComplete());
             },
@@ -136,19 +133,16 @@ export class ParadroidOutro extends NPGameObjectList {
         y: number,
         label: string,
         result: TParadroidMatchResult,
-        color: string
+        style: Phaser.Types.GameObjects.Text.TextStyle
     ) {
-        const title = this.scene.add
-            .text(x, y, label, { fontSize: '88px', color, stroke: '#02110a', strokeThickness: 8, fontStyle: 'bold' })
-            .setOrigin(0.5);
-        const score = this.scene.add
-            .text(x, y + 92, `${result.playerScore} — ${result.droidScore}`, {
-                fontSize: '52px',
-                color: '#4dd3f6',
-                stroke: '#042b2c',
-                strokeThickness: 4,
-            })
-            .setOrigin(0.5);
+        const title = centeredText(this.scene, x, y, label, style);
+        const score = centeredText(
+            this.scene,
+            x,
+            y + 92,
+            `${result.playerScore} — ${result.droidScore}`,
+            TEXT.duelScore
+        );
         group.add([title, score]);
         popIn(title, { duration: STAMP_MS }); // stamps in from nothing (was scale 0.2 → 0; visually the same punch)
         fadeIn(score, { duration: STAMP_MS, delay: 120 });

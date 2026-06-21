@@ -1,6 +1,6 @@
 import { inject, Injectable, InjectionToken, Signal } from '@angular/core';
+import { RunContext } from '@shared/np-config';
 
-import { RunContext } from './model/run-context';
 import { RunFsm } from './run/run.fsm';
 import { RunStateStore } from './run/run-state.store';
 import { InMemoryPersistence, PersistencePort } from './save/persistence.port';

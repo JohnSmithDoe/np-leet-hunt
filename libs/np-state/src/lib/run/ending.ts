@@ -1,5 +1,4 @@
-import { SECTOR_COUNT } from '../balance/balance.model';
-import { CREW_DISPLAY_NAMES, CrewMember, RunContext } from '../model/run-context';
+import { CREW_DISPLAY_NAMES, CrewMember, RunContext, SECTOR_COUNT } from '@shared/np-config';
 
 /**
  * How a run ended — which exit the player took (Leet-33/34 / GDD §2 "Endings"). The conductor records

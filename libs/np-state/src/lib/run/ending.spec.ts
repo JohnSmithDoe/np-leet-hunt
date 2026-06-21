@@ -1,4 +1,4 @@
-import { RunContext } from '../model/run-context';
+import { RunContext } from '@shared/np-config';
 import { describeEnding, EndingKind } from './ending';
 
 const ctx = (over: Partial<RunContext> = {}): RunContext => ({

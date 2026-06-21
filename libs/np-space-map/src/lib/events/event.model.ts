@@ -5,7 +5,8 @@
  * the spec.
  */
 
-import type { CrewMember, ModeLaunch, SectorId } from '@shared/np-state';
+import type { CrewMember, SectorId } from '@shared/np-config';
+import type { ModeLaunch } from '@shared/np-state';
 
 /** Internal balance tag, never rendered (spec §4). Order of a question's answers is always good|neutral|bad. */
 export type Tone = 'good' | 'neutral' | 'bad';

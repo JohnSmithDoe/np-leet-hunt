@@ -1,5 +1,6 @@
+import type { Sector } from '@shared/np-config';
 import { clamp, NPMovableSprite, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
-import type { GameState, Sector } from '@shared/np-state';
+import type { GameState } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { NPSpaceMap } from '../space/np-space-map';

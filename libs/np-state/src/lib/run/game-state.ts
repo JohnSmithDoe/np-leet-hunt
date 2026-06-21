@@ -1,5 +1,4 @@
-import { ResourceDelta, Resources } from '../model/resources';
-import { CrewMember, RunContext, SectorId } from '../model/run-context';
+import { CrewMember, ResourceDelta, Resources, RunContext, SectorId } from '@shared/np-config';
 
 /**
  * The contract a game mode codes against — resources, inventory, flags, crew. Implemented by

@@ -1,4 +1,4 @@
-import { DuelBoardLevel } from '@shared/np-state';
+import { DuelBoardLevel } from '@shared/np-config';
 
 import { TParadroidShape, TParadroidTileDefinition } from './paradroid.types';
 

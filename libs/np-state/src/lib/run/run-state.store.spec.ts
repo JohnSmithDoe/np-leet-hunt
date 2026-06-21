@@ -1,4 +1,4 @@
-import { STARTING_RESOURCES } from '../model/resources';
+import { STARTING_RESOURCES } from '@shared/np-config';
 import { RunStateStore } from './run-state.store';
 
 describe('RunStateStore', () => {

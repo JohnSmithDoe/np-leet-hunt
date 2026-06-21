@@ -1,5 +1,5 @@
+import { SectorId } from '@shared/np-config';
 import { NPRng } from '@shared/np-library';
-import { SectorId } from '@shared/np-state';
 
 import { distortionCache } from './content/distortion-battery.event';
 import { enRouteEvents } from './content/en-route.events';

@@ -24,5 +24,6 @@ export * from './lib/sprites/timer/binarytimer';
 export * from './lib/utilities/np-phaser-utils';
 export * from './lib/utilities/np-math';
 export * from './lib/utilities/np-tween';
+export * from './lib/utilities/np-text-helpers';
 // lifecycle interfaces live in a .d.ts — re-export as types only so no runtime require is emitted
 export type { OnSceneInit, OnScenePreload, OnSceneCreate, OnSceneUpdate, TNPTextureKey } from './lib/types/np-phaser';

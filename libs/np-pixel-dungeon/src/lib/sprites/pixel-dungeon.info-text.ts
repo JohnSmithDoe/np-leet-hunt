@@ -1,3 +1,4 @@
+import { PALETTE } from '@shared/np-config';
 import { floatUp, NPText } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
@@ -12,10 +13,10 @@ export enum EMobInfoType {
 }
 
 const CMobInfoColors: Record<EMobInfoType, string> = {
-    [EMobInfoType.GainHealth]: '#00FF00',
-    [EMobInfoType.LoseHealth]: '#FF0000',
-    [EMobInfoType.Blocked]: '#af641a',
-    [EMobInfoType.Doged]: '#ece212',
+    [EMobInfoType.GainHealth]: PALETTE.heal,
+    [EMobInfoType.LoseHealth]: PALETTE.damage,
+    [EMobInfoType.Blocked]: PALETTE.blocked,
+    [EMobInfoType.Doged]: PALETTE.dodged,
 };
 
 export class PixelDungeonInfoText extends NPText {

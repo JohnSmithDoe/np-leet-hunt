@@ -1,6 +1,16 @@
-import { clamp, floatUp, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload, pop } from '@shared/np-phaser';
-import type { GameState, Sector } from '@shared/np-state';
-import { SECTOR_COUNT } from '@shared/np-state';
+import type { Sector } from '@shared/np-config';
+import { PALETTE, SECTOR_COUNT, TEXT } from '@shared/np-config';
+import {
+    centeredText,
+    clamp,
+    floatUp,
+    NPScene,
+    OnSceneCreate,
+    OnSceneInit,
+    OnScenePreload,
+    pop,
+} from '@shared/np-phaser';
+import type { GameState } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { FrontAdvancedPayload, SPACE_EVENTS } from '../space.events';
@@ -56,20 +66,16 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
                 .setScrollFactor(0)
                 .setDepth(100);
 
-        this.#title = text(BAR.x, BAR.y - 64, this.#titleText(), 24, '#e7ecff');
-        text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, '#cfd8ff');
+        this.#title = text(BAR.x, BAR.y - 64, this.#titleText(), 24, PALETTE.hudTitle);
+        text(BAR.x, BAR.y - 32, 'REALITY CLOSING IN', 22, PALETTE.hudSubtitle);
         this.#bar = this.add.graphics().setScrollFactor(0).setDepth(100);
-        this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, '#9fb0d0');
+        this.#jumps = text(BAR.x, BAR.y + BAR.h + 8, 'JUMPS  0', 20, PALETTE.hudMuted);
         const r = this.#state.resources;
-        this.#stats = text(BAR.x, BAR.y + BAR.h + 36, this.#statsText(r), 20, '#9fb0d0');
+        this.#stats = text(BAR.x, BAR.y + BAR.h + 36, this.#statsText(r), 20, PALETTE.hudMuted);
         this.#prevResources = { hull: r.hull, heart: r.heart, marbles: r.marbles };
-        this.#pet = text(BAR.x, BAR.y + BAR.h + 62, this.#petText(), 20, '#bfa6ff'); // robo-pet readout (Leet-39)
+        this.#pet = text(BAR.x, BAR.y + BAR.h + 62, this.#petText(), 20, PALETTE.hudPet); // robo-pet readout (Leet-39)
         this.#prevPetClass = this.#state.petClass;
-        this.#banner = this.add
-            .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
-            .setOrigin(0.5)
-            .setScrollFactor(0)
-            .setDepth(101);
+        this.#banner = centeredText(this, 960, 540, '', TEXT.hudBanner).setScrollFactor(0).setDepth(101);
         this.#drawBar();
 
         this.game.events.on(SPACE_EVENTS.FRONT_ADVANCED, (payload: FrontAdvancedPayload) => {
@@ -80,14 +86,14 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         this.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => {
             this.#fraction = 1;
             this.#drawBar();
-            this.#banner.setColor('#ff8a8a').setText('REALITY SNAPPED BACK');
+            this.#banner.setColor(PALETTE.alert).setText('REALITY SNAPPED BACK');
         });
         this.game.events.on(SPACE_EVENTS.SECTOR_EXIT, () => {
-            this.#banner.setColor('#8affc8').setText('JUMPED OUT — SECTOR LEFT');
+            this.#banner.setColor(PALETTE.gain).setText('JUMPED OUT — SECTOR LEFT');
         });
         this.game.events.on(SPACE_EVENTS.FRONT_PUSHED, () => {
             // The bar already retreats via FRONT_ADVANCED; this calls out the rare reprieve (Leet-36).
-            this.#banner.setColor('#8affc8').setText('DISTORTION BATTERY — THE GREY PULLS BACK');
+            this.#banner.setColor(PALETTE.gain).setText('DISTORTION BATTERY — THE GREY PULLS BACK');
         });
     }
 
@@ -143,13 +149,11 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     /** One rising, fading gain/loss number, stacked to the right of the stats readout (clear of the text). */
     #floatDelta(label: string, delta: number, row: number) {
         const gain = delta > 0;
-        const color = gain ? '#8affc8' : '#ff8a8a'; // same green/red as the front bar + snapback banner
+        const color = gain ? PALETTE.gain : PALETTE.alert; // same green/red as the front bar + snapback banner
         const sign = gain ? '+' : '-';
         const floater = this.add
             .text(BAR.x + 360, BAR.y + BAR.h + 36 + row * 26, `${label} ${sign}${Math.abs(delta)}`, {
-                fontFamily: 'sans-serif',
-                fontSize: '22px',
-                fontStyle: 'bold',
+                ...TEXT.hudFloater,
                 color,
             })
             .setScrollFactor(0)

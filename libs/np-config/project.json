@@ -1,0 +1,23 @@
+{
+    "name": "np-config",
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/np-config/src",
+    "prefix": "np-afterwork",
+    "targets": {
+        "test": {
+            "executor": "@nx/vitest:test",
+            "outputs": [
+                "{options.reportsDirectory}"
+            ],
+            "options": {
+                "configFile": "libs/np-config/vitest.config.ts",
+                "reportsDirectory": "../../coverage/libs/np-config"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        }
+    },
+    "tags": []
+}

@@ -1,4 +1,4 @@
-import { DuelAiLevel, DuelBoardLevel } from '../balance/balance.model';
+import { DuelAiLevel, DuelBoardLevel } from '@shared/np-config';
 
 /**
  * The mode hand-off contract (Leet-29). A run is the map plus excursions into transient modes (a duel, a

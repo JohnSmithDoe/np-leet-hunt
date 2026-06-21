@@ -1,3 +1,4 @@
+import type { Sector } from '@shared/np-config';
 import { NPRng } from '@shared/np-library';
 import {
     degToRad,
@@ -9,7 +10,7 @@ import {
     NPMovableSprite,
     NPScene,
 } from '@shared/np-phaser';
-import type { GameState, Sector } from '@shared/np-state';
+import type { GameState } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { DISTORTION_BATTERY, Effect } from '../events/event.model';

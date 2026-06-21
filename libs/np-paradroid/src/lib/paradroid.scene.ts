@@ -1,5 +1,6 @@
+import { DuelAiParams } from '@shared/np-config';
 import { fadeIn, NPScene, NPTextButton, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
-import { DuelAiParams, DuelResult } from '@shared/np-state';
+import { DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
 import { TParadroidFactoryOptions } from './core/paradroid.factory';
