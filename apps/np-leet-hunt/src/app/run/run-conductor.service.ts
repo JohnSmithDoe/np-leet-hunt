@@ -1,4 +1,5 @@
 import { effect, inject, Injectable } from '@angular/core';
+import { NpAudioService } from '@shared/np-audio';
 import { Balance, CREW_DISPLAY_NAMES, Sector, SECTOR_COUNT } from '@shared/np-config';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
@@ -31,7 +32,12 @@ const DUEL_LOSS_PENALTY = { hull: -2 };
 export class RunConductorService {
     #stage = inject(StageService);
     #game = inject(GameStateService);
+    #audio = inject(NpAudioService);
     #wired = false;
+
+    // The mood currently playing, so a same-mood phase (event overlay, same-sector return) doesn't
+    // restart the track — only a genuine mood change re-evaluates.
+    #currentMood?: string;
 
     // The sector currently rendered, and its number, so #showSpace can tell a *new* sector (rebuild the
     // map fresh) from a return to the same one (wake the slept scenes after a dungeon/duel excursion).
@@ -64,6 +70,7 @@ export class RunConductorService {
             this.#stage.phaser.game.events.on(SPACE_EVENTS.REALITY_SNAPBACK, () => this.#onSnapback());
             this.#stage.phaser.game.events.on(SPACE_EVENTS.GUARDIAN_REACHED, () => this.#onGuardianReached());
             this.#stage.phaser.game.events.on(SPACE_EVENTS.SPAWN_GAME, (s: SpawnGamePayload) => this.#onSpawnGame(s));
+            this.#stage.phaser.game.events.on(SPACE_EVENTS.TRAVEL_TAP, () => this.#audio.sfx.play('ui.travel'));
         });
         // React to every *settled* phase (incl. the initial 'hangar'), but only once Phaser is up. A
         // synchronous double-step like `to('sectorExit')→to('sector')` coalesces to 'sector' directly —
@@ -75,6 +82,7 @@ export class RunConductorService {
     }
 
     #enter(phase: RunPhase): void {
+        this.#audioForPhase(phase);
         switch (phase) {
             case 'hangar':
                 this.#showHangar();
@@ -101,6 +109,40 @@ export class RunConductorService {
             case 'sectorExit':
                 // Transient routing phase — no scene of its own; #onSectorExit advances straight through it.
                 break;
+        }
+    }
+
+    /**
+     * Map the run phase to a mood: a calm wash over the map, the encounter mood with raised intensity
+     * for combat modes — "a mid-travel encounter raises tension". This only *queues* the mood; audio
+     * actually boots when {@link NpAudioService} catches the first user gesture (autoplay policy).
+     * Re-evaluating the same mood is skipped (see {@link #playMood}) so an event overlay or same-sector
+     * return won't restart it.
+     */
+    #audioForPhase(phase: RunPhase): void {
+        switch (phase) {
+            case 'duel':
+            case 'dungeon':
+            case 'guardian':
+            case 'boarding':
+                this.#playMood('space.encounter', 0.85, 1200); // quicker drop into the tense mood
+                break;
+            case 'ending':
+                this.#audio.music.stop(800);
+                this.#currentMood = undefined;
+                break;
+            default:
+                this.#playMood('space.calm', 0.15, 2000); // slow wash back to the map
+                break;
+        }
+    }
+
+    /** Set intensity first (so a new mood starts at the right tension), then crossfade if it changed. */
+    #playMood(mood: string, intensity: number, fadeMs: number): void {
+        this.#audio.music.setIntensity(intensity);
+        if (mood !== this.#currentMood) {
+            this.#currentMood = mood;
+            this.#audio.music.play(mood, { fadeMs });
         }
     }
 

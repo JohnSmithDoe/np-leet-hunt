@@ -9,6 +9,11 @@
             <ion-button aria-label='Boarding action' (click)='toBoarding()'>Board</ion-button>
             <ion-button aria-label='Sector guardian' (click)='toGuardian()'>Guardian</ion-button>
         </ion-buttons>
+        <ion-buttons slot="end">
+            <ion-button aria-label='Test SFX' (click)='playSfx()'>SFX</ion-button>
+            <ion-button aria-label='Play theme song' (click)='playTheme()'>Theme</ion-button>
+            <ion-button aria-label='Toggle sound' (click)='toggleMute()'>{{ muted() ? 'Sound off' : 'Sound on' }}</ion-button>
+        </ion-buttons>
         <ion-title>Home</ion-title>
     </ion-toolbar>
 </ion-header>
@@ -17,5 +22,10 @@
         <np-stage></np-stage>
         <np-planet-info></np-planet-info>
         <np-event-dialog></np-event-dialog>
+        @if (!started()) {
+            <div class="start-overlay">
+                <button type="button" class="start-button" (click)="start()">▶ Enter the Hush</button>
+            </div>
+        }
     </div>
 </ion-content>

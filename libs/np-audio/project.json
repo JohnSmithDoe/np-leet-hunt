@@ -1,0 +1,21 @@
+{
+    "name": "np-audio",
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/np-audio/src",
+    "prefix": "np-afterwork",
+    "targets": {
+        "test": {
+            "executor": "@nx/vitest:test",
+            "outputs": ["{options.reportsDirectory}"],
+            "options": {
+                "configFile": "libs/np-audio/vitest.config.ts",
+                "reportsDirectory": "../../coverage/libs/np-audio"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        }
+    },
+    "tags": []
+}

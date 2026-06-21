@@ -7,6 +7,7 @@ A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 2
 - Working notes for contributors (incl. AI agents) are in [`CLAUDE.md`](./CLAUDE.md).
 
 **Version constraints to respect:**
+
 - **Phaser stays on 3.x** — Phaser 4 is a ground-up rewrite incompatible with the game code and `phaser3-rex-plugins`.
 - **Angular tracks the newest version Nx supports** (Nx's peer range usually lags one major behind Angular's latest).
 
@@ -30,13 +31,13 @@ apps/np-leet-hunt  (Ionic shell)
 
 Each library has its own README with how it works, its main components, and a grounded "what can be improved" list:
 
-| Library | What it is | Key components | Notable gaps (see its README) |
-|---|---|---|---|
-| [`np-library`](./libs/np-library/README.md) | Framework-agnostic TypeScript utilities; the bottom of the dependency graph. | `NPBaseSubscriber` (RxJS cleanup), math helpers (`clamp`, `array2D`, radian constants). | Re-exports `piecemeal` *from* `np-phaser`, inverting the dependency direction; no tests. |
-| [`np-phaser`](./libs/np-phaser/README.md) | The Angular↔Phaser bridge and shared game framework everything builds on. | `PhaserService` (owns `Phaser.Game`), `StageService` (scene lifecycle), `NPScene` (component model), `StageComponent`, shared sprites/cameras, and the `piecemeal` geometry/RNG toolkit (`NPVec2`, `NPRect`, `NPRng`, `EDirection`). | Thin public barrel forces deep imports; fragile fade plumbing; heavy rex-plugin coupling; near-zero tests. |
-| [`np-space-map`](./libs/np-space-map/README.md) | The star-map / overworld, run as **three concurrent scenes** (background, map, UI) with independent cameras instead of Phaser layers. | `SpaceScene` / `SpaceMapScene` / `SpaceUiScene`, `NPSpaceMap`, `StarmapFactory` (Poisson-disc generation), `Planet`. | Cross-scene API is only two zoom events; hardcoded config; possible outer-space sampling offset. |
-| [`np-paradroid`](./libs/np-paradroid/README.md) | A Paradroid-style "Influence Device" duel — capture a procedurally-generated circuit by activating flow paths toward the contested middle. | `ParadroidScene`, `ParadroidFactory` (seeded generation), `ParadroidEngine`, `ParadroidField`/`Path` state machines. | Magic numbers; stringly-typed path state; dead `ParadroidIntro`; no tests. |
-| [`np-pixel-dungeon`](./libs/np-pixel-dungeon/README.md) | A turn-based roguelike: room-and-maze dungeon generation, energy-gated turns, pathfinding, FOV, LPC-spritesheet mobs. | `PixelDungeonScene`, `PixelDungeonEngine` (rex state machine), `PixelDungeonFactory`, tilemap layers, mob traits (movement/action/vision). | FOV `perspective` mode disabled (*"true crashs"*) so no true line-of-sight occlusion; placeholder enemy AI; `EndGameState` is a stub; no tests. |
+| Library                                                 | What it is                                                                                                                                 | Key components                                                                                                                                                                                                                       | Notable gaps (see its README)                                                                                                                   |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`np-library`](./libs/np-library/README.md)             | Framework-agnostic TypeScript utilities; the bottom of the dependency graph.                                                               | `NPBaseSubscriber` (RxJS cleanup), math helpers (`clamp`, `array2D`, radian constants).                                                                                                                                              | Re-exports `piecemeal` _from_ `np-phaser`, inverting the dependency direction; no tests.                                                        |
+| [`np-phaser`](./libs/np-phaser/README.md)               | The Angular↔Phaser bridge and shared game framework everything builds on.                                                                  | `PhaserService` (owns `Phaser.Game`), `StageService` (scene lifecycle), `NPScene` (component model), `StageComponent`, shared sprites/cameras, and the `piecemeal` geometry/RNG toolkit (`NPVec2`, `NPRect`, `NPRng`, `EDirection`). | Thin public barrel forces deep imports; fragile fade plumbing; heavy rex-plugin coupling; near-zero tests.                                      |
+| [`np-space-map`](./libs/np-space-map/README.md)         | The star-map / overworld, run as **three concurrent scenes** (background, map, UI) with independent cameras instead of Phaser layers.      | `SpaceScene` / `SpaceMapScene` / `SpaceUiScene`, `NPSpaceMap`, `StarmapFactory` (Poisson-disc generation), `Planet`.                                                                                                                 | Cross-scene API is only two zoom events; hardcoded config; possible outer-space sampling offset.                                                |
+| [`np-paradroid`](./libs/np-paradroid/README.md)         | A Paradroid-style "Influence Device" duel — capture a procedurally-generated circuit by activating flow paths toward the contested middle. | `ParadroidScene`, `ParadroidFactory` (seeded generation), `ParadroidEngine`, `ParadroidField`/`Path` state machines.                                                                                                                 | Magic numbers; stringly-typed path state; dead `ParadroidIntro`; no tests.                                                                      |
+| [`np-pixel-dungeon`](./libs/np-pixel-dungeon/README.md) | A turn-based roguelike: room-and-maze dungeon generation, energy-gated turns, pathfinding, FOV, LPC-spritesheet mobs.                      | `PixelDungeonScene`, `PixelDungeonEngine` (rex state machine), `PixelDungeonFactory`, tilemap layers, mob traits (movement/action/vision).                                                                                           | FOV `perspective` mode disabled (_"true crashs"_) so no true line-of-sight occlusion; placeholder enemy AI; `EndGameState` is a stub; no tests. |
 
 **Asset convention:** each library keeps its assets under its own source tree; the app's `project.json` build target copies them to output folders named after the lib (`./np-phaser`, `./np-space-map`, …), so in-game `load` calls reference paths like `np-space-map/...`.
 
@@ -84,6 +85,14 @@ npm run sync:app:angular        # cap copy + sync
 npm run ios:app:angular         # open the iOS project
 npm run android:app:angular     # open the Android project
 ```
+
+## License
+
+np-leet-hunt is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see [`LICENSE`](./LICENSE).
+
+The project adopted AGPL to match its **Strudel** audio engine (`@strudel/web`, also AGPL-3.0): bundling AGPL code makes the combined work AGPL, so the whole game is source-available. AGPL's distribution/network terms conflict with the Apple App Store's usage rules, so the game ships via **GitHub, Google Play, and F-Droid — never the Apple App Store** (direct iOS sideloading stays AGPL-clean).
+
+Copyright (C) 2026 Martin Stärk. _(adjust the holder/year to taste)_
 
 ## Checking licenses
 

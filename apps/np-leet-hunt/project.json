@@ -7,9 +7,7 @@
     "targets": {
         "build": {
             "executor": "@angular/build:application",
-            "outputs": [
-                "{workspaceRoot}/dist/apps/np-leet-hunt"
-            ],
+            "outputs": ["{workspaceRoot}/dist/apps/np-leet-hunt"],
             "options": {
                 "outputPath": {
                     "base": "dist/apps/np-leet-hunt",
@@ -45,17 +43,16 @@
                         "glob": "**/*",
                         "input": "libs/np-pixel-dungeon/src/assets",
                         "output": "./np-pixel-dungeon"
+                    },
+                    {
+                        "glob": "**/*",
+                        "input": "libs/np-audio/src/lib/assets",
+                        "output": "./np-audio"
                     }
                 ],
-                "styles": [
-                    "apps/np-leet-hunt/src/global.scss"
-                ],
+                "styles": ["apps/np-leet-hunt/src/global.scss"],
                 "scripts": [],
-                "allowedCommonJsDependencies": [
-                    "phaser",
-                    "poisson-disk-sampling",
-                    "eventemitter3"
-                ]
+                "allowedCommonJsDependencies": ["phaser", "poisson-disk-sampling", "eventemitter3"]
             },
             "configurations": {
                 "production": {
@@ -110,9 +107,7 @@
         },
         "test": {
             "executor": "@nx/vitest:test",
-            "outputs": [
-                "{options.reportsDirectory}"
-            ],
+            "outputs": ["{options.reportsDirectory}"],
             "options": {
                 "configFile": "apps/np-leet-hunt/vitest.config.ts",
                 "reportsDirectory": "../../coverage/apps/np-leet-hunt"
@@ -120,14 +115,9 @@
         },
         "stylelint": {
             "executor": "nx-stylelint:lint",
-            "outputs": [
-                "{options.outputFile}"
-            ],
+            "outputs": ["{options.outputFile}"],
             "options": {
-                "lintFilePatterns": [
-                    "apps/np-leet-hunt/**/*.css",
-                    "apps/np-leet-hunt/**/*.scss"
-                ]
+                "lintFilePatterns": ["apps/np-leet-hunt/**/*.css", "apps/np-leet-hunt/**/*.scss"]
             }
         }
     },

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
     IonButton,
     IonButtons,
@@ -8,6 +8,7 @@ import {
     IonTitle,
     IonToolbar,
 } from '@ionic/angular/standalone';
+import { NpAudioService } from '@shared/np-audio';
 import { StageComponent } from '@shared/np-phaser';
 import { EventDialogComponent, PlanetInfoComponent } from '@shared/np-space-map';
 import { GameStateService, RunPhase } from '@shared/np-state';
@@ -34,6 +35,12 @@ import { RunConductorService } from '../run/run-conductor.service';
 })
 export class HomePageComponent {
     #game = inject(GameStateService);
+    #audio = inject(NpAudioService);
+
+    /** Gates the game behind a start screen — its click is the user gesture that unlocks audio. */
+    readonly started = signal(false);
+    /** Mirrors the audio mute state for the toolbar toggle. */
+    readonly muted = this.#audio.muted;
 
     constructor() {
         // Composition root: instantiating the conductor wires it to the stage + run FSM (see its
@@ -41,6 +48,35 @@ export class HomePageComponent {
         // StageService stays domain-free and the FSM is the single source of truth for the active mode.
         // The run starts in the hangar; the hangar's "Launch run" begins the run.
         inject(RunConductorService);
+        void this.#gateAudio();
+    }
+
+    /** Skip the start overlay when the browser already grants audio (no gesture needed); else it gates. */
+    async #gateAudio(): Promise<void> {
+        if (await this.#audio.canAutoplay()) {
+            this.started.set(true);
+            void this.#audio.unlock();
+        }
+    }
+
+    /** Dismiss the start screen and unlock audio — must run from this real user gesture (autoplay policy). */
+    public start(): void {
+        void this.#audio.unlock();
+        this.started.set(true);
+    }
+
+    public toggleMute(): void {
+        this.#audio.toggleMute();
+    }
+
+    /** Debug: load and play the bundled `song.strudel`. Needs its samples dropped in (see SAMPLES.md). */
+    public playTheme(): void {
+        void this.#audio.music.playSong('np-audio/song.strudel');
+    }
+
+    /** Debug: fire a one-shot SFX to test the SFX path. */
+    public playSfx(): void {
+        this.#audio.sfx.play('weapon.shoot');
     }
 
     // Debug toolbar: each button is a run-phase *intent* — the conductor turns the phase into a scene

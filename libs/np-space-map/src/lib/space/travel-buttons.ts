@@ -2,6 +2,7 @@ import { angleBetween, NPScene } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { Planet } from '../planet/planet';
+import { SPACE_EVENTS } from '../space.events';
 
 interface TravelButton {
     planet: Planet;
@@ -79,7 +80,10 @@ export class TravelButtons {
             .setStrokeStyle(4, REST.stroke, 0.85)
             .setDepth(28)
             .setInteractive({ useHandCursor: true });
-        bg.on('pointerup', () => this.onTap(planet));
+        bg.on('pointerup', () => {
+            this.#scene.game.events.emit(SPACE_EVENTS.TRAVEL_TAP); // app plays the click SFX (np-space-map stays audio-free)
+            this.onTap(planet);
+        });
         // Arrow points along +x at rotation 0 (tip at the bbox's mid-right), so setRotation aims it outward.
         const arrow = this.#scene.add
             .triangle(x, y, 0, 0, 0, 2 * ARROW_H, ARROW_W, ARROW_H, REST.arrow)

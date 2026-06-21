@@ -7,6 +7,8 @@ export enum SPACE_EVENTS {
     PLANET_DESELECTED = 'npPlanetDeselected',
     /** A jump was committed; the ship has begun travelling. Payload: `{ to: string }`. */
     JUMP_COMMITTED = 'npJumpCommitted',
+    /** A travel/direction button was tapped — UI click feedback for the app (SFX). No payload. */
+    TRAVEL_TAP = 'npTravelTap',
     /** The ship landed on a planet; its event fires. Payload: `PlanetArrivedPayload`. */
     PLANET_ARRIVED = 'npPlanetArrived',
     /** An answer with a stake was chosen; its cost applies at once. Payload: `EventChoiceCommittedPayload`. */
