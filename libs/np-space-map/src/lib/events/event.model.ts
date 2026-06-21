@@ -24,6 +24,12 @@ export interface PlanetEvent {
     id: string;
     /** Scene-setter, shown once on arrival. */
     intro: string;
+    /**
+     * Optional establishing illustration for the intro, shown on arrival above the scene-setter text.
+     * App-root-relative asset path, by convention `np-space-map/events/<id>.jpeg` (bundled from
+     * `libs/np-space-map/src/assets/events`). Omit for events without art yet.
+     */
+    image?: string;
     /** The first decision. */
     root: Question;
     /** Pool membership; omit = core pool (eligible in any sector). */

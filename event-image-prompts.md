@@ -21,11 +21,11 @@ Style line** to each scene prompt, then append your generator's own flags (e.g. 
 
 > Lush painted digital illustration, cinematic wide establishing shot, deep-space backdrop, soft
 > volumetric light, rich saturated colour where the distortion lives. House tone: warm wonder with a
-> melancholy core — FTL meets Studio Ghibli, the stolen-time sadness of *Momo* and the quiet menace of
-> *Doctor Who*. The everyday made strange. No text, no UI, no watermark. Landscape 16:9.
+> melancholy core — FTL meets Studio Ghibli, the stolen-time sadness of _Momo_ and the quiet menace of
+> _Doctor Who_. The everyday made strange. No text, no UI, no watermark. Landscape 16:9.
 
 The Hush (the grey) is the antagonist: **colour and clash read as alive; flat grey uniformity is the
-Hush winning.** Sectors run a *grey gradient* from vivid (sector 1) to near-monochrome (sector 5) — the
+Hush winning.** Sectors run a _grey gradient_ from vivid (sector 1) to near-monochrome (sector 5) — the
 Sector Style lines below carry that.
 
 ### Sector Style lines (prepend the one matching the event's pool)
@@ -79,6 +79,8 @@ Sector Style lines below carry that.
 - **`home-sprinkler-nebula`** — A suburban nebula shaped like a giant oscillating lawn sprinkler the size of a moon, throwing great glittering arcs of mist across a lawn of stars, hissing and sweeping back and forth. Playful cosmic domesticity.
 - **`home-ice-cream-truck`** — An ice-cream truck coasting driverless through the dark, its jingle looping tinny and slow, the little serving hatch propped open, a robo-pet already pawing at the airlock to get to it. Sweet and faintly eerie.
 - **`home-garage-sale-asteroid`** — An asteroid covered surface-to-surface in folding tables of pegged-out junk under handwritten prices, a cardboard "SALE THIS WAY" arrow pointing into open space, a grandfather clock ticking somewhere. Cozy treasure-hunt clutter.
+- xxxx
+-
 - **`home-paper-route`** — A canvas paperboy satchel tumbling through space, still stuffed with rubber-banded rolled newspapers each addressed to a porch among the planets ahead, a bike bell tinging out of sight. Nostalgic suburban Americana in orbit.
 - **`home-trampoline-moon`** — A small moon that is one enormous backyard trampoline, springs singing in the vacuum, the mat still faintly warm, dipping and rebounding all on its own — slow and inviting. Playful, bouncy, gently uncanny.
 - **`home-sandbox-planet`** — A whole planet of clean raked yellow sand, a plastic bucket and spade left mid-sandcastle near the pole, tiny footprints leading away and stopping, the sand still damp where it was packed. Innocent and lonely.
@@ -212,10 +214,10 @@ Sector Style lines below carry that.
 > From `event-content.md` — these fire only once their triggers land (en-route intercept, boarding mode).
 > Included so art can be staged ahead of the code.
 
-- **`black-hole-dilemma`** *(core / en-route)* — A black hole sitting dead ahead, swallowing light and patience alike, a tiny ship hesitating at the edge of its accretion glow. Awe, dread, gravitational menace, deep space.
-- **`pirates-attack`** *(en-route)* — A ragtag pirate ship swinging into the viewer's path, weapons hot and run out, demanding cargo. Aggressive, scrappy, a tense standoff in open space.
-- **`distress-signal`** *(en-route)* — A small civilian ship pinned down by raiders, flashing a desperate distress call, the viewer's ship arriving on the scene. Urgency, a choice to intervene, the glow of a chaotic firefight.
-- **`abandoned-station`** *(en-route)* — A derelict space station turning slowly in the dark, airlocks gaping open, lights dead, an air of salvage and danger. Eerie, exploratory, cold.
-- **`cargo-boarding`** *(boarding)* — The view through a breached airlock into the quiet corridors of a boarded Federation freighter, dim emergency lighting, tension before contact. Boarding dread, industrial.
-</content>
-</invoke>
+- **`black-hole-dilemma`** _(core / en-route)_ — A black hole sitting dead ahead, swallowing light and patience alike, a tiny ship hesitating at the edge of its accretion glow. Awe, dread, gravitational menace, deep space.
+- **`pirates-attack`** _(en-route)_ — A ragtag pirate ship swinging into the viewer's path, weapons hot and run out, demanding cargo. Aggressive, scrappy, a tense standoff in open space.
+- **`distress-signal`** _(en-route)_ — A small civilian ship pinned down by raiders, flashing a desperate distress call, the viewer's ship arriving on the scene. Urgency, a choice to intervene, the glow of a chaotic firefight.
+- **`abandoned-station`** _(en-route)_ — A derelict space station turning slowly in the dark, airlocks gaping open, lights dead, an air of salvage and danger. Eerie, exploratory, cold.
+- **`cargo-boarding`** _(boarding)_ — The view through a breached airlock into the quiet corridors of a boarded Federation freighter, dim emergency lighting, tension before contact. Boarding dread, industrial.
+  </content>
+  </invoke>

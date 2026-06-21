@@ -11,6 +11,7 @@ import { PlanetEvent } from '../../event.model';
 export const homeReachEvents: PlanetEvent[] = [
     {
         id: 'home-tractor-in-orbit',
+        image: 'np-space-map/events/home-tractor-in-orbit.jpeg',
         sector: 'home-reach',
         intro:
             'A farm tractor turns slow circles in low orbit, engine idling, no farm in sight. It still has ' +
@@ -89,6 +90,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-gnome-scout',
+        image: 'np-space-map/events/home-gnome-scout.jpeg',
         sector: 'home-reach',
         intro:
             'A garden gnome stands on a bare asteroid, red hat, fishing rod, line cast into open space. It does ' +
@@ -163,6 +165,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-lemonade-comet',
+        image: 'np-space-map/events/home-lemonade-comet.jpeg',
         sector: 'home-reach',
         intro:
             'A comet drifts by trailing a folding table, a hand-lettered sign, and a small alien in a sun-hat. ' +
@@ -239,6 +242,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-thief-drone-cul-de-sac',
+        image: 'np-space-map/events/home-thief-drone-cul-de-sac.jpeg',
         sector: 'home-reach',
         intro:
             'A Grey Fleet thief drone hangs over a tidy ring of suburban planets like a cul-de-sac, tractor beam ' +
@@ -313,6 +317,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-backyard-pool',
+        image: 'np-space-map/events/home-backyard-pool.jpeg',
         sector: 'home-reach',
         intro:
             'A round above-ground swimming pool floats in the black, water perfectly level, an inflatable ' +
@@ -384,6 +389,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-mailbox-row',
+        image: 'np-space-map/events/home-mailbox-row.jpeg',
         sector: 'home-reach',
         intro:
             'A row of suburban mailboxes stands on a strip of curb floating in orbit, red flags up, every one ' +
@@ -458,6 +464,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-block-party',
+        image: 'np-space-map/events/home-block-party.jpeg',
         sector: 'home-reach',
         intro:
             'A whole green world is mid block-party: bunting strung pole to pole, grills smoking, a hundred ' +
@@ -533,6 +540,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-treehouse-broadcast',
+        image: 'np-space-map/events/home-treehouse-broadcast.jpeg',
         sector: 'home-reach',
         intro:
             'A treehouse rides a drifting chunk of oak, rope ladder dangling, a coat-hanger aerial on the roof ' +
@@ -607,6 +615,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-sprinkler-nebula',
+        image: 'np-space-map/events/home-sprinkler-nebula.jpeg',
         sector: 'home-reach',
         intro:
             'The suburban nebula opens around you as a slow oscillating sprinkler the size of a moon, throwing ' +
@@ -681,6 +690,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-ice-cream-truck',
+        image: 'np-space-map/events/home-ice-cream-truck.jpeg',
         sector: 'home-reach',
         intro:
             'An ice-cream truck coasts through the dark, jingle looping tinny and slow, the little hatch propped ' +
@@ -755,6 +765,7 @@ export const homeReachEvents: PlanetEvent[] = [
     },
     {
         id: 'home-garage-sale-asteroid',
+        image: 'np-space-map/events/home-garage-sale-asteroid.jpeg',
         sector: 'home-reach',
         intro:
             'An asteroid wears folding tables across its whole surface, junk pegged out under handwritten prices, ' +
