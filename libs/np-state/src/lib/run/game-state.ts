@@ -12,6 +12,8 @@ import { CrewMember, RunContext, SectorId } from '../model/run-context';
 export interface GameState {
     readonly resources: Readonly<Resources>;
     readonly sector: SectorId;
+    /** The robo-pet's class this run (Leet-39) — read by the HUD and the duel-difficulty hook. */
+    readonly petClass: number;
 
     /** Apply a signed change to the meters; each meter is clamped at zero. */
     adjustResources(delta: ResourceDelta): void;

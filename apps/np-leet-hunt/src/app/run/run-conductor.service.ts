@@ -117,13 +117,15 @@ export class RunConductorService {
         if (this.#game.fsm.can(phase)) this.#game.fsm.to(phase);
     }
 
-    /** Build a duel and wire its typed result back to the run (Leet-29/37). */
+    /** Build a duel and wire its typed result back to the run (Leet-29/37/39). */
     #showDuel(): void {
         // Use the difficulty the encounter asked for (Leet-37); default to normal when launched without one
         // (e.g. the debug toolbar). The sector-scaled difficulty curve is Leet-38.
         const launch = this.#pendingLaunch?.kind === 'duel' ? this.#pendingLaunch : undefined;
         const boardLevel = launch?.boardLevel ?? 'normal';
-        const aiLevel = launch?.aiLevel ?? 'normal';
+        // The pet's class is its "stronger duel position" (Leet-39): it eases the opposing AI a notch per
+        // tier of class. The board stays as the encounter set it.
+        const aiLevel = Balance.duelAiForPet(launch?.aiLevel ?? 'normal', this.#game.run.petClass);
         const factoryOptions = paradroidFactoryOptions(
             Balance.duelBoardParams(boardLevel),
             CParadroidTileSets[boardLevel]
@@ -131,6 +133,7 @@ export class RunConductorService {
         const scene = new ParadroidScene({
             factoryOptions,
             aiParams: Balance.duelAiParams(aiLevel),
+            droidClass: launch?.droidClass, // echoed into the result's absorbedClass on a win
             onResult: result => this.#onModeResult(result),
         });
         this.#stage.startScene({ key: ParadroidScene.key, scene });
@@ -138,21 +141,64 @@ export class RunConductorService {
 
     /** Build a dungeon run and wire its typed result back to the run (Leet-29). */
     #showDungeon(): void {
-        const scene = new PixelDungeonScene({ onResult: result => this.#onModeResult(result) });
+        // Pass the pet class through as the dungeon-companion-perk seam (Leet-39); the perks themselves are
+        // Phase 3 (the dungeon loop), so the scene just carries it for now.
+        const scene = new PixelDungeonScene({
+            petClass: this.#game.run.petClass,
+            onResult: result => this.#onModeResult(result),
+        });
         this.#stage.startScene({ key: PixelDungeonScene.key, scene });
     }
 
     /**
-     * A mode reported its outcome (Leet-29/37): consume it, then return to the map. A **lost duel is
+     * A mode reported its outcome (Leet-29/37/39): consume it, then return to the map. A **lost duel is
      * non-lethal** (Phase 2 decision) — it costs resources but never ends the run; a lethal failure belongs
-     * to the dungeon/boarding mode (Phase 3). Pet absorption on a win is Leet-39. Guarded so a late report
-     * (after the player already left the mode another way) can't fire an illegal transition.
+     * to the dungeon/boarding mode (Phase 3). A **won** duel offers the beaten droid's class for absorption
+     * (Leet-39). Guarded so a late report (after the player left the mode another way) can't fire illegally.
      */
     #onModeResult(result: ModeResult): void {
-        if (result.kind === 'duel' && !isModeSuccess(result)) {
+        this.#pendingLaunch = undefined;
+        if (result.kind === 'duel') {
+            if (isModeSuccess(result)) {
+                this.#offerAbsorption(result.absorbedClass);
+                return;
+            }
             this.#game.run.adjustResources(DUEL_LOSS_PENALTY);
         }
-        this.#pendingLaunch = undefined;
+        this.#toMapAfterMode();
+    }
+
+    /**
+     * After a takeover win, offer the beaten droid's class for absorption (GDD §4 — Paradroid-style choice,
+     * not auto). Only worth offering an upgrade, so a class at-or-below the pet's just returns to the map.
+     */
+    #offerAbsorption(droidClass?: number): void {
+        const current = this.#game.run.petClass;
+        if (droidClass === undefined || droidClass <= current) {
+            this.#toMapAfterMode();
+            return;
+        }
+        this.#showPlaceholder('duel', {
+            title: 'Takeover',
+            lines: [
+                `You cracked a class ${droidClass} droid; your pet runs class ${current}.`,
+                'Absorb its class for a stronger duel position and dungeon perks — or keep your own.',
+            ],
+            actions: [
+                {
+                    label: `⬆ Absorb class ${droidClass}`,
+                    onSelect: () => {
+                        this.#game.run.setPetClass(droidClass);
+                        this.#toMapAfterMode();
+                    },
+                },
+                { label: `Keep class ${current}`, onSelect: () => this.#toMapAfterMode() },
+            ],
+        });
+    }
+
+    /** Return to the map after a mode/absorption resolves (guarded against an illegal late transition). */
+    #toMapAfterMode(): void {
         if (this.#game.fsm.can('sector')) this.#game.fsm.to('sector');
     }
 

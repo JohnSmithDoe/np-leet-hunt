@@ -18,6 +18,12 @@ export const SECTOR_ORDER: readonly SectorId[] = [
 /** Number of sectors in a run. */
 export const SECTOR_COUNT = SECTOR_ORDER.length;
 
+/** The robo-pet's class at the start of every run (Paradroid 001→999), before any duel takeovers (Leet-39). */
+export const PET_BASE_CLASS = 1;
+
+/** Pet-class steps per AI-difficulty notch eased — every this-many classes above base softens the duel by one level. */
+export const PET_CLASS_PER_NOTCH = 2;
+
 /**
  * Which captive each sector's guardian holds (GDD §5 / Leet-34). The sibling is *always* the Hush's
  * most-prized piece in sector 5; mom/dad/grandma/grandpa fill sectors 1–4. The GDD shuffles those four

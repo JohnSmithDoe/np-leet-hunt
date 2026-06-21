@@ -8,6 +8,11 @@ import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
 
 /** What the app injects when starting a dungeon run (Leet-29). */
 export interface TPixelDungeonSceneConfig {
+    /**
+     * The robo-pet's class (Leet-39 seam): the dungeon-companion perks it drives — scouting, assists, and
+     * dragging the kid out when downed — are Phase 3 (the dungeon loop); the scene just carries it for now.
+     */
+    petClass?: number;
     /** Called once when the player leaves the dungeon — reports the outcome back to the run. */
     onResult?: (result: DungeonResult) => void;
 }

@@ -98,7 +98,7 @@ export const greyEscortFighter: PlanetEvent = {
                             kind: 'spawnGame',
                             game: 'duel',
                             reason: 'grey-escort-fighter',
-                            launch: { kind: 'duel', boardLevel: 'hard', aiLevel: 'hard' },
+                            launch: { kind: 'duel', boardLevel: 'hard', aiLevel: 'hard', droidClass: 5 },
                         },
                     ],
                 },

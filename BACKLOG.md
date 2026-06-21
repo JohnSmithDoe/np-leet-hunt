@@ -22,8 +22,8 @@ playable `ParadroidScene` with an intro that reports a typed `DuelResult` via `o
 sector-tunable droid AI (`paradroid.ai.ts`, `Balance.duelBoardParams`/`duelAiParams`). What's missing is
 everything that makes a duel *part of a run*: nothing in a real run opens one, no result is consumed, and
 there is no robo-pet. The three issues below close that.
-Recommended order: **~~Leet-37~~ → 39 → 38** (37 + 39 are the exit criterion — duels fire from the map and a
-win grows the pet; 38 is the teeth: a difficulty curve and the mini-duel variant). **39 is next.**
+Recommended order: **~~Leet-37~~ → ~~39~~ → 38** (37 + 39 met the exit criterion — duels fire from the map
+and a win grows the pet; **38 is next** — the teeth: a sector difficulty curve and the mini-duel variant).
 
 ## Leet-37: Duel-as-takeover — fire duels from the map — ✅ done
 
@@ -71,29 +71,35 @@ minimal.
 
 **Exit:** duels scale with depth and a quick mini-duel variant exists alongside the full board.
 
-## Leet-39: Robo-pet v1 — duel avatar + run-scoped class absorption — ☐ todo
+## Leet-39: Robo-pet v1 — duel avatar + run-scoped class absorption — ✅ done
 
-**Context:** `DuelResult.absorbedClass` exists but is **unwired**; `RunContext` carries no pet state at all,
-and `SaveFile.meta.petEvolution` is only the between-runs meta stub. GDD §4 (the robo-pet): the pet is the
-duel avatar; beating a stronger droid offers its class for absorption (Paradroid 001→999), **run-scoped and
-lost at run end**; higher class = stronger duel position + better dungeon-companion perks; the pet drags the
-kid out when downed in a dungeon.
+**Context:** `DuelResult.absorbedClass` existed but was **unwired**; `RunContext` carried no pet state, and
+`SaveFile.meta.petEvolution` was only the between-runs meta stub. GDD §4: the pet is the duel avatar;
+beating a stronger droid offers its class for absorption (Paradroid 001→999), run-scoped and lost at run
+end; higher class = stronger duel position + dungeon perks.
 
 **Decided:**
 - On a takeover win, **offer the swap** (Paradroid-style: keep your current class or take the beaten droid's) —
   not auto-absorb.
 - Pet class feeds **both** the duel start position *and* the dungeon-companion perks in v1.
 
-**Scope**
-- [ ] Run-scoped **pet class** in run state (`GameState` / `RunStateStore` + `RunContext`), seeded at run
-      start and reset each run (the run-scoped sibling of `SaveFile.meta.petEvolution`).
-- [ ] The duel reports the beaten droid's class (`absorbedClass`); a win raises/offers the pet class via the
-      conductor's result consumption (builds on Leet-37's `#onModeResult`).
-- [ ] Feed pet class into the next duel's `DuelLaunch` (a `Balance` hook for the pet's starting strength).
-- [ ] Surface pet class on the HUD.
-- [ ] Dungeon-rescue **hook (stub)**: the seam for "pet drags you out when downed" — real behaviour is the
-      Phase 3 dungeon loop.
-- [ ] *(Deferred)* sibling temperament (§2/§4) rides with the hangar sibling choice in Phase 4 — note only.
+**Outcome**
+- [x] Run-scoped **`petClass`** in run state (`RunContext` + `RunStateStore`, exposed read-only on
+      `GameState`), seeded to `PET_BASE_CLASS` (1) each run; `setPetClass` is raise-only (a takeover never
+      downgrades). Lost at run end via the existing `reset`.
+- [x] The duel carries the droid's class (`DuelLaunch.droidClass`) and echoes it into
+      `DuelResult.absorbedClass` on a win (`ParadroidScene`). Two sources set it: stray-droid (class 3),
+      escort-fighter (class 5).
+- [x] **Offer the swap:** a won duel shows a "Takeover" choice (Absorb class N / Keep class M) via the
+      conductor's `#offerAbsorption`; only an upgrade is offered (a class ≤ the pet's skips straight back).
+- [x] **Duel start position:** `Balance.duelAiForPet(aiLevel, petClass)` softens the opposing AI one ladder
+      notch per `PET_CLASS_PER_NOTCH` (2) classes above base, floored at `easy` — `#showDuel` applies it.
+- [x] **Dungeon perks:** `petClass` is threaded into `TPixelDungeonSceneConfig` as the Phase-3 seam (the
+      perk behaviour — scouting / assists / drag-you-out-when-downed — is the dungeon loop, Phase 3).
+- [x] HUD shows `PET  class N` (`space-ui.scene`), refreshed when a takeover grows it.
+- [x] *(Deferred)* sibling temperament (§2/§4) rides with the hangar sibling choice in Phase 4 — noted only.
+- [x] build + lint + unit tests green (np-state 45 incl. new `setPetClass` + `duelAiForPet` tests,
+      np-paradroid 10, np-pixel-dungeon 17, np-space-map 24, app smoke 1). *UI not exercised here.*
 
 **Exit:** winning a duel grows the pet's class within a run, and it shows on the HUD.
 

@@ -24,7 +24,7 @@ export const strayDroid: PlanetEvent = {
                             kind: 'spawnGame',
                             game: 'duel',
                             reason: 'stray-droid',
-                            launch: { kind: 'duel', boardLevel: 'normal', aiLevel: 'normal' },
+                            launch: { kind: 'duel', boardLevel: 'normal', aiLevel: 'normal', droidClass: 3 },
                         },
                     ],
                 },

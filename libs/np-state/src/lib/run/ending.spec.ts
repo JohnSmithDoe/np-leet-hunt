@@ -6,6 +6,7 @@ const ctx = (over: Partial<RunContext> = {}): RunContext => ({
     items: [],
     flags: [],
     crew: [],
+    petClass: 1,
     sector: 'ember-belt',
     sectorNumber: 3,
     ...over,

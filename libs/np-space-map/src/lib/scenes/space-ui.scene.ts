@@ -14,12 +14,15 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
     #title!: Phaser.GameObjects.Text;
     #jumps!: Phaser.GameObjects.Text;
     #stats!: Phaser.GameObjects.Text;
+    #pet!: Phaser.GameObjects.Text;
     #banner!: Phaser.GameObjects.Text;
     #fraction = 0;
     #state: GameState;
     #sector: Sector;
     /** Last seen meter values, to diff the polled `state.resources` into gain/loss floaters. */
     #prevResources?: { hull: number; heart: number; marbles: number };
+    /** Last seen pet class, to refresh the readout when a duel takeover grows it (Leet-39). */
+    #prevPetClass?: number;
 
     constructor(state: GameState, sector: Sector) {
         super({ key: SpaceUiScene.key });
@@ -60,6 +63,8 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         const r = this.#state.resources;
         this.#stats = text(BAR.x, BAR.y + BAR.h + 36, this.#statsText(r), 20, '#9fb0d0');
         this.#prevResources = { hull: r.hull, heart: r.heart, marbles: r.marbles };
+        this.#pet = text(BAR.x, BAR.y + BAR.h + 62, this.#petText(), 20, '#bfa6ff'); // robo-pet readout (Leet-39)
+        this.#prevPetClass = this.#state.petClass;
         this.#banner = this.add
             .text(960, 540, '', { fontFamily: 'sans-serif', fontSize: '64px', color: '#ff8a8a' })
             .setOrigin(0.5)
@@ -100,6 +105,15 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             this.#showResourceDeltas(prev, { hull, heart, marbles });
             this.#prevResources = { hull, heart, marbles };
         }
+        // The pet class only changes on a duel takeover (off-map); refresh the readout when it does.
+        if (this.#prevPetClass !== this.#state.petClass) {
+            this.#pet.setText(this.#petText());
+            this.#prevPetClass = this.#state.petClass;
+        }
+    }
+
+    #petText(): string {
+        return `PET  class ${this.#state.petClass}`;
     }
 
     #statsText(r: { hull: number; heart: number; marbles: number }): string {

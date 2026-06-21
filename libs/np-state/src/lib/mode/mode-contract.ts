@@ -15,6 +15,8 @@ export interface DuelLaunch {
     kind: 'duel';
     boardLevel: DuelBoardLevel;
     aiLevel: DuelAiLevel;
+    /** The dueled droid's robo-pet class (Paradroid 001→999). Echoed into {@link DuelResult.absorbedClass} on a win (Leet-39). */
+    droidClass?: number;
 }
 
 /** Dungeon goals land in Phase 3 (GDD §3); the type carries the intent from day one. */

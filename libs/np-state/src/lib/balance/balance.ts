@@ -4,12 +4,17 @@ import {
     DuelAiParams,
     DuelBoardLevel,
     DuelBoardParams,
+    PET_BASE_CLASS,
+    PET_CLASS_PER_NOTCH,
     Sector,
     SECTOR_COUNT,
     SECTOR_ORDER,
     SECTOR_RESCUE,
     SectorParams,
 } from './balance.model';
+
+/** AI ladder, easiest → hardest — the order the pet-class hook steps down (Leet-39). */
+const AI_LADDER: readonly DuelAiLevel[] = ['easy', 'normal', 'hard', 'brutal'];
 
 /**
  * The central balancing surface — the single place to tune the game. Today it holds the per-sector
@@ -72,6 +77,18 @@ export class Balance {
     /** The captive freed by beating a sector's guardian (Leet-34 / GDD §5); sibling is always sector 5. */
     static rescueForSector(sectorNumber: number): CrewMember {
         return SECTOR_RESCUE[clampNumber(sectorNumber) - 1];
+    }
+
+    /**
+     * The robo-pet's "stronger duel position" hook (Leet-39 / GDD §4): a higher pet class softens the
+     * opposing AI, one ladder notch per {@link PET_CLASS_PER_NOTCH} classes above the base. Returns the
+     * eased AI level (never below `easy`). The board level is untouched — only the droid's play eases.
+     */
+    static duelAiForPet(aiLevel: DuelAiLevel, petClass: number): DuelAiLevel {
+        const notches = Math.max(0, Math.floor((petClass - PET_BASE_CLASS) / PET_CLASS_PER_NOTCH));
+        const index = AI_LADDER.indexOf(aiLevel);
+        if (index < 0) return aiLevel; // unknown level: leave it be
+        return AI_LADDER[Math.max(0, index - notches)];
     }
 
     /** The numeric board knobs for a duel board difficulty (unknown levels fall back to `normal`). */

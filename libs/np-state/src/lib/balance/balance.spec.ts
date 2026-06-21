@@ -69,6 +69,19 @@ describe('Balance.rescueForSector', () => {
     });
 });
 
+describe('Balance.duelAiForPet', () => {
+    it('softens the AI one notch per tier of pet class, floored at easy (Leet-39)', () => {
+        expect(Balance.duelAiForPet('brutal', 1)).toBe('brutal'); // base class = no easing
+        expect(Balance.duelAiForPet('brutal', 3)).toBe('hard'); // +2 classes = 1 notch (PET_CLASS_PER_NOTCH=2)
+        expect(Balance.duelAiForPet('brutal', 5)).toBe('normal'); // +4 classes = 2 notches
+        expect(Balance.duelAiForPet('normal', 99)).toBe('easy'); // never eases below the easiest level
+    });
+
+    it('leaves an unknown level untouched', () => {
+        expect(Balance.duelAiForPet('bogus' as DuelAiLevel, 9)).toBe('bogus');
+    });
+});
+
 describe('Balance duel params', () => {
     const BOARD_LEVELS: DuelBoardLevel[] = ['debug', 'easy', 'normal', 'hard', 'brutal'];
     const AI_LEVELS: DuelAiLevel[] = ['easy', 'normal', 'hard', 'brutal'];

@@ -1,6 +1,6 @@
 import { Signal, signal } from '@angular/core';
 
-import { SECTOR_COUNT, SECTOR_ORDER } from '../balance/balance.model';
+import { PET_BASE_CLASS, SECTOR_COUNT, SECTOR_ORDER } from '../balance/balance.model';
 import { ResourceDelta, Resources, STARTING_RESOURCES } from '../model/resources';
 import { CrewMember, RunContext, SectorId } from '../model/run-context';
 import { GameState } from './game-state';
@@ -16,6 +16,7 @@ export class RunStateStore implements GameState {
     #items: string[] = [];
     #flags = new Set<string>();
     #crew = new Set<CrewMember>();
+    #petClass = PET_BASE_CLASS;
     #sector: SectorId = 'home-reach';
     #sectorNumber = 1;
     readonly #changes = signal<RunContext>(this.snapshot());
@@ -27,6 +28,9 @@ export class RunStateStore implements GameState {
     }
     get sector(): SectorId {
         return this.#sector;
+    }
+    get petClass(): number {
+        return this.#petClass;
     }
 
     adjustResources(delta: ResourceDelta): void {
@@ -66,12 +70,21 @@ export class RunStateStore implements GameState {
         return this.#crew.has(member);
     }
 
+    /** Grow the robo-pet's class from a duel takeover (Leet-39). Raise-only — a takeover never downgrades it. */
+    setPetClass(petClass: number): void {
+        const next = Math.max(this.#petClass, Math.floor(petClass));
+        if (next === this.#petClass) return;
+        this.#petClass = next;
+        this.#publish();
+    }
+
     snapshot(): RunContext {
         return {
             resources: { ...this.#resources },
             items: [...this.#items],
             flags: [...this.#flags],
             crew: [...this.#crew],
+            petClass: this.#petClass,
             sector: this.#sector,
             sectorNumber: this.#sectorNumber,
         };
@@ -94,6 +107,7 @@ export class RunStateStore implements GameState {
         this.#items = [...(seed?.items ?? [])];
         this.#flags = new Set(seed?.flags ?? []);
         this.#crew = new Set(seed?.crew ?? []);
+        this.#petClass = seed?.petClass ?? PET_BASE_CLASS;
         this.#sector = seed?.sector ?? 'home-reach';
         this.#sectorNumber = seed?.sectorNumber ?? 1;
         this.#publish();

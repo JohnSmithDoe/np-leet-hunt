@@ -27,6 +27,8 @@ export interface RunContext {
     flags: string[];
     /** Crew rescued and aboard. */
     crew: CrewMember[];
+    /** The robo-pet's class this run (Paradroid 001→999) — run-scoped, grown by duel takeovers (Leet-39). */
+    petClass: number;
     /** The sector currently being traversed. */
     sector: SectorId;
     /** 1-based sector index within the run. */

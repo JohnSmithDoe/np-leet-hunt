@@ -14,6 +14,8 @@ const FOCUS_MS = 600;
 export interface TParadroidSceneConfig {
     factoryOptions?: TParadroidFactoryOptions;
     aiParams?: DuelAiParams;
+    /** The dueled droid's robo-pet class (Leet-39); echoed into the result's `absorbedClass` on a win. */
+    droidClass?: number;
     /** Called once when the player leaves the duel — reports the outcome back to the run (Leet-29). */
     onResult?: (result: DuelResult) => void;
 }
@@ -165,7 +167,9 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     /** Leave the duel and report the latest outcome to the run (Leet-29). Ignored while the intro plays. */
     #leave(): void {
         if (this.#busy) return;
-        this.#config.onResult?.({ kind: 'duel', outcome: this.#lastOutcome });
+        // A takeover win offers the beaten droid's class for absorption (Leet-39); a loss/forfeit offers nothing.
+        const absorbedClass = this.#lastOutcome === 'win' ? this.#config.droidClass : undefined;
+        this.#config.onResult?.({ kind: 'duel', outcome: this.#lastOutcome, absorbedClass });
     }
 
     /** Tear down the current game and build a fresh one (defaults to the injected config). */

@@ -31,6 +31,16 @@ describe('RunStateStore', () => {
         expect(store.hasCrew('dad')).toBe(false);
     });
 
+    it('grows the pet class on a takeover, raise-only (Leet-39)', () => {
+        const store = new RunStateStore();
+        expect(store.petClass).toBe(1); // PET_BASE_CLASS
+        store.setPetClass(4);
+        expect(store.petClass).toBe(4);
+        store.setPetClass(2); // a lower class never downgrades the pet
+        expect(store.petClass).toBe(4);
+        expect(store.snapshot().petClass).toBe(4);
+    });
+
     it('exposes a fresh snapshot signal on construction and after every mutation', () => {
         const store = new RunStateStore();
         const marbles: number[] = [];
