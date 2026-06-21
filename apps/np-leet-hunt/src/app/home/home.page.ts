@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
     IonButton,
     IonButtons,
@@ -37,8 +37,6 @@ export class HomePageComponent {
     #game = inject(GameStateService);
     #audio = inject(NpAudioService);
 
-    /** Gates the game behind a start screen — its click is the user gesture that unlocks audio. */
-    readonly started = signal(false);
     /** Mirrors the audio mute state for the toolbar toggle. */
     readonly muted = this.#audio.muted;
 
@@ -51,18 +49,13 @@ export class HomePageComponent {
         void this.#gateAudio();
     }
 
-    /** Skip the start overlay when the browser already grants audio (no gesture needed); else it gates. */
+    /**
+     * Start in the hangar. Audio can't autoplay without a gesture, so start it as early as the browser
+     * allows; otherwise {@link NpAudioService} unlocks it on the first interaction anywhere (the hangar's
+     * own buttons count) — no dedicated "tap to start" screen needed.
+     */
     async #gateAudio(): Promise<void> {
-        if (await this.#audio.canAutoplay()) {
-            this.started.set(true);
-            void this.#audio.unlock();
-        }
-    }
-
-    /** Dismiss the start screen and unlock audio — must run from this real user gesture (autoplay policy). */
-    public start(): void {
-        void this.#audio.unlock();
-        this.started.set(true);
+        if (await this.#audio.canAutoplay()) void this.#audio.unlock();
     }
 
     public toggleMute(): void {
