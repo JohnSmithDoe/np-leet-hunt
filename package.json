@@ -7,7 +7,7 @@
         "build": "nx build --base-href ./",
         "test": "nx run-many -t test --no-tui",
         "e2e": "nx e2e np-leet-hunt-e2e",
-        "prepare": "husky",
+        "prepare": "lefthook install",
         "serve:app:angular": "nx serve np-leet-hunt",
         "build:app:angular": "nx build np-leet-hunt",
         "copy:app:angular": "cd apps/np-leet-hunt && npx cap copy",
@@ -66,10 +66,9 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.6",
         "eslint-plugin-simple-import-sort": "^13.0.0",
-        "husky": "^9.1.7",
         "jsdom": "^29.1.1",
+        "lefthook": "^2.1.9",
         "license-checker": "^25.0.1",
-        "lint-staged": "^17.0.7",
         "nx": "22.7.5",
         "nx-stylelint": "^19.0.0",
         "phaser3spectorjs": "^0.0.8",
@@ -83,13 +82,5 @@
         "vite": "^8.0.16",
         "vitest": "^4.1.8",
         "vitest-canvas-mock": "^1.1.4"
-    },
-    "lint-staged": {
-        "*.{js,ts,html}": [
-            "eslint --fix"
-        ],
-        "*.{css,scss}": [
-            "stylelint --fix"
-        ]
     }
 }

@@ -1,5 +1,0 @@
-echo "Setting Node Memory to 8 GB"
-export NODE_OPTIONS="--max-old-space-size=8192"
-
-echo "Linting Staged Files for consistency to np standards..."
-npx lint-staged

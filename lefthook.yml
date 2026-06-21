@@ -1,0 +1,23 @@
+# Git hooks managed by lefthook (replaces husky + lint-staged).
+# `npm install` wires the hooks up via the `prepare` script;
+# run `npx lefthook install` manually if they ever go missing.
+
+pre-commit:
+  parallel: true
+  jobs:
+    # eslint-plugin-prettier formats JS/TS/HTML through this step.
+    - name: eslint
+      glob: '*.{js,ts,html}'
+      run: npx eslint --fix {staged_files}
+      stage_fixed: true
+      env:
+        NODE_OPTIONS: '--max-old-space-size=8192'
+    - name: stylelint
+      glob: '*.{css,scss}'
+      run: npx stylelint --fix {staged_files}
+      stage_fixed: true
+    # Prettier covers the formats eslint/stylelint don't.
+    - name: prettier
+      glob: '*.{json,jsonc,md,yml,yaml}'
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
