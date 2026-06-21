@@ -1,4 +1,4 @@
-import { NPText } from '@shared/np-phaser';
+import { floatUp, NPText } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
@@ -33,15 +33,6 @@ export class PixelDungeonInfoText extends NPText {
         const worldXY = engine.level.tileToWorldXY(tile)!;
         super(engine.scene, worldXY.x + 8, worldXY.y, text, style);
         this.setOrigin(0.5);
-        this.scene.tweens.add({
-            targets: this,
-            y: worldXY.y - 8,
-            alpha: 0.3,
-            ease: 'Power1',
-            duration: 750,
-            onComplete: () => {
-                this.destroy(true);
-            },
-        });
+        floatUp(this, { distance: 8, to: 0.3, duration: 750, ease: 'Power1' });
     }
 }

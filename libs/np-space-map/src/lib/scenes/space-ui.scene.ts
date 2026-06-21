@@ -1,4 +1,4 @@
-import { clamp, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
+import { clamp, floatUp, NPScene, OnSceneCreate, OnSceneInit, OnScenePreload, pop } from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import { SECTOR_COUNT } from '@shared/np-state';
 import * as Phaser from 'phaser';
@@ -136,12 +136,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
         }
         if (row > 0) {
             // A brief scale pop on the readout itself, so the change reads even off-screen of the floater.
-            this.tweens.add({
-                targets: this.#stats,
-                scale: { from: 1.18, to: 1 },
-                duration: 280,
-                ease: 'Quad.easeOut',
-            });
+            pop(this.#stats);
         }
     }
 
@@ -160,14 +155,7 @@ export class SpaceUiScene extends NPScene implements OnScenePreload, OnSceneCrea
             .setScrollFactor(0)
             .setDepth(102)
             .setScale(1.15);
-        this.tweens.add({
-            targets: floater,
-            y: floater.y - 44,
-            alpha: { from: 1, to: 0 },
-            duration: 1000,
-            ease: 'Cubic.easeOut',
-            onComplete: () => floater.destroy(),
-        });
+        floatUp(floater, { distance: 44 });
     }
 
     #drawBar() {

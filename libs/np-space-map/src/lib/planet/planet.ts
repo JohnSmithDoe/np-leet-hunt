@@ -1,5 +1,5 @@
 import { NPRNG } from '@shared/np-library';
-import { NPScene, NPSprite } from '@shared/np-phaser';
+import { NPScene, NPSprite, pulse, shrinkAway } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { PlanetInfo } from './planet-info';
@@ -148,14 +148,7 @@ export class Planet extends NPSprite {
                 break;
             case 'reachable':
                 this.clearTint().setAlpha(1).setInteractive({ useHandCursor: true });
-                this.#pulse = this.scene.tweens.add({
-                    targets: this,
-                    scale: this.#baseScale * 1.08,
-                    duration: 700,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut',
-                });
+                this.#pulse = pulse(this);
                 break;
             case 'dim':
                 // Still clickable so the player can inspect any live planet, just not a jump target.
@@ -165,13 +158,7 @@ export class Planet extends NPSprite {
                 this.#alive = false;
                 this.disableInteractive();
                 this.setTint(SWALLOWED_TINT);
-                this.scene.tweens.add({
-                    targets: this,
-                    alpha: 0.3,
-                    scale: this.#baseScale * 0.3,
-                    duration: 800,
-                    ease: 'Sine.easeIn',
-                });
+                shrinkAway(this);
                 break;
         }
         return this;

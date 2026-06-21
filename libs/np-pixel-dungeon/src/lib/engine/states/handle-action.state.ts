@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { rotateTo } from '@shared/np-phaser';
+import { lunge, rotateTo } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 
@@ -48,18 +48,12 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
             const angle = this.mob.engine.level.angleBetween(this.mob, this.target);
             const pos = new Phaser.Math.Vector2(this.mob.x, this.mob.y);
             rotateTo(pos, this.mob.x, this.mob.y, angle, 8);
-            this.mob.scene.tweens.add({
-                targets: this.mob,
+            lunge(this.mob, {
                 x: pos.x,
                 y: pos.y,
-                ease: 'Power1',
-                duration: 250,
-                yoyo: true,
+                onContact: () => this.target.info('3', EMobInfoType.LoseHealth),
                 onComplete: () => {
                     this.#done = true;
-                },
-                onYoyo: () => {
-                    this.target.info('3', EMobInfoType.LoseHealth);
                 },
             });
         }

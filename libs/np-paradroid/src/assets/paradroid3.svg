@@ -1,0 +1,137 @@
+<svg xmlns="http://w3.org" viewBox="0 0 480 480" width="100%" height="100%">
+    <defs>
+        <!-- Mehrschichtiger, intensiver Neon-Glow-Filter -->
+        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Kosmischer Nebel-Effekt über radiale Farbverläufe mit Transparenz (Alpha) -->
+        <radialGradient id="nebula-purple" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#7B2CBF" stop-opacity="0.5"/>
+            <stop offset="50%" stop-color="#3C096C" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+
+        <radialGradient id="nebula-cyan" cx="80%" cy="70%" r="60%">
+            <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.3"/>
+            <stop offset="60%" stop-color="#00B4D8" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Futuristische Tech-Gitterstruktur im Hintergrund -->
+        <pattern id="cyber-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <rect width="40" height="40" fill="none"/>
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" stroke-width="0.7" stroke-opacity="0.6"/>
+        </pattern>
+
+        <!-- Fancy Cyber-Rahmen mit teilweiser Transparenz -->
+        <g id="fancy-tile">
+            <!-- Hintergrund-Kachel mit semi-transparenter Space-Füllung -->
+            <rect width="116" height="116" x="2" y="2" rx="10" fill="#0B132B" fill-opacity="0.85" stroke="#3A0CA3" stroke-width="1.5"/>
+            <!-- Innere Tech-Linien -->
+            <rect width="104" height="104" x="8" y="8" rx="6" fill="none" stroke="#4CC9F0" stroke-width="0.5" stroke-opacity="0.3" stroke-dasharray="6,4"/>
+            <!-- Leuchtende Eck-Verzierungen (Sci-Fi Brackets) -->
+            <path d="M 6 16 L 6 6 L 16 6 M 100 6 L 110 6 L 110 16 M 110 100 L 110 110 L 100 110 M 16 110 L 6 110 L 6 100" fill="none" stroke="#4CC9F0" stroke-width="2" stroke-linecap="round"/>
+        </g>
+
+        <!-- CSS für Glüheffekte und Energiekabel -->
+        <style>
+          .glow-rail { fill: none; stroke: #00F5D4; stroke-width: 20; stroke-linecap: round; stroke-linejoin: round; filter: url(#neon-glow); opacity: 0.9; }
+          .core-rail { fill: none; stroke: #FFFFFF; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+          .terminal-ring { fill: none; stroke: #00F5D4; stroke-width: 4; filter: url(#neon-glow); }
+          .terminal-core { fill: #4CC9F0; }
+        </style>
+    </defs>
+
+    <!-- 1. Hintergrundebene: Tiefschwarz -->
+    <rect width="480" height="480" fill="#030712"/>
+
+    <!-- 2. Nebelebene: Transparente Gaswolken -->
+    <rect width="480" height="480" fill="url(#nebula-purple)"/>
+    <rect width="480" height="480" fill="url(#nebula-cyan)"/>
+
+    <!-- 3. Gitterebene -->
+    <rect width="480" height="480" fill="url(#cyber-grid)"/>
+
+    <!-- ================= ROW 1 ================= -->
+    <g transform="translate(0, 0)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,60 L60,120" /><path class="core-rail" d="M60,60 L60,120" />
+        <circle class="terminal-ring" cx="60" cy="60" r="18" /><circle class="terminal-core" cx="60" cy="60" r="8" />
+    </g>
+    <g transform="translate(120, 0)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M120,60 L60,60 L60,120" /><path class="core-rail" d="M120,60 L60,60 L60,120" />
+    </g>
+    <g transform="translate(240, 0)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L120,60 M60,60 L60,120" /><path class="core-rail" d="M0,60 L120,60 M60,60 L60,120" />
+    </g>
+    <g transform="translate(360, 0)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L60,60 L60,120" /><path class="core-rail" d="M0,60 L60,60 L60,120" />
+    </g>
+
+    <!-- ================= ROW 2 ================= -->
+    <g transform="translate(0, 120)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,120" /><path class="core-rail" d="M60,0 L60,120" />
+    </g>
+    <g transform="translate(120, 120)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,120 M60,60 L120,60" /><path class="core-rail" d="M60,0 L60,120 M60,60 L120,60" />
+    </g>
+    <g transform="translate(240, 120)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L120,60 M60,0 L60,120" /><path class="core-rail" d="M0,60 L120,60 M60,0 L60,120" />
+    </g>
+    <g transform="translate(360, 120)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,120 M0,60 L60,60" /><path class="core-rail" d="M60,0 L60,120 M0,60 L60,60" />
+    </g>
+
+    <!-- ================= ROW 3 ================= -->
+    <g transform="translate(0, 240)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,60" /><path class="core-rail" d="M60,0 L60,60" />
+        <circle class="terminal-ring" cx="60" cy="60" r="18" /><circle class="terminal-core" cx="60" cy="60" r="8" />
+    </g>
+    <g transform="translate(120, 240)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,60 L120,60" /><path class="core-rail" d="M60,0 L60,60 L120,60" />
+    </g>
+    <g transform="translate(240, 240)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L120,60 M60,0 L60,60" /><path class="core-rail" d="M0,60 L120,60 M60,0 L60,60" />
+    </g>
+    <g transform="translate(360, 240)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,0 L60,60 L0,60" /><path class="core-rail" d="M60,0 L60,60 L0,60" />
+    </g>
+
+    <!-- ================= ROW 4 ================= -->
+    <g transform="translate(0, 360)">
+        <use href="#fancy-tile"/>
+        <!-- Technisches Zierelement auf der leeren Kachel -->
+        <circle cx="60" cy="60" r="4" fill="#3A0CA3" opacity="0.5"/>
+    </g>
+    <g transform="translate(120, 360)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M60,60 L120,60" /><path class="core-rail" d="M60,60 L120,60" />
+        <circle class="terminal-ring" cx="60" cy="60" r="18" /><circle class="terminal-core" cx="60" cy="60" r="8" />
+    </g>
+    <g transform="translate(240, 360)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L120,60" /><path class="core-rail" d="M0,60 L120,60" />
+    </g>
+    <g transform="translate(360, 360)">
+        <use href="#fancy-tile"/>
+        <path class="glow-rail" d="M0,60 L60,60" /><path class="core-rail" d="M0,60 L60,60" />
+        <circle class="terminal-ring" cx="60" cy="60" r="18" /><circle class="terminal-core" cx="60" cy="60" r="8" />
+    </g>
+</svg>

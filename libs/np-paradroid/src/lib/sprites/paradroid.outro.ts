@@ -1,5 +1,5 @@
 import { NPRNG } from '@shared/np-library';
-import { NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { fadeIn, fadeTo, NPGameObjectList, NPScene, popIn, slideTo } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { TParadroidMatchResult } from '../core/paradroid.game';
@@ -67,11 +67,8 @@ export class ParadroidOutro extends NPGameObjectList {
         droid.setAlpha(0);
         group.add([backdrop, player, droid]);
 
-        this.scene.tweens.add({ targets: backdrop, alpha: 0.92, ease: 'Sine.easeOut', duration: APPEAR_MS });
-        this.scene.tweens.add({
-            targets: [player, droid],
-            alpha: 1,
-            ease: 'Sine.easeOut',
+        fadeTo(backdrop, 0.92, { duration: APPEAR_MS });
+        fadeIn([player, droid], {
             duration: APPEAR_MS,
             onComplete: () =>
                 this.scene.time.delayedCall(HOLD_MS, () => this.#resolve(result, player, droid, group, hooks)),
@@ -111,8 +108,7 @@ export class ParadroidOutro extends NPGameObjectList {
             duration: RESOLVE_MS,
         });
         // The winner slides to the centre and swells — promoted.
-        this.scene.tweens.add({
-            targets: winner,
+        slideTo(winner, {
             x: cx,
             y: cy * 0.96,
             scale: promoted,
@@ -144,9 +140,7 @@ export class ParadroidOutro extends NPGameObjectList {
     ) {
         const title = this.scene.add
             .text(x, y, label, { fontSize: '88px', color, stroke: '#02110a', strokeThickness: 8, fontStyle: 'bold' })
-            .setOrigin(0.5)
-            .setScale(0.2)
-            .setAlpha(0);
+            .setOrigin(0.5);
         const score = this.scene.add
             .text(x, y + 92, `${result.playerScore} — ${result.droidScore}`, {
                 fontSize: '52px',
@@ -154,11 +148,10 @@ export class ParadroidOutro extends NPGameObjectList {
                 stroke: '#042b2c',
                 strokeThickness: 4,
             })
-            .setOrigin(0.5)
-            .setAlpha(0);
+            .setOrigin(0.5);
         group.add([title, score]);
-        this.scene.tweens.add({ targets: title, scale: 1, alpha: 1, ease: 'Back.easeOut', duration: STAMP_MS });
-        this.scene.tweens.add({ targets: score, alpha: 1, ease: 'Sine.easeOut', duration: STAMP_MS, delay: 120 });
+        popIn(title, { duration: STAMP_MS }); // stamps in from nothing (was scale 0.2 → 0; visually the same punch)
+        fadeIn(score, { duration: STAMP_MS, delay: 120 });
     }
 
     #portrait(image: 'vsPlayerFemale' | 'vsDroid', frame?: number): Phaser.GameObjects.Image {

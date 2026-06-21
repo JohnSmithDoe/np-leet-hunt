@@ -1,5 +1,14 @@
 import { NPRng } from '@shared/np-library';
-import { degToRad, getClosest, NPDashedLine, NPGameObjectList, NPMovableSprite, NPScene } from '@shared/np-phaser';
+import {
+    degToRad,
+    fadeOut,
+    getClosest,
+    glow,
+    NPDashedLine,
+    NPGameObjectList,
+    NPMovableSprite,
+    NPScene,
+} from '@shared/np-phaser';
 import type { GameState, Sector } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -224,14 +233,7 @@ export class NPSpaceMap extends NPGameObjectList {
         // states, and the opening front readout (deferred a tick so the HUD's listeners are registered).
         this.#planets.forEach(planet => planet.on('pointerup', () => this.#onPlanetTap(planet)));
         this.#here = this.scene.add.circle(0, 0, 1, 0x66ccff, 0).setStrokeStyle(12, 0x66ccff, 0.9).setDepth(25);
-        this.scene.tweens.add({
-            targets: this.#here,
-            alpha: 0.4,
-            duration: 900,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-        });
+        glow(this.#here);
         this.#built = true;
         this.#refreshStates();
         this.scene.time.delayedCall(0, () => this.#emitFront());
@@ -564,7 +566,7 @@ export class NPSpaceMap extends NPGameObjectList {
         planet.setMapState('swallowed');
         this.#connections
             .filter(conn => conn.from === planet || conn.to === planet)
-            .forEach(conn => this.scene.tweens.add({ targets: conn.line, alpha: 0, duration }));
+            .forEach(conn => fadeOut(conn.line, { duration, ease: 'Linear' }));
         this.scene.game.events.emit(SPACE_EVENTS.PLANET_SWALLOWED, { planet: planet.name });
     }
 
