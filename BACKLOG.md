@@ -119,16 +119,21 @@ there was no ending beat. This makes choosing the layout part of the gameplay an
 - **Countdown honours the "binary clock / 3-2-1" idea:** a big digit punches in at the board's centre each
   second, *ghosted* (alpha ~0.22) so the board stays readable through it, reddening as it runs out, over a
   compact binary-block readout (`▮ ▯ ▮`). The selection-window duration is a **duel-timing** constant in
-  np-paradroid (alongside `FOCUS_MS` / `MATCH_DURATION_MS`), not an np-state `Balance` knob — `Balance` holds
-  difficulty *tuning* (rates, AI), not staging.
+  np-paradroid (alongside `MATCH_DURATION_MS`), not an np-state `Balance` knob — `Balance` holds difficulty
+  *tuning* (rates, AI), not staging.
+- **The board never changes size after selection.** The board is fit to the view during selection and *that*
+  size is kept through the intro and fight — the VS splash no longer zooms the camera to a neutral 1:1 view
+  and back; it lays out over the camera's current world view instead, so the board stays exactly where the
+  player picked it (only the text/portrait tween moves).
 - **Ending animation bookends the VS intro:** both portraits fade up over the cleared board, the **loser drops
   out of the bottom** (tumbling, fading) while the **winner slides to the centre and swells (is promoted)**,
   then a "WINNER — PROMOTED" / "DROID WINS" / "DRAW" banner stamps in with a screen shake over the final score.
 
 **Outcome**
 - [x] `ParadroidScene` now runs a staging state machine — **`select → intro → fight → outro → done`**
-      (replacing the `#busy` flag). The board is visible + camera-fit only in `select` / `fight`; the intro and
-      outro own the screen at a neutral 1:1 view (the existing intro choreography, reused).
+      (replacing the `#busy` flag). The intro keeps the camera on the selection fit and lays the VS splash out
+      over the camera's world view (`#viewRect`) so the board never resizes; only the outro hides the board and
+      switches to a neutral 1:1 view.
 - [x] New `ParadroidCountdown` (plain object, no textures): ghosted centre digit + binary readout + caption,
       ticks on the scene clock, expires into `#lockIn`. New `ParadroidOutro` (component, for portrait preload —
       textures shared with the intro): the drop/promote choreography, draw-aware.
@@ -137,8 +142,13 @@ there was no ending beat. This makes choosing the layout part of the gameplay an
       *visible* controls; a re-roll lifts the countdown back above the freshly-added board.
 - [x] Pure `toBinaryBlocks` extracted to a Phaser-free `@types/paradroid.format.ts` (+ spec). No
       run-conductor / contract changes — the new flow is internal to the scene; `onResult` is unchanged.
-- [x] build + lint + unit tests green (np-paradroid 20 incl. the new format spec, app smoke 1, app prod build).
-      *UI not exercised here* — the selection countdown + the win/lose ending are for the user to eyeball.
+- [x] *(Feel polish)* New `ParadroidScoreboard`: persistent **`YOU` / `DROID`** corner labels (green/red,
+      matching the outro) that orient the player to their half of the mirrored board, plus a **live `n — n`
+      middle-row tally** during the fight fed by a new `ParadroidGame.EVENT_SCORE_CHANGED` — so the duel reads
+      as it swings. Labels show in selection + fight; the score only in the fight.
+- [x] build + lint + unit tests green (np-paradroid 20 incl. the format spec, app smoke 1, app prod build).
+      *UI not exercised here* — the selection countdown, the scoreboard, and the win/lose ending are for the
+      user to eyeball.
 
 **Exit:** the grid roll is a timed player choice, and a decided duel plays a win/lose ending animation.
 *(Advances Leet-38's "tighten intro → play → result staging" item; 38's sector curve + mini-duel remain.)*

@@ -49,8 +49,10 @@ export class ParadroidCountdown {
         const cy = bounds.centerY;
         const size = bounds.height;
 
+        // Sits centred above the board between the scoreboard's YOU / DROID corner labels (the score they
+        // flank is hidden during selection), so keep it short — the "↻ Re-Roll" button conveys the action.
         const caption = this.#scene.add
-            .text(cx, bounds.top - 6, 'CHOOSE YOUR GRID   ·   ↻ RE-ROLL', {
+            .text(cx, bounds.top - 6, 'CHOOSE YOUR GRID', {
                 fontSize: `${Math.round(size * 0.09)}px`,
                 color: CYAN,
                 stroke: '#042b2c',

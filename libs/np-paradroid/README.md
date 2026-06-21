@@ -40,6 +40,7 @@ Imported via the `@shared/np-paradroid` path alias defined in `tsconfig.base.jso
 - `ParadroidImage` (`paradroid.image.ts`) — image wrapper used for shots/artwork.
 - `ParadroidIntro` (`paradroid.intro.ts`) — the Street-Fighter "VS" splash played between locking the grid in and the match beginning.
 - `ParadroidCountdown` (`paradroid.countdown.ts`) — the grid-selection countdown: a fixed window (ghosted centre digit + binary block readout) during which the player may re-roll the board freely before it locks.
+- `ParadroidScoreboard` (`paradroid.scoreboard.ts`) — `YOU` / `DROID` orientation labels over the two halves plus the live middle-row tally during the fight (fed by `ParadroidGame.EVENT_SCORE_CHANGED`).
 - `ParadroidOutro` (`paradroid.outro.ts`) — the ending animation: the loser drops out of the screen while the winner moves to the centre and is promoted.
 
 **Types & constants** (`@types/`)

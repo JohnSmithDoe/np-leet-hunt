@@ -27,6 +27,8 @@ export interface TParadroidMatchResult {
 export class ParadroidGame extends NPGameObjectList<NPGameObject> {
     /** Fired on {@link ParadroidGame.events} once the timer is up and all flows have settled. */
     static readonly EVENT_MATCH_ENDED = 'paradroid-match-ended';
+    /** Fired on {@link ParadroidGame.events} with `{ player, droid }` whenever the middle-row tally changes. */
+    static readonly EVENT_SCORE_CHANGED = 'paradroid-score-changed';
     /** The game's own event bus — NPGameObjectList is a Phaser List, not an EventEmitter. */
     readonly events = new Phaser.Events.EventEmitter();
 
@@ -320,6 +322,8 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
         } else if (all.droid < all.player) {
             this.#middle(-1)!.owner = 'middle-player';
         }
+        // Surface the live tally so the scene can show a swinging "YOU n — n DROID" scoreboard.
+        this.events.emit(ParadroidGame.EVENT_SCORE_CHANGED, { player: all.player, droid: all.droid });
     }
 
     #generateShots() {

@@ -1,5 +1,5 @@
 import { NPRNG } from '@shared/np-library';
-import { NPGameObjectList, NPScene } from '@shared/np-phaser';
+import { fadeOut, NPGameObjectList, NPScene, slideTo, swell } from '@shared/np-phaser';
 import * as Phaser from 'phaser';
 
 import { PARADROID_IMAGES } from './paradroid.image';
@@ -8,7 +8,7 @@ import { PARADROID_IMAGES } from './paradroid.image';
 export interface ParadroidIntroHooks {
     /** Fade the (hidden) board in over `durationMs`, synced with the VS crossfade-out. */
     revealBoard: (durationMs: number) => void;
-    /** The splash is fully gone — settle the camera onto the board and start the match. */
+    /** The splash is fully gone — start the match (the board is already on-screen at its picked size). */
     onComplete: () => void;
 }
 
@@ -21,18 +21,21 @@ const FIGHT_HOLD_MS = 1500; // the "show it bigger" beat — lingers and slowly 
 const FIGHT_OUT_MS = 360; // blow up past the viewport and vanish
 
 /**
- * The classic Street-Fighter "VS" splash, played between pressing Start and the duel beginning:
+ * The classic Street-Fighter "VS" splash, played between locking the grid in and the duel beginning:
  *
  *   portraits slide in → "VS" stamps with a screen shake → the VS splash crossfades out while the
  *   board fades in → a big "FIGHT!" punches in over the live board, lingers ~1.5s → it blows up out
  *   of the viewport and vanishes → the match starts.
  *
  * Registered as a scene component only so its textures preload at boot; the visuals are built fresh on
- * every {@link play}. The whole thing lays out in plain `scale.gameSize` screen coordinates: the scene
- * holds the camera at a neutral 1:1 view for the entire splash (see ParadroidScene#playIntro) and only
- * settles it onto the board once the splash is gone — so the splash never has to fight the board zoom.
+ * every {@link play}. It lays out over the **camera's current world view** (passed in as `view`) rather
+ * than raw `scale.gameSize`: the scene keeps the camera at the board-fit it had during selection and never
+ * zooms it, so the board is revealed at exactly the size the player picked — it never changes size. Because
+ * `view` is the world rect the camera maps to the full screen, the splash still fills the screen at any zoom.
  */
 export class ParadroidIntro extends NPGameObjectList {
+    #view!: Phaser.Geom.Rectangle; // the camera's world view to lay the splash out over (set per play)
+
     constructor(scene: NPScene) {
         super(scene);
     }
@@ -45,11 +48,12 @@ export class ParadroidIntro extends NPGameObjectList {
         this.scene.load.image(PARADROID_IMAGES.vsFight);
     }
 
-    /** Play the VS splash, driving the scene through `hooks` at the board-reveal and finish beats. */
-    play(hooks: ParadroidIntroHooks) {
-        const { width, height } = this.scene.scale.gameSize;
-        const cx = width / 2;
-        const cy = height / 2;
+    /** Play the VS splash over `view` (the camera's world view), driving the scene through `hooks`. */
+    play(view: Phaser.Geom.Rectangle, hooks: ParadroidIntroHooks) {
+        this.#view = view;
+        const { x: ox, width, height } = view;
+        const cx = view.centerX;
+        const cy = view.centerY;
 
         // The VS splash (backdrop + portraits + "VS") lives in one group so it can crossfade out as a unit.
         const vsGroup = new Phaser.GameObjects.Container(this.scene, 0, 0, []);
@@ -62,17 +66,15 @@ export class ParadroidIntro extends NPGameObjectList {
         this.#fitHeight(player, height * 0.5);
         this.#fitHeight(droid, height * 0.5);
         this.#fitHeight(vs, height * 0.28);
-        player.setPosition(-width * 0.3, cy);
-        droid.setPosition(width * 1.3, cy);
+        player.setPosition(ox - width * 0.3, cy); // charged off the left edge of the view
+        droid.setPosition(ox + width * 1.3, cy); // ...and off the right edge
         vs.setScale(vs.scaleX * 3).setAlpha(0); // charged up + invisible until it stamps in
         vsGroup.add([backdrop, player, droid, vs]);
 
-        // Portraits charge in from opposite sides...
-        this.scene.tweens.add({ targets: player, x: width * 0.27, ease: 'Back.easeOut', duration: SLIDE_MS });
-        this.scene.tweens.add({
-            targets: droid,
-            x: width * 0.73,
-            ease: 'Back.easeOut',
+        // Portraits charge in from opposite sides (slideTo's springy Back.easeOut is the charge-in feel)...
+        slideTo(player, { x: ox + width * 0.27, duration: SLIDE_MS });
+        slideTo(droid, {
+            x: ox + width * 0.73,
             duration: SLIDE_MS,
             onComplete: () => this.#stampVs(vsGroup, vs, hooks),
         });
@@ -98,9 +100,7 @@ export class ParadroidIntro extends NPGameObjectList {
     /** Fade the VS splash out while the scene fades the board in, then hand off to the FIGHT beat. */
     #crossfade(vsGroup: Phaser.GameObjects.Container, hooks: ParadroidIntroHooks) {
         hooks.revealBoard(CROSSFADE_MS);
-        this.scene.tweens.add({
-            targets: vsGroup,
-            alpha: 0,
+        fadeOut(vsGroup, {
             ease: 'Sine.easeInOut',
             duration: CROSSFADE_MS,
             onComplete: () => {
@@ -112,8 +112,8 @@ export class ParadroidIntro extends NPGameObjectList {
 
     /** Punch the big "FIGHT!" image in over the now-visible board, let it linger and swell. */
     #fight(hooks: ParadroidIntroHooks) {
-        const { width, height } = this.scene.scale.gameSize;
-        const fight = this.scene.add.image(width / 2, height / 2, PARADROID_IMAGES.vsFight.key).setOrigin(0.5);
+        const { centerX, centerY, height } = this.#view;
+        const fight = this.scene.add.image(centerX, centerY, PARADROID_IMAGES.vsFight.key).setOrigin(0.5);
         this.#fitHeight(fight, height * 0.6);
         const restScale = fight.scaleX;
         fight.setScale(restScale * 0.2).setAlpha(0);
@@ -127,14 +127,7 @@ export class ParadroidIntro extends NPGameObjectList {
             duration: FIGHT_IN_MS,
             onComplete: () => {
                 // Linger and slowly swell over the live board for the "show it bigger" beat...
-                this.scene.tweens.add({
-                    targets: fight,
-                    scaleX: restScale * 1.12,
-                    scaleY: restScale * 1.12,
-                    ease: 'Sine.easeInOut',
-                    duration: FIGHT_HOLD_MS,
-                    onComplete: () => this.#fightOut(fight, restScale, hooks),
-                });
+                swell(fight, { duration: FIGHT_HOLD_MS, onComplete: () => this.#fightOut(fight, restScale, hooks) });
             },
         });
     }

@@ -1,4 +1,4 @@
-import { lerp, NPScene, NPTextButton, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
+import { fadeIn, NPScene, NPTextButton, OnSceneCreate, OnSceneInit, OnScenePreload } from '@shared/np-phaser';
 import { DuelAiParams, DuelResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 
@@ -7,22 +7,21 @@ import { ParadroidGame, TParadroidMatchResult } from './core/paradroid.game';
 import { ParadroidCountdown } from './sprites/paradroid.countdown';
 import { ParadroidIntro } from './sprites/paradroid.intro';
 import { ParadroidOutro } from './sprites/paradroid.outro';
-
-/** How long the camera takes to settle from the splash's neutral 1:1 view onto the board-fit view. */
-const FOCUS_MS = 600;
+import { ParadroidScoreboard } from './sprites/paradroid.scoreboard';
 
 /**
  * The grid-selection window, in seconds (Leet-40). A fixed budget to re-roll the board before it locks —
- * choosing the layout is the gameplay. Lives here with the other duel-timing constants (FOCUS_MS,
- * `MATCH_DURATION_MS`), not in np-state `Balance`, which holds difficulty *tuning* (rates, AI), not staging.
+ * choosing the layout is the gameplay. Lives here with the other duel-timing constant (`MATCH_DURATION_MS`),
+ * not in np-state `Balance`, which holds difficulty *tuning* (rates, AI), not staging.
  */
 const SELECTION_SECONDS = 20;
 
 /**
  * The duel's staging state machine (Leet-40):
  *   select → (lock-in / time-out) → intro → fight → (buzzer) → outro → done.
- * The board is visible and camera-fit only in `select` and `fight`; the intro and outro own the screen at a
- * neutral 1:1 view with the board hidden (see {@link ParadroidIntro} / {@link ParadroidOutro}).
+ * The board is fixed to the size the player picked during selection — the intro keeps the camera on that
+ * selection fit and lays the VS splash out over the camera's world view (it never zooms the board). Only the
+ * outro hides the board and switches to a neutral 1:1 view (see {@link ParadroidIntro} / {@link ParadroidOutro}).
  */
 type DuelPhase = 'select' | 'intro' | 'fight' | 'outro' | 'done';
 
@@ -43,6 +42,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     #intro!: ParadroidIntro;
     #outro!: ParadroidOutro;
     #countdown!: ParadroidCountdown;
+    #scoreboard!: ParadroidScoreboard;
     #phase: DuelPhase = 'select';
     #lastOutcome: DuelResult['outcome'] = 'lose'; // forfeit by default; a decided match sets win/lose
 
@@ -68,10 +68,13 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.addComponent(this.#outro);
     }
 
-    /** Build a game (defaulting to the injected config) and wire its match-ended announcement. */
+    /** Build a game (defaulting to the injected config) and wire its match-ended + live-score events. */
     #createGame(): ParadroidGame {
         const game = new ParadroidGame(this, this.#config.factoryOptions, this.#config.aiParams);
         game.events.on(ParadroidGame.EVENT_MATCH_ENDED, (result: TParadroidMatchResult) => this.#onMatchEnded(result));
+        game.events.on(ParadroidGame.EVENT_SCORE_CHANGED, (s: { player: number; droid: number }) =>
+            this.#scoreboard?.setScore(s.player, s.droid)
+        );
         return game;
     }
 
@@ -89,6 +92,7 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.#mapBtn = this.#addControl(520, '↩ Map', () => this.#leave());
 
         this.#countdown = new ParadroidCountdown(this);
+        this.#scoreboard = new ParadroidScoreboard(this);
 
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
         this.resize();
@@ -114,14 +118,20 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
         this.#paradroidGame.container.setVisible(true);
         this.#setControls(true, true, true);
         this.resize(); // fit the board (+ controls) into the viewport
-        this.#countdown.play(SELECTION_SECONDS, this.#paradroidGame.container.getBounds(), () => this.#lockIn());
+        const bounds = this.#paradroidGame.container.getBounds();
+        this.#scoreboard.place(bounds);
+        this.#scoreboard.show(true, false); // orient the player to their half; the score is the fight's job
+        this.#countdown.play(SELECTION_SECONDS, bounds, () => this.#lockIn());
     }
 
     /** Re-roll a fresh board at the injected difficulty. The countdown keeps running — the window is fixed. */
     #reroll(): void {
         if (this.#phase !== 'select') return;
         this.#rebuild();
-        this.#countdown.bringToTop(); // the new board was added on top of the display list — lift the overlay back
+        // The new board was added on top of the display list — re-lay the overlays back above it.
+        this.#scoreboard.place(this.#paradroidGame.container.getBounds());
+        this.#scoreboard.show(true, false);
+        this.#countdown.bringToTop();
     }
 
     /** Lock the chosen grid in (button or countdown expiry): play the VS splash, then start the match. */
@@ -134,71 +144,51 @@ export class ParadroidScene extends NPScene implements OnScenePreload, OnSceneCr
     /**
      * Play the Street-Fighter VS splash, then run `onDone` (the actual fight).
      *
-     * The duel uses a single camera that's normally zoomed to fit the board, so to give the splash a
-     * clean full-screen stage we hide the board and hold the camera at a neutral 1:1 view for the whole
-     * splash (it lays out in plain screen coordinates). The splash crossfades the board in part-way
-     * through (`#revealBoard`) and, once it's fully gone, we settle the camera onto the board
-     * (`#focusBoard`) and start the match — see ParadroidIntro for the choreography.
+     * The board keeps the exact size the player picked during selection: the camera is **never** zoomed or
+     * scrolled here — it stays on the selection fit. The splash lays out over the camera's current world view
+     * (`#viewRect`), so it still fills the screen at that fit while the board stays put. We only hide the board
+     * during the VS portion and crossfade it back in (`#revealBoard`) at its fixed size — see ParadroidIntro.
      */
     #playIntro(onDone: () => void): void {
         this.#phase = 'intro';
         this.time.paused = false;
         this.#setBoardVisible(false);
-        this.cameras.main.setZoom(1).setScroll(0, 0);
-        this.#intro.play({
+        this.#intro.play(this.#viewRect(), {
             revealBoard: durationMs => this.#revealBoard(durationMs),
             onComplete: () => {
-                // The board is on-screen at the neutral view; settle the camera onto it and start the
-                // fight (clock + AI begin now — after the FIGHT splash has cleared).
-                this.#focusBoard(FOCUS_MS, () => (this.#phase = 'fight'));
+                // The board is already on-screen at its picked size; just hand off to the fight (clock + AI
+                // begin now — after the FIGHT splash has cleared). No camera move, so the board never resizes.
+                this.#phase = 'fight';
                 onDone();
             },
         });
     }
 
-    /** Reveal the board with a fade-in (crossfading against the VS splash) and bring the Map control back. */
+    /** Reveal the board with a fade-in (crossfading against the VS splash) and bring the fight HUD back. */
     #revealBoard(durationMs: number): void {
         const board = this.#paradroidGame.container;
-        board.setAlpha(0).setVisible(true);
+        board.setVisible(true);
         this.#setControls(false, false, true); // only Map during the fight (no re-roll / lock-in mid-match)
-        this.tweens.add({ targets: board, alpha: 1, ease: 'Sine.easeOut', duration: durationMs });
+        this.#scoreboard.setScore(0, 0); // the match starts level; it swings from here
+        this.#scoreboard.show(true, true); // labels + the live tally for the fight
+        this.#scoreboard.bringToTop();
+        fadeIn(board, { duration: durationMs }); // crossfades the board up against the VS splash fading out
     }
 
-    /** Smoothly tween the camera from the neutral 1:1 view onto the board-fit view (no jarring snap). */
-    #focusBoard(duration: number, onDone: () => void): void {
-        const { width, height } = this.scale.gameSize;
-        const fit = this.#computeBoardFit(width, height);
+    /** The world rectangle the main camera currently maps to the full screen — what the splash lays out over. */
+    #viewRect(): Phaser.Geom.Rectangle {
         const cam = this.cameras.main;
-        if (!fit) {
-            onDone();
-            return;
-        }
-        const startZoom = cam.zoom;
-        const startCx = cam.scrollX + width / 2 / cam.zoom; // world point at the current viewport centre
-        const startCy = cam.scrollY + height / 2 / cam.zoom;
-        this.tweens.addCounter({
-            from: 0,
-            to: 1,
-            ease: 'Sine.easeInOut',
-            duration,
-            onUpdate: tween => {
-                const t = tween.getValue() ?? 1;
-                cam.setZoom(lerp(startZoom, fit.zoom, t)).centerOn(
-                    lerp(startCx, fit.centerX, t),
-                    lerp(startCy, fit.centerY, t)
-                );
-            },
-            onComplete: () => {
-                this.#fitBoardToViewport(width, height); // land exactly on the fit
-                onDone();
-            },
-        });
+        const { width, height } = this.scale.gameSize;
+        const topLeft = cam.getWorldPoint(0, 0);
+        const bottomRight = cam.getWorldPoint(width, height);
+        return new Phaser.Geom.Rectangle(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
     }
 
     /** Hide (or show) the board and all its header controls together (clears the stage for splash/outro). */
     #setBoardVisible(visible: boolean): void {
         this.#paradroidGame.container.setVisible(visible);
         this.#setControls(visible, visible, visible);
+        this.#scoreboard?.show(visible, false); // the fight re-shows the score itself via #revealBoard
     }
 
     /** Toggle the three header controls independently. */
