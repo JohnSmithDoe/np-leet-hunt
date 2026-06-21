@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
     IonButton,
     IonButtons,
@@ -37,6 +37,12 @@ export class HomePageComponent {
     #game = inject(GameStateService);
     #audio = inject(NpAudioService);
 
+    /**
+     * Title-screen gate. The browser blocks audio until a user gesture, so the game opens on a title
+     * screen whose Start click both unlocks audio and reveals the hangar — guaranteeing the hangar (the
+     * "main menu") always has music. `false` = title screen showing; `true` = in the game.
+     */
+    readonly started = signal(false);
     /** Mirrors the audio mute state for the toolbar toggle. */
     readonly muted = this.#audio.muted;
 
@@ -46,16 +52,12 @@ export class HomePageComponent {
         // StageService stays domain-free and the FSM is the single source of truth for the active mode.
         // The run starts in the hangar; the hangar's "Launch run" begins the run.
         inject(RunConductorService);
-        void this.#gateAudio();
     }
 
-    /**
-     * Start in the hangar. Audio can't autoplay without a gesture, so start it as early as the browser
-     * allows; otherwise {@link NpAudioService} unlocks it on the first interaction anywhere (the hangar's
-     * own buttons count) — no dedicated "tap to start" screen needed.
-     */
-    async #gateAudio(): Promise<void> {
-        if (await this.#audio.canAutoplay()) void this.#audio.unlock();
+    /** Enter from the title screen: unlock audio (this click is the required gesture), reveal the hangar. */
+    public start(): void {
+        void this.#audio.unlock();
+        this.started.set(true);
     }
 
     public toggleMute(): void {

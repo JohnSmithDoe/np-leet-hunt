@@ -22,5 +22,13 @@
         <np-stage></np-stage>
         <np-planet-info></np-planet-info>
         <np-event-dialog></np-event-dialog>
+        @if (!started()) {
+            <div class="title-screen">
+                <h1 class="title-name">LEET HUNT</h1>
+                <p class="title-tagline">Reality is bent. A rescue run waits.</p>
+                <button type="button" class="title-start" (click)="start()">▶ Enter the Hush</button>
+                <p class="title-hint">click to begin — with sound</p>
+            </div>
+        }
     </div>
 </ion-content>

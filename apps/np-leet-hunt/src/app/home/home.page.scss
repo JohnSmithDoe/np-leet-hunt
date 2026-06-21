@@ -5,6 +5,55 @@
   height: 100%;
 }
 
+// Title screen / main menu — its Start click is the user gesture that enables audio before the hangar.
+.title-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: radial-gradient(circle at 50% 38%, #0a1830, #02060f 72%);
+}
+
+.title-name {
+  margin: 0;
+  font-size: 3.5rem;
+  letter-spacing: 0.3rem;
+  color: #aee3ff;
+  text-shadow: 0 0 1.5rem rgb(102 204 255 / 50%);
+}
+
+.title-tagline {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #8fb8d6;
+}
+
+.title-start {
+  margin-top: 1rem;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.3rem;
+  color: #aee3ff;
+  cursor: pointer;
+  background: #123a5c;
+  border: 0.125rem solid #6cf;
+  border-radius: 0.5rem;
+}
+
+.title-start:hover {
+  background: #1a4f7a;
+}
+
+.title-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5a7896;
+}
+
 #container {
   text-align: center;
   position: absolute;
