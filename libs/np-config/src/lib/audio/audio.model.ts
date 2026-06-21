@@ -1,5 +1,5 @@
 /**
- * Identifies a musical mood / context. Known ids today: `space.calm`, `space.encounter`.
+ * Identifies a musical mood / context. Known ids today: `space.calm`, `space.encounter`, `space.duel`.
  * Resolved to a {@link MoodBuilder} via the {@link Audio} registry.
  */
 export type MoodId = string;

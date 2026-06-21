@@ -1,6 +1,6 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { NpAudioService } from '@shared/np-audio';
-import { Balance, CREW_DISPLAY_NAMES, Sector, SECTOR_COUNT } from '@shared/np-config';
+import { Audio, Balance, CREW_DISPLAY_NAMES, Sector, SECTOR_COUNT } from '@shared/np-config';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
@@ -35,9 +35,10 @@ export class RunConductorService {
     #audio = inject(NpAudioService);
     #wired = false;
 
-    // The mood currently playing, so a same-mood phase (event overlay, same-sector return) doesn't
-    // restart the track — only a genuine mood change re-evaluates.
+    // The mood + intensity currently playing, so a same-mood/same-tension phase (event overlay,
+    // same-sector return) doesn't restart the track — only a genuine change re-evaluates.
     #currentMood?: string;
+    #currentIntensity = -1;
 
     // The sector currently rendered, and its number, so #showSpace can tell a *new* sector (rebuild the
     // map fresh) from a return to the same one (wake the slept scenes after a dungeon/duel excursion).
@@ -113,34 +114,58 @@ export class RunConductorService {
     }
 
     /**
-     * Map the run phase to a mood: a calm wash over the map, the encounter mood with raised intensity
-     * for combat modes — "a mid-travel encounter raises tension". This only *queues* the mood; audio
+     * Map the run phase to a mood: each sector's own escalating map track, the dedicated driving duel
+     * track for a Paradroid fight, the tense encounter mood for the other combat modes, and a gentle
+     * wash over the hangar — "a mid-travel encounter raises tension". This only *queues* the mood; audio
      * actually boots when {@link NpAudioService} catches the first user gesture (autoplay policy).
-     * Re-evaluating the same mood is skipped (see {@link #playMood}) so an event overlay or same-sector
-     * return won't restart it.
+     * Re-playing the same mood at the same tension is skipped (see {@link #playMood}) so an event overlay
+     * or same-sector return won't restart it.
      */
     #audioForPhase(phase: RunPhase): void {
         switch (phase) {
             case 'duel':
+                this.#playMood('space.duel', 0.85, 1200); // its own beat-driven combat track
+                break;
             case 'dungeon':
             case 'guardian':
             case 'boarding':
                 this.#playMood('space.encounter', 0.85, 1200); // quicker drop into the tense mood
                 break;
+            case 'hangar':
+                this.#playMood('space.calm', 0.12, 2000); // gentle wash over the garage/menu
+                break;
             case 'ending':
                 this.#audio.music.stop(800);
                 this.#currentMood = undefined;
+                this.#currentIntensity = -1;
                 break;
             default:
-                this.#playMood('space.calm', 0.15, 2000); // slow wash back to the map
+                // The map (sector/event): each sector has its own track (ascending tempo + drive), at a
+                // tension that rises the deeper the run gets — closing on the Hush.
+                this.#playMapMood();
                 break;
         }
     }
 
-    /** Set intensity first (so a new mood starts at the right tension), then crossfade if it changed. */
+    /** The current sector's map track, at a depth-scaled tension (deeper sector = tenser wash). */
+    #playMapMood(): void {
+        const number = this.#game.run.snapshot().sectorNumber;
+        const intensity = Math.min(0.7, 0.15 + (number - 1) * 0.12);
+        this.#playMood(Audio.sectorMoodId(Balance.sector(number).id), intensity, 2000);
+    }
+
+    /**
+     * Queue a mood at a tension. Skips entirely when neither changed (same track + tension), so an event
+     * overlay or same-sector return doesn't restart the groove. Sets intensity first (so a new mood
+     * starts at the right tension), then crossfades only when the mood itself changes.
+     */
     #playMood(mood: string, intensity: number, fadeMs: number): void {
+        const moodChanged = mood !== this.#currentMood;
+        const intensityChanged = Math.abs(intensity - this.#currentIntensity) > 0.001;
+        if (!moodChanged && !intensityChanged) return;
+        this.#currentIntensity = intensity;
         this.#audio.music.setIntensity(intensity);
-        if (mood !== this.#currentMood) {
+        if (moodChanged) {
             this.#currentMood = mood;
             this.#audio.music.play(mood, { fadeMs });
         }
