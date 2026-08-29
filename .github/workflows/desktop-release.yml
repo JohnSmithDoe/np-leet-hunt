@@ -1,0 +1,77 @@
+# Builds the unsigned desktop bundles (macOS .dmg, Windows .exe/.msi) and
+# attaches them to a draft GitHub release for the pushed tag.
+#
+# Deliberately unsigned: signing needs a paid Apple Developer ID (~$99/yr) and a
+# Windows code-signing certificate. Users get an OS "unknown publisher" warning —
+# see the README for how to get past it.
+name: Build desktop bundles
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            # universal binary so one .dmg covers Apple Silicon and Intel
+            args: '--target universal-apple-darwin'
+            rust-targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
+          - platform: windows-latest
+            args: ''
+            rust-targets: ''
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and bundle
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Leet Hunt ${{ github.ref_name }}'
+          releaseBody: |
+            Unsigned desktop builds — your OS will warn about an unknown publisher.
+
+            **macOS:** the app is blocked on first launch. Open
+            System Settings → Privacy & Security → *Open Anyway*, or run
+            `xattr -dr com.apple.quarantine "/Applications/Leet Hunt.app"`.
+
+            **Windows:** SmartScreen shows "Windows protected your PC" →
+            *More info* → *Run anyway*.
+
+            Install at your own risk.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

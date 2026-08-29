@@ -1,0 +1,39 @@
+{
+    "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+    "productName": "Leet Hunt",
+    "mainBinaryName": "np-leet-hunt",
+    "version": "1.0.0",
+    "identifier": "np.leet.hunt",
+    "build": {
+        "frontendDist": "../dist/apps/np-leet-hunt",
+        "devUrl": "http://localhost:4200",
+        "beforeDevCommand": "npx nx serve np-leet-hunt",
+        "beforeBuildCommand": "npx nx build np-leet-hunt --base-href ./"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "Leet Hunt",
+                "width": 1280,
+                "height": 720,
+                "minWidth": 960,
+                "minHeight": 540,
+                "resizable": true,
+                "fullscreen": false,
+                "center": true
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": ["dmg", "app", "nsis", "msi"],
+        "category": "Game",
+        "shortDescription": "A space RPG hunt for the leet",
+        "longDescription": "np-leet-hunt — a hobby space-RPG built with Angular, Ionic and Phaser, wrapped for the desktop with Tauri.",
+        "copyright": "AGPL-3.0-only",
+        "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+    }
+}
