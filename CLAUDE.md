@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A hobby space-RPG game ("leet hunt") built as an Nx monorepo: an Angular 21 / Ionic 8 shell app (standalone components, zoneless — no zone.js — with OnPush change detection, `bootstrapApplication` + `app.config.ts`) hosting a Phaser 4 game, packaged for iOS/Android via Capacitor 8. The design doc is `game-design.md` (full GDD, built with the `/game-designer` skill); the active issue backlog is `BACKLOG.md` (continues the `Leet-<n>` numbering). Neither contains coding rules.
+A hobby space-RPG game ("leet hunt") built as an Nx monorepo: an Angular 21 / Ionic 8 shell app (standalone components, zoneless — no zone.js — with OnPush change detection, `bootstrapApplication` + `app.config.ts`) hosting a Phaser 4 game, packaged for iOS/Android via Capacitor 8. The design doc is `docs/game-design.md` (full GDD, built with the `/game-designer` skill); the active issue backlog is `docs/BACKLOG.md` (continues the `Leet-<n>` numbering). Neither contains coding rules.
 
 Version constraints to respect:
 
@@ -27,6 +27,8 @@ npx nx affected:test                       # affected only; defaultBase is 'mast
 ```
 
 Mobile (Capacitor): `npm run sync:app:angular`, `npm run ios:app:angular`, `npm run android:app:angular` (run a build first).
+
+Desktop (Tauri 2, `src-tauri/`): `npm run serve:app:desktop` (= `tauri dev`, boots `nx serve` and points the native window at `:4200`), `npm run build:app:desktop` (= `tauri build`, runs the prod Angular build first). Needs a Rust toolchain. Mobile stays with Capacitor — Tauri is desktop-only here.
 
 When generating a new project with Nx, also run `nx g nx-stylelint:configuration --project <projectName>`.
 
@@ -61,3 +63,5 @@ Nx workspace, npm scope `np-afterwork`. Libraries are imported via the `@shared/
 
 - Phaser must never boot while its container is 0×0 — since Phaser 3.8x a zero-sized WebGL renderer throws "Framebuffer status: Incomplete Attachment" at boot instead of recovering on resize. `StageComponent` defers `initStage` via ResizeObserver until the container has dimensions; keep that behavior when touching stage bootstrapping.
 - Ionic imports must come from `@ionic/angular/standalone`, never `@ionic/angular` — mixing the two entrypoints double-registers the web components. Icons are bundled via `addIcons({ ... })` from `ionicons` in the component that uses them (see `home.page.ts`).
+- The Tauri desktop build runs on the **OS webview**, not Chromium: WKWebView (Safari's engine) on macOS, WebView2 (Chromium) on Windows. A clean run in Chrome is not proof the macOS bundle works — check Safari at `:4200` before blaming Tauri.
+- `tauri build`'s macOS `.dmg` step drives Finder over AppleScript and fails in any non-interactive shell (CI, agents, `ssh`). Prefix with `CI=true` to skip the window styling. Failure is easy to miss when the build is piped through `tail` — the pipe masks the non-zero exit.

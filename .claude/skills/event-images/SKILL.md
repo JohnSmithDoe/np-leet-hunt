@@ -5,7 +5,7 @@ description: Generate event hero images from event-image-prompts.md by driving D
 
 # Event hero images
 
-One establishing image per event, generated from `event-image-prompts.md` and written to
+One establishing image per event, generated from `../../../docs/event-image-prompts.md` and written to
 `libs/np-space-map/src/assets/events/<event-key>.jpeg`.
 
 `scripts/generate.mjs` drives <https://deepai.org/machine-learning-model/text2img> exactly the way a
@@ -43,7 +43,7 @@ heading. With no selector it takes **every** event still missing an image.
 ## Image shape
 
 Aspect ratio is a **page control, not a prompt instruction** — `Landscape 16:9` in the prompt did
-nothing and has been removed from `event-image-prompts.md`. The script now picks the shape before every
+nothing and has been removed from `../../../docs/event-image-prompts.md`. The script now picks the shape before every
 submit: open the row if collapsed (`#modelEditButton` toggles `#suboutline-try-it`), click
 `#edit_shape_N`, and confirm the element's `iscurrentshape` attribute flipped to `True`.
 
@@ -94,7 +94,7 @@ CORS-blocked. The download event is the reliable path.
 
 ## Prompt assembly
 
-`event-image-prompts.md` is the only source. The script composes each prompt as:
+`../../../docs/event-image-prompts.md` is the only source. The script composes each prompt as:
 
 ```
 <Global Style Prefix> <Sector Style line> <event scene prompt>
@@ -105,14 +105,14 @@ stripping markdown emphasis so `_Momo_` doesn't reach the generator as literal u
 events by adding a bullet to that file** — `- **`event-key`** — scene description.` — and they appear in
 `--list` automatically. Nothing else needs editing.
 
-Note `event-image-prompts.md` carries an `xxxxxx` progress marker in the Frozen Drift section. It's a
+Note `../../../docs/event-image-prompts.md` carries an `xxxxxx` progress marker in the Frozen Drift section. It's a
 human bookmark only; the script ignores it and uses the presence of the file on disk as truth.
 
 ## Open issues — fix before the next big batch
 
 **1. Fake signatures.** The model likes to sign its work: a cursive artist name, a year, or an invented
 studio wordmark painted into the bottom-right corner (found in 8 of the first 50 images — e.g.
-`Pelia Stinige`, `AULLISTERIK ROOSTIMARRY`). `event-image-prompts.md`'s prefix now carries an
+`Pelia Stinige`, `AULLISTERIK ROOSTIMARRY`). `../../../docs/event-image-prompts.md`'s prefix now carries an
 `Unsigned:` clause, but that is unproven — **inspect the bottom-right corner of every new image**
 (crop the bottom ~15%, upscale ~4×, normalise) before accepting it.
 

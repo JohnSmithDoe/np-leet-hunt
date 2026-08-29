@@ -1,7 +1,7 @@
 # Leet Hunt — Event Image Generation Prompts
 
 > One establishing illustration per event — the scene-setter shown on arrival when the event fires
-> (the `intro` text in `libs/np-space-map/src/lib/events/content/`). Grounded in `game-design.md`
+> (the `intro` text in `../libs/np-space-map/src/lib/events/content`). Grounded in `game-design.md`
 > §"Art direction" and §5 (the five sectors / grey gradient). Companion to `event-system.md` and
 > `event-content.md`.
 
@@ -19,13 +19,17 @@ Style line** to each scene prompt, then append your generator's own flags (e.g. 
 
 ### Global Style Prefix (prepend to every prompt)
 
-> Lush painted digital illustration, cinematic wide establishing shot, deep-space backdrop, soft
-> volumetric light, rich saturated colour where the distortion lives. House tone: warm wonder with a
-> melancholy core — FTL meets Studio Ghibli, the stolen-time sadness of *Momo* and the quiet menace of
-> *Doctor Who*. The everyday made strange. No text, no UI, no watermark. Landscape 16:9.
+```
+Lush painted digital illustration, cinematic wide establishing shot, deep-space backdrop, soft
+volumetric light, rich saturated colour where the distortion lives. House tone: warm wonder with a
+melancholy core — FTL meets Studio Ghibli, the stolen-time sadness of _Momo_ and the quiet menace of
+_Doctor Who_. The everyday made strange. No text, no UI, no watermark. Unsigned: no artist
+signature, no handwritten or cursive script, no studio logo or wordmark, no year or date, no
+border or frame — the bottom edge stays clean painted scene.
+```
 
 The Hush (the grey) is the antagonist: **colour and clash read as alive; flat grey uniformity is the
-Hush winning.** Sectors run a *grey gradient* from vivid (sector 1) to near-monochrome (sector 5) — the
+Hush winning.** Sectors run a _grey gradient_ from vivid (sector 1) to near-monochrome (sector 5) — the
 Sector Style lines below carry that.
 
 ### Sector Style lines (prepend the one matching the event's pool)
@@ -108,6 +112,7 @@ Sector Style lines below carry that.
 - **`frozen-frozen-waterfall`** — A whole waterfall caught mid-fall off an ice cliff: a wall of glass spray frozen between one instant and the next, the roar still trapped somewhere inside it. Suspended motion, glittering stillness.
 - **`frozen-comet-rink`** — A comet flattened into a glass-smooth disc of ice, fresh frost-edged skate-tracks looping and figure-eighting across it, leading from nowhere to nowhere. Playful yet haunting, pale and empty.
 - **`frozen-ice-hermit`** — A lone bundled figure sitting on a stool over a hole cut in an ice floe, line in the water, back to the whole frozen sky — ice-fishing here so long they've forgotten there are no fish. Quiet, absurd, melancholy.
+  xxxxxx
 - **`frozen-snow-globe`** — A perfect dome of clear ice no bigger than a ship, floating in space, holding one tiny toy town under one toy sky, snow forever falling, small lights forever lit in small windows. Precious, contained, wistful.
 - **`frozen-frostbit-greenhouse`** — A cracked-glass greenhouse dome on an ice plain still trying to be a garden — rows of flowers caught at full bloom in a sheath of frost, their colour locked under the ice the moment the warmth ran out. Frozen vivid colour, poignant.
 - **`frozen-lighthouse-keeper`** — An ice-rimed lighthouse on a black reef of frozen shipwrecks, its great lamp still sweeping the dark, and in the glass room at the top a keeper with frost on their shoulders still standing watch. Lonely vigil, cold beam through fog.
@@ -212,10 +217,10 @@ Sector Style lines below carry that.
 > From `event-content.md` — these fire only once their triggers land (en-route intercept, boarding mode).
 > Included so art can be staged ahead of the code.
 
-- **`black-hole-dilemma`** *(core / en-route)* — A black hole sitting dead ahead, swallowing light and patience alike, a tiny ship hesitating at the edge of its accretion glow. Awe, dread, gravitational menace, deep space.
-- **`pirates-attack`** *(en-route)* — A ragtag pirate ship swinging into the viewer's path, weapons hot and run out, demanding cargo. Aggressive, scrappy, a tense standoff in open space.
-- **`distress-signal`** *(en-route)* — A small civilian ship pinned down by raiders, flashing a desperate distress call, the viewer's ship arriving on the scene. Urgency, a choice to intervene, the glow of a chaotic firefight.
-- **`abandoned-station`** *(en-route)* — A derelict space station turning slowly in the dark, airlocks gaping open, lights dead, an air of salvage and danger. Eerie, exploratory, cold.
-- **`cargo-boarding`** *(boarding)* — The view through a breached airlock into the quiet corridors of a boarded Federation freighter, dim emergency lighting, tension before contact. Boarding dread, industrial.
-</content>
-</invoke>
+- **`black-hole-dilemma`** _(core / en-route)_ — A black hole sitting dead ahead, swallowing light and patience alike, a tiny ship hesitating at the edge of its accretion glow. Awe, dread, gravitational menace, deep space.
+- **`pirates-attack`** _(en-route)_ — A ragtag pirate ship swinging into the viewer's path, weapons hot and run out, demanding cargo. Aggressive, scrappy, a tense standoff in open space.
+- **`distress-signal`** _(en-route)_ — A small civilian ship pinned down by raiders, flashing a desperate distress call, the viewer's ship arriving on the scene. Urgency, a choice to intervene, the glow of a chaotic firefight.
+- **`abandoned-station`** _(en-route)_ — A derelict space station turning slowly in the dark, airlocks gaping open, lights dead, an air of salvage and danger. Eerie, exploratory, cold.
+- **`cargo-boarding`** _(boarding)_ — The view through a breached airlock into the quiet corridors of a boarded Federation freighter, dim emergency lighting, tension before contact. Boarding dread, industrial.
+  </content>
+  </invoke>

@@ -1,6 +1,6 @@
 # Leet Hunt — Event System Spec
 
-> Companion to `game-design.md` (the GDD). The GDD §4 *Events* / §6 *UX* hold the **what and why**;
+> Companion to `game-design.md` (the GDD). The GDD §4 _Events_ / §6 _UX_ hold the **what and why**;
 > this doc holds the **shape and wiring** — the data model, content pools, planet-arrival flow, and
 > the dialog UI. Implementation-aware: it names the existing code it builds on. It is the structured
 > destination for the raw `AI.md` brainstorm, which is consumed into it event by event (§10).
@@ -44,16 +44,17 @@ libs/np-space-map/src/lib/
 ```
 
 **Patterns reused (don't reinvent):**
-- *Phaser↔Angular bridge* — `PlanetInfoComponent` (`ui/planet-info/planet-info.component.ts`):
+
+- _Phaser↔Angular bridge_ — `PlanetInfoComponent` (`ui/planet-info/planet-info.component.ts`):
   subscribe to `StageService.initialized$`, listen on `game.events`, drive an OnPush `signal`.
   The dialog adds the reverse direction (emit the result back on the same `game.events`).
-- *Data + pools + seeded pick* — `generatePlanetInfo(rng)` + `PLANET_INFO_DATA`
+- _Data + pools + seeded pick_ — `generatePlanetInfo(rng)` + `PLANET_INFO_DATA`
   (`planet/planet-info.ts`, `planet/planet-info.data.ts`): typed shape, content in pools, a seeded
   `NPRng` so the same planet yields the same result.
-- *Arrival hook* — `NPSpaceMap.#onArrived(target)` (`space/np-space-map.ts:226`): today it handles
+- _Arrival hook_ — `NPSpaceMap.#onArrived(target)` (`space/np-space-map.ts:226`): today it handles
   rim-bail and snapback then refreshes state. The normal-planet branch is the empty slot the event
   fires from (§6).
-- *Front pushback* — `reality.ts` (`sweepTo`) + `NormalityFront.advance()`: the `front` effect (§8)
+- _Front pushback_ — `reality.ts` (`sweepTo`) + `NormalityFront.advance()`: the `front` effect (§8)
   drives these; the GDD already foresees distortion-battery pushback (§4).
 
 ## 3. Data model
@@ -65,12 +66,12 @@ type Tone = 'good' | 'neutral' | 'bad';
 
 /** A planet event: a scene-setting intro wrapping a question tree. The unit of authoring & pooling. */
 interface PlanetEvent {
-    id: string;            // stable, kebab-case, unique (also the migration key, §10)
-    intro: string;         // scene-setter, shown once on arrival
-    root: Question;        // the first decision
-    sector?: SectorId;     // pool membership; omit = core pool (eligible in any sector)
-    weight?: number;       // relative draw weight within its pool (default 1)
-    gate?: Requirement;    // event only enters the pool if the run meets this (omit = always)
+    id: string; // stable, kebab-case, unique (also the migration key, §10)
+    intro: string; // scene-setter, shown once on arrival
+    root: Question; // the first decision
+    sector?: SectorId; // pool membership; omit = core pool (eligible in any sector)
+    weight?: number; // relative draw weight within its pool (default 1)
+    gate?: Requirement; // event only enters the pool if the run meets this (omit = always)
 }
 
 /** Exactly three answers, internally ordered good | neutral | bad. */
@@ -80,41 +81,42 @@ interface Question {
 }
 
 interface Answer {
-    choice: string;        // the button label the player sees
-    tone: Tone;            // INTERNAL tag — never rendered (GDD §4)
-    gate?: Requirement;    // gated answer (crew/pet/item/flag) — GDD §4 "gated answers"
-    cost?: Effect[];       // stake paid the moment this answer is chosen, before its follow-up/outcome (§4/§8)
+    choice: string; // the button label the player sees
+    tone: Tone; // INTERNAL tag — never rendered (GDD §4)
+    gate?: Requirement; // gated answer (crew/pet/item/flag) — GDD §4 "gated answers"
+    cost?: Effect[]; // stake paid the moment this answer is chosen, before its follow-up/outcome (§4/§8)
     // Exactly one of the next two (invariant, §4):
-    followUp?: Question;   // branch one level deeper — recursion allowed (flexible depth)
-    outcome?: Outcome;     // ...or resolve here
+    followUp?: Question; // branch one level deeper — recursion allowed (flexible depth)
+    outcome?: Outcome; // ...or resolve here
 }
 
 interface Outcome {
-    resultText: string;    // narrative shown after the choice
-    effects: Effect[];     // [] = pure flavour, no state change
+    resultText: string; // narrative shown after the choice
+    effects: Effect[]; // [] = pure flavour, no state change
 }
 
 /** What an outcome does to the run. Applied in order (§8). */
 type Effect =
     | { kind: 'resource'; hull?: number; heart?: number; marbles?: number } // signed deltas
-    | { kind: 'item'; grant?: string; take?: string }                       // inventory ids
-    | { kind: 'spawnGame'; game: 'dungeon' | 'duel'; launch: ModeLaunch }   // hand-off (Leet-29)
-    | { kind: 'openRoute'; to: string }                                     // reveal a map connection
-    | { kind: 'front'; advance: number }                                    // <0 = distortion-battery pushback
-    | { kind: 'flag'; set: string };                                        // run-scoped story/state flag
+    | { kind: 'item'; grant?: string; take?: string } // inventory ids
+    | { kind: 'spawnGame'; game: 'dungeon' | 'duel'; launch: ModeLaunch } // hand-off (Leet-29)
+    | { kind: 'openRoute'; to: string } // reveal a map connection
+    | { kind: 'front'; advance: number } // <0 = distortion-battery pushback
+    | { kind: 'flag'; set: string }; // run-scoped story/state flag
 
 /** Unlock condition for an event entering its pool, or for a gated answer. */
 type Requirement =
-    | { kind: 'crew'; member: CrewMember }   // rescued & aboard
-    | { kind: 'item'; id: string }           // in inventory
-    | { kind: 'petClass'; atLeast: number }  // robo-pet class 001..999 (Paradroid)
-    | { kind: 'flag'; set: string };         // a flag previously set this run
+    | { kind: 'crew'; member: CrewMember } // rescued & aboard
+    | { kind: 'item'; id: string } // in inventory
+    | { kind: 'petClass'; atLeast: number } // robo-pet class 001..999 (Paradroid)
+    | { kind: 'flag'; set: string }; // a flag previously set this run
 
 // `ModeLaunch` is the mode-result contract from BACKLOG Leet-29 (duel grid/AI level, dungeon objective…).
 // Imported, not redefined here, so events and the run state machine speak one launch vocabulary.
 ```
 
 **Notes**
+
 - `followUp` recurses through `Question`, not `PlanetEvent` — a nested node needs no `id`/`intro`/pool
   metadata. This is the tightening of your "fixed-3, flexible depth" pick: always three answers, depth
   driven by recursion, no hard cap.
@@ -127,7 +129,7 @@ type Requirement =
    `AI.md` already think this way.
 2. **Tone is invisible.** Never render it, never colour by it. It exists for authoring balance and
    analytics only.
-3. **Presentation order ≠ tone order.** The dialog renders answers in a fixed *non-tonal* order
+3. **Presentation order ≠ tone order.** The dialog renders answers in a fixed _non-tonal_ order
    (authored deliberately mixed, or shuffled with a per-event seed). Pick one and keep it consistent
    (recommendation: author mixed; deterministic and reviewable).
 4. **Each answer is terminal XOR a branch.** Exactly one of `outcome` / `followUp` is set.
@@ -141,13 +143,13 @@ type Requirement =
 7. **Effects are signed deltas / explicit ids**, never prose-encoded. The narrative lives in
    `resultText`; the mechanics live in `effects`. (This is the `AI.md` `reward: string` → structured
    transform.)
-8. **A `cost` is the answer's *stake*** — `Effect[]` applied the instant the answer is chosen, before its
+8. **A `cost` is the answer's _stake_** — `Effect[]` applied the instant the answer is chosen, before its
    follow-up or outcome (§8). It models a risk/commitment trade: spend resources to take a branch, then
-   its outcome decides the payoff (e.g. *ram the derelict* → `cost: [{resource, hull: -2}]`, then the
+   its outcome decides the payoff (e.g. _ram the derelict_ → `cost: [{resource, hull: -2}]`, then the
    branch's outcomes pay out marbles — sometimes big, sometimes a dud, so the spend is a real gamble).
    Costs are normally negative `resource` deltas; keep `front`/`spawnGame` in outcomes, not costs.
-   A `cost` is independent of the terminal-XOR-branch rule — an answer may carry a cost *and* a
-   follow-up, or a cost *and* an outcome.
+   A `cost` is independent of the terminal-XOR-branch rule — an answer may carry a cost _and_ a
+   follow-up, or a cost _and_ an outcome.
 
 ## 5. Content pools & selection
 
@@ -159,8 +161,7 @@ type Requirement =
   (`event.pool.ts`) draws from `CORE_EVENTS` + `SECTOR_EVENT_POOLS[sector]`, keyed by the run's current
   sector (from the np-state balance model). Still deferred: filtering by `gate` against the run context, and
   subtracting events already fired this run (no-immediate-repeats) — both need richer run context first.
-- **Selection** = seeded pick: `new NPRng(\`event-${sector}-${seed}\`).item(eligible)` — same seed strategy as
-  `generatePlanetInfo`, so a planet's event is stable if re-surveyed and reproducible for tests. (`weight` is
+- **Selection** = seeded pick: `new NPRng(\`event-${sector}-${seed}\`).item(eligible)`— same seed strategy as`generatePlanetInfo`, so a planet's event is stable if re-surveyed and reproducible for tests. (`weight` is
   not yet applied.) Each planet fires **one** event on arrival.
 - Every non-rim planet fires an event; "shop" / "pure gain" planets are just events whose tree is
   shallow (a single question, or outcomes with `item`/`resource` effects). Rim suns bail — no event.
@@ -215,18 +216,18 @@ HTML/Ionic overlays").
 ## 8. Effect application & hand-offs
 
 Effects apply **in array order**. An answer's **`cost`** runs through the exact same applier, just at a
-different moment: on `EVENT_CHOICE_COMMITTED` when the branch is chosen, *before* its outcome's effects
+different moment: on `EVENT_CHOICE_COMMITTED` when the branch is chosen, _before_ its outcome's effects
 (which apply on `EVENT_RESOLVED`). So a cost→gain answer first spends the stake, then pays out. Ownership
 and current readiness:
 
-| Effect       | Applied to                                   | Status now                                                                 |
-|--------------|----------------------------------------------|----------------------------------------------------------------------------|
-| `resource`   | run-state Hull/Heart/Marbles store           | **Stub** — store lands with Leet-27. Emit deltas; a stub service holds them, HUD reads them. |
-| `flag`       | run-state flag set                           | **Buildable** — a small `Set<string>` on the stub run-state.               |
-| `openRoute`  | the map graph (reveal a connection)          | **Buildable now** — `np-space-map` can add/reveal a line between nodes.     |
-| `front`      | `NormalityFront` / `reality.sweepTo`         | **Buildable now** — pushback path already foreseen (GDD §4 batteries).      |
-| `item`       | inventory                                    | **Stub** — no inventory yet; record grants/takes on the stub run-state.     |
-| `spawnGame`  | `StageService.startScene` + `ModeLaunch`     | **Deferred hand-off** — wire when Leet-29 lands; until then log + no-op.    |
+| Effect      | Applied to                               | Status now                                                                                   |
+| ----------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `resource`  | run-state Hull/Heart/Marbles store       | **Stub** — store lands with Leet-27. Emit deltas; a stub service holds them, HUD reads them. |
+| `flag`      | run-state flag set                       | **Buildable** — a small `Set<string>` on the stub run-state.                                 |
+| `openRoute` | the map graph (reveal a connection)      | **Buildable now** — `np-space-map` can add/reveal a line between nodes.                      |
+| `front`     | `NormalityFront` / `reality.sweepTo`     | **Buildable now** — pushback path already foreseen (GDD §4 batteries).                       |
+| `item`      | inventory                                | **Stub** — no inventory yet; record grants/takes on the stub run-state.                      |
+| `spawnGame` | `StageService.startScene` + `ModeLaunch` | **Deferred hand-off** — wire when Leet-29 lands; until then log + no-op.                     |
 
 So the vertical slice is **end-to-end real** for `flag`/`openRoute`/`front` and **stubbed against a
 minimal run-state** for `resource`/`item`, with `spawnGame` a logged hand-off. The stub run-state is a
@@ -283,7 +284,8 @@ export const grassAlienEncounter: PlanetEvent = {
                             choice: 'Climb for the summit view',
                             tone: 'bad',
                             outcome: {
-                                resultText: 'Slope turns to cliff, then to ice. You turn back battered, the view unearned.',
+                                resultText:
+                                    'Slope turns to cliff, then to ice. You turn back battered, the view unearned.',
                                 effects: [{ kind: 'resource', heart: -2 }],
                             },
                         },
@@ -312,7 +314,8 @@ export const grassAlienEncounter: PlanetEvent = {
                             choice: 'Work as one team, one goal',
                             tone: 'neutral',
                             outcome: {
-                                resultText: 'Slower, but solid. You leave with steady hands and a little to show for it.',
+                                resultText:
+                                    'Slower, but solid. You leave with steady hands and a little to show for it.',
                                 effects: [{ kind: 'resource', marbles: 6 }],
                             },
                         },
@@ -320,7 +323,8 @@ export const grassAlienEncounter: PlanetEvent = {
                             choice: 'Let them compete for the best find',
                             tone: 'bad',
                             outcome: {
-                                resultText: 'It turns into a race. Someone takes a tumble in the bragging, and the haul suffers.',
+                                resultText:
+                                    'It turns into a race. Someone takes a tumble in the bragging, and the haul suffers.',
                                 effects: [{ kind: 'resource', heart: -1, marbles: 3 }],
                             },
                         },
@@ -382,15 +386,15 @@ file → `event.pool.ts`. With sector context now live, **planet events graduate
 typed pool** (`events/content/sectors/<sector-id>.events.ts`); only the en-route/boarding seeds remain
 catalogued in `event-content.md`.
 
-| Event | Pool | Status |
-|-------|------|--------|
-| Alien Encounter (grass) | `home-reach` | ✅ coded · `grass-alien-encounter.event.ts` (§9) |
-| Space Whale, Zeebo the guide | core | ✅ coded · `space-whale.event.ts`, `zeebo-guide.event.ts` |
-| Per-sector pools (~25 each) | all 5 sectors | ✅ coded · `content/sectors/<sector-id>.events.ts` |
-| Enchanted Nebula, Celestial Dance-Off, Cosmic Carnival | `veiled-nebula` | ✅ coded · in `veiled-nebula.events.ts` |
-| Black Hole Dilemma | core/en-route | 📝 catalogued (en-route trigger) |
-| Space Pirates, Distress Signal, Abandoned Station | en-route | 📝 catalogued (en-route trigger) |
-| Cargo-Ship Boarding | boarding | 📝 catalogued (boarding mode) |
+| Event                                                  | Pool            | Status                                                    |
+| ------------------------------------------------------ | --------------- | --------------------------------------------------------- |
+| Alien Encounter (grass)                                | `home-reach`    | ✅ coded · `grass-alien-encounter.event.ts` (§9)          |
+| Space Whale, Zeebo the guide                           | core            | ✅ coded · `space-whale.event.ts`, `zeebo-guide.event.ts` |
+| Per-sector pools (~25 each)                            | all 5 sectors   | ✅ coded · `content/sectors/<sector-id>.events.ts`        |
+| Enchanted Nebula, Celestial Dance-Off, Cosmic Carnival | `veiled-nebula` | ✅ coded · in `veiled-nebula.events.ts`                   |
+| Black Hole Dilemma                                     | core/en-route   | 📝 catalogued (en-route trigger)                          |
+| Space Pirates, Distress Signal, Abandoned Station      | en-route        | 📝 catalogued (en-route trigger)                          |
+| Cargo-Ship Boarding                                    | boarding        | 📝 catalogued (boarding mode)                             |
 
 `event.pool.ts` keys `SECTOR_EVENT_POOLS` by `SectorId` (the np-state balance model) and adds `CORE_EVENTS`;
 `resolvePlanetEvent(sector, seed)` picks from `core ∪ sector(current)`. Each of the five sectors has ~25

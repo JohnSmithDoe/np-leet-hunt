@@ -2,8 +2,8 @@
 
 A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 21 / Ionic 8** shell app (standalone components, zoneless, OnPush) hosting a **Phaser 4** game, packaged for iOS/Android via **Capacitor 8** and for desktop via **Tauri 2**.
 
-- The full game design doc lives in [`game-design.md`](./game-design.md).
-- The active issue backlog is [`BACKLOG.md`](./BACKLOG.md) (`Leet-<n>` numbering).
+- The full game design doc lives in [`docs/game-design.md`](docs/game-design.md).
+- The active issue backlog is [`docs/BACKLOG.md`](docs/BACKLOG.md) (`Leet-<n>` numbering).
 - Working notes for contributors (incl. AI agents) are in [`CLAUDE.md`](./CLAUDE.md).
 
 **Version constraints to respect:**

@@ -13,17 +13,17 @@ drafted below (GDD §7).
 
 ---
 
-# Phase 2 — The Duel Loop *(active)*
+# Phase 2 — The Duel Loop _(active)_
 
-Goal (GDD §7): *duels fire from the map; winning grows the pet within a run.*
+Goal (GDD §7): _duels fire from the map; winning grows the pet within a run._
 What already exists (Leet-29 + the duel-AI work, ahead of this tracker): the mode hand-off contract
 (`mode-contract.ts` — `DuelLaunch` / `DuelResult` with an `absorbedClass` field / `isModeSuccess`), a
 playable `ParadroidScene` with an intro that reports a typed `DuelResult` via `onResult`, and a seeded,
 sector-tunable droid AI (`paradroid.ai.ts`, `Balance.duelBoardParams`/`duelAiParams`). What's missing is
-everything that makes a duel *part of a run*: nothing in a real run opens one, no result is consumed, and
+everything that makes a duel _part of a run_: nothing in a real run opens one, no result is consumed, and
 there is no robo-pet. The three issues below close that.
 Recommended order: **~~Leet-37~~ → ~~39~~ → ~~40~~ → 38** (37 + 39 met the exit criterion — duels fire from
-the map and a win grows the pet; 40 turned the duel into a *staged* encounter — grid-selection + ending
+the map and a win grows the pet; 40 turned the duel into a _staged_ encounter — grid-selection + ending
 animation; **38 is next** — the teeth: a sector difficulty curve and the mini-duel variant).
 
 ## Leet-37: Duel-as-takeover — fire duels from the map — ✅ done
@@ -34,11 +34,13 @@ hardcoded the difficulty, and `#onModeResult` just logged the result. The contra
 the run-side wiring was the gap.
 
 **Decided:**
-- **Both** open duels — en-route intercepts (the Leet-35 pool) *and* planet events.
+
+- **Both** open duels — en-route intercepts (the Leet-35 pool) _and_ planet events.
 - **A duel loss is non-lethal** — it fails the encounter and costs resources, but never ends the run. Only a
   failed dungeon/boarding (the ship-map mode, Phase 3) can end the run; a Paradroid loss cannot.
 
 **Outcome**
+
 - [x] `#applyEffects` now **returns** the `spawnGame` effect (instead of logging it) and a new
       `SPACE_EVENTS.SPAWN_GAME` carries it (`SpawnGamePayload`); the conductor's `#onSpawnGame` records the
       launch and drives the FSM into `duel`/`dungeon`. `#showDuel` reads the carried `DuelLaunch` (default
@@ -47,30 +49,42 @@ the run-side wiring was the gap.
       Leet-39) and the en-route **escort-fighter** "dare it" branch (it engages → duel) — both `spawnGame`.
 - [x] `#onModeResult` **consumes** the `DuelResult` via `isModeSuccess`: a **non-lethal** loss applies a
       placeholder hull penalty (tuned by the Leet-38 curve), a win returns clean (pet reward is Leet-39).
-- [x] *Closed the en-route ⇄ duel seam:* an intercept that turns into a duel sleeps the space scenes, so the
+- [x] _Closed the en-route ⇄ duel seam:_ an intercept that turns into a duel sleeps the space scenes, so the
       jump can't fly its second leg mid-duel. It now holds the destination (`#resumeAfterMode`) and finishes
       the jump on `#onSceneWake` (snap + normal arrival) when the map wakes back from the duel.
 - [x] build + lint + unit tests green (np-space-map 24 incl. a new "an encounter opens a duel" spec,
-      np-state 42, app smoke 1). *UI not exercised* — the duel staging + the en-route-duel return are for the
+      np-state 42, app smoke 1). _UI not exercised_ — the duel staging + the en-route-duel return are for the
       user to eyeball.
 
 **Exit:** a map event/encounter opens a duel and the run continues with its result.
 
-## Leet-38: Duel staging & variety — sector curve + mini-duel — ☐ todo
+## Leet-38: Duel staging & variety — sector curve + mini-duel — 🛠 in progress
 
 **Context:** `ParadroidScene` already has intro → play → a "↩ Map" result control (Leet-29) and a seeded AI,
 but duel difficulty is only ever the fixed levels chosen at launch — there's no sector-scaled curve, and no
 small-board **mini-duel** for lightweight encounters (every duel is full guardian-scale). Result framing is
-minimal.
+minimal. Mechanics + the size curve are documented in `../libs/np-paradroid/paradroid.md`.
 
 **Scope**
-- [ ] A duel difficulty **curve** in np-state `Balance`, keyed by sector (and encounter type), so duels
-      harden with depth the way the sector curve hardens the map — feeds the launch chosen in Leet-37.
-- [ ] A **mini-duel** (small-grid) board variant for quick map encounters, distinct from the full board.
-- [ ] Tighten intro → play → result staging: clear win/lose readout, time-left, and the absorbed-class beat
-      (the hand-off Leet-39 consumes).
 
-**Exit:** duels scale with depth and a quick mini-duel variant exists alongside the full board.
+- [x] **Board-size curve = the mini-duel.** `Balance.duelRows(sector)` grows the board from a **4-row
+      mini-duel** in sector 1 to a **12-row** full board in sector 5 (linear; `DUEL_MIN/MAX_ROWS`). Rows =
+      contested middle nodes, so the board _is_ the stakes. `#showDuel` passes `{ rows }` to
+      `paradroidFactoryOptions`; the per-side **shot budget scales with rows** (`DUEL_SHOTS_PER_ROW = 1.5`,
+      8 rows → the original 12) so small boards aren't spammable nor big ones starved. Columns stay 8.
+- [x] **Debug:** `S3` / `S5` toolbar buttons jump to sectors 3/5 (`debugJumpToSector` → `setSector`) to
+      eyeball the scaled boards. _UI not exercised — for the user to eyeball._
+- [x] build + lint + unit tests green (np-config `duelRows`, np-paradroid factory `shots`, np-state
+      `setSector`; app prod build).
+- [ ] A duel difficulty **curve** for the _other_ axes — tile palette + changer/autofire rates + AI skill
+      keyed by sector (+ encounter type), so duels harden with depth beyond size. `#showDuel` still
+      hardcodes `boardLevel`/`aiLevel` to `'normal'`. Orthogonal to the size curve.
+- [ ] _(Optional)_ per-encounter sizing — a `DuelLaunch.scale` so en-route skirmishes are smaller than
+      planet takeovers _within_ a sector; decide if a mini caps class absorption.
+- [x] Tighten intro → play → result staging — largely delivered by Leet-40 (countdown, scoreboard, outro).
+
+**Exit:** duels scale with depth and a quick mini-duel variant exists alongside the full board. _(Size
+half done — the board now scales 4→12 by sector; the palette/AI difficulty curve remains.)_
 
 ## Leet-39: Robo-pet v1 — duel avatar + run-scoped class absorption — ✅ done
 
@@ -80,11 +94,13 @@ beating a stronger droid offers its class for absorption (Paradroid 001→999), 
 end; higher class = stronger duel position + dungeon perks.
 
 **Decided:**
+
 - On a takeover win, **offer the swap** (Paradroid-style: keep your current class or take the beaten droid's) —
   not auto-absorb.
-- Pet class feeds **both** the duel start position *and* the dungeon-companion perks in v1.
+- Pet class feeds **both** the duel start position _and_ the dungeon-companion perks in v1.
 
 **Outcome**
+
 - [x] Run-scoped **`petClass`** in run state (`RunContext` + `RunStateStore`, exposed read-only on
       `GameState`), seeded to `PET_BASE_CLASS` (1) each run; `setPetClass` is raise-only (a takeover never
       downgrades). Lost at run end via the existing `reset`.
@@ -98,9 +114,9 @@ end; higher class = stronger duel position + dungeon perks.
 - [x] **Dungeon perks:** `petClass` is threaded into `TPixelDungeonSceneConfig` as the Phase-3 seam (the
       perk behaviour — scouting / assists / drag-you-out-when-downed — is the dungeon loop, Phase 3).
 - [x] HUD shows `PET  class N` (`space-ui.scene`), refreshed when a takeover grows it.
-- [x] *(Deferred)* sibling temperament (§2/§4) rides with the hangar sibling choice in Phase 4 — noted only.
+- [x] _(Deferred)_ sibling temperament (§2/§4) rides with the hangar sibling choice in Phase 4 — noted only.
 - [x] build + lint + unit tests green (np-state 45 incl. new `setPetClass` + `duelAiForPet` tests,
-      np-paradroid 10, np-pixel-dungeon 17, np-space-map 24, app smoke 1). *UI not exercised here.*
+      np-paradroid 10, np-pixel-dungeon 17, np-space-map 24, app smoke 1). _UI not exercised here._
 
 **Exit:** winning a duel grows the pet's class within a run, and it shows on the HUD.
 
@@ -108,20 +124,21 @@ end; higher class = stronger duel position + dungeon perks.
 
 **Context:** the duel opened straight onto an idle board with debug "Start Normal / Start Brutal / Re-Create"
 buttons — you pressed Start, the VS intro played, the match ran, and a decided match just printed a text label
-above the board. Grid generation was invisible and fixed (a bad roll felt like the *game* being unfair), and
+above the board. Grid generation was invisible and fixed (a bad roll felt like the _game_ being unfair), and
 there was no ending beat. This makes choosing the layout part of the gameplay and bookends the fight.
 
 **Decided:**
+
 - **The grid roll is a timed player choice.** A fixed ~20s window to **re-roll freely** before it locks — the
-  window does *not* reset on a re-roll (the fixed budget is the pressure). A good grid wins easier, a bad one
-  loses more likely, so a poor board is the player's *call*, not the game being unfair (GDD §4 — the sibling's
+  window does _not_ reset on a re-roll (the fixed budget is the pressure). A good grid wins easier, a bad one
+  loses more likely, so a poor board is the player's _call_, not the game being unfair (GDD §4 — the sibling's
   "re-roll a grid row" assist is the same fantasy, scoped smaller).
 - **Countdown honours the "binary clock / 3-2-1" idea:** a big digit punches in at the board's centre each
-  second, *ghosted* (alpha ~0.22) so the board stays readable through it, reddening as it runs out, over a
+  second, _ghosted_ (alpha ~0.22) so the board stays readable through it, reddening as it runs out, over a
   compact binary-block readout (`▮ ▯ ▮`). The selection-window duration is a **duel-timing** constant in
   np-paradroid (alongside `MATCH_DURATION_MS`), not an np-state `Balance` knob — `Balance` holds difficulty
-  *tuning* (rates, AI), not staging.
-- **The board never changes size after selection.** The board is fit to the view during selection and *that*
+  _tuning_ (rates, AI), not staging.
+- **The board never changes size after selection.** The board is fit to the view during selection and _that_
   size is kept through the intro and fight — the VS splash no longer zooms the camera to a neutral 1:1 view
   and back; it lays out over the camera's current world view instead, so the board stays exactly where the
   player picked it (only the text/portrait tween moves).
@@ -130,6 +147,7 @@ there was no ending beat. This makes choosing the layout part of the gameplay an
   then a "WINNER — PROMOTED" / "DROID WINS" / "DRAW" banner stamps in with a screen shake over the final score.
 
 **Outcome**
+
 - [x] `ParadroidScene` now runs a staging state machine — **`select → intro → fight → outro → done`**
       (replacing the `#busy` flag). The intro keeps the camera on the selection fit and lays the VS splash out
       over the camera's world view (`#viewRect`) so the board never resizes; only the outro hides the board and
@@ -139,25 +157,25 @@ there was no ending beat. This makes choosing the layout part of the gameplay an
       textures shared with the intro): the drop/promote choreography, draw-aware.
 - [x] Controls are now gameplay-focused: **`↻ Re-Roll` · `⚔ Lock In` · `↩ Map`** (the debug Start-difficulty
       buttons are retired — difficulty is set by the encounter/launch, `normal` default). The fit unions only
-      *visible* controls; a re-roll lifts the countdown back above the freshly-added board.
+      _visible_ controls; a re-roll lifts the countdown back above the freshly-added board.
 - [x] Pure `toBinaryBlocks` extracted to a Phaser-free `@types/paradroid.format.ts` (+ spec). No
       run-conductor / contract changes — the new flow is internal to the scene; `onResult` is unchanged.
-- [x] *(Feel polish)* New `ParadroidScoreboard`: persistent **`YOU` / `DROID`** corner labels (green/red,
+- [x] _(Feel polish)_ New `ParadroidScoreboard`: persistent **`YOU` / `DROID`** corner labels (green/red,
       matching the outro) that orient the player to their half of the mirrored board, plus a **live `n — n`
       middle-row tally** during the fight fed by a new `ParadroidGame.EVENT_SCORE_CHANGED` — so the duel reads
       as it swings. Labels show in selection + fight; the score only in the fight.
 - [x] build + lint + unit tests green (np-paradroid 20 incl. the format spec, app smoke 1, app prod build).
-      *UI not exercised here* — the selection countdown, the scoreboard, and the win/lose ending are for the
+      _UI not exercised here_ — the selection countdown, the scoreboard, and the win/lose ending are for the
       user to eyeball.
 
 **Exit:** the grid roll is a timed player choice, and a decided duel plays a win/lose ending animation.
-*(Advances Leet-38's "tighten intro → play → result staging" item; 38's sector curve + mini-duel remain.)*
+_(Advances Leet-38's "tighten intro → play → result staging" item; 38's sector curve + mini-duel remain.)_
 
 ---
 
 # Phase 1 — The Map Run ✅ complete
 
-Goal (GDD §7): *a map-only run is genuinely playable — reach the exit before the front; text endings.* — met.
+Goal (GDD §7): _a map-only run is genuinely playable — reach the exit before the front; text endings._ — met.
 Order delivered: **~~Leet-33~~ → ~~34~~ → ~~35~~ → ~~36~~** (33 closed the literal exit criterion; 34 settled
 the two-exit core loop — the central design payoff; 35 added en-route intercepts; 36 added the distortion-
 battery pushback — the last of the teeth).
@@ -167,9 +185,10 @@ battery pushback — the last of the teeth).
 **Context:** the front catching the ship currently only flashes the camera and shows a map banner —
 `NPSpaceMap.#onSnapback` emits `REALITY_SNAPBACK` but **nothing drives the FSM to an ending**. The
 conductor only listens for `SECTOR_EXIT` (`run-conductor.service.ts:42`), and the ending screen is a stub
-placeholder ("text endings — Phase 1"). This issue makes the run actually *end*.
+placeholder ("text endings — Phase 1"). This issue makes the run actually _end_.
 
 **Outcome**
+
 - [x] Conductor now subscribes to `REALITY_SNAPBACK` (alongside `SECTOR_EXIT`) and drives the FSM to `ending`
       (`#onSnapback`, guarded by `can('ending')`). The 1000 ms stage fade-out lets the snapback flash + the
       "REALITY SNAPPED BACK" banner play before the ending screen.
@@ -180,7 +199,7 @@ placeholder ("text endings — Phase 1"). This issue makes the run actually *end
 - [x] Dropped the stale `// TODO(Leet-27)` handoff comments in `np-space-map.ts`; refreshed the
       `REALITY_SNAPBACK`/`SECTOR_EXIT` doc comments in `space.events.ts` (no longer "stubs").
 - [x] build + lint + all unit tests green (incl. the new `ending.spec.ts` and the app bootstrap smoke test).
-      *e2e not run here:* port 4200 was held by an unrelated dev server and Playwright reused it
+      _e2e not run here:_ port 4200 was held by an unrelated dev server and Playwright reused it
       (`reuseExistingServer`); rerun once :4200 is free.
 
 **Exit:** the literal Phase 1 exit criterion — reach the exit before the front; text endings.
@@ -188,20 +207,22 @@ placeholder ("text endings — Phase 1"). This issue makes the run actually *end
 ## Leet-34: Guardian gate node — the rewarding exit — ✅ done
 
 **Context:** the graph had only **bail-suns** (no-reward rim exits — `StarmapFactory` rim `outerSpace`
-nodes). GDD §3/§8: rim suns stay no-reward bail-exits and the **guardian becomes the *rewarding* exit**
-(rescue + advance). The real guardian *fight* is Phase 4; here the guardian is a graph node that gates the
+nodes). GDD §3/§8: rim suns stay no-reward bail-exits and the **guardian becomes the _rewarding_ exit**
+(rescue + advance). The real guardian _fight_ is Phase 4; here the guardian is a graph node that gates the
 rewarding exit and hands off to the existing guardian placeholder scene.
 
 **Decided (GDD §3/§5):**
-- **Bailing keeps prior rescues.** A rim sun forfeits only *this* sector's captive + rim loot; crew already
+
+- **Bailing keeps prior rescues.** A rim sun forfeits only _this_ sector's captive + rim loot; crew already
   won back stays aboard (consistent with GDD §3 "a partial rescue is still a rescue"). Run state already
   persisted crew across sectors — only the bail ending copy needed reframing.
 - **No extra bail cost.** Walking away empty-handed (no new captive) is cost enough — bail stays a clean,
   low-punishment escape valve, matching the bittersweet tone.
 
 **Outcome**
+
 - [x] `StarmapFactory` generates one guardian node out past the farthest inner planet along the front's
-      *safe* axis (`guardianDir`), deep on the far side the grey never normalises. It's also explicitly kept
+      _safe_ axis (`guardianDir`), deep on the far side the grey never normalises. It's also explicitly kept
       out of the front bounds and the swallow set, so the front can't strand the rewarding exit.
 - [x] Distinct guardian node: dedicated `planetPurpleTwo` texture (reserved from the random inner pool — gives
       the just-added asset a purpose) + biggest display size; `Planet.guardian` flag. Reaching it fires the
@@ -211,13 +232,13 @@ rewarding exit and hands off to the existing guardian placeholder scene.
       advances to the next sector. Beating the **final** guardian wins the sibling and ends the run on the new
       **`'rescued'`** text ending — the way to the Hush opens (GDD §2 full rescue / true-final, Phase 4).
 - [x] Rim suns stay no-reward bail; the pull between the two exits is the core loop (GDD §3).
-- [x] *Fixed a latent integration bug:* `#showSpace`'s "advanced to a new sector" path assumed the space
+- [x] _Fixed a latent integration bug:_ `#showSpace`'s "advanced to a new sector" path assumed the space
       scenes were awake (only ever hit via rim-sun bail). A guardian win advances while those scenes are
-      *slept* off-stage — now it rebuilds their content while hidden, then wakes + fades them back in.
-- [x] *(Folded-in polish)* the hardcoded "3 nearest" route linkage is now a `linkDegree` knob in np-state
+      _slept_ off-stage — now it rebuilds their content while hidden, then wakes + fades them back in.
+- [x] _(Folded-in polish)_ the hardcoded "3 nearest" route linkage is now a `linkDegree` knob in np-state
       `Balance` (4 in sector 1, easing to 3; floor 2 to stay connectable).
 - [x] build + lint + all unit tests green (np-state 41 incl. new `rescueForSector` + `'rescued'` ending tests,
-      np-space-map 20, app bootstrap smoke 1). *UI not exercised here* — user verifies the map visually.
+      np-space-map 20, app bootstrap smoke 1). _UI not exercised here_ — user verifies the map visually.
 
 **Exit:** a sector has two real exits — bail (poor) and guardian (rescue + advance).
 
@@ -228,6 +249,7 @@ enemy ship flies toward yours → choice event / fight / boarding). This wires t
 boarding stay Phase 2/3.
 
 **Outcome**
+
 - [x] Intercept roll on jump commit — chance is a new `interceptChance` sector knob in np-state `Balance`
       (climbs 10→30% with depth, so ambushes stay rare early and common near the Hush). Seeded by
       sector + jump count so a jump's roll is reproducible (`NPSpaceMap.#rollIntercept`).
@@ -241,7 +263,7 @@ boarding stay Phase 2/3.
 - [x] The front advances exactly **once** per jump (at commit, unchanged) — the intercept only interrupts
       the flight, never re-advances it; en-route outcomes deliberately carry no `front` effects.
 - [x] build + lint + unit tests green (np-state 42, np-space-map 22 incl. new `resolveEnRouteEvent` +
-      `interceptChance` tests, app smoke 1). *UI not exercised here* — user verifies the intercept visually.
+      `interceptChance` tests, app smoke 1). _UI not exercised here_ — user verifies the intercept visually.
 
 **Two-leg flight reused the slept-scene insight from Leet-34:** the intercept never sleeps the space scenes
 (the dialog is an HTML overlay over the live map), so no scene-wake juggling was needed.
@@ -254,20 +276,21 @@ boarding stay Phase 2/3.
 them (`// TODO(Leet-29): wire to event/loot rewards`) — and the negative `front` path was subtly broken.
 
 **Outcome**
+
 - [x] A **distortion battery** is a loot item (`DISTORTION_BATTERY`, shared const) granted by an event
       outcome. The map consumes it on grant — it isn't carried — and calls `pushFront()` to ease the grey
       back one node (`#applyEffects`). This wires the public `pushFront()` (the stale TODO is gone); the
       Sabotage dungeon drop becomes the same code path in Phase 3.
 - [x] New core-pool reward event `distortion-cache` (a derelict cradling a live charge): the good branch
       feeds it to the grey (grants the battery → pushback); neutral strips it for marbles; bad overloads.
-- [x] *Fixed a latent bug:* the negative `front` effect pushed back by a raw position **unit**, not a node
+- [x] _Fixed a latent bug:_ the negative `front` effect pushed back by a raw position **unit**, not a node
       (`pushFront(-steps)` passed a count as the amount). It now loops `pushFront()` one node at a time,
       symmetric with the forward shove — so `front: { advance: -1 }` eases the grey by exactly one jump.
 - [x] Surfaced on the HUD: the front bar already retreats via `FRONT_ADVANCED`; added a new `FRONT_PUSHED`
       bus event + a green "DISTORTION BATTERY — THE GREY PULLS BACK" banner (matching the snapback /
       sector-exit banners) so the rare reprieve reads as a clear positive beat. `Reality.sweepTo` eases the veil.
 - [x] build + lint + unit tests green (np-space-map 23 incl. a new test asserting a battery source exists,
-      app smoke 1). *UI not exercised here* — user verifies the bar retreat visually.
+      app smoke 1). _UI not exercised here_ — user verifies the bar retreat visually.
 
 **Exit:** the player can buy back a little room against the front.
 
@@ -286,7 +309,8 @@ traversable end-to-end.
 **Context:** big-bang switch to strict before the spine is built.
 
 **Outcome**
-- [x] `strict` was already on in `tsconfig.base.json` (since Claude-4) with no weakening per-project
+
+- [x] `strict` was already on in `../tsconfig.base.json` (since Claude-4) with no weakening per-project
       overrides; verified the whole workspace builds/tests/lints green under it.
 - [x] Added the strict-adjacent flags `strict` doesn't cover: `noImplicitOverride`, `noImplicitReturns`,
       `noFallthroughCasesInSwitch`, `forceConsistentCasingInFileNames` — fixed the fallout (~50 `override`
