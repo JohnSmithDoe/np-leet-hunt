@@ -8,6 +8,9 @@
             <ion-button aria-label='Pixel dungeon' (click)='toDungeon()'>Dungeon</ion-button>
             <ion-button aria-label='Boarding action' (click)='toBoarding()'>Board</ion-button>
             <ion-button aria-label='Sector guardian' (click)='toGuardian()'>Guardian</ion-button>
+            <ion-button aria-label='Grey-fight colony' (click)='toColony()'>Colony</ion-button>
+            <ion-button aria-label='Jump to sector 3' (click)='toSector3()'>S3</ion-button>
+            <ion-button aria-label='Jump to sector 5' (click)='toSector5()'>S5</ion-button>
         </ion-buttons>
         <ion-buttons slot="end">
             <ion-button aria-label='Test SFX' (click)='playSfx()'>SFX</ion-button>
@@ -22,12 +25,13 @@
         <np-stage></np-stage>
         <np-planet-info></np-planet-info>
         <np-event-dialog></np-event-dialog>
-        @if (!started()) {
+        @if (boot() === 'title') {
             <div class="title-screen">
-                <h1 class="title-name">LEET HUNT</h1>
-                <p class="title-tagline">Reality is bent. A rescue run waits.</p>
-                <button type="button" class="title-start" (click)="start()">▶ Enter the Hush</button>
-                <p class="title-hint">click to begin — with sound</p>
+                <div class="title-actions">
+                    <button type="button" class="title-start" (click)="enter(true)">▶ Enter the Hush</button>
+                    <button type="button" class="title-mute" (click)="enter(false)">Play without sound</button>
+                </div>
+                <p class="title-hint">choose to begin — sound can be toggled any time</p>
             </div>
         }
     </div>

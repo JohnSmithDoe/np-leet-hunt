@@ -6,35 +6,37 @@
 }
 
 // Title screen / main menu — its Start click is the user gesture that enables audio before the hangar.
+// The LEET HUNT artwork (its logo + tagline) is the backdrop, so the controls float low over the
+// calmer cloud band; a bottom scrim keeps them legible against the busy image. A dark gradient is the
+// fallback while the image loads / if it 404s.
 .title-screen {
   position: absolute;
   inset: 0;
   z-index: 50;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-bottom: 2.5rem;
   text-align: center;
-  background: radial-gradient(circle at 50% 38%, #0a1830, #02060f 72%);
+  background-color: #02060f; // fallback while the image loads / if it 404s
+  background-image:
+    linear-gradient(to top, rgb(2 6 15 / 94%) 0%, rgb(2 6 15 / 72%) 22%, rgb(2 6 15 / 0%) 50%),
+    url("/assets/title.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
-.title-name {
-  margin: 0;
-  font-size: 3.5rem;
-  letter-spacing: 0.3rem;
-  color: #aee3ff;
-  text-shadow: 0 0 1.5rem rgb(102 204 255 / 50%);
-}
-
-.title-tagline {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #8fb8d6;
+.title-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .title-start {
-  margin-top: 1rem;
   padding: 0.9rem 2.2rem;
   font-size: 1.3rem;
   color: #aee3ff;
@@ -46,6 +48,22 @@
 
 .title-start:hover {
   background: #1a4f7a;
+}
+
+// Secondary "no sound" choice — quieter than the primary Start button.
+.title-mute {
+  padding: 0.5rem 1.4rem;
+  font-size: 0.95rem;
+  color: #8fb8d6;
+  cursor: pointer;
+  background: transparent;
+  border: 0.0625rem solid #3a5e7c;
+  border-radius: 0.4rem;
+}
+
+.title-mute:hover {
+  color: #aee3ff;
+  border-color: #6cf;
 }
 
 .title-hint {

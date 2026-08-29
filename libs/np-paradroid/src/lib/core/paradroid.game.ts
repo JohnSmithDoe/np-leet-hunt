@@ -328,7 +328,7 @@ export class ParadroidGame extends NPGameObjectList<NPGameObject> {
 
     #generateShots() {
         const result = new NPGameObjectList<ParadroidImage>(this.scene);
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < this.#options.shots; i++) {
             result.add(new ParadroidImage(this.scene, (i * this.#options.tileWidth) / 2, 0, 'shot'));
         }
         return result;

@@ -3,6 +3,9 @@
         <section class="event-card">
             @if (question(); as q) {
                 @if (atRoot()) {
+                    @if (ev.image; as image) {
+                        <img class="event-image" [src]="image" alt="" />
+                    }
                     <p class="event-intro">{{ ev.intro }}</p>
                 }
                 <h2 class="event-prompt">{{ q.prompt }}</h2>

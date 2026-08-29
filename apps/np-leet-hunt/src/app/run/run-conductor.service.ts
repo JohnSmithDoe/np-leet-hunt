@@ -1,6 +1,7 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { NpAudioService } from '@shared/np-audio';
-import { Audio, Balance, CREW_DISPLAY_NAMES, Sector, SECTOR_COUNT } from '@shared/np-config';
+import { Audio, Balance, CREW_DISPLAY_NAMES, ITEMS, Sector, SECTOR_COUNT } from '@shared/np-config';
+import { GreyFight, GreyFightScene } from '@shared/np-grey-fight';
 import { CParadroidTileSets, paradroidFactoryOptions, ParadroidScene } from '@shared/np-paradroid';
 import { PlaceholderConfig, PlaceholderScene, StageService } from '@shared/np-phaser';
 import { PixelDungeonScene } from '@shared/np-pixel-dungeon';
@@ -14,6 +15,8 @@ import {
     ModeResult,
     RunPhase,
 } from '@shared/np-state';
+
+import { IntroScene } from '../intro/intro.scene';
 
 /** Placeholder consequence of losing a duel — non-lethal (Phase 2 decision); tuned by the curve in Leet-38. */
 const DUEL_LOSS_PENALTY = { hull: -2 };
@@ -34,6 +37,11 @@ export class RunConductorService {
     #game = inject(GameStateService);
     #audio = inject(NpAudioService);
     #wired = false;
+
+    // The grey-fight colony's engine (GDD §4 "Holding the Grey"). A clockless side game outside the run
+    // FSM; kept here so its progress (light, upgrades, freed cats) survives leaving and reopening within a
+    // session. Persistence to the save file is a later job — for now it lives as long as the app does.
+    #greyFight = new GreyFight();
 
     // The mood + intensity currently playing, so a same-mood/same-tension phase (event overlay,
     // same-sector return) doesn't restart the track — only a genuine change re-evaluates.
@@ -82,9 +90,59 @@ export class RunConductorService {
         });
     }
 
+    /**
+     * Debug toolbar: jump straight to a sector to test its deeper map + duel scaling. Sets the run's
+     * sector, then re-enters the map so {@link #showSpace} rebuilds it — bouncing through the transient
+     * `sectorExit` phase when already on the map (the rebuild path a rim-sun bail uses), or straight into
+     * `sector` from the hangar. Not part of the run loop; only the dev buttons call it.
+     */
+    debugJumpToSector(sectorNumber: number): void {
+        this.#game.run.setSector(sectorNumber);
+        if (this.#game.fsm.can('sectorExit')) {
+            this.#game.fsm.to('sectorExit');
+            this.#game.fsm.to('sector'); // sector→sectorExit→sector forces #showSpace to rebuild for the new sector
+        } else if (this.#game.fsm.can('sector')) {
+            this.#game.fsm.to('sector');
+        }
+    }
+
+    /**
+     * Start the opening crawl. Called from the title screen's audio choice (the gesture that unlocks audio)
+     * so the crawl and its fanfare begin together. Builds a fresh {@link IntroScene} and wires its end —
+     * the scroll finishing or a skip — to the `intro → hangar` transition, which the conductor then renders
+     * as the hangar. Stays the conductor's job since it's the only place that calls `startScene`.
+     */
+    beginIntro(): void {
+        const scene = new IntroScene({
+            onDone: () => {
+                if (this.#game.fsm.can('hangar')) this.#game.fsm.to('hangar');
+            },
+        });
+        this.#stage.startScene({ key: IntroScene.key, scene });
+    }
+
+    /**
+     * Open the grey-fight colony (GDD §4 "Holding the Grey") — a clockless side game *outside* the run FSM,
+     * like {@link beginIntro}. The engine persists on the conductor, so progress survives leaving and
+     * reopening; "← Back" re-enters whatever run phase is current, restoring the mode that was on stage.
+     * The colony never advances the normality front (it isn't a phase), so it's safe to dip into mid-run.
+     */
+    beginColony(): void {
+        const scene = new GreyFightScene({
+            engine: this.#greyFight,
+            onExit: () => this.#enter(this.#game.fsm.phase()),
+        });
+        this.#stage.startScene({ key: GreyFightScene.key, scene });
+    }
+
     #enter(phase: RunPhase): void {
         this.#audioForPhase(phase);
         switch (phase) {
+            case 'intro':
+                // The IntroScene isn't started here (at boot, behind the title screen) — it begins on the
+                // title's audio choice via beginIntro(), so the crawl + fanfare start together with the
+                // gesture. #enter('intro') only queues the mood (#audioForPhase); the stage stays empty until.
+                break;
             case 'hangar':
                 this.#showHangar();
                 break;
@@ -123,6 +181,9 @@ export class RunConductorService {
      */
     #audioForPhase(phase: RunPhase): void {
         switch (phase) {
+            case 'intro':
+                this.#playMood('intro.crawl', 0.7, 1500); // the bold Star-Wars-y fanfare under the crawl
+                break;
             case 'duel':
                 this.#playMood('space.duel', 0.85, 1200); // its own beat-driven combat track
                 break;
@@ -190,9 +251,13 @@ export class RunConductorService {
         // The pet's class is its "stronger duel position" (Leet-39): it eases the opposing AI a notch per
         // tier of class. The board stays as the encounter set it.
         const aiLevel = Balance.duelAiForPet(launch?.aiLevel ?? 'normal', this.#game.run.petClass);
+        // The board grows with sector depth (Leet-38): a 4-row mini-duel in sector 1 up to a full 12-row
+        // board near the Hush. Rows feed the factory; the shot budget scales with them inside np-paradroid.
+        const rows = Balance.duelRows(this.#game.run.snapshot().sectorNumber);
         const factoryOptions = paradroidFactoryOptions(
             Balance.duelBoardParams(boardLevel),
-            CParadroidTileSets[boardLevel]
+            CParadroidTileSets[boardLevel],
+            { rows }
         );
         const scene = new ParadroidScene({
             factoryOptions,
@@ -203,12 +268,41 @@ export class RunConductorService {
         this.#stage.startScene({ key: ParadroidScene.key, scene });
     }
 
-    /** Build a dungeon run and wire its typed result back to the run (Leet-29). */
+    /** Build a dungeon run and wire its typed result back to the run (Leet-29 / F1). */
     #showDungeon(): void {
-        // Pass the pet class through as the dungeon-companion-perk seam (Leet-39); the perks themselves are
-        // Phase 3 (the dungeon loop), so the scene just carries it for now.
+        // Read the encounter's launch (mirror #showDuel): the objective drives generation/exit, defaulting
+        // to 'retrieve' when launched without one (e.g. the debug toolbar). Depth is the current sector, so
+        // dungeon content can scale with run progress. No seed source yet — leaving it undefined keeps the
+        // engine on its fixed-layout default, which is fine for now.
+        const launch = this.#pendingLaunch?.kind === 'dungeon' ? this.#pendingLaunch : undefined;
         const scene = new PixelDungeonScene({
+            // Pass the pet class through as the dungeon-companion-perk seam (Leet-39); the perks themselves are
+            // Phase 3 (the dungeon loop), so the scene just carries it for now.
             petClass: this.#game.run.petClass,
+            objective: launch?.objective ?? 'retrieve',
+            depth: this.#game.run.snapshot().sectorNumber,
+            // The floor's enemy roster, scaled to the current sector (item #10 / RPG cluster E): archetype
+            // ids the engine resolves through np-config's bestiary and builds via MobFactory — count and mix
+            // both grow with depth. Numbers live in np-config; the engine just spawns what it's handed.
+            roster: Balance.dungeonRoster(this.#game.run.snapshot().sectorNumber),
+            // The floor's loot plan, scaled to the current sector (RPG cluster A): the engine scatters these
+            // item ids on the floor and carries the collected ones back as `DungeonResult.loot`.
+            loot: Balance.dungeonLoot(this.#game.run.snapshot().sectorNumber),
+            // The kid's starting equipment (item #13): the launch's declared loadout if the encounter named
+            // one, else the pet-class-scaled starter set from np-config. The engine equips each id so its
+            // mods fold into the player's combat stats — equipment changes damage without the formula moving.
+            // A run-managed equipped set kept across excursions is item #17.
+            startingEquipment: launch?.equippedItemIds ?? Balance.startingEquipment(this.#game.run.petClass),
+            // Inject the dungeon combat tuning (the combat spine): numbers live in np-config, the formula in
+            // the mode lib. Left out the engine falls back to a minDamage:1 default (standalone/debug entry).
+            combatParams: Balance.dungeonCombatParams(),
+            // The floor's mob-AI tuning, scaled to the current sector (item #12 / RPG cluster E): sight/wake
+            // radii, give-up memory, wander chance and flee fraction the enemy brains read. Deeper floors see
+            // farther and flee sooner. Numbers live in np-config; the FSM lives in the mode lib.
+            aiParams: Balance.dungeonAiParams(this.#game.run.snapshot().sectorNumber),
+            // The floor's world-content plan, scaled to the current sector (RPG cluster C): the decorator
+            // draws trap/lock budgets from it (#14). Step 0 places only the exit stairs regardless of it.
+            plan: Balance.dungeonPlan(this.#game.run.snapshot().sectorNumber),
             onResult: result => this.#onModeResult(result),
         });
         this.#stage.startScene({ key: PixelDungeonScene.key, scene });
@@ -229,7 +323,40 @@ export class RunConductorService {
             }
             this.#game.run.adjustResources(DUEL_LOSS_PENALTY);
         }
+        if (result.kind === 'dungeon') {
+            if (isModeSuccess(result)) {
+                // Completed: bank the loot through the ITEMS catalog (RPG cluster A). A `coin` adds its
+                // value to the run's marble economy (summed into one adjustResources call so the meter
+                // ticks once); anything else is granted to the run inventory. Unknown ids are ignored.
+                this.#bankLoot(result.loot ?? []);
+                this.#toMapAfterMode();
+            } else {
+                // Failed is now LETHAL (combat spine / item #9): the kid died in the dungeon, so the whole run
+                // ends on the 'wiped' ending via the legal `dungeon → ending` transition — not a quiet return
+                // to the map. (Soften here later if desired, e.g. an extraction/downed-but-rescued mechanic.)
+                this.#endRun('wiped');
+            }
+            return;
+        }
         this.#toMapAfterMode();
+    }
+
+    /**
+     * Bank a completed dungeon's loot (RPG cluster A). Each id is resolved through np-config's `ITEMS`
+     * catalog: a `coin` accumulates its `value` into a single marble total (so the economy meter ticks
+     * once, not per coin), every other kind is granted as a run-inventory item. Ids missing from the
+     * catalog are skipped — the dungeon should only ever return ids it scattered, but the run stays robust
+     * to a stale plan. The marble adjustment is applied only when at least one coin was banked.
+     */
+    #bankLoot(loot: string[]): void {
+        let marbles = 0;
+        for (const id of loot) {
+            const def = ITEMS[id];
+            if (!def) continue;
+            if (def.kind === 'coin') marbles += def.value ?? 0;
+            else this.#game.run.grantItem(id);
+        }
+        if (marbles > 0) this.#game.run.adjustResources({ marbles });
     }
 
     /**

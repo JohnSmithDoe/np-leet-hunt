@@ -36,28 +36,36 @@ import { RunConductorService } from '../run/run-conductor.service';
 export class HomePageComponent {
     #game = inject(GameStateService);
     #audio = inject(NpAudioService);
+    /**
+     * Composition root: injecting the conductor wires it to the stage + run FSM (see its constructor). It
+     * waits for the stage to boot, then renders each FSM phase as a scene — so StageService stays
+     * domain-free and the FSM is the single source of truth for the active mode. The run opens on the
+     * intro crawl, then the hangar, whose "Launch run" begins the run. Kept as a field so the debug
+     * toolbar can drive it.
+     */
+    #conductor = inject(RunConductorService);
 
     /**
-     * Title-screen gate. The browser blocks audio until a user gesture, so the game opens on a title
-     * screen whose Start click both unlocks audio and reveals the hangar — guaranteeing the hangar (the
-     * "main menu") always has music. `false` = title screen showing; `true` = in the game.
+     * Boot gate. The browser blocks audio until a user gesture, so the game opens on a title screen whose
+     * audio choice (play with sound / muted) is that gesture; choosing reveals the game and rolls the
+     * one-time intro crawl (a Phaser scene), which then hands off to the hangar — guaranteeing the hangar
+     * (the "main menu") always has music. `'title'` → `'game'` (the crawl + hangar are Phaser scenes).
      */
-    readonly started = signal(false);
+    readonly boot = signal<'title' | 'game'>('title');
     /** Mirrors the audio mute state for the toolbar toggle. */
     readonly muted = this.#audio.muted;
 
-    constructor() {
-        // Composition root: instantiating the conductor wires it to the stage + run FSM (see its
-        // constructor). It waits for the stage to boot, then renders each FSM phase as a scene — so
-        // StageService stays domain-free and the FSM is the single source of truth for the active mode.
-        // The run starts in the hangar; the hangar's "Launch run" begins the run.
-        inject(RunConductorService);
-    }
-
-    /** Enter from the title screen: unlock audio (this click is the required gesture), reveal the hangar. */
-    public start(): void {
+    /**
+     * Leave the title screen via the audio choice (the gesture that unlocks audio): play with sound, or
+     * muted. Either way we unlock — `unlock` honours the mute flag, so a later un-mute still works — then
+     * reveal the stage and start the intro crawl. The conductor queued the `intro.crawl` fanfare (the run
+     * FSM opens on `intro`), so unlocking starts the music in step with the crawl it now begins.
+     */
+    public enter(withSound: boolean): void {
+        this.#audio.setMuted(!withSound);
         void this.#audio.unlock();
-        this.started.set(true);
+        this.boot.set('game');
+        this.#conductor.beginIntro();
     }
 
     public toggleMute(): void {
@@ -93,6 +101,19 @@ export class HomePageComponent {
     }
     public toGuardian(): void {
         this.#toPhase('guardian');
+    }
+
+    /** Debug: open the grey-fight colony — a clockless side game outside the run FSM (GDD §4). */
+    public toColony(): void {
+        this.#conductor.beginColony();
+    }
+
+    // Debug: jump straight to a deeper sector to test its larger map + scaled-up duel board (Leet-38).
+    public toSector3(): void {
+        this.#conductor.debugJumpToSector(3);
+    }
+    public toSector5(): void {
+        this.#conductor.debugJumpToSector(5);
     }
 
     #toPhase(phase: RunPhase): void {

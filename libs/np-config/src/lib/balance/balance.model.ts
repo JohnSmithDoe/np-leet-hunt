@@ -86,6 +86,82 @@ export interface DuelBoardParams {
 }
 
 /**
+ * Dungeon combat tuning — all primitive, so np-state stays free of np-pixel-dungeon. The mode's pure
+ * `resolveDamage(attack, defense, params)` consumes this verbatim (`attack − defense`, floored at
+ * `minDamage`); the app resolves it via {@link Balance.dungeonCombatParams}. Mirrors the
+ * {@link DuelAiParams} split exactly: the *math* lives in the mode lib, only the *numbers* live here.
+ */
+export interface DungeonCombatParams {
+    /** Damage floor: the least a connecting hit can deal, however high the target's defense. */
+    minDamage: number;
+}
+
+/**
+ * The world-content plan for one dungeon floor (RPG cluster C). All primitive, so np-state/np-config stay
+ * free of np-pixel-dungeon — the mode's `PixelDungeonDecorator` consumes it; the app resolves it via
+ * {@link Balance.dungeonPlan}. Depth-scalable like every other curve here.
+ *
+ * **Step 0 reads NONE of these fields** — the exit stairs are always exactly one per floor, so they need
+ * no plan field. The counts below are reserved for #14 (traps / locked doors): they exist now so the
+ * decorator signature and the balance surface already speak the vocabulary, and they scale with depth so
+ * #14 inherits a realistic curve rather than back-filling one. A room-archetype budget (treasure/shop/boss
+ * counts) joins this interface when special rooms land (#14/#16).
+ */
+export interface DungeonPlan {
+    /** Reserved (#14): non-damaging→damaging traps to scatter on the floor. Unused in step 0. */
+    trapCount: number;
+    /** Reserved (#14): locked doors (each needing a solvably-placed key) to introduce. Unused in step 0. */
+    lockCount: number;
+}
+
+/**
+ * The dungeon mob-AI tuning (RPG cluster E / item #12) — all primitive, so np-state/np-config stay free of
+ * np-pixel-dungeon. The mode's pure `decideDungeonAi(obs, state, memory, params, rng)` consumes this verbatim;
+ * the app resolves it via {@link Balance.dungeonAiParams}. Mirrors the {@link DuelAiParams} split exactly: the
+ * full behaviour state machine (Sleeping → Wandering → Hunting → Fleeing) lives in the mode lib, only the
+ * *numbers* live here. Depth-scalable like every other curve — deeper floors hold sharper, twitchier monsters.
+ */
+export interface DungeonAiParams {
+    /**
+     * How far (in tiles) a mob can register the player as visible — the AI's effective sight radius. The
+     * brain clamps its line-of-sight check by this on top of the mob's own field of view, so an open
+     * corridor doesn't let a mob lock on from across the whole floor. Grows with depth (sharper-eyed
+     * monsters the deeper you go).
+     */
+    sightRange: number;
+    /**
+     * The proximity (in tiles) at which a *sleeping* mob jolts awake even without line of sight — the player
+     * stumbled close enough to be heard/felt. Independent of `sightRange`: a mob wakes when the player is
+     * within this radius OR is actually seen. Grows with depth (lighter sleepers the deeper you go).
+     */
+    wakeOnSpotRadius: number;
+    /**
+     * How many turns a hunting mob keeps chasing the player's *last known tile* after losing sight before it
+     * gives up and drops back to wandering. Higher = more persistent pursuit. A short memory makes a mob easy
+     * to shake around a corner; a long one makes it dog the player.
+     */
+    loseTargetAfterTurns: number;
+    /**
+     * The 0..1 probability that a *wandering* mob takes a random step on a given turn (vs. waiting in place),
+     * so idle mobs aren't in perpetual motion. Lower = more sedentary roamers. Not depth-scaled — it's a feel
+     * knob, not a difficulty one.
+     */
+    wanderChance: number;
+    /**
+     * The HP fraction (0..1) below which a mob breaks off and flees instead of fighting. A mob at or above
+     * this fraction stands its ground; once damage drops it under, it runs from the player. Grows with depth,
+     * i.e. deeper monsters flee *sooner* (at a higher remaining-HP fraction) — they value their skins more.
+     */
+    fleeBelowHpPct: number;
+    /**
+     * Reserved (alert propagation): the radius within which a mob entering the hunt wakes nearby sleeping
+     * mobs (a shout that rouses the room). Carried so the balance surface speaks the vocabulary and scales it
+     * with depth; whether the brain acts on it is its choice (see `MobBrain`). Unread when propagation is off.
+     */
+    alertRadius: number;
+}
+
+/**
  * The droid-AI tuning for a difficulty — all primitive, so np-state stays free of np-paradroid.
  * The mode's pure `ParadroidAi` consumes this verbatim; the app resolves it via {@link Balance}.
  */

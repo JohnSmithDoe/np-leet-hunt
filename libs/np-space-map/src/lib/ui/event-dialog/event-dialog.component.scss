@@ -34,6 +34,16 @@
     animation: event-card-in 220ms ease-out;
 }
 
+.event-image {
+    display: block;
+    width: calc(100% + 3.5rem); // bleed past the card's 1.75rem horizontal padding…
+    margin: -1.75rem -1.75rem 1.25rem; // …and pull up to its top + side edges for a hero banner
+    aspect-ratio: 16 / 9; // normalise the varied source ratios into one consistent banner
+    object-fit: cover;
+    border-radius: 1rem 1rem 0 0; // match the card's rounded top corners
+    border-bottom: 0.0625rem solid rgb(102 204 255 / 0.3);
+}
+
 .event-intro {
     margin: 0 0 1rem;
     font-size: 0.9375rem;

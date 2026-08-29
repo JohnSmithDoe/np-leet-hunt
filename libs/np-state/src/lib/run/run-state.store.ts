@@ -109,6 +109,17 @@ export class RunStateStore implements GameState {
         this.#publish();
     }
 
+    /**
+     * Jump straight to a sector (clamped to 1..SECTOR_COUNT), setting both the number and id. No other run
+     * state changes — used by the dev toolbar's "jump to sector" buttons. Orchestration-only, like
+     * {@link advanceSector}, so it stays off the mode-facing {@link GameState} interface.
+     */
+    setSector(sectorNumber: number): void {
+        this.#sectorNumber = Math.min(SECTOR_COUNT, Math.max(1, Math.floor(sectorNumber)));
+        this.#sector = SECTOR_ORDER[this.#sectorNumber - 1];
+        this.#publish();
+    }
+
     /** Reset to a fresh run (optionally seeded), then publish. Called by `GameStateService.startNewRun`. */
     reset(seed?: Partial<RunContext>): void {
         this.#resources = { ...STARTING_RESOURCES, ...(seed?.resources ?? {}) };

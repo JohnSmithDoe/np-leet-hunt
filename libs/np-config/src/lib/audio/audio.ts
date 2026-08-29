@@ -27,6 +27,20 @@ import { MixLevels, MoodBuilder, SfxParams } from './audio.model';
  * Tune by ear.
  */
 const MOODS: Record<string, MoodBuilder> = {
+    // The one-time opening crawl (Leet: intro): a deliberately Star-Wars-flavoured brass fanfare — heroic
+    // and in the bright key of Bb major (it never crossfades into the C-minor space moods, so it can stand
+    // apart). A sustained sawtooth "brass" chord pad, a triplet-pickup fanfare lead, a low tuba bass,
+    // timpani-style kick + snare hits, and a sparkling piano countermelody. Intensity lifts the gains and
+    // opens the filters; the conductor plays it bold (~0.7) under the scrolling text.
+    'intro.crawl': i => `
+        setcpm(104/4)
+        $: note("<[bb2,d3,f3,bb3] [eb3,g3,bb3,eb4] [f2,a2,c3,f3] [bb2,d3,f3,bb3]>").s("sawtooth").attack(0.05).release(2.2).lpf(${Math.round(1100 + i * 1100)}).lpq(3).room(0.7).roomsize(4).gain(${(0.32 + i * 0.12).toFixed(2)})
+        $: note("[bb3 bb3 bb3] f4 ~ bb4 ~ ~ [a4 g4] f4 bb4 ~ ~ d5 c5 bb4").slow(2).s("sawtooth").attack(0.02).release(0.3).lpf(${Math.round(2200 + i * 1600)}).lpq(4).room(0.45).gain(${(0.38 + i * 0.16).toFixed(2)})
+        $: note("bb1 ~ ~ ~ f1 ~ ~ ~").s("sawtooth").lpf(420).attack(0.02).release(0.6).gain(${(0.4 + i * 0.12).toFixed(2)})
+        $: s("bd ~ ~ bd ~ ~ bd ~").room(0.3).gain(${(0.5 + i * 0.3).toFixed(2)})
+        $: s("~ ~ sd ~ ~ ~ ~ ~").room(0.4).gain(${(0.28 + i * 0.25).toFixed(2)})
+        $: note("<bb5 d6 f6 d6>").s("piano").degradeBy(${(0.5 - i * 0.3).toFixed(2)}).room(0.85).roomsize(4).delay(0.3).delaytime(0.16).delayfeedback(0.3).gain(${(0.15 + i * 0.12).toFixed(2)}).pan(sine.slow(7).range(0.35, 0.65))
+    `,
     'space.calm': i => `
         setcpm(20/4)
         $: note("<[c2,g2,c3,eb3] [ab1,c2,ab2,c3] [bb1,f2,bb2,d3] [g1,d2,g2,bb2]>").s("sawtooth").attack(3).release(5).lpf(sine.range(${Math.round(260 + i * 340)}, ${Math.round(900 + i * 1500)}).slow(24)).room(0.9).roomsize(3).gain(${(0.42 + i * 0.16).toFixed(2)})

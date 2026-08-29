@@ -25,6 +25,18 @@ export type DungeonObjective = 'retrieve' | 'sabotage' | 'hunt';
 export interface DungeonLaunch {
     kind: 'dungeon';
     objective: DungeonObjective;
+    /**
+     * The sector/floor depth this excursion sits at — the seam for depth-scaled dungeon content (loot, roster,
+     * AI, combat). Optional: the conductor falls back to the run's current sector number when a launch omits it.
+     */
+    depth?: number;
+    /**
+     * The equipment the kid carries into this dungeon (item #13): item ids — keys of np-config's `ITEMS`,
+     * each an equipment entry. The typed seam for the run to declare its loadout. A run-managed equipped set
+     * (kept across excursions) is item #17; until then the conductor supplies a starting set via
+     * `Balance.startingEquipment`, and a launch may override it here.
+     */
+    equippedItemIds?: string[];
 }
 
 /** What the conductor passes a mode when launching it. */

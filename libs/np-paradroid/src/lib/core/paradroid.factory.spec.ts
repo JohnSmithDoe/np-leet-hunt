@@ -73,4 +73,24 @@ describe('paradroidFactoryOptions', () => {
         expect(defaultFactoryOptions.changerRate).toBe(15);
         expect(defaultFactoryOptions.autoFireRate).toBe(0);
     });
+
+    it('derives the per-side shot budget from the row count, 8 rows → the original 12 (Leet-38)', () => {
+        const full = paradroidFactoryOptions({ changerRate: 0, autoFireRate: 0 }, CParadroidTileSets.normal);
+        expect(full.rows).toBe(DUEL_DIMS.rows);
+        expect(full.shots).toBe(12);
+
+        const mini = paradroidFactoryOptions({ changerRate: 0, autoFireRate: 0 }, CParadroidTileSets.normal, {
+            rows: 4,
+        });
+        expect(mini.rows).toBe(4);
+        expect(mini.shots).toBe(6);
+    });
+
+    it('lets an explicit shots override win over the row-derived budget', () => {
+        const opts = paradroidFactoryOptions({ changerRate: 0, autoFireRate: 0 }, CParadroidTileSets.normal, {
+            rows: 12,
+            shots: 4,
+        });
+        expect(opts.shots).toBe(4);
+    });
 });

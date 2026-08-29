@@ -24,7 +24,9 @@ export const PERSISTENCE_PORT = new InjectionToken<PersistencePort>('PERSISTENCE
 @Injectable({ providedIn: 'root' })
 export class GameStateService {
     readonly run = new RunStateStore();
-    readonly fsm = new RunFsm();
+    // The run opens on the one-time intro crawl (Leet: opening crawl); it leads to the hangar and is
+    // never re-entered — `startNewRun`/`fsm.reset()` return to the hangar, not the intro.
+    readonly fsm = new RunFsm('intro');
     readonly save = new SaveStore(inject(PERSISTENCE_PORT));
     /**
      * The live run snapshot for Angular consumers (OnPush HUD/overlay components). Just the store's own

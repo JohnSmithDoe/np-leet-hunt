@@ -11,12 +11,20 @@ const MIN_ZOOM = 0.05;
 const MAX_ZOOM = 1;
 const ZOOM_STEP = 0.02; // per wheel notch — fine-grained so zoom creeps, not jumps
 
+// Opening fly-in (Leet-39): every time the map becomes visible, start on the whole-map overview and dive
+// all the way in onto the rocket as the camera fades up from black, so the eye lands close on the ship.
+// The tween outlasts the 1000ms fade a touch so the dive is still visibly moving once the screen is lit.
+const ENTRY_FROM_ZOOM = INITIAL_ZOOM; // the wide overview the map otherwise rests at
+const ENTRY_TO_ZOOM = MAX_ZOOM; // dive fully in on the ship (== the button-jump follow zoom)
+const ENTRY_ZOOM_MS = 1500;
+
 export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCreate, OnSceneInit {
     static key = 'space-map-scene';
     #rocket!: NPMovableSprite;
     #map!: NPSpaceMap;
     #state: GameState;
     #sector: Sector;
+    #flyInTween?: Phaser.Tweens.Tween;
 
     constructor(state: GameState, sector: Sector) {
         super({ key: SpaceMapScene.key });
@@ -37,7 +45,14 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.#map.loadSector(sector);
         const start = this.#map.startingPlanet;
         this.#rocket.setPosition(start.x, start.y);
-        this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
+        if (this.scene.isSleeping()) {
+            // Rebuilt off-stage (advancing after a guardian win): just frame the start; the scene's WAKE
+            // fires the fly-in once it's woken and fading back in.
+            this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
+        } else {
+            // Rebuilt on-stage behind a fade (a rim-sun bail): fly the camera in as the map fades back.
+            this.#flyInToRocket();
+        }
     }
 
     override preload() {
@@ -54,13 +69,42 @@ export class SpaceMapScene extends NPScene implements OnScenePreload, OnSceneCre
         this.addExisting(this.#rocket);
         this.#map.setRocket(this.#rocket);
 
-        // Centre on the start once; NPSpaceMap drives follow (only while travelling), ease-to-select, and drag.
-        this.cameras.main.centerOn(start.x, start.y).setZoom(INITIAL_ZOOM);
+        // Open zoomed in on the ship; NPSpaceMap drives follow (only while travelling), ease-to-select, drag.
+        this.#flyInToRocket();
+        // Every later return from an excursion (a duel/dungeon) wakes — not re-creates — this persistent
+        // scene, so animate the same entrance on WAKE. NPSpaceMap's own WAKE handler runs first (it snaps a
+        // resumed jump to its destination), so the fly-in lands on the rocket's final position.
+        this.events.on(Phaser.Scenes.Events.WAKE, this.#flyInToRocket, this);
         this.input.on('wheel', (_pointer: unknown, _over: unknown, _dx: number, dy: number) => {
             const cam = this.cameras.main;
             cam.setZoom(clamp(cam.zoom * (dy > 0 ? 1 - ZOOM_STEP : 1 + ZOOM_STEP), MIN_ZOOM, MAX_ZOOM));
         });
         this.scale.on(Phaser.Scale.Events.RESIZE, this.resize, this);
+    }
+
+    /**
+     * Cinematic entrance: snap the camera to the wide {@link ENTRY_FROM_ZOOM} overview centred on the
+     * rocket, then dive in to {@link ENTRY_TO_ZOOM} (full zoom), re-centring on the ship each frame so it
+     * stays put while the view closes in. Runs alongside the camera fade so the eye lands on the ship.
+     */
+    #flyInToRocket(): void {
+        const cam = this.cameras.main;
+        const { x, y } = this.#rocket;
+        // Cancel any in-flight camera move (a leftover follow zoom / select-pan) and the previous fly-in.
+        cam.panEffect.reset();
+        cam.zoomEffect.reset();
+        cam.stopFollow();
+        this.#flyInTween?.stop();
+        cam.setZoom(ENTRY_FROM_ZOOM).centerOn(x, y);
+        // Tween the camera's own `zoom` and re-centre on the ship each frame so it holds the middle as the
+        // view closes in (the camera is a valid tween target — same pattern as reality.ts tweening x/y).
+        this.#flyInTween = this.tweens.add({
+            targets: cam,
+            zoom: ENTRY_TO_ZOOM,
+            duration: ENTRY_ZOOM_MS,
+            ease: 'Sine.easeInOut',
+            onUpdate: () => cam.centerOn(x, y),
+        });
     }
 
     override update(time: number, delta: number) {

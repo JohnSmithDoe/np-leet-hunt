@@ -5,6 +5,14 @@ describe('RunFsm', () => {
         expect(new RunFsm().current).toBe('hangar');
     });
 
+    it('opens on the intro and leads only to the hangar (never re-entered)', () => {
+        const fsm = new RunFsm('intro');
+        expect(fsm.can('hangar')).toBe(true);
+        expect(fsm.can('sector')).toBe(false);
+        expect(fsm.to('hangar')).toBe('hangar');
+        expect(fsm.can('intro')).toBe(false); // nothing transitions back into the intro
+    });
+
     it('allows a transition the table lists and updates the current phase', () => {
         const fsm = new RunFsm();
         expect(fsm.to('sector')).toBe('sector');

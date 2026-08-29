@@ -29,6 +29,8 @@ export interface TParadroidFactoryOptions {
     stretchFactor: number;
     changerRate: number;
     autoFireRate: number;
+    /** Pulses (button presses) each side gets for the whole match. Scales with the board (see {@link DUEL_SHOTS_PER_ROW}). */
+    shots: number;
     tileSet: EParadroidTileType[];
     owner: TParadroidPlayer;
     /// Optional. Provide one for reproducible generation (tests, debugging).
@@ -38,6 +40,9 @@ export interface TParadroidFactoryOptions {
 
 /// The fixed board geometry of a duel — same at every difficulty (only the tileSet palette and the
 /// fx rates vary). Exported so the app can assemble factory options alongside `Balance.duelBoardParams`.
+/// The default board geometry of a duel. `rows` is the *full*-board height; mini/scaled duels pass a
+/// smaller `rows` override (the sector curve does — np-state `Balance.duelRows`). `columns` must stay even
+/// (the factory generates the left half and mirrors it). Exported so the app can assemble factory options.
 export const DUEL_DIMS = {
     rows: 8,
     columns: 8, // only use even values
@@ -46,22 +51,31 @@ export const DUEL_DIMS = {
     stretchFactor: 0, // # of straight tiles after each rnd tile to stretch out the level design
 } as const;
 
+/// Pulses (button presses) each side gets per board row. The board grows with the sector (Leet-38) and the
+/// charge budget scales with it, so a small mini-duel isn't trivially spammable and a big late board isn't
+/// starved — the fight keeps the same feel at every size. At the 8-row default this is the original 12 shots.
+export const DUEL_SHOTS_PER_ROW = 1.5;
+
 /// Assemble factory options from the central numeric board knobs (np-state `Balance.duelBoardParams`)
 /// plus this mode's own tileSet palette (`CParadroidTileSets`). Pass `overrides` to tweak individual
-/// fields, e.g. a fixed `seed` for reproducible generation.
+/// fields, e.g. a smaller `rows` for a mini-duel, or a fixed `seed` for reproducible generation.
 export const paradroidFactoryOptions = (
     board: DuelBoardParams,
     tileSet: EParadroidTileType[],
     overrides: Partial<TParadroidFactoryOptions> = {}
-): TParadroidFactoryOptions => ({
-    ...DUEL_DIMS,
-    tileSet,
-    changerRate: board.changerRate, // percentage chance 0 - 100; <= 0 disables
-    autoFireRate: board.autoFireRate, // percentage chance 0 - 100; <= 0 disables
-    owner: EParadroidOwner.Player,
-    // seed intentionally omitted: each factory gets a fresh layout (see constructor).
-    ...overrides,
-});
+): TParadroidFactoryOptions => {
+    const rows = overrides.rows ?? DUEL_DIMS.rows;
+    return {
+        ...DUEL_DIMS,
+        tileSet,
+        changerRate: board.changerRate, // percentage chance 0 - 100; <= 0 disables
+        autoFireRate: board.autoFireRate, // percentage chance 0 - 100; <= 0 disables
+        owner: EParadroidOwner.Player,
+        shots: Math.round(rows * DUEL_SHOTS_PER_ROW), // budget tracks the board size; an explicit override wins below
+        // seed intentionally omitted: each factory gets a fresh layout (see constructor).
+        ...overrides,
+    };
+};
 
 /// A self-contained default (brutal palette + rates) so the factory and its spec need no np-state at
 /// runtime. The live game injects options resolved from `Balance` (see the app's run-conductor).

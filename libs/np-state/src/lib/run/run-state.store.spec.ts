@@ -74,6 +74,16 @@ describe('RunStateStore', () => {
         expect(store.snapshot()).toMatchObject({ sector: 'long-quiet', sectorNumber: 5 });
     });
 
+    it('jumps straight to a sector (clamped) via setSector', () => {
+        const store = new RunStateStore();
+        store.setSector(3);
+        expect(store.snapshot()).toMatchObject({ sector: 'ember-belt', sectorNumber: 3 });
+        store.setSector(99); // clamps to the last sector
+        expect(store.snapshot()).toMatchObject({ sector: 'long-quiet', sectorNumber: 5 });
+        store.setSector(0); // clamps to the first sector
+        expect(store.snapshot()).toMatchObject({ sector: 'home-reach', sectorNumber: 1 });
+    });
+
     it('reset returns to a fresh run, optionally seeded', () => {
         const store = new RunStateStore();
         store.adjustResources({ marbles: 50 });

@@ -2,9 +2,13 @@ import { Signal, signal } from '@angular/core';
 
 /**
  * The phases of a single run (Leet-27 / GDD §7 spine):
- * hangar → sector → (event | dungeon | duel | boarding | guardian) → sectorExit → … → ending → hangar.
+ * intro → hangar → sector → (event | dungeon | duel | boarding | guardian) → sectorExit → … → ending → hangar.
+ *
+ * `intro` is the one-time opening crawl shown at app start, before the hangar; it is never re-entered
+ * (a new run resets to `hangar`, not `intro`), so it sits at the head of the spine and leads only forward.
  */
 export type RunPhase =
+    | 'intro'
     | 'hangar'
     | 'sector'
     | 'event'
@@ -21,6 +25,7 @@ export type RunPhase =
  * spine; the app's wrapper maps a phase change to a scene swap (Leet-28), the FSM never touches Phaser.
  */
 export const RUN_TRANSITIONS: Readonly<Record<RunPhase, readonly RunPhase[]>> = {
+    intro: ['hangar'],
     hangar: ['sector'],
     sector: ['event', 'dungeon', 'duel', 'boarding', 'guardian', 'sectorExit', 'ending'],
     event: ['sector', 'dungeon', 'duel', 'ending'],
