@@ -1,18 +1,61 @@
+import { DungeonAiParams, DungeonCombatParams, DungeonPlan } from '@shared/np-config';
 import { clamp, NPScene, OnSceneCreate, OnScenePreload } from '@shared/np-phaser';
-import { DungeonResult } from '@shared/np-state';
+import { DungeonObjective, DungeonResult } from '@shared/np-state';
 import * as Phaser from 'phaser';
 import BoardPlugin from 'phaser4-rex-plugins/plugins/board-plugin';
 
 import { NPSceneWithBoard } from './@types/pixel-dungeon.types';
 import { PixelDungeonEngine } from './engine/pixel-dungeon.engine';
 
-/** What the app injects when starting a dungeon run (Leet-29). */
+/** What the app injects when starting a dungeon run (Leet-29 / F1). */
 export interface TPixelDungeonSceneConfig {
     /**
      * The robo-pet's class (Leet-39 seam): the dungeon-companion perks it drives — scouting, assists, and
      * dragging the kid out when downed — are Phase 3 (the dungeon loop); the scene just carries it for now.
      */
     petClass?: number;
+    /** The run's goal for this excursion; forwarded to the engine for the objective-driven exit (later tasks). */
+    objective?: DungeonObjective;
+    /** Generation seed; `undefined` leaves the engine on its fixed-layout default. */
+    seed?: string;
+    /** The sector/floor depth this run sits at; forwarded for depth-scaled content (later tasks). */
+    depth?: number;
+    /**
+     * The floor's enemy roster (item #10 / F3): archetype ids — keys of np-config's `BESTIARY` — to spawn.
+     * The app fills it from `Balance.dungeonRoster(depth)`; forwarded to the engine, which builds each via
+     * `MobFactory`. Omitted (debug entry), the engine falls back to its three-skeleton default roster.
+     */
+    roster?: string[];
+    /**
+     * The floor's loot plan (RPG cluster A): item ids — keys of np-config's `ITEMS` — to scatter on the
+     * floor. The app fills it from `Balance.dungeonLoot(depth)`; forwarded to the engine. Omitted (debug
+     * entry), the floor is bare.
+     */
+    loot?: string[];
+    /**
+     * The player's starting equipment (item #13): item ids — keys of np-config's `ITEMS` — the kid carries
+     * in. The app fills it from `Balance.startingEquipment(petClass)` (or the launch's `equippedItemIds`);
+     * forwarded to the engine, which equips each so its `mods` fold into the player's combat stats. Omitted
+     * (debug entry), the player starts bare on base stats.
+     */
+    startingEquipment?: string[];
+    /**
+     * Combat tuning the run injects (`Balance.dungeonCombatParams()`); forwarded to the engine so the
+     * pure `resolveDamage` reads it. Omitted (debug entry), the engine falls back to its `minDamage:1` default.
+     */
+    combatParams?: DungeonCombatParams;
+    /**
+     * The floor's mob-AI tuning (item #12): sight/wake radii, give-up turns, wander chance, flee fraction.
+     * The app fills it from `Balance.dungeonAiParams(depth)` and forwards it to the engine, which each
+     * `MobBrain` reads. Omitted (debug entry), the engine falls back to its sector-1 AI default.
+     */
+    aiParams?: DungeonAiParams;
+    /**
+     * The floor's world-content plan (RPG cluster C): trap/lock budgets the decorator draws on (#14); the
+     * app fills it from `Balance.dungeonPlan(depth)` and forwards it to the engine. Omitted (debug entry),
+     * the engine falls back to its no-trap/no-lock default — the exit stairs are still placed regardless.
+     */
+    plan?: DungeonPlan;
     /** Called once when the player leaves the dungeon — reports the outcome back to the run. */
     onResult?: (result: DungeonResult) => void;
 }
@@ -33,7 +76,20 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
     }
 
     public setupComponents(): void {
-        this.engine = new PixelDungeonEngine(this);
+        // Inject the launch config into the engine so generation + the result hand-off come from the run,
+        // not hard-coded literals (F1). Empty config (debug entry) keeps the engine on its old defaults.
+        this.engine = new PixelDungeonEngine(this, {
+            objective: this.#config.objective,
+            seed: this.#config.seed,
+            depth: this.#config.depth,
+            roster: this.#config.roster,
+            loot: this.#config.loot,
+            startingEquipment: this.#config.startingEquipment,
+            combatParams: this.#config.combatParams,
+            aiParams: this.#config.aiParams,
+            plan: this.#config.plan,
+            onResult: this.#config.onResult,
+        });
     }
 
     override preload() {
@@ -108,10 +164,12 @@ export class PixelDungeonScene extends NPScene implements OnScenePreload, OnScen
         );
 
         camera.setZoom(5);
-        // Phase-0 bail: press M to leave the dungeon and report a (stub) result to the run (Leet-29). The
-        // real objective-driven exit lands with the Phase-3 dungeon rebuild; the map's debug toolbar is
-        // the touch escape until then.
-        this.input.keyboard!.on('keydown-M', () => this.#config.onResult?.({ kind: 'dungeon', outcome: 'failed' }));
+        // Demoted debug *fallback* bail (F1): press M to leave the dungeon. It goes through the FSM —
+        // `engine.endGame` records the outcome and routes to EndGameState, which reports `onResult` (the
+        // engine, not the scene, owns the hand-off). NOTE: a `failed` dungeon is now LETHAL (combat spine /
+        // item #9) — this debug bail therefore ENDS THE WHOLE RUN ('wiped'), a debug death, not a quiet
+        // return to the map. The real objective-driven exit lands with later tasks.
+        this.input.keyboard!.on('keydown-M', () => this.engine.endGame({ kind: 'dungeon', outcome: 'failed' }));
         this.engine.startUP();
         this.engine.startUpdate();
     }

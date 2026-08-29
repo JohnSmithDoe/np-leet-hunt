@@ -87,9 +87,13 @@ export class MobMovement extends MoveTo<PixelDungeonMob> {
     }
 
     moveToTile(tile: TileXYType) {
+        const from = this.mob.tile;
         this.moveTo(tile);
         this.mob.animateFaceToDirection(mapRexPluginDirection(this.destinationDirection));
         this.mob.animateWalk(mapRexPluginDirection(this.destinationDirection));
-        this.mob.engine.onMobMoved(this.mob);
+        // 'mob:moved' drives the render/vision refresh; 'mob:entered-tile' is the gameplay-trigger hook
+        // (traps / auto-pickup / stairs) for later tasks.
+        this.mob.engine.events.emit('mob:moved', { mob: this.mob, from, to: tile });
+        this.mob.engine.events.emit('mob:entered-tile', { mob: this.mob, tile });
     }
 }

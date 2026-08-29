@@ -7,6 +7,7 @@ import { PixelDungeonEngine } from '../engine/pixel-dungeon.engine';
 import { EMobInfoType } from './pixel-dungeon.info-text';
 import { PixelDungeonLPCSprite, TPixelDungeonLPCSpriteOptions } from './pixel-dungeon.lpc-sprite';
 import { MobAction } from './traits/mob-action';
+import { MobCombat } from './traits/mob-combat';
 import { MobMovement } from './traits/mob-movement';
 import { MobVision } from './traits/mob-vision';
 
@@ -20,6 +21,11 @@ export interface TPixelDungeonMobOptions extends TPixelDungeonLPCSpriteOptions {
     fovConeAngle?: number;
 
     startingDirection?: EDirection;
+
+    // Combat stats (Leet combat spine). Equipment folds into the derived attack/defense later (item #13).
+    maxHp?: number;
+    attack?: number;
+    defense?: number;
 }
 
 const defaultOptions: TPixelDungeonMobOptions = {
@@ -30,6 +36,12 @@ const defaultOptions: TPixelDungeonMobOptions = {
     moveSpeed: 160,
     visionRange: 3,
     energyGain: 25,
+    // The real per-archetype combat stats now come from np-config's `BESTIARY` via `MobFactory` (item #10).
+    // These are only a minimal *safety* fallback so a directly-newed mob (a test, an unexpected path) still
+    // has non-undefined HP and `MobCombat` never reads NaN — not balance numbers (those live in the bestiary).
+    maxHp: 1,
+    attack: 1,
+    defense: 0,
 };
 
 export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObject {
@@ -40,6 +52,7 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
     #movement!: MobMovement;
     #vision!: MobVision;
     #activity!: MobAction;
+    #combat!: MobCombat;
     #lastTile = { x: 0, y: 0, z: 0 };
 
     constructor(
@@ -56,6 +69,7 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
         this.#movement = new MobMovement(this);
         this.#vision = new MobVision(this);
         this.#activity = new MobAction(this);
+        this.#combat = new MobCombat(this);
         this.setTexture(this.options.key, 1);
         this.setScale(1);
         const size = 20;
@@ -65,6 +79,15 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
 
     startTurn() {
         // nop
+    }
+
+    /**
+     * Decide this mob's next action for the turn — an explicit step the turn loop calls before reading
+     * `action` (RPG cluster E / F5). The base mob is passive (no-op); the player continues its queued path,
+     * the enemy delegates to its `MobBrain`. Replaces the old mutation-on-read `get action()` side-effect.
+     */
+    decide(): void {
+        // base: no decision
     }
 
     info(msg: string, type: EMobInfoType) {
@@ -90,6 +113,10 @@ export class PixelDungeonMob extends PixelDungeonLPCSprite implements NPGameObje
 
     get activity() {
         return this.#activity;
+    }
+
+    get combat() {
+        return this.#combat;
     }
 
     get action() {

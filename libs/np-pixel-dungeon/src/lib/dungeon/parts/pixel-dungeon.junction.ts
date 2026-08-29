@@ -1,6 +1,6 @@
 import { EDirection } from '@shared/np-library';
 
-import { TDungeonTile } from '../../@types/pixel-dungeon.types';
+import { ChessLayer, TDungeonTile } from '../../@types/pixel-dungeon.types';
 import { PixelDungeonBoard } from '../../core/pixel-dungeon-board';
 import { PixelDungeonMap } from '../../map/pixel-dungeon.map';
 import { NPTilesetMappingNew } from '../../map/pixel-dungeon-tileset';
@@ -19,7 +19,7 @@ export class PixelDungeonJunction extends PixelDungeonTile {
         this.regions = dungeon.cardinalRegions(tile);
     }
     addToLevel(map: PixelDungeonMap, board: PixelDungeonBoard): void {
-        board.addChess(this, this.x, this.y, 'objects', false);
+        board.addChess(this, this.x, this.y, ChessLayer.objects, false);
         this.rexChess.setBlocker(false);
         this.#map = map;
         this.#render();

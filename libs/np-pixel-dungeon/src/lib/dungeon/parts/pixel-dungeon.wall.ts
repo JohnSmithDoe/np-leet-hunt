@@ -1,5 +1,6 @@
 import { EDirection } from '@shared/np-library';
 
+import { ChessLayer } from '../../@types/pixel-dungeon.types';
 import { PixelDungeonBoard } from '../../core/pixel-dungeon-board';
 import { PixelDungeonMap } from '../../map/pixel-dungeon.map';
 import { NPTilesetMappingNew } from '../../map/pixel-dungeon-tileset';
@@ -7,7 +8,7 @@ import { PixelDungeonTile } from './pixel-dungeon.tile';
 
 export class PixelDungeonWall extends PixelDungeonTile {
     addToLevel(map: PixelDungeonMap, board: PixelDungeonBoard): void {
-        board.addChess(this, this.x, this.y, 'walls', false);
+        board.addChess(this, this.x, this.y, ChessLayer.walls, false);
         this.rexChess.setBlocker(true);
 
         map.walllayer.putTileAt(this, this.#toTileIndex());

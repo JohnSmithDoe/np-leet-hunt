@@ -6,6 +6,7 @@ import { TileXYType } from 'phaser4-rex-plugins/plugins/board/types/Position';
 import { EMobInfoType } from '../../sprites/pixel-dungeon.info-text';
 import { PixelDungeonMob } from '../../sprites/pixel-dungeon.mob';
 import { PixelDungeonPlayer } from '../../sprites/pixel-dungeon.player';
+import { resolveDamage } from '../combat';
 import { PixelDungeonState } from '../pixel-dungeon.state';
 import { States } from './states';
 
@@ -51,13 +52,41 @@ export class AttackMobAction extends PixelDungeonBaseAction implements PixelDung
             lunge(this.mob, {
                 x: pos.x,
                 y: pos.y,
-                onContact: () => this.target.info('3', EMobInfoType.LoseHealth),
+                onContact: () => this.#onContact(),
                 onComplete: () => {
                     this.#done = true;
                 },
             });
         }
         return this.#done;
+    }
+
+    // Resolve real damage when the lunge connects (Leet combat spine), replacing the old cosmetic '3'.
+    #onContact(): void {
+        // Guard a target killed mid-lunge: if it already died (another attack, or a prior contact),
+        // don't re-apply damage or spawn a second floater. `killMob` is idempotent, but skipping here
+        // avoids a misleading `0`/NaN floater over a corpse.
+        if (this.target.combat.isDead) return;
+        const dmg = resolveDamage(this.mob.combat.attack, this.target.combat.defense, this.mob.engine.combatParams);
+        this.target.combat.applyDamage(dmg);
+        this.target.info(String(dmg), EMobInfoType.LoseHealth);
+        if (this.target.combat.isDead) this.mob.engine.killMob(this.target);
+    }
+}
+
+/**
+ * Pick up the item lying on the acting mob's tile (RPG cluster A). A new verb on the proven action
+ * contract — zero turn-loop changes. Instant: `perform` collects-and-returns-true in one frame (no
+ * animation), so the mob acts again the same pump. It is *self-checking*: if the tile is bare (the item
+ * was already taken, or the mob isn't standing on one) it's a harmless no-op that still completes, so the
+ * scheduler never stalls. The engine records the id and removes the entity; floater + bookkeeping live in
+ * the engine's auto-pickup handler so this stays a thin "take what's here" verb.
+ */
+export class PickUpAction extends PixelDungeonBaseAction implements PixelDungeonAction {
+    override perform(): boolean {
+        const item = this.mob.engine.level.getItemAt(this.mob.tile);
+        if (item) this.mob.engine.collectItem(this.mob, item);
+        return true;
     }
 }
 
@@ -122,8 +151,22 @@ export class HandleActionState extends PixelDungeonState {
         this.#waitForInputAction = new WaitForInputAction(player);
     }
 
+    /**
+     * Scrub a killed mob from the ready set (Leet combat spine). Called by `engine.killMob`, this is the
+     * SECOND of the two lists a dead mob must leave (the first is `engine.mobs`): a mob shifted off as
+     * ready, or still queued behind another, must never be acted on after it dies. Filtering covers both
+     * a queued mob and a defensive re-add.
+     */
+    removeFromReady(mob: PixelDungeonMob): void {
+        this.#mobs = this.#mobs.filter(m => m !== mob);
+    }
+
     next = () => {
         while (true) {
+            // A death/victory mid-loop (killMob → endGame) flips `engine.isOver`. Bail to EndGame before the
+            // next pump so the simulation stops cleanly instead of pumping energy into a finished run — and
+            // crucially before touching any mob a kill may have just removed. (Respects the 10k guard below.)
+            if (this.engine.isOver) return States.EndGame;
             // gain energy until one or more mobs can act. Guard against a misconfigured mob (e.g.
             // energyGain 0) that can never reach FULL_ENERGY — without this the loop never yields and
             // freezes the game; fail fast and loud instead.
@@ -146,6 +189,16 @@ export class HandleActionState extends PixelDungeonState {
             while (this.#mobs.length) {
                 // the while condition guarantees a non-empty list
                 const mob = this.#mobs.shift()!;
+
+                // The shifted mob may have been killed since it was marked ready (e.g. by an earlier mob's
+                // attack this drain). It's already gone from `engine.mobs`; skip its action so we never read
+                // `mob.action` on a corpse.
+                if (!this.engine.mobs.includes(mob)) continue;
+
+                // Decide BEFORE reading `action` (RPG cluster E / F5): the player continues its queued path,
+                // the enemy runs its brain. Decision-making is now an explicit step, not a side-effect of the
+                // `action` getter — so the getter is a pure read and is safe to evaluate more than once.
+                mob.decide();
 
                 const action = mob.action ?? this.#waitForInputAction;
                 const done = action.perform();

@@ -40,11 +40,12 @@ export interface TPixelDungeonLPCSpriteOptions {
     key: TLpcSheetKeys;
 }
 
-export type TLpcSheetKeys = 'brawler' | 'skeleton';
+export type TLpcSheetKeys = 'brawler' | 'skeleton' | 'goblin';
 
 export const CLpcSheetConfigs: Record<TLpcSheetKeys, { url: string }> = {
     brawler: { url: 'np-pixel-dungeon/Download96156.png' },
     skeleton: { url: 'np-pixel-dungeon/Download19233.png' },
+    goblin: { url: 'np-pixel-dungeon/goblin.png' },
 };
 
 /**

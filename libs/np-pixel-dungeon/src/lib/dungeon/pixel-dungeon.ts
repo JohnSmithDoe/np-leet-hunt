@@ -115,6 +115,14 @@ export class PixelDungeon implements Iterable<TDungeonTile> {
         return this.#allTiles;
     }
 
+    /**
+     * Every walkable floor tile — room floor + hallway floor (junctions/walls excluded). The guaranteed-
+     * passable surface, used to scatter floor loot (RPG cluster A) without ever landing a pickup on a wall.
+     */
+    get floorTiles(): PixelDungeonTile[] {
+        return [...this.#roomTiles, ...this.#hallTiles];
+    }
+
     #tileXY(x: number, y: number) {
         return y >= 0 && x >= 0 && y < this.#dungeon.length && x < this.#dungeon[y].length ? this.#dungeon[y][x] : null;
     }

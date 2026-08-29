@@ -30,11 +30,12 @@ const defaultOptions: TPixelDungeonPlayerOptions = {
     startingDirection: EDirection.N,
     lpcType: 'standard',
     key: 'brawler',
-    visionRange: 10,
     moveRotate: false,
     moveSpeed: 120,
     fovConeAngle: undefined,
-    energyGain: 100,
+    // The player's real stats (HP/attack/defense, energy, vision, sheet) now come from np-config's
+    // `BESTIARY.brawler`, threaded in by the engine's `#setup` (item #10) — the same data path enemies take
+    // through `MobFactory`. No stats hard-coded here; the engine passes the bestiary block as options.
 };
 
 export class PixelDungeonPlayer extends PixelDungeonMob {
@@ -44,12 +45,17 @@ export class PixelDungeonPlayer extends PixelDungeonMob {
         super(engine, Object.assign({}, defaultOptions, options ?? {}));
     }
 
-    override get action() {
-        if (!super.action && this.movement.hasMoves()) {
+    /**
+     * Continue the player's queued click-to-move path (RPG cluster E / F5). Moved out of the old
+     * `get action()` (which mutated state as a side-effect of a property read) into this explicit step the
+     * turn loop calls before reading `action`. When the player has no queued action but still has path
+     * tiles left, pop the next one into a `WalkToAction`. The `action` getter reverts to the base mob's.
+     */
+    override decide(): void {
+        if (!this.action && this.movement.hasMoves()) {
             const pathTile = this.movement.nextMove();
             this.activity.setNextAction(new WalkToAction(this, pathTile));
         }
-        return super.action;
     }
 
     attack(mob: PixelDungeonMob) {
