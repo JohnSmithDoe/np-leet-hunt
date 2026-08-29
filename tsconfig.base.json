@@ -25,6 +25,7 @@
         "paths": {
             "@shared/np-audio": ["libs/np-audio/src/index.ts"],
             "@shared/np-config": ["libs/np-config/src/index.ts"],
+            "@shared/np-grey-fight": ["libs/np-grey-fight/src/index.ts"],
             "@shared/np-pixel-dungeon": ["libs/np-pixel-dungeon/src/index.ts"],
             "@shared/np-library": ["libs/np-library/src/index.ts"],
             "@shared/np-paradroid": ["libs/np-paradroid/src/index.ts"],

@@ -1,6 +1,6 @@
 # np-leet-hunt
 
-A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 21 / Ionic 8** shell app (standalone components, zoneless, OnPush) hosting a **Phaser 3** game, packaged for iOS/Android via **Capacitor 8**.
+A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 21 / Ionic 8** shell app (standalone components, zoneless, OnPush) hosting a **Phaser 4** game, packaged for iOS/Android via **Capacitor 8** and for desktop via **Tauri 2**.
 
 - The full game design doc lives in [`game-design.md`](./game-design.md).
 - The active issue backlog is [`BACKLOG.md`](./BACKLOG.md) (`Leet-<n>` numbering).
@@ -8,7 +8,7 @@ A hobby space-RPG game ("leet hunt") built as an **Nx monorepo**: an **Angular 2
 
 **Version constraints to respect:**
 
-- **Phaser stays on 3.x** — Phaser 4 is a ground-up rewrite incompatible with the game code and `phaser3-rex-plugins`.
+- **Phaser is on 4.x** — pure ESM with no global `Phaser`, so every file using `Phaser` as a _value_ must `import * as Phaser from 'phaser'`. The rex plugins moved with it: use **`phaser4-rex-plugins`**, never `phaser3-rex-plugins`.
 - **Angular tracks the newest version Nx supports** (Nx's peer range usually lags one major behind Angular's latest).
 
 ## Architecture
@@ -85,6 +85,35 @@ npm run sync:app:angular        # cap copy + sync
 npm run ios:app:angular         # open the iOS project
 npm run android:app:angular     # open the Android project
 ```
+
+## Desktop (Tauri)
+
+The desktop build wraps the same web build in a **Tauri 2** shell (`src-tauri/`) to produce a macOS `.dmg` and a Windows `.exe`/`.msi`. Tauri uses the **operating system's webview** rather than bundling a browser — WKWebView on macOS, WebView2 (Chromium) on Windows — so a rendering check in Safari is a good proxy for the macOS build.
+
+Prerequisites beyond `npm install`: a **Rust toolchain** ([rustup](https://rustup.rs)), plus Xcode Command Line Tools on macOS or the MSVC build tools + WebView2 runtime on Windows.
+
+```bash
+npm run serve:app:desktop       # tauri dev — boots nx serve and opens the native window
+npm run build:app:desktop       # tauri build — bundles to src-tauri/target/release/bundle
+```
+
+`tauri dev` runs `nx serve` behind the scenes and points the window at `localhost:4200`, so hot reload works as usual. `tauri build` runs the production Angular build first.
+
+> **macOS gotcha:** the `.dmg` step (`bundle_dmg.sh`) styles the disk-image window by driving Finder over AppleScript, which fails in any non-interactive shell (CI, an agent, `ssh`). Prefix the build with `CI=true` to skip the styling and get a plain, working `.dmg`.
+
+Tagged pushes also build both platforms in CI (`.github/workflows/desktop-release.yml`) and attach the bundles to a **draft** GitHub release.
+
+### These builds are unsigned — install at your own risk
+
+Code signing is an _identity_ chain, not a safety check: the signature tells the OS that a known, revocable entity vouched for the binary. Signing here would need a paid Apple Developer ID (~$99/yr) and a Windows code-signing certificate, which this hobby project does not have. Both systems therefore report an **unknown publisher** and offer a manual override:
+
+- **macOS** — the app is blocked on first launch. Go to System Settings → Privacy & Security → _Open Anyway_, then confirm. Or from a terminal:
+    ```bash
+    xattr -dr com.apple.quarantine "/Applications/Leet Hunt.app"
+    ```
+- **Windows** — SmartScreen shows "Windows protected your PC" → _More info_ → _Run anyway_.
+
+Locally built bundles are never quarantined, so `npm run build:app:desktop` output just runs.
 
 ## License
 

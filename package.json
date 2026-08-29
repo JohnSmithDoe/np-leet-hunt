@@ -14,7 +14,10 @@
         "sync:app:angular": "cd apps/np-leet-hunt && npx cap sync",
         "update:app:angular": "cd apps/np-leet-hunt && npx cap update",
         "ios:app:angular": "cd apps/np-leet-hunt && npx cap open ios",
-        "android:app:angular": "cd apps/np-leet-hunt && npx cap open android"
+        "android:app:angular": "cd apps/np-leet-hunt && npx cap open android",
+        "tauri": "tauri",
+        "serve:app:desktop": "tauri dev",
+        "build:app:desktop": "tauri build"
     },
     "private": true,
     "engines": {
@@ -61,6 +64,7 @@
         "@nx/vitest": "^22.7.5",
         "@nx/workspace": "22.7.5",
         "@playwright/test": "^1.60.0",
+        "@tauri-apps/cli": "^2.11.4",
         "@types/node": "^22.19.21",
         "@types/poisson-disk-sampling": "^2.2.4",
         "@vitest/coverage-v8": "^4.1.8",
